@@ -1,0 +1,10 @@
+.idea
+.swap
+venv
+.*~
+.DS_Store
+*.ipynb
+__pycache__
+alembic
+alembic.ini
+db.sqlite
