@@ -4,8 +4,8 @@ on:
   push:
     branches: [ "main" , "release/*", "develop", "feature/dev-cicd" ]
     paths:
-     - source/basic
-     - source/services/user
+     - source/basic/**
+     - source/services/user/**
      - manifests/service-user.yaml
      - .github/workflows/service-user.yaml
     tags: [ '*' ]
