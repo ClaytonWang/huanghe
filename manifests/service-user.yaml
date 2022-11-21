@@ -1,0 +1,53 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user
+  namespace: juece
+  labels:
+    app: user
+    service: user
+spec:
+  ports:
+  - port: 80
+    name: http
+  selector:
+    app: user
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: juce-user
+  labels:
+    account: user
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-v1
+  namespace: juece
+  labels:
+    app: user
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: user
+        version: v1
+    spec:
+      serviceAccountName: juce-user
+      containers:
+      - name: user
+        image: containers.git.digitalbrain.cn/engineering-group/huanghe:2022-11-16.19
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: db-container
+---
