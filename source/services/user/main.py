@@ -25,7 +25,7 @@ app = FastAPI(
 # app.include_router(router_auth, prefix='/auth')
 
 
-@app.get('/hello')
+@app.get('/v1/hello')
 def hello():
     return "hello world"
 
