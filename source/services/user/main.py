@@ -30,7 +30,7 @@ def hello():
     return "hello world"
 
 
-service_port = int(os.getenv('USER_SERVICE_PORT'))
+service_port = int(os.getenv('USER_SERVICE_PORT', 0))
 if not service_port:
     service_port = 8000
 
