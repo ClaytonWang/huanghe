@@ -93,4 +93,4 @@ jobs:
             db-container
           manifests: |
             manifests/service-user.yaml
-          images: containers.git.digitalbrain.cn/engineering-group/huanghe:${{needs.docker_build_and_push.outputs.out_docker_tag}}
+          images: containers.git.digitalbrain.cn/engineering-group/huanghe.user:${{needs.docker_build_and_push.outputs.out_docker_tag}}
