@@ -1,6 +1,7 @@
 """
 启动入口、根路由配置
 """
+import os
 import uvicorn
 from fastapi import FastAPI, Depends
 # from apps.users.views import router_user
@@ -29,9 +30,14 @@ def hello():
     return "hello world"
 
 
+service_port = os.getenv('USER_SERVICE_PORT').upper()
+if not service_port:
+    service_port = 8000
+
+# USER_SERVICE_PORT
 if __name__ == '__main__':
     uvicorn.run(
-        'main:app', host='0.0.0.0', port=8000,
+        'main:app', host='0.0.0.0', port=service_port,
         reload=False,
         # debug=DEBUG,
         workers=2
