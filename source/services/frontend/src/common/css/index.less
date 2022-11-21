@@ -1,0 +1,22 @@
+/*
+ * @description styles
+ * @author liguanlin<guanlin.li@digitalbrain.cn>
+ */
+@root-entry-name: default;
+// Vars
+@import './default.less';
+@import './variables.less';
+@import './mixins.less';
+
+// antd componets style
+@import '~antd/dist/antd.less';
+.ant-tabs > .ant-tabs-nav {
+  background-color: @background-color;
+  margin-bottom: 0;
+}
+.ant-card-extra button {
+  margin-left: 12px;
+}
+.ant-btn.alert {
+  color: @alerting-red;
+}
