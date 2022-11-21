@@ -44,7 +44,7 @@ spec:
       serviceAccountName: juce-user
       containers:
       - name: user
-        image: containers.git.digitalbrain.cn/engineering-group/huanghe:2022-11-16.19
+        image: containers.git.digitalbrain.cn/engineering-group/huanghe.user:2022-11-16.19
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
