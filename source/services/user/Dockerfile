@@ -6,7 +6,7 @@ ENV TZ=Asia/Shanghai
 ARG APP_PATH=services/user
 WORKDIR /source/services/user
 
-RUN sed -i s@/ports.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list \
+RUN sed -i s@/archive.ubuntu.com//@/mirrors.aliyun.com/@g /etc/apt/sources.list \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
     && apt-get clean
 RUN set -eux \
