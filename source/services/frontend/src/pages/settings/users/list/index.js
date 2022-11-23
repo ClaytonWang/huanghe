@@ -24,7 +24,11 @@ const UsersList = () => {
       pageNo: 1,
       pageSize: 10,
       sort: 'id:desc',
-      filter: {},
+      filter: {
+        username: '',
+        access: 'all',
+        project: 'all',
+      },
     }),
     []
   );
@@ -55,21 +59,19 @@ const UsersList = () => {
     },
     [getFilters]
   );
-  const syncSearchParams = useCallback(() => {
-    const filters = getFilters();
-    setSearchParams(qs.stringify(filters));
-  }, [getFilters, setSearchParams]);
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     requestList();
-    syncSearchParams();
-  }, [requestList, syncSearchParams]);
+    const filters = getFilters();
+    setSearchParams(qs.stringify(filters));
+  }, []);
 
   const reload = (args) => {
     const filters = getFilters();
     const params = purifyDeep({ ...filters, ...args });
     // 手动同步Url
-    setSearchParams(params);
+    setSearchParams(qs.stringify(params));
     requestList(params);
   };
   const onPageNoChange = (pageNo, pageSize) => {
@@ -190,6 +192,7 @@ const UsersList = () => {
     <div className="users-list">
       <UsersFilter
         initialValues={getFilters()}
+        defaultFilters={defaultFilters.filter}
         reload={reload}
         projectsDataSource={projectsDataSource}
       />

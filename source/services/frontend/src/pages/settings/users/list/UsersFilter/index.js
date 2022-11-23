@@ -11,6 +11,7 @@ const { Option } = Select;
 
 const UsersFilter = ({
   initialValues = {},
+  defaultFilters = {},
   reload = () => {},
   projectsDataSource = [],
 }) => {
@@ -23,16 +24,14 @@ const UsersFilter = ({
   );
   const handleSearch = (values) => {
     reload({
-      ...values,
+      filter: {
+        ...values,
+      },
       pageNo: 1,
     });
   };
   const reset = () => {
-    form.setFieldsValue({
-      username: '',
-      access: 'all',
-      project: 'all',
-    });
+    form.setFieldsValue(defaultFilters);
   };
   return (
     <Form
