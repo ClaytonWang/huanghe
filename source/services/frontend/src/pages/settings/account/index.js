@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useAuth } from '@/common/hooks/useAuth';
 import api from '@/common/api';
-import { ROLE_MAP, PASSWORD, INFO } from '@/common/constants';
+import { USER_ROLE, PASSWORD, INFO } from '@/common/constants';
 import { FormModal } from '@/common/components';
 import './index.less';
 
@@ -29,7 +29,7 @@ const Account = () => {
       name: 'role',
       render(value) {
         if (!value) return '-';
-        return ROLE_MAP[value] || value;
+        return USER_ROLE[value] || value;
       },
     },
     {

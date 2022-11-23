@@ -3,17 +3,16 @@
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Input, message, Form, Select, Modal } from 'antd';
 import { filter } from 'lodash';
 import qs from 'qs';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { useAuth } from '@/common/hooks/useAuth';
-import { parseKVToKeyValue, transformDate } from '@/common/utils/helper';
+import { parseKVToKeyValue } from '@/common/utils/helper';
 import { AuthButton, FormModal } from '@/common/components';
 import api from '@/common/api';
 import UsersTable from './UsersTable';
-import { EMAIL_REG, ROLE_MAP } from '@/common/constants';
+import { EMAIL_REG, USER_ROLE } from '@/common/constants';
 import { b64 } from '@/common/utils/util';
 
 const { Option } = Select;
@@ -34,8 +33,6 @@ const UsersList = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [initialFormValues, setInitialFormValues] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { user } = useAuth();
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const getFilters = useCallback(
@@ -190,14 +187,14 @@ const UsersList = () => {
         <Select placeholder="请选择用户角色">
           {(type === 'create' &&
             filter(
-              parseKVToKeyValue(ROLE_MAP, 'k', 'v'),
+              parseKVToKeyValue(USER_ROLE, 'k', 'v'),
               ({ k }) => k !== 'admin'
             ).map(({ k, v }) => (
               <Option key={k} value={k}>
                 {v}
               </Option>
             ))) ||
-            parseKVToKeyValue(ROLE_MAP, 'k', 'v').map(({ k, v }) => (
+            parseKVToKeyValue(USER_ROLE, 'k', 'v').map(({ k, v }) => (
               <Option key={k} value={k}>
                 {v}
               </Option>

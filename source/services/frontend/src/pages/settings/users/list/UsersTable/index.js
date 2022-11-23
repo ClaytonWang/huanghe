@@ -1,40 +1,40 @@
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Table, Modal, message } from 'antd';
+import { Table, Modal } from 'antd';
 import qs from 'qs';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { ROLE_MAP } from '@/common/constants';
 import { AuthButton } from '@/common/components';
-import api from '@/common/api';
+import { ACCESS_MAP } from '@/common/constants';
 
 const UsersTable = ({
   tableData = {},
   loading = false,
   onEdit = () => {},
+  onDelete = () => {},
   onPageNoChange = () => {},
 }) => {
   const columns = [
     {
       title: '姓名',
-      dataIndex: 'userName',
-    },
-    {
-      title: '角色',
-      dataIndex: 'role',
-      render(value) {
-        return ROLE_MAP[value] || '-';
-      },
-    },
-    {
-      title: '组织',
-      dataIndex: 'organization',
-      render(value) {
-        return (value && value.name) || '-';
-      },
+      dataIndex: 'username',
     },
     {
       title: '邮箱',
       dataIndex: 'email',
+    },
+    {
+      title: '所属项目',
+      dataIndex: 'project',
+      render(value) {
+        return value.name || value;
+      },
+    },
+    {
+      title: '权限',
+      dataIndex: 'access',
+      render(value) {
+        return ACCESS_MAP[value] || value;
+      },
     },
     {
       title: '操作',
@@ -54,10 +54,10 @@ const UsersTable = ({
               type="link"
               required="settings.users.edit"
               onClick={() => {
-                handleResetPwdClicked(record);
+                handleRemove(record);
               }}
             >
-              重置密码
+              移除
             </AuthButton>
           </span>
         );
@@ -88,20 +88,14 @@ const UsersTable = ({
     onEdit(data);
   };
 
-  const handleResetPwdClicked = (record) => {
+  const handleRemove = (record) => {
     Modal.confirm({
-      title: '确定要重置该用户密码吗？',
+      title: '确定要移除该用户吗？',
       icon: <ExclamationCircleOutlined />,
       okText: '确认',
       cancelText: '取消',
       onOk: async () => {
-        try {
-          const { id: userId } = record;
-          await api.settingsUsersPasswordReset({ userId });
-          message.success('密码重置成功！');
-        } catch (error) {
-          console.log(error);
-        }
+        onDelete(record);
       },
     });
   };
