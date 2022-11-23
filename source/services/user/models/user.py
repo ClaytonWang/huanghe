@@ -19,7 +19,7 @@ class Role(DateModel):
 
     id: int = ormar.Integer(primary_key=True)
     name = ormar.String(max_length=30, comnet='角色名')
-    text = ormar.String(max_length=60, default='', nullable=True, comment='说明')
+    text = ormar.String(max_length=30, default='', nullable=True, comment='说明')
 
 
 class User(DateAuditModel):
@@ -27,12 +27,12 @@ class User(DateAuditModel):
         tablename: str = "user_user"
 
     id: int = ormar.Integer(primary_key=True)
-    username: str = ormar.String(max_length=255, comment='用户名')
-    email: str = ormar.String(max_length=255, comment='邮箱')
+    username: str = ormar.String(max_length=80, comment='用户名')
+    email: str = ormar.String(max_length=80, comment='邮箱')
     password: str = ormar.String(max_length=255, comment='密码')
-    first_name: str = ormar.String(max_length=255, nullable=True)
-    last_name: str = ormar.String(max_length=255, nullable=True)
+    first_name: str = ormar.String(max_length=20, nullable=True)
+    last_name: str = ormar.String(max_length=60, nullable=True)
     phone: str = ormar.String(max_length=12, nullable=True)
-
+    is_delete: bool = ormar.Boolean(default=False, comment='是否删除')
     # roles: Optional[List[Role]] = ormar.ManyToMany(Role, server_default=0)
     role: Optional[Role] = ormar.ForeignKey(Role, related_name='users')

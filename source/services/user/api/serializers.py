@@ -9,13 +9,12 @@ from pydantic import BaseModel
 
 
 class LoginBody(BaseModel):
-    username: str
+    email: str
     password: str
 
 
-# 获取 token 路径操作函数的响应模型
 class Token(BaseModel):
-    access_token: str
+    token: str
     token_type: str
 
 

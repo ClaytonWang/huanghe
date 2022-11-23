@@ -39,20 +39,28 @@ async def add_common_response_data(request: Request, call_next) -> Response:
     async for chunk in response.body_iterator:
         response_body += chunk
 
-    fast_rsp = json.loads(response_body.decode())
+    fast_rsp_de = response_body.decode()
+    try:
+        fast_rsp = json.loads(fast_rsp_de)
+    except json.JSONDecodeError:
+        fast_rsp = fast_rsp_de
+
+    status_code = response.status_code
+    message = fast_rsp.get('detail') if fast_rsp and 'detail' in fast_rsp else str(fast_rsp) \
+        if status_code > 300 or status_code < 200 else ''
     content = json.dumps(
             dict(
-                success=True if 200 <= response.status_code < 300 else False,
-                message=fast_rsp.get('detail') if 'detail' in fast_rsp else str(fast_rsp),
-                status=response.status_code,
+                success=True if 200 <= status_code < 300 else False,
+                message=message,
+                status=status_code,
                 result=fast_rsp,
-            )
+            ), ensure_ascii=False
         )
     headers = dict(response.headers)
     headers['content-length'] = str(len(content))
     return Response(
         content=content,
-        status_code=response.status_code,
+        status_code=status_code,
         headers=headers,
         media_type=response.media_type
     )
