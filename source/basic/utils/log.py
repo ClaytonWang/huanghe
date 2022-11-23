@@ -2,9 +2,9 @@ import logging
 import logging.config  # needed when logging_config doesn't start with logging.config
 from copy import copy
 
-from settings import DEBUG
-from utils.color import color_style
-from utils.module_loading import import_string
+from basic.utils.color import color_style
+from basic.utils.module_loading import import_string
+DEBUG = False
 
 request_logger = logging.getLogger('fast.request')
 
@@ -16,15 +16,15 @@ DEFAULT_LOGGING = {
     'disable_existing_loggers': False,
     'filters': {
         'require_debug_false': {
-            '()': 'utils.log.RequireDebugFalse',
+            '()': 'basic.utils.log.RequireDebugFalse',
         },
         'require_debug_true': {
-            '()': 'utils.log.RequireDebugTrue',
+            '()': 'basic.utils.log.RequireDebugTrue',
         },
     },
     'formatters': {
         'fastapi.server': {
-            '()': 'utils.log.ServerFormatter',
+            '()': 'basic.utils.log.ServerFormatter',
             'format': '[{server_time}] {message}',
             'style': '{',
         }

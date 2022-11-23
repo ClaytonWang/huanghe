@@ -9,15 +9,14 @@ import ormar
 import databases
 import sqlalchemy
 from datetime import datetime
-from settings import DATABASES
-
+from config import DATABASES
+from sqlalchemy import func
 
 DB_CONN = f'{DATABASES["USER"]}:{DATABASES["PASSWORD"]}@{DATABASES["HOST"]}:{DATABASES["PORT"]}/{DATABASES["NAME"]}'
-DB_POSTGRESQL_CONN = f'postgres://{DB_CONN}'
-DB_MYSQL_CONN = f'mysql://{DB_CONN}'
-DB_SQLITE_CONN = "sqlite:///db.sqlite"
+DB_POSTGRESQL_CONN = f'postgresql://{DB_CONN}'
 
-DATABASE = databases.Database(DB_SQLITE_CONN)
+
+DATABASE = databases.Database(DB_POSTGRESQL_CONN)
 METADATA = sqlalchemy.MetaData()
 
 
@@ -74,7 +73,7 @@ class AuditModel(ormar.Model):
     updated_by: str = ormar.String(max_length=100, default="Sam")
 
 
-class DateFieldsModel(ormar.Model):
+class DateModel(ormar.Model):
     class Meta:
         alias_generator = to_camel
         abstract = True
@@ -83,3 +82,17 @@ class DateFieldsModel(ormar.Model):
 
     created_date: datetime = ormar.DateTime(default=datetime.now)
     updated_date: datetime = ormar.DateTime(default=datetime.now)
+
+
+class DateAuditModel(ormar.Model):
+    class Meta:
+        alias_generator = to_camel
+        abstract = True
+        metadata = METADATA
+        database = DATABASE
+
+    created_by: str = ormar.Integer(comment='创建者', nullable=True)
+    updated_by: str = ormar.Integer(comment='更新者', nullable=True)
+
+    created_date: datetime = ormar.DateTime(server_default=func.now(), comment='创建日期')
+    updated_date: datetime = ormar.DateTime(server_default=func.now(), onupdate=func.now(), comment='更新日期')

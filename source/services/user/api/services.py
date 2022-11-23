@@ -9,7 +9,8 @@ from jose import jwt
 from typing import Optional
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
-from settings import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from fastapi import Request, Response, status
+from config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 PWD_CONTEXT = CryptContext(schemes=['bcrypt'], deprecated="auto")

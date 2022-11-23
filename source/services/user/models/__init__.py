@@ -6,5 +6,7 @@
     >Time    : 2022/10/11 09:29
 """
 
-from .users import *
+from models.user import *
+from models.base_model import *
+
 

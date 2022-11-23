@@ -5,7 +5,7 @@ Sets up the terminal color scheme.
 import functools
 import os
 import sys
-from utils import termcolors
+from basic.utils import termcolors
 
 try:
     import colorama
