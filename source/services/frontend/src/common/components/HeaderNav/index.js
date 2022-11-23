@@ -20,7 +20,7 @@ const HeaderNav = () => {
       </div>
       <div className="user-info">
         <UserOutlined />
-        {user.userName || null}
+        {user.username || null}
       </div>
     </Header>
   );

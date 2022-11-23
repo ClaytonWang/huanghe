@@ -36,10 +36,16 @@ const account = {
     username: '张三', // 用户名，字符串
     email: 'san.zhang@digitalbrain.cn', // 用户邮箱，字符串
     role: 'admin', // 角色代码，可选：admin｜owner｜user
-    project: {
-      name: '紫龙游戏', // 项目名称，字符串
-      id: 'ENG06', // 项目编码，字符串
-    },
+    project: [
+      {
+        name: '紫龙游戏', // 项目名称，字符串
+        id: 'EN106', // 项目编码，字符串
+      },
+      {
+        name: '足球AI', // 项目名称，字符串
+        id: 'EN105', // 项目编码，字符串
+      },
+    ],
     createDate: 'YYYY-MM-DD', // 创建日期，字符串
     permissions: [...admin, ...owner],
   },
