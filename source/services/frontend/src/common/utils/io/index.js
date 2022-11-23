@@ -132,7 +132,7 @@ export class IO {
     return this.axios.get(...args);
   }
   post(url, data, configs) {
-    // 兼容指定content-type为json的格式
+    // 兼容指定content-type为form的格式
     if (
       configs &&
       configs.headers &&
@@ -180,10 +180,7 @@ export class IO {
               ...configs,
             });
           }
-          if (method === 'patch') {
-            return this.patch(url, data, configs);
-          }
-          return this.post(url, data, configs);
+          return this[method](url, data, configs);
         };
       }
     };
