@@ -8,6 +8,11 @@ export const USER_ROLE = {
   owner: '项目负责人',
   user: '普通用户',
 };
+// 普通用户权限
+export const ACCESS_MAP = {
+  edit: '编辑',
+  readonly: '查看',
+};
 // 计划名词
 export const PLANS_MAP = {
   name: '计划名称',
@@ -18,12 +23,6 @@ export const PLANS_MAP = {
   status: '状态',
   saveCost: '预计节省',
   users: '普通用户',
-};
-// 角色
-export const ROLE_MAP = {
-  owner: '项目负责人',
-  admin: '管理员',
-  user: '普通用户',
 };
 // 正则
 export const EMAIL_REG = /^[\w._]+@[\w-]+(\.[\w]+)*(\.[\w]{2,6})$/;

@@ -1,0 +1,68 @@
+---
+# namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    istio-injection: enabled
+    kubernetes.io/metadata.name: juece
+  name: juece
+spec:
+  finalizers:
+  - kubernetes
+---
+# gateway
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: juece-gateway
+  namespace: juece
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - hosts:
+    - '*'
+    port:
+      name: http
+      number: 31400
+      protocol: HTTP
+---
+# virtual service
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: juece
+  namespace: juece
+spec:
+  gateways:
+  - juece-gateway
+  hosts:
+  - '*'
+  http:
+  - match:
+    - uri:
+        prefix: /api/project/
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: project
+        port:
+          number: 80
+  - match:
+    - uri:
+        prefix: /api/user/
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: user
+        port:
+          number: 80
+  - route:
+    - destination:
+        host: frontend
+        port:
+          number: 80
+---
