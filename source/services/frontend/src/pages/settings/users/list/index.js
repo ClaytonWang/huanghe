@@ -191,7 +191,7 @@ const UsersList = () => {
   return (
     <div className="users-list">
       <UsersFilter
-        initialValues={getFilters()}
+        initialValues={getFilters().filter}
         defaultFilters={defaultFilters.filter}
         reload={reload}
         projectsDataSource={projectsDataSource}
