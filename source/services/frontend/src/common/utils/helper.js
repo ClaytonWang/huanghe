@@ -3,7 +3,7 @@
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
 
-import { uniqueId } from 'lodash';
+import { uniqueId, cloneDeep } from 'lodash';
 import accounting from 'accounting';
 import moment from 'moment';
 /**
@@ -238,3 +238,23 @@ export const isLeafNode = (item) => !(item && item.children);
  */
 export const arrayToMapByKey = (arr, key) =>
   arr.map((value) => ({ [key]: value }));
+
+/**
+ * 深度查找，去掉对象中的空字段
+ *
+ * @param {object} obj
+ * @return object
+ */
+export const purifyDeep = (obj) => {
+  const result = cloneDeep(obj);
+  Object.keys(obj).reduce((acc, k) => {
+    if (obj[k] instanceof Object) {
+      return purifyDeep(obj[k]);
+    }
+    if (!obj[k]) {
+      delete acc[k];
+    }
+    return acc;
+  }, result);
+  return result;
+};

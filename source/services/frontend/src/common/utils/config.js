@@ -13,7 +13,7 @@ module.exports = {
     // login
     login: 'post|/login',
     signup: 'post|/signup',
-    // logout: 'post|/logout',
+    // logout: 'put|/logout',
 
     // bam
     bamProjectsList: 'get|/bam/projects',
@@ -23,7 +23,7 @@ module.exports = {
     // bamUsersList: 'get|/bam/users',
     bamUsersList: 'get|/user/users',
     bamUsersCreate: 'post|/bam/users',
-    bamUsersUpdate: 'put|/bam/users',
+    bamUsersUpdate: 'put|/bam/users/:id',
     bamUsersDelete: 'delete|/bam/users/:id',
 
     // settings

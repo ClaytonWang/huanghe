@@ -12,8 +12,10 @@ import { useAuth } from '@/common/hooks/useAuth';
 import { AuthButton, FormModal } from '@/common/components';
 import { ACCESS_MAP, CREATE, DEFAULT_PASSWORD } from '@/common/constants';
 import api from '@/common/api';
-import { parseKVToKeyValue } from '@/common/utils/helper';
+import { parseKVToKeyValue, purifyDeep } from '@/common/utils/helper';
 import UsersTable from './UsersTable';
+import UsersFilter from './UsersFilter';
+import './index.less';
 
 const { Option } = Select;
 const UsersList = () => {
@@ -21,6 +23,12 @@ const UsersList = () => {
     () => ({
       pageNo: 1,
       pageSize: 10,
+      sort: 'id:desc',
+      filter: {
+        username: '',
+        access: 'all',
+        project: 'all',
+      },
     }),
     []
   );
@@ -51,21 +59,19 @@ const UsersList = () => {
     },
     [getFilters]
   );
-  const syncSearchParams = useCallback(() => {
-    const filters = getFilters();
-    setSearchParams(qs.stringify(filters));
-  }, [getFilters, setSearchParams]);
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     requestList();
-    syncSearchParams();
-  }, [requestList, syncSearchParams]);
+    const filters = getFilters();
+    setSearchParams(qs.stringify(filters));
+  }, []);
 
   const reload = (args) => {
     const filters = getFilters();
-    const params = { ...filters, ...args };
+    const params = purifyDeep({ ...filters, ...args });
     // 手动同步Url
-    setSearchParams(params);
+    setSearchParams(qs.stringify(params));
     requestList(params);
   };
   const onPageNoChange = (pageNo, pageSize) => {
@@ -121,13 +127,6 @@ const UsersList = () => {
   const handleCancelClicked = () => {
     closeModal();
   };
-  // const handleCreateUser = (values) => {
-  //   const result = {
-  //     ...values,
-  //     organizationId: values.organization,
-  //   };
-  //   createUser(result);
-  // };
   const handleCreateSubmit = (values) => {
     createUser(values);
   };
@@ -190,25 +189,33 @@ const UsersList = () => {
   };
 
   return (
-    <div className="dbr-table-container">
-      <div className="batch-command">
-        <AuthButton
-          required="settings.users.edit"
-          style={{ float: 'left' }}
-          type="primary"
-          onClick={handleCreateClicked}
-        >
-          <PlusOutlined />
-          添加成员
-        </AuthButton>
-      </div>
-      <UsersTable
-        tableData={tableData}
-        loading={loading}
-        onEdit={handleEditClicked}
-        onDelete={handleDelete}
-        onPageNoChange={onPageNoChange}
+    <div className="users-list">
+      <UsersFilter
+        initialValues={getFilters().filter}
+        defaultFilters={defaultFilters.filter}
+        reload={reload}
+        projectsDataSource={projectsDataSource}
       />
+      <div className="dbr-table-container">
+        <div className="batch-command">
+          <AuthButton
+            required="settings.users.edit"
+            style={{ float: 'left' }}
+            type="primary"
+            onClick={handleCreateClicked}
+          >
+            <PlusOutlined />
+            添加成员
+          </AuthButton>
+        </div>
+        <UsersTable
+          tableData={tableData}
+          loading={loading}
+          onEdit={handleEditClicked}
+          onDelete={handleDelete}
+          onPageNoChange={onPageNoChange}
+        />
+      </div>
       {showCreateModal && (
         <FormModal
           title="添加成员"

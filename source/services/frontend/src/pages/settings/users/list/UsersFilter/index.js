@@ -5,7 +5,7 @@
 
 import { useMemo } from 'react';
 import { Form, Input, Select, Button } from 'antd';
-import { USER_ROLE } from '@/common/constants';
+import { ACCESS_MAP } from '@/common/constants';
 import { parseKVToKeyValue } from '@/common/utils/helper';
 const { Option } = Select;
 
@@ -44,12 +44,12 @@ const UsersFilter = ({
       <Form.Item label="姓名" name="username">
         <Input placeholder="输入用户姓名..." style={{ width: 250 }} />
       </Form.Item>
-      <Form.Item label="角色" name="role">
+      <Form.Item label="权限" name="access">
         <Select style={{ width: 150 }}>
           <Option key="all" value="all">
             全部
           </Option>
-          {parseKVToKeyValue(USER_ROLE, 'k', 'v').map(({ k, v }) => (
+          {parseKVToKeyValue(ACCESS_MAP, 'k', 'v').map(({ k, v }) => (
             <Option key={k} value={k}>
               {v}
             </Option>

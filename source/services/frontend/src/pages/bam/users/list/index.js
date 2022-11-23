@@ -8,12 +8,14 @@ import { Input, message, Form, Select, Modal } from 'antd';
 import { filter } from 'lodash';
 import qs from 'qs';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { parseKVToKeyValue } from '@/common/utils/helper';
+import { parseKVToKeyValue, purifyDeep } from '@/common/utils/helper';
 import { AuthButton, FormModal } from '@/common/components';
 import api from '@/common/api';
 import UsersTable from './UsersTable';
 import { EMAIL_REG, USER_ROLE } from '@/common/constants';
 import { b64 } from '@/common/utils/util';
+import UsersFilter from './UsersFilter';
+import './index.less';
 
 const { Option } = Select;
 
@@ -22,8 +24,12 @@ const UsersList = () => {
     () => ({
       pageNo: 1,
       pageSize: 10,
-      order: 'desc',
-      orderBy: 'createTime',
+      sort: 'id:desc',
+      filter: {
+        username: '',
+        role: 'all',
+        project: 'all',
+      },
     }),
     []
   );
@@ -68,16 +74,15 @@ const UsersList = () => {
   useEffect(() => {
     requestList();
     requestProjects();
-    // loadUsers();
     const filters = getFilters();
     setSearchParams(qs.stringify(filters));
-  }, [requestList, getFilters]);
+  }, []);
 
   const reload = (args) => {
     const filters = getFilters();
-    const params = { ...filters, ...args };
+    const params = purifyDeep({ ...filters, ...args });
     // 手动同步Url
-    setSearchParams(params);
+    setSearchParams(qs.stringify(params));
     requestList(params);
   };
   const onPageNoChange = (pageNo, pageSize) => {
@@ -237,26 +242,34 @@ const UsersList = () => {
     </FormModal>
   );
   return (
-    <div className="dbr-table-container">
-      <div className="batch-command">
-        <AuthButton
-          required="bam.projects.create"
-          style={{ float: 'left' }}
-          type="primary"
-          onClick={handleCreateClicked}
-        >
-          <PlusOutlined />
-          新建用户
-        </AuthButton>
-      </div>
-      <UsersTable
-        tableData={tableData}
+    <div className="users-list">
+      <UsersFilter
+        initialValues={getFilters().filter}
+        defaultFilters={defaultFilters.filter}
         reload={reload}
-        loading={loading}
-        onEdit={handleEditClicked}
-        onDelete={handleDelete}
-        onPageNoChange={onPageNoChange}
+        projectsDataSource={projectsDataSource}
       />
+      <div className="dbr-table-container">
+        <div className="batch-command">
+          <AuthButton
+            required="bam.projects.create"
+            style={{ float: 'left' }}
+            type="primary"
+            onClick={handleCreateClicked}
+          >
+            <PlusOutlined />
+            新建用户
+          </AuthButton>
+        </div>
+        <UsersTable
+          tableData={tableData}
+          reload={reload}
+          loading={loading}
+          onEdit={handleEditClicked}
+          onDelete={handleDelete}
+          onPageNoChange={onPageNoChange}
+        />
+      </div>
       {showCreateModal && renderCreateModal()}
       {showEditModal && renderEditModal()}
     </div>
