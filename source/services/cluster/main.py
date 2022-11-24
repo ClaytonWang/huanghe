@@ -14,9 +14,7 @@ def status():
 
 
 def start():
-    service_port = int(os.getenv('CLUSTER_SERVICE_PORT', ""))
-    if not service_port:
-        service_port = 80
+    service_port = int(os.getenv('CLUSTER_SERVICE_PORT', 80))
     uvicorn.run(
         'main:app', port=service_port,
         reload=False,
