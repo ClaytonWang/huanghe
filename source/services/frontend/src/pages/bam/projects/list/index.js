@@ -3,12 +3,10 @@
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Input, message, Form, Select, Modal } from 'antd';
 import qs from 'qs';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { useAuth } from '@/common/hooks/useAuth';
-import { transformDate } from '@/common/utils/helper';
 import { AuthButton, FormModal } from '@/common/components';
 import api from '@/common/api';
 import ProjectsTable from './ProjectsTable';
@@ -31,8 +29,6 @@ const ProjectList = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [initialFormValues, setInitialFormValues] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { user } = useAuth();
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const getFilters = useCallback(
@@ -57,34 +53,22 @@ const ProjectList = () => {
   );
   const requestOwnersDatasource = async () => {
     try {
-      const { result } = await api.bamUsersList({ filter: { role: 'owner' } });
+      const { result } = await api.bamUsersList({
+        filter: { role: 'owner' },
+      });
       setOwnersDatasource(result.data);
     } catch (error) {
       console.log(error);
     }
   };
 
-  // const loadUsers = useCallback(async () => {
-  //   try {
-  //     const { result } = await api.settingsUsersList({
-  //       organizationId: user.organization.id,
-  //       role: 'user',
-  //     });
-  //     setUserDataSource(result.data);
-  //     return Promise.resolve(result.data);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }, [user]);
-
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     requestList();
     requestOwnersDatasource();
-    // loadUsers();
     const filters = getFilters();
     setSearchParams(qs.stringify(filters));
-  }, [requestList, getFilters]);
+  }, []);
 
   const reload = (args) => {
     const filters = getFilters();
@@ -146,7 +130,8 @@ const ProjectList = () => {
   const handleDelete = (record) => {
     const { id } = record;
     Modal.confirm({
-      title: '确定要删除该计划吗？',
+      title: '确定要删除该项目吗？',
+      content: '将项目中的成员移除且占用资源清空后，可删除该项目。',
       icon: <ExclamationCircleOutlined />,
       okText: '确认',
       cancelText: '取消',

@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Table, Button } from 'antd';
 import qs from 'qs';
 import { map } from 'lodash';
