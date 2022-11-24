@@ -20,7 +20,7 @@ class Role(DateModel):
         database = DB
 
     id: int = ormar.Integer(primary_key=True)
-    name = ormar.String(max_length=30, comnet='角色名')
+    name = ormar.String(max_length=30, comnet='角色名', unique=True)
     text = ormar.String(max_length=30, default='', nullable=True, comment='说明')
 
 
@@ -30,9 +30,8 @@ class User(DateAuditModel):
         metadata = META
         database = DB
 
-    id: int = ormar.Integer(primary_key=True)
     username: str = ormar.String(max_length=80, comment='用户名')
-    email: str = ormar.String(max_length=80, comment='邮箱')
+    email: str = ormar.String(max_length=80, comment='邮箱', unique=True)
     password: str = ormar.String(max_length=255, comment='密码')
     first_name: str = ormar.String(max_length=20, nullable=True)
     last_name: str = ormar.String(max_length=60, nullable=True)

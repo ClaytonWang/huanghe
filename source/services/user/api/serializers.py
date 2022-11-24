@@ -8,17 +8,17 @@
 from pydantic import BaseModel
 
 
-class LoginBody(BaseModel):
+class LoginBodySerializers(BaseModel):
     email: str
     password: str
 
 
-class Token(BaseModel):
+class TokenSerializers(BaseModel):
     token: str
     token_type: str
 
 
-class UserList(BaseModel):
+class UserListSerializers(BaseModel):
 
     id: int
     username: str

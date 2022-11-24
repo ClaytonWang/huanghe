@@ -76,6 +76,7 @@ class DateAuditModel(ormar.Model):
         alias_generator = to_camel
         abstract = True
 
+    id: int = ormar.Integer(primary_key=True)
     created_by: str = ormar.Integer(comment='创建者', nullable=True)
     updated_by: str = ormar.Integer(comment='更新者', nullable=True)
 

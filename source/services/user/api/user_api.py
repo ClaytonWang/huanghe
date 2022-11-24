@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 # from .models import User
 from models.user import User
 from api.services import hash_password
-from api.serializers import UserList
+from api.serializers import UserListSerializers
 
 
 router_user = APIRouter()
@@ -20,7 +20,7 @@ router_user = APIRouter()
     description='创建用户',
     response_model=None,
 )
-async def create_user(user: UserList):
+async def create_user(user: User):
     user.password = hash_password(user.password)
     return await user.save()
 
@@ -28,9 +28,9 @@ async def create_user(user: UserList):
 @router_user.get(
     '',
     description='用户列表',
-    response_model=UserList,
+    response_model=UserListSerializers,
 )
-async def list_user(sort: str, filter: str, pageno: int = 1, pagesize: int = 10):
+async def list_user(pageno: int = 1, pagesize: int = 10):
     """
 
     :param pageno:  页码
@@ -39,7 +39,7 @@ async def list_user(sort: str, filter: str, pageno: int = 1, pagesize: int = 10)
     :param filter: 过滤参数
     :return:
     """
-    print(sort)
-    print(filter)
+    # print(sort)
+    # print(filter)
     return await User.objects.paginate(page=pageno, page_size=pagesize).all()
     pass

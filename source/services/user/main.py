@@ -12,6 +12,7 @@ from basic.middleware.rsp import add_common_response_data
 from basic.middleware.auth import OFOAuth2PasswordBearer
 from api.auth_api import router_auth
 from api.user_api import router_user
+from api.role_api import router_role
 from models import startup_event, shutdown_event
 
 
@@ -19,7 +20,7 @@ oauth2_scheme = OFOAuth2PasswordBearer(token_url="/v1/auth/login")
 configure_logging('logging.config.dictConfig', LOGGING)
 app = FastAPI(
     tags=["FastAPI 用户验证模块"],
-    dependencies=[Depends(oauth2_scheme)]
+    # dependencies=[Depends(oauth2_scheme)]
 )
 
 # 配置中间件
@@ -33,7 +34,8 @@ app.add_event_handler("shutdown", shutdown_event)
 
 # 路由配置
 app.include_router(router_auth, prefix='/v1/auth')
-app.include_router(router_user, prefix='/v1/users')
+app.include_router(router_user, prefix='/v1/user')
+app.include_router(router_role, prefix='/v1/role')
 
 
 if __name__ == '__main__':
