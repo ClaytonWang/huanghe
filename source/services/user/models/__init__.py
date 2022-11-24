@@ -5,8 +5,6 @@
     >Mail    : jindu.yin@digitalbrain.cn
     >Time    : 2022/10/11 09:29
 """
-
-from models.user import *
-from models.base_model import *
-
-
+from models.initdb import *
+from models.user import User, Role
+from models.permissions import Permissions

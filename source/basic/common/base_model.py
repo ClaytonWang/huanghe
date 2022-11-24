@@ -6,18 +6,9 @@
     >Time    : 2022/10/10 20:01
 """
 import ormar
-import databases
-import sqlalchemy
+
 from datetime import datetime
-from config import DATABASES
 from sqlalchemy import func
-
-DB_CONN = f'{DATABASES["USER"]}:{DATABASES["PASSWORD"]}@{DATABASES["HOST"]}:{DATABASES["PORT"]}/{DATABASES["NAME"]}'
-DB_POSTGRESQL_CONN = f'postgresql://{DB_CONN}'
-
-
-DATABASE = databases.Database(DB_POSTGRESQL_CONN)
-METADATA = sqlalchemy.MetaData()
 
 
 
@@ -40,8 +31,8 @@ def to_camel(string: str) -> str:
 
 
 class AuditMixin:
-    created_by: str = ormar.String(max_length=100)
-    updated_by: str = ormar.String(max_length=100, default="Sam")
+    created_by: str = ormar.Integer(comment='创建者', nullable=True)
+    updated_by: str = ormar.Integer(comment='更新者', nullable=True)
 
 
 class DateFieldsMixins:
@@ -66,19 +57,15 @@ class AuditModel(ormar.Model):
     class Meta:
         alias_generator = to_camel
         abstract = True
-        metadata = METADATA
-        database = DATABASE
 
-    created_by: str = ormar.String(max_length=100)
-    updated_by: str = ormar.String(max_length=100, default="Sam")
+    created_by: str = ormar.Integer(comment='创建者', nullable=True)
+    updated_by: str = ormar.Integer(comment='更新者', nullable=True)
 
 
 class DateModel(ormar.Model):
     class Meta:
         alias_generator = to_camel
         abstract = True
-        metadata = METADATA
-        database = DATABASE
 
     created_date: datetime = ormar.DateTime(default=datetime.now)
     updated_date: datetime = ormar.DateTime(default=datetime.now)
@@ -88,9 +75,8 @@ class DateAuditModel(ormar.Model):
     class Meta:
         alias_generator = to_camel
         abstract = True
-        metadata = METADATA
-        database = DATABASE
 
+    id: int = ormar.Integer(primary_key=True)
     created_by: str = ormar.Integer(comment='创建者', nullable=True)
     updated_by: str = ormar.Integer(comment='更新者', nullable=True)
 

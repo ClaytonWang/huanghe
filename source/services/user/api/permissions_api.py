@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    >File    : auth_api_test.py
+    >File    : permissions_api.py
     >Author  : YJD
     >Mail    : jindu.yin@digitalbrain.cn
-    >Time    : 2022/11/23 14:35
+    >Time    : 2022/11/24 09:04
 """
-
-import pytest
-
-

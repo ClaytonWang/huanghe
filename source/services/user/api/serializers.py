@@ -8,18 +8,17 @@
 from pydantic import BaseModel
 
 
-class LoginBody(BaseModel):
-    username: str
+class LoginBodySerializers(BaseModel):
+    email: str
     password: str
 
 
-# 获取 token 路径操作函数的响应模型
-class Token(BaseModel):
-    access_token: str
+class TokenSerializers(BaseModel):
+    token: str
     token_type: str
 
 
-class UserList(BaseModel):
+class UserListSerializers(BaseModel):
 
     id: int
     username: str
