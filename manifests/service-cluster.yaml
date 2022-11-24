@@ -1,0 +1,53 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cluster
+  namespace: juece
+  labels:
+    app: cluster
+    service: cluster
+spec:
+  ports:
+  - port: 80
+    name: http
+  selector:
+    app: cluster
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: juece-cluster
+  labels:
+    account: cluster
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cluster-v1
+  namespace: juece
+  labels:
+    app: cluster
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cluster
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: cluster
+        version: v1
+    spec:
+      serviceAccountName: juece-cluster
+      containers:
+      - name: cluster
+        image: containers.git.digitalbrain.cn/engineering-group/huanghe.cluster:2022-11-24.12
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: db-container
+---
