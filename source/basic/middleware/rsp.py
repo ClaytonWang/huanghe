@@ -57,9 +57,10 @@ async def add_common_response_data(request: Request, call_next) -> Response:
             ), ensure_ascii=False
         )
     headers = dict(response.headers)
-    headers['content-length'] = str(len(content))
+    encode_content = content.encode()
+    headers['content-length'] = str(len(encode_content))
     return Response(
-        content=content,
+        content=encode_content,
         status_code=status_code,
         headers=headers,
         media_type=response.media_type

@@ -5,9 +5,13 @@
     >Mail    : jindu.yin@digitalbrain.cn
     >Time    : 2022/11/24 09:04
 """
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from models.user import Role
 from api.role_serializers import RoleDetailSerializers
+from fastapi.encoders import jsonable_encoder
+from basic.common.paginate import Page
+from basic.common.paginate import Params
+from basic.common.paginate import paginate
 
 
 router_role = APIRouter()
@@ -44,7 +48,7 @@ def delete_role():
 @router_role.get(
     '',
     description='列表',
-    response_model=RoleDetailSerializers,
+    response_model=Page[RoleDetailSerializers]
 )
-async def list_role(pageno: int, pagesize: int):
-    return await Role.objects.paginate(page=pageno, page_size=pagesize).all()
+async def list_role(params: Params = Depends()):
+    return await paginate(Role.objects.filter(), params=params)

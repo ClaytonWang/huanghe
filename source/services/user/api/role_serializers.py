@@ -6,9 +6,10 @@
     >Time    : 2022/11/24 09:04
 """
 from pydantic import BaseModel
+from typing import Optional
 
 
 class RoleDetailSerializers(BaseModel):
-    id: int
-    name: str
-    text: str
+    id: int = None
+    name: str = ''
+    text: Optional[str] = ''

@@ -12,6 +12,8 @@ from typing import Optional
 from config import SECRET_KEY
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
+from fastapi.exceptions import ValidationError
+from fastapi.exception_handlers import http_exception_handler
 
 
 async def verify_token(request: Request, call_next):
@@ -36,7 +38,14 @@ async def verify_token(request: Request, call_next):
 
             token = authorization.split(' ')[1]
             jwt.decode(token, key=SECRET_KEY)
-            return await call_next(request)
+
+            # 参数已经需要重新封装
+            try:
+                return await call_next(request)
+            except ValidationError as exc:
+                exc.status_code = 400
+                setattr(exc, 'detail', str(exc))
+                return await http_exception_handler(request, exc)
         except Exception as e:
             print(e)
             return auth_error
