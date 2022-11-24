@@ -6,7 +6,7 @@ WORKDIR /source/services/cluster
 
 # python dependence
 COPY ${APP_PATH}/requirements.txt .
-RUN pip install -r $APP_PATH/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 COPY ${APP_PATH} .
 
