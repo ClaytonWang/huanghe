@@ -12,7 +12,8 @@ from basic.middleware.rsp import add_common_response_data
 from basic.middleware.auth import OFOAuth2PasswordBearer
 from api.auth_api import router_auth
 from api.user_api import router_user
-from api.role_api import router_role
+from role.api import router_role
+from permissions.api import router_pms
 from models import startup_event, shutdown_event
 
 
@@ -36,6 +37,7 @@ app.add_event_handler("shutdown", shutdown_event)
 app.include_router(router_auth, prefix='/v1/auth')
 app.include_router(router_user, prefix='/v1/user')
 app.include_router(router_role, prefix='/v1/role')
+app.include_router(router_pms, prefix='/v1/pms')
 
 
 if __name__ == '__main__':

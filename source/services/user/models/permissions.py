@@ -16,11 +16,12 @@ class Permissions(DateAuditModel):
     """
     """
     # 4位一个层级，最多5层
-    id: int = ormar.Integer(primary_key=True)
     code: str = ormar.String(max_length=20, unique=True)
 
-    name: str = ormar.String(max_length=30, verbose_name='模块/菜单/操作标题')
-    text: str = ormar.String(max_length=50, blank=True, null=True, verbose_name='中文')
+    name: str = ormar.String(max_length=30, comment='模块/菜单/操作标题')
+    value: str = ormar.String(max_length=50, nullable=True, comment='描述')
+    uri: str = ormar.JSON(nullable=True, comment='资源（预留）')
+    project: str = ormar.String(max_length=30, nullable=True, comment='项目（预留扩展）')
 
     role: Optional[List[Role]] = ormar.ManyToMany(Role)
     user: Optional[List[User]] = ormar.ManyToMany(User)

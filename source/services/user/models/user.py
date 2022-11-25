@@ -21,7 +21,7 @@ class Role(DateModel):
 
     id: int = ormar.Integer(primary_key=True)
     name = ormar.String(max_length=30, comnet='角色名', unique=True)
-    text = ormar.String(max_length=30, default='', nullable=True, comment='说明')
+    value = ormar.String(max_length=30, default='', nullable=True, comment='说明')
 
 
 class User(DateAuditModel):
