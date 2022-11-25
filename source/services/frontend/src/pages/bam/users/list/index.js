@@ -134,7 +134,8 @@ const UsersList = () => {
   const handleDelete = (record) => {
     const { id } = record;
     Modal.confirm({
-      title: '确定要删除该计划吗？',
+      title: '确定要删除该用户吗？',
+      content: '将用户使用资源清空后，该用户可被删除。',
       icon: <ExclamationCircleOutlined />,
       okText: '确认',
       cancelText: '取消',
