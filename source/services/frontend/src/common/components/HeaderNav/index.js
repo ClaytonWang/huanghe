@@ -33,7 +33,7 @@ const { Header } = Layout;
 const { Option } = Select;
 
 const HeaderNav = () => {
-  const { user, logout, loadAccount } = useAuth();
+  const { user, logout } = useAuth();
   const [showAccountModal, setShowAccountModal] = useState(false);
 
   const handleAccountClicked = () => {
@@ -68,20 +68,23 @@ const HeaderNav = () => {
   const updateAccount = async (values) => {
     try {
       await api.settingsAccountUpdate(values);
-      message.success('个人信息修改成功！');
+      message.success('个人信息修改成功！即将跳转至首页重新登陆...');
       closeAccountModal();
-      // reload account
-      loadAccount();
+      // 个人信息修改成功后，重新登陆。
+      setTimeout(() => {
+        logout();
+      }, 1000);
     } catch (error) {
       console.log(error);
       closeAccountModal();
     }
   };
   const handleAccountSubmit = (values) => {
+    const { oldPassword = null, password = null } = values;
     updateAccount({
       ...values,
-      oldPassword: b64.encode(values.oldPassword),
-      password: b64.encode(values.password),
+      oldPassword: b64.encode(oldPassword),
+      password: password && b64.encode(password),
     });
   };
   const handleAccountCancel = () => {
@@ -149,10 +152,7 @@ const HeaderNav = () => {
           <Form.Item
             label="新密码"
             name="password"
-            rules={[
-              { required: true, message: '请输入新密码' },
-              { len: 8, message: '请输入8位数密码' },
-            ]}
+            rules={[{ len: 8, message: '请输入8位数密码' }]}
           >
             <Input.Password placeholder="请输入新密码" />
           </Form.Item>
