@@ -13,7 +13,7 @@ module.exports = {
     // login
     login: 'post|/login',
     signup: 'post|/signup',
-    // logout: 'put|/logout',
+    logout: 'put|/logout',
 
     // bam
     bamProjectsList: 'get|/bam/projects',
@@ -35,7 +35,7 @@ module.exports = {
     settingsUsersPasswordReset: 'post|/users/password/reset',
 
     settingsAccount: 'get|/account',
-    settingsAccountUpdate: 'post|/account/update',
+    settingsAccountUpdate: 'put|/account/update',
   },
   breadcrumbConfig: {
     '/bam/projects': '项目管理',
@@ -48,6 +48,7 @@ module.exports = {
     {
       key: 'bam',
       label: '后台管理',
+      icon: '',
       children: [
         {
           key: 'bam.projects',
@@ -62,6 +63,7 @@ module.exports = {
     {
       key: 'settings',
       label: '设置',
+      icon: '',
       children: [
         {
           key: 'settings.users',
