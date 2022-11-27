@@ -5,10 +5,9 @@
     >Mail    : jindu.yin@digitalbrain.cn
     >Time    : 2022/11/24 09:04
 """
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, Depends
 from models.user import Role
-from api.role_serializers import RoleDetailSerializers
-from fastapi.encoders import jsonable_encoder
+from role.serializers import RoleDetailSerializers
 from basic.common.paginate import Page
 from basic.common.paginate import Params
 from basic.common.paginate import paginate
@@ -27,27 +26,10 @@ async def add_role(role: Role):
     return await role.save()
 
 
-@router_role.put(
-    '',
-    description='更新',
-    responses={status.HTTP_204_NO_CONTENT: {'model': None}}
-)
-def update_role():
-    pass
-
-
-@router_role.delete(
-    '',
-    description='删除',
-    responses={status.HTTP_204_NO_CONTENT: {'model': None}}
-)
-def delete_role():
-    pass
-
-
 @router_role.get(
     '',
-    description='列表',
+    description='角色列表',
+    response_description='返回角色列表',
     response_model=Page[RoleDetailSerializers]
 )
 async def list_role(params: Params = Depends()):

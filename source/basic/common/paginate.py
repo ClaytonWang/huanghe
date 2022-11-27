@@ -14,7 +14,7 @@ from contextvars import ContextVar
 from pydantic import BaseModel, conint
 from fastapi_pagination.bases import AbstractParams, RawParams
 from fastapi_pagination.bases import AbstractPage
-from fastapi_pagination.api import resolve_params, create_page
+from fastapi_pagination.api import resolve_params
 from ormar import Model, QuerySet
 
 T = TypeVar("T")
@@ -79,3 +79,6 @@ async def paginate(query: Union[QuerySet, Type[Model]], params: Optional[Params]
     items = await query.offset(raw_params.offset).limit(raw_params.limit).all()
 
     return create_page(items, total, params)
+
+
+__all__ = ['Params', 'paginate', 'Page']

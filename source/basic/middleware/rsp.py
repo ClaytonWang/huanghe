@@ -48,12 +48,13 @@ async def add_common_response_data(request: Request, call_next) -> Response:
     status_code = response.status_code
     message = fast_rsp.get('detail') if fast_rsp and 'detail' in fast_rsp else str(fast_rsp) \
         if status_code > 300 or status_code < 200 else ''
+    # 非200间的状态result返回空
     content = json.dumps(
             dict(
                 success=True if 200 <= status_code < 300 else False,
                 message=message,
                 status=status_code,
-                result=fast_rsp,
+                result=fast_rsp if not message else {},
             ), ensure_ascii=False
         )
     headers = dict(response.headers)

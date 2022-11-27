@@ -12,4 +12,4 @@ from typing import Optional
 class RoleDetailSerializers(BaseModel):
     id: int = None
     name: str = ''
-    text: Optional[str] = ''
+    value: Optional[str] = ''
