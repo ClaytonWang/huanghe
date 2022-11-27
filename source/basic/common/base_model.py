@@ -36,8 +36,8 @@ class AuditMixin:
 
 
 class DateFieldsMixins:
-    created_date: datetime = ormar.DateTime(default=datetime.now)
-    updated_date: datetime = ormar.DateTime(default=datetime.now)
+    created_at: datetime = ormar.DateTime(default=datetime.now)
+    updated_at: datetime = ormar.DateTime(default=datetime.now)
 
 
 """
@@ -67,8 +67,8 @@ class DateModel(ormar.Model):
         alias_generator = to_camel
         abstract = True
 
-    created_date: datetime = ormar.DateTime(default=datetime.now)
-    updated_date: datetime = ormar.DateTime(default=datetime.now)
+    created_at: datetime = ormar.DateTime(default=datetime.now)
+    updated_at: datetime = ormar.DateTime(default=datetime.now)
 
 
 class DateAuditModel(ormar.Model):
@@ -80,5 +80,5 @@ class DateAuditModel(ormar.Model):
     created_by: str = ormar.Integer(comment='创建者', nullable=True)
     updated_by: str = ormar.Integer(comment='更新者', nullable=True)
 
-    created_date: datetime = ormar.DateTime(server_default=func.now(), comment='创建日期')
-    updated_date: datetime = ormar.DateTime(server_default=func.now(), onupdate=func.now(), comment='更新日期')
+    created_at: datetime = ormar.DateTime(server_default=func.now(), comment='创建日期')
+    updated_at: datetime = ormar.DateTime(server_default=func.now(), onupdate=func.now(), comment='更新日期')

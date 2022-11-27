@@ -15,6 +15,11 @@ from models.user import Role, User
 class Permissions(DateAuditModel):
     """
     """
+    class Meta(ormar.ModelMeta):
+        tablename: str = "user_permissions"
+        metadata = META
+        database = DB
+
     # 4位一个层级，最多5层
     code: str = ormar.String(max_length=20, unique=True)
 
@@ -26,7 +31,5 @@ class Permissions(DateAuditModel):
     role: Optional[List[Role]] = ormar.ManyToMany(Role)
     user: Optional[List[User]] = ormar.ManyToMany(User)
 
-    class Meta(ormar.ModelMeta):
-        tablename: str = "user_permissions"
-        metadata = META
-        database = DB
+    def __repr__(self):
+        return f'{self.name}__{self.code}'

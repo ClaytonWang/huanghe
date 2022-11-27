@@ -8,8 +8,8 @@
 from fastapi import APIRouter, HTTPException, status
 from api.services import verify_password, create_access_token
 from models.user import User
-from api.serializers import TokenSerializers
-from api.serializers import LoginBodySerializers
+from api.serializers import Token
+from api.serializers import Login
 
 
 router_auth = APIRouter()
@@ -17,11 +17,11 @@ router_auth = APIRouter()
 
 @router_auth.post(
     "/login",
-    response_model=TokenSerializers,
+    response_model=Token,
     description='登录',
     response_description="返回access_token"
 )
-async def login(body: LoginBodySerializers):
+async def login(body: Login):
     user = await User.objects.get_or_none(email=body.email)
     if not user or not verify_password(body.password, user.password):
         raise HTTPException(
