@@ -6,8 +6,9 @@ import uvicorn
 from config import *
 from fastapi import FastAPI
 from starlette.middleware.base import BaseHTTPMiddleware
-from fastapi.exceptions import RequestValidationError
+from asyncpg.exceptions import PostgresError
 from pydantic.error_wrappers import ValidationError
+from fastapi.exceptions import RequestValidationError
 from basic.utils.log import configure_logging
 from basic.middleware.auth import verify_token
 from basic.middleware.rsp import add_common_response_data
@@ -16,9 +17,11 @@ from basic.common.env_variable import get_integer_variable
 from basic.common.env_variable import get_string_variable
 from basic.middleware.exception import validation_pydantic_exception_handler
 from basic.middleware.exception import validation_ormar_exception_handler
+from basic.middleware.exception import ormar_db_exception_handler
 from api.auth_api import router_auth
 from api.user_api import router_user
 from role.api import router_role
+from project.api import router_project
 from permissions.api import router_pms
 from models import startup_event, shutdown_event
 
@@ -42,12 +45,14 @@ app.add_event_handler("shutdown", shutdown_event)
 # 异常处理
 app.add_exception_handler(ValidationError, validation_pydantic_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_ormar_exception_handler)
+app.add_exception_handler(PostgresError, ormar_db_exception_handler)
 
 # 路由配置
 app.include_router(router_auth, prefix='/v1/auth')
 app.include_router(router_user, prefix='/v1/user')
 app.include_router(router_role, prefix='/v1/role')
 app.include_router(router_pms, prefix='/v1/pms')
+app.include_router(router_project, prefix='/v1/project')
 
 
 if __name__ == '__main__':

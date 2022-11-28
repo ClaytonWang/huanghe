@@ -31,7 +31,6 @@ class UserCreate(BaseModel):
     password: str = Field(..., min_length=8, max_length=255)
     email: EmailStr
     role: int
-    project: int = Optional[int]
 
     @validator('password')
     def set_password(cls, pwd):
@@ -49,10 +48,17 @@ class UserEdit(BaseModel):
         return hash_password(pwd)
 
 
-class UserList(BaseModel):
+class UserId(BaseModel):
+    id: int
+
+
+class UserItem(BaseModel):
     id: int
     username: str
     email: str
+
+
+class UserList(UserItem):
     role: RoleDetailSerializers
     created_at: Optional[datetime]
     updated_at: Optional[datetime]

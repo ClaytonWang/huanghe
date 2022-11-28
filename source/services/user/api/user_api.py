@@ -8,7 +8,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Path
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
-from asyncpg.exceptions import UniqueViolationError
+from ormar.exceptions import ModelError
 from models.user import User
 from api.serializers import UserList, UserCreate, UserEdit, AccountInfo
 from basic.common.paginate import *
@@ -25,10 +25,7 @@ router_user = APIRouter()
     response_model=UserList,
 )
 async def create_user(user: UserCreate):
-    try:
-        return await User.objects.create(**user.dict())
-    except UniqueViolationError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    return await User.objects.create(**user.dict())
 
 
 @router_user.get(

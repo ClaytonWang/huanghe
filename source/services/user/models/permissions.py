@@ -16,7 +16,7 @@ class Permissions(DateAuditModel):
     """
     """
     class Meta(ormar.ModelMeta):
-        tablename: str = "user_permissions"
+        tablename: str = "bam_permissions"
         metadata = META
         database = DB
 
