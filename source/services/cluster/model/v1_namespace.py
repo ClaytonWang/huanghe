@@ -4,7 +4,7 @@ from model.base_model import BaseModel
 from model.v1_namespace_spec import V1NamespaceSpec
 from model.v1_namespace_status import V1NamespaceStatus
 from model.v1_object_meta import V1ObjectMeta
-from const.const import API_VERSION_V1,  NAMESPACE_KIND
+from const.workloads_const import API_VERSION_V1,  NAMESPACE_KIND
 from typing import Optional
 
 class V1Namespace(BaseModel):
