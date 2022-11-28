@@ -60,3 +60,11 @@ class UserList(BaseModel):
     @validator('created_at', 'updated_at')
     def format_dt(cls, dt):
         return dt_to_string(dt)
+
+
+class AccountInfo(UserList):
+    project = []
+    permissions = []
+
+    class Config:
+        orm_mode=True

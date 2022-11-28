@@ -13,50 +13,50 @@ def pms_data():
     # admin owner  user
     data = [
         {
-            'name': '后台模块',
-            'value': 'bam',
+            'name': 'bam',
+            'value': '后台模块',
             'access': ['admin'],
             'children': [
                 {
-                    'name': '项目列表',
-                    'value': 'projects',
+                    'name': 'projects',
+                    'value': '项目列表',
                     'access': ['admin'],
                     'children': [
                         {
-                            'name': '创建',
-                            'value': 'create',
+                            'name': 'create',
+                            'value': '创建',
                             'access': ['admin'],
                         },
                         {
-                            'name': '编辑',
-                            'value': 'edit',
+                            'name': 'edit',
+                            'value': '编辑',
                             'access': ['admin'],
                         },
                         {
-                            'name': '删除',
-                            'value': 'delete',
+                            'name': 'delete',
+                            'value': '删除',
                             'access': ['admin'],
                         }
                     ]
                 },
                 {
-                    'name': '用户列表',
-                    'value': 'users',
+                    'name': 'users',
+                    'value': '用户列表',
                     'access': ['admin'],
                     'children': [
                         {
-                            'name': '创建',
-                            'value': 'create',
+                            'name': 'create',
+                            'value': '创建',
                             'access': ['admin'],
                         },
                         {
-                            'name': '编辑',
-                            'value': 'edit',
+                            'name': 'edit',
+                            'value': '编辑',
                             'access': ['admin'],
                         },
                         {
-                            'name': '删除',
-                            'value': 'delete',
+                            'name': 'delete',
+                            'value': '删除',
                             'access': ['admin'],
                         }
                     ]
@@ -64,28 +64,28 @@ def pms_data():
             ]
         },
         {
-            'name': '设置',
-            'value': 'settings',
+            'name': 'settings',
+            'value': '设置',
             'access': ['owner'],
             'children': [
                 {
-                    'name': '用户列表',
-                    'value': 'users',
+                    'name': 'users',
+                    'value': '用户列表',
                     'access': ['owner'],
                     'children': [
                         {
-                            'name': '新建',
-                            'value': 'create',
+                            'name': 'create',
+                            'value': '新建',
                             'access': ['owner'],
                         },
                         {
-                            'name': '编辑',
-                            'value': 'edit',
+                            'name': 'edit',
+                            'value': '编辑',
                             'access': ['owner'],
                         },
                         {
-                            'name': '删除',
-                            'value': 'delete',
+                            'name': 'delete',
+                            'value': '删除',
                             'access': ['owner'],
                         },
                     ]

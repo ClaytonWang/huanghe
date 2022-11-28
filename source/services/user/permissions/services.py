@@ -94,7 +94,7 @@ def join_pms_to_string(pms, parent_value=None) -> list:
     """
     result = []
     for item in pms:
-        value = item['value']
+        value = item['name']
         if parent_value:
             new_value = f'{parent_value}.{value}'
             result.append(new_value)
@@ -110,7 +110,7 @@ def join_pms_to_string(pms, parent_value=None) -> list:
 
 async def role_pms(role: str) -> list:
     """
-    根据角色查询缺陷因子
+    根据角色查询权限因子
     :param role:
     :return:
     """
