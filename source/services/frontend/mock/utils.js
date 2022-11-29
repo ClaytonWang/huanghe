@@ -20,11 +20,11 @@ const error = () => ({
 const list = (req, res, obj) => {
   let requestParams = assign({}, req.query, req.body);
   let pageParams = {
-    pageNo: requestParams.pageNo ? parseInt(requestParams.pageNo, 10) : 1,
-    pageSize: requestParams.pageSize
-      ? parseInt(requestParams.pageSize, 10)
+    pageno: requestParams.pageno ? parseInt(requestParams.pageno, 10) : 1,
+    pagesize: requestParams.pagesize
+      ? parseInt(requestParams.pagesize, 10)
       : 30,
-    totalCount: (obj.result || obj.data || []).length ? 100 : 0,
+    total: (obj.result || obj.data || []).length ? 100 : 0,
     order: requestParams.order,
     orderBy: requestParams.orderBy,
   };
