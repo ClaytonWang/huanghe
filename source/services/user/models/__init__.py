@@ -8,3 +8,4 @@
 from models.initdb import *
 from models.user import User, Role
 from models.permissions import Permissions
+from models.project import Project

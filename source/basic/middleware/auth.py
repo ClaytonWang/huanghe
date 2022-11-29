@@ -10,9 +10,15 @@ from fastapi import Request, Response, status
 from fastapi import HTTPException
 from typing import Optional
 from config import SECRET_KEY
+from starlette.authentication import AuthCredentials, SimpleUser
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
 from jose.jwt import JWTError
+
+
+async def get_current_user(email=Optional[str]):
+    from source.services.user.models import User
+    return await User.objects.select_related('role').get_or_none(email=email)
 
 
 async def verify_token(request: Request, call_next):
@@ -36,8 +42,15 @@ async def verify_token(request: Request, call_next):
                 return auth_error
 
             token = authorization.split(' ')[1]
-            jwt.decode(token, key=SECRET_KEY)
+            data = jwt.decode(token, key=SECRET_KEY)
+            sub = data.get('sub') if 'sub' in data else ''
+            sub and setattr(request, 'email', sub)
 
+            userinfo = await get_current_user(sub)
+            if userinfo:
+                request.scope['user'] = userinfo
+            else:
+                return auth_error
             return await call_next(request)
         except JWTError:
             return auth_error
