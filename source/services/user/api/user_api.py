@@ -109,7 +109,10 @@ async def delete_user(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到用户')
 
     # TODO 判断用户管理资源
-    pass
+    if await user.projects.count():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联项目资源不能删除')
+
+    await user.delete()
 
 
 @router_user.get(
