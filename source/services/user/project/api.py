@@ -72,8 +72,7 @@ async def delete_project(
     if not project:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到项目')
 
-    count = await project.member.count()
-    if count:
+    if await project.member.count():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联用户，不能删除')
 
     await project.delete()
