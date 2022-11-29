@@ -48,14 +48,10 @@ class UserEdit(BaseModel):
         return hash_password(pwd)
 
 
-class UserId(BaseModel):
-    id: int
-
-
 class UserItem(BaseModel):
     id: int
-    username: str
-    email: str
+    username: str = None
+    email: str = None
 
 
 class UserList(UserItem):
@@ -66,6 +62,16 @@ class UserList(UserItem):
     @validator('created_at', 'updated_at')
     def format_dt(cls, dt):
         return dt_to_string(dt)
+
+
+class AdminUserListProject(BaseModel):
+    id: int
+    code: str
+    name: str
+
+
+class AdminUserList(UserList):
+    projects: Optional[List[AdminUserListProject]] = None
 
 
 class AccountInfo(UserList):

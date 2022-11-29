@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Path
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from models.user import User
+from api.serializers import AdminUserList
 from api.serializers import UserList, UserCreate, UserEdit, AccountInfo
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
@@ -29,8 +30,8 @@ async def create_user(user: UserCreate):
 
 @router_user.get(
     '',
-    description='用户列表',
-    response_model=Page[UserList],
+    description='用户列表（管理员）',
+    response_model=Page[AdminUserList],
     response_model_exclude_unset=True
 )
 async def list_user(
@@ -40,7 +41,7 @@ async def list_user(
     :param query_params:
     :return:
     """
-    return await paginate(User.objects.select_related('role').filter(
+    return await paginate(User.objects.select_related(['role', 'projects']).filter(
         **query_params.filter_
     ), params=query_params.params)
 

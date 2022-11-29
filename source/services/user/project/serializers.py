@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 from basic.utils.dt_format import dt_to_string
 from pydantic import validator
-from api.serializers import UserId
+from api.serializers import UserItem
 
 
 class ProjectCreate(BaseModel):
@@ -20,9 +20,10 @@ class ProjectCreate(BaseModel):
 
 
 class ProjectList(BaseModel):
+    id: int
     code: str
     name: str
-    owner: UserId
+    owner: UserItem
     project: Optional[List[int]] = None
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
