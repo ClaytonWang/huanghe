@@ -152,7 +152,7 @@ const GeneralTable = ({
 
   const pagination = {
     total: dataSource.length,
-    pageSize: 10,
+    pagesize: 10,
     showSizeChanger: false,
   };
 

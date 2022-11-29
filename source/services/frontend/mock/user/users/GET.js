@@ -1,8 +1,14 @@
-module.exports = {
-  success: true,
-  message: '',
-  result: {
-    total: 5, // 总条数,数字
+/**
+ * @Author guanlin.li guanlin.li@digitalbrain.cn
+ * @Date 2022-11-29 10:48:24
+ * @LastEditors guanlin.li guanlin.li@digitalbrain.cn
+ * @LastEditTime 2022-11-29 12:13:02
+ * @Description 后台管理用户管理列表 Mock Data
+ */
+/* eslint-disable @typescript-eslint/no-var-requires */
+const utils = require('../../utils');
+module.exports = function (req, res) {
+  utils.list(req, res, {
     data: [
       {
         username: '田政', // 用户名,字符串
@@ -44,5 +50,5 @@ module.exports = {
         creatDate: '2022-10-10', // 创建时间,字符串
       },
     ],
-  },
+  });
 };

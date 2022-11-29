@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Table, Button } from 'antd';
 import qs from 'qs';
 import { transformDate } from '@/common/utils/helper';
@@ -10,7 +10,6 @@ const ProjectsTable = ({
   onEdit = () => {},
   onDelete = () => {},
 }) => {
-  const navigate = useNavigate();
   const columns = [
     {
       title: '项目编号',
@@ -58,15 +57,15 @@ const ProjectsTable = ({
     },
   ];
   const [searchParams] = useSearchParams();
-  const { pageNo = 1, pageSize = 10 } = {
+  const { pageno = 1, pagesize = 10 } = {
     ...qs.parse(searchParams.toString()),
   };
 
-  const { totalCount = 0, data = [] } = tableData;
+  const { total = 0, data = [] } = tableData;
   const pagination = {
-    current: Number(pageNo),
-    pageSize: Number(pageSize),
-    total: totalCount,
+    current: Number(pageno),
+    pageSize: Number(pagesize),
+    total,
     onChange: onPageNoChange,
     showSizeChanger: false,
   };

@@ -16,8 +16,8 @@ const { Option } = Select;
 const ProjectList = () => {
   const defaultFilters = useMemo(
     () => ({
-      pageNo: 1,
-      pageSize: 10,
+      pageno: 1,
+      pagesize: 10,
       order: 'desc',
       orderBy: 'createTime',
     }),
@@ -77,8 +77,8 @@ const ProjectList = () => {
     setSearchParams(params);
     requestList(params);
   };
-  const onPageNoChange = (pageNo, pageSize) => {
-    reload({ pageNo, pageSize });
+  const onPageNoChange = (pageno, pagesize) => {
+    reload({ pageno, pagesize });
   };
 
   const createProject = async (values) => {

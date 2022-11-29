@@ -1,8 +1,7 @@
-module.exports = {
-  success: true,
-  message: '',
-  result: {
-    total: 50, // 总条数，整数
+/* eslint-disable @typescript-eslint/no-var-requires */
+const utils = require('../../utils');
+module.exports = function (req, res) {
+  utils.list(req, res, {
     data: [
       {
         id: '1', // 列表id，字符串
@@ -71,5 +70,5 @@ module.exports = {
         access: 'readonly', // 普通用户权限，可选readonly（只读）｜edit（编辑）
       },
     ],
-  },
+  });
 };
