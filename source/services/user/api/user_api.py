@@ -14,6 +14,7 @@ from api.serializers import UserList, UserCreate, UserEdit, AccountInfo
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from permissions.services import role_pms
+from api.services import update_user_of_project
 
 
 router_user = APIRouter()
@@ -33,13 +34,12 @@ async def create_user(user: UserCreate):
     if role.name == 'admin':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='不能创建管理员账号')
 
+    # TODO 失败回滚
     project_ids = init_data.pop('project', [])
     new_user = await User.objects.create(**init_data)
 
     if role.name == 'owner':
-        projects = await Project.objects.filter(id__in=project_ids).all()
-        for _project in projects:
-            await _project.member.add(new_user)
+        await update_user_of_project(project_ids=project_ids, user=new_user)
     return new_user
 
 
@@ -63,7 +63,7 @@ async def list_user(
 
 @router_user.put(
     '/{user_id}',
-    description='更新用户信息',
+    description='更新用户信息，角色不能更新成管理员',
     response_description='返回空',
 )
 async def update_user(
@@ -71,9 +71,28 @@ async def update_user(
         user_id: int = Path(..., ge=1, description='需要更新的用户ID'),
 ):
     update_data = user.dict(exclude_unset=True)
+
+    if 'role' in update_data:
+        role = await Role.objects.get_or_none(id=update_data['role'])
+        if not role:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='角色无效')
+        if role.name == 'admin':
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='角色不能修改成管理员')
+
+    project_ids = []
+    if 'project' in update_data:
+        project_ids = update_data.pop('project')
+
     _user = await User.objects.get_or_none(pk=user_id)
-    if not (_user and await _user.update(**update_data)):
+    if not _user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='用户不存在')
+
+    if update_data:
+        _user = await _user.update(**update_data)
+
+    if project_ids:
+        await update_user_of_project(project_ids=project_ids, user=_user, delete_old=True)
+
     return JSONResponse(dict(id=user_id))
 
 
