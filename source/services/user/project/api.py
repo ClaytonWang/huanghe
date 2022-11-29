@@ -21,7 +21,7 @@ router_project = APIRouter()
     description='创建项目',
     response_model=ProjectList,
 )
-async def create_user(project: ProjectCreate):
+async def create_project(project: ProjectCreate):
     return await Project.objects.create(**project.dict())
 
 
@@ -31,14 +31,15 @@ async def create_user(project: ProjectCreate):
     response_model=Page[ProjectList],
     response_model_exclude_unset=True
 )
-async def list_user(
+async def list_project(
         query_params: QueryParameters = Depends(QueryParameters)
 ):
     """
     :param query_params:
     :return:
     """
-    return await paginate(Project.objects.filter(), params=query_params.params)
+    print('...')
+    return await paginate(Project.objects.all(), params=query_params.params)
 
 
 @router_project.put(
@@ -46,7 +47,7 @@ async def list_user(
     description='更新项目信息',
     response_description='返回空',
 )
-async def update_user(
+async def update_project(
         project: ProjectEdit,
         project_id: int = Path(..., ge=1, description='需要更新的项目ID'),
 ):
@@ -64,7 +65,7 @@ async def update_user(
     description='删除项目（项目中没有成员且资源清空，可删除项目）',
     status_code=status.HTTP_200_OK,
 )
-async def delete_user(
+async def delete_project(
         project_id: int = Path(..., ge=1, description='项目ID')
 ):
 

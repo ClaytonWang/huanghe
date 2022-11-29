@@ -40,7 +40,9 @@ async def list_user(
     :param query_params:
     :return:
     """
-    return await paginate(User.objects.select_related('role'), params=query_params.params)
+    return await paginate(User.objects.select_related('role').filter(
+        **query_params.filter_
+    ), params=query_params.params)
 
 
 @router_user.put(
