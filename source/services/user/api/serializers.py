@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from basic.utils.dt_format import dt_to_string
 from role.serializers import RoleDetailSerializers
-from api.services import hash_password
+from auth.services import hash_password
 
 
 class Login(BaseModel):
@@ -79,4 +79,4 @@ class AccountInfo(UserList):
     permissions = []
 
     class Config:
-        orm_mode=True
+        orm_mode = True

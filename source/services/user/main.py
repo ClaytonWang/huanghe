@@ -18,7 +18,7 @@ from basic.common.env_variable import get_string_variable
 from basic.middleware.exception import validation_pydantic_exception_handler
 from basic.middleware.exception import validation_ormar_exception_handler
 from basic.middleware.exception import ormar_db_exception_handler
-from api.auth_api import router_auth
+from auth.auth_api import router_auth
 from api.user_api import router_user
 from role.api import router_role
 from project.api import router_project
