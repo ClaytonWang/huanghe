@@ -8,7 +8,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Path
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
-from ormar.exceptions import ModelError
 from models.user import User
 from api.serializers import UserList, UserCreate, UserEdit, AccountInfo
 from basic.common.paginate import *
@@ -54,9 +53,8 @@ async def update_user(
         user_id: int = Path(..., ge=1, description='需要更新的用户ID'),
 ):
     update_data = user.dict(exclude_unset=True)
-    print('update_data: ', update_data)
     _user = await User.objects.get_or_none(pk=user_id)
-    if not (_user and await _user.update(update_data)):
+    if not (_user and await _user.update(**update_data)):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='用户不存在')
     return JSONResponse(dict(id=user_id))
 
@@ -65,7 +63,6 @@ async def update_user(
     '/{user_id}',
     description='删除用户',
     status_code=status.HTTP_200_OK,
-    # response_model={"detail": "aaaa"},
 )
 async def delete_user(
         user_id: int = Path(..., ge=1, description='用户ID')

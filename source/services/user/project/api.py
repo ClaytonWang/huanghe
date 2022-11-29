@@ -6,14 +6,11 @@
     >Time    : 2022/11/28 19:52
 """
 from fastapi import APIRouter, Depends, HTTPException, status, Path
-from fastapi.requests import Request
 from fastapi.responses import JSONResponse
-from asyncpg.exceptions import UniqueViolationError
 from models.project import Project
-from project.serializers import ProjectCreate, ProjectList
+from project.serializers import ProjectCreate, ProjectList, ProjectEdit
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
-
 
 
 router_project = APIRouter()
@@ -26,3 +23,54 @@ router_project = APIRouter()
 )
 async def create_user(project: ProjectCreate):
     return await Project.objects.create(**project.dict())
+
+
+@router_project.get(
+    '',
+    description='项目列表',
+    response_model=Page[ProjectList],
+    response_model_exclude_unset=True
+)
+async def list_user(
+        query_params: QueryParameters = Depends(QueryParameters)
+):
+    """
+    :param query_params:
+    :return:
+    """
+    return await paginate(Project.objects.filter(), params=query_params.params)
+
+
+@router_project.put(
+    '/{project_id}',
+    description='更新项目信息',
+    response_description='返回空',
+)
+async def update_user(
+        project: ProjectEdit,
+        project_id: int = Path(..., ge=1, description='需要更新的项目ID'),
+):
+    update_data = project.dict(exclude_unset=True)
+    if not update_data:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
+    _project = await Project.objects.get_or_none(pk=project_id)
+    if not (_project and await _project.update(**update_data)):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='项目不存在')
+    return JSONResponse(dict(id=project_id))
+
+
+@router_project.delete(
+    '/{project_id}',
+    description='删除项目（项目中没有成员且资源清空，可删除项目）',
+    status_code=status.HTTP_200_OK,
+)
+async def delete_user(
+        project_id: int = Path(..., ge=1, description='项目ID')
+):
+
+    user = await Project.objects.get_or_none(id=project_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到用户')
+
+    if Project.objects.select_related("member").exists():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='关联存在用户，不能删除')

@@ -30,3 +30,9 @@ class ProjectList(BaseModel):
     @validator('created_at', 'updated_at')
     def format_dt(cls, dt):
         return dt_to_string(dt)
+
+
+class ProjectEdit(BaseModel):
+    code: str = Field(None, max_length=80)
+    name: str = Field(None, min_length=1, max_length=255)
+    owner:  Optional[int] = None
