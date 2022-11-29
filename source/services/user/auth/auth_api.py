@@ -8,8 +8,8 @@
 from fastapi import APIRouter, HTTPException, status
 from auth.services import verify_password, create_access_token
 from models.user import User
-from api.serializers import Token
-from api.serializers import Login
+from auth.serializers import Token
+from auth.serializers import Login
 
 
 router_auth = APIRouter()
