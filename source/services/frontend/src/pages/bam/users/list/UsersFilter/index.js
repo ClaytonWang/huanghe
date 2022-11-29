@@ -27,7 +27,7 @@ const UsersFilter = ({
       filter: {
         ...values,
       },
-      pageNo: 1,
+      pageno: 1,
     });
   };
   const reset = () => {

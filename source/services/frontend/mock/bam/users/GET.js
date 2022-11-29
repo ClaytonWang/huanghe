@@ -35,7 +35,7 @@ module.exports = function (req, res) {
         project: [
           // 所属项目名称,项目对象数组
           {
-            code: 'EN107',
+            id: 'EN107',
             name: '大模型',
           },
         ],
@@ -48,7 +48,7 @@ module.exports = function (req, res) {
         project: [
           // 所属项目名称,项目对象数组
           {
-            code: 'EN108',
+            id: 'EN108',
             name: '运筹',
           },
         ],
@@ -61,11 +61,11 @@ module.exports = function (req, res) {
         project: [
           // 所属项目名称,项目对象数组
           {
-            code: 'EN106',
+            id: 'EN106',
             name: '紫龙游戏',
           },
           {
-            code: 'EN107',
+            id: 'EN107',
             name: '大模型',
           },
         ],
@@ -78,11 +78,11 @@ module.exports = function (req, res) {
         project: [
           // 所属项目名称,项目对象数组
           {
-            code: 'EN107',
+            id: 'EN107',
             name: '大模型',
           },
           {
-            code: 'EN108',
+            id: 'EN108',
             name: '运筹',
           },
         ],
