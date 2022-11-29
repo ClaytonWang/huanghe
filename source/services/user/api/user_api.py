@@ -8,7 +8,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Path
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
-from models.user import User
+from models import User, Role, Project
 from api.serializers import AdminUserList
 from api.serializers import UserList, UserCreate, UserEdit, AccountInfo
 from basic.common.paginate import *
@@ -25,7 +25,22 @@ router_user = APIRouter()
     response_model=UserList,
 )
 async def create_user(user: UserCreate):
-    return await User.objects.create(**user.dict())
+
+    init_data = user.dict()
+    role = await Role.objects.get_or_none(id=user.role)
+    if role:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='角色无效')
+    if role.name == 'admin':
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='不能创建管理员账号')
+
+    project_ids = init_data.pop('project', [])
+    new_user = await User.objects.create(**init_data)
+
+    if role.name == 'owner':
+        projects = await Project.objects.filter(id__in=project_ids).all()
+        for _project in projects:
+            await _project.member.add(new_user)
+    return new_user
 
 
 @router_user.get(
