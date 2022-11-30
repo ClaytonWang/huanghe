@@ -84,3 +84,13 @@ class AccountInfo(UserList):
 
     class Config:
         orm_mode = True
+
+
+class AccountEdit(BaseModel):
+    username: str = Field(..., max_length=80)
+    old_password: Optional[str] = Field(None, min_length=8, max_length=255)
+    password: Optional[str] = Field(None, min_length=8, max_length=255)
+
+    @validator('password')
+    def set_password(cls, pwd):
+        return hash_password(pwd) if pwd else None
