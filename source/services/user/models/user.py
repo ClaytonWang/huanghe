@@ -15,7 +15,7 @@ from models import DB, META
 
 class Role(DateModel):
     class Meta(ormar.ModelMeta):
-        tablename: str = "user_role"
+        tablename: str = "bam_role"
         metadata = META
         database = DB
         orders_by = ['-id']
@@ -30,7 +30,7 @@ class Role(DateModel):
 
 class User(DateAuditModel):
     class Meta(ormar.ModelMeta):
-        tablename: str = "user_user"
+        tablename: str = "bam_user"
         metadata = META
         database = DB
         orders_by = ['-id']

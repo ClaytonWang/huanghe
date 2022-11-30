@@ -7,6 +7,7 @@
 """
 from fastapi import status
 from fastapi.responses import JSONResponse
+from asyncpg.exceptions import UniqueViolationError, ForeignKeyViolationError
 
 
 def validation_pydantic_exception_handler(request, exc):
@@ -25,3 +26,17 @@ def validation_ormar_exception_handler(request, exc):
     :return:
     """
     return JSONResponse(str(exc), status_code=status.HTTP_400_BAD_REQUEST)
+
+
+def ormar_db_exception_handler(request, exc):
+    """
+    :param request:
+    :param exc:
+    :return:
+    """
+    if isinstance(exc, (UniqueViolationError, ForeignKeyViolationError)):
+        return JSONResponse(
+            exc.detail if hasattr(exc, 'detail') and len(str(exc.detail)) else str(exc),
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+    return exc

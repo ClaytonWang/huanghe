@@ -3,51 +3,26 @@
     >File    : services.py
     >Author  : YJD
     >Mail    : jindu.yin@digitalbrain.cn
-    >Time    : 2022/10/13 07:10
+    >Time    : 2022/11/29 16:48
 """
-from jose import jwt
-from typing import Optional
-from datetime import datetime, timedelta
-from passlib.context import CryptContext
-from config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from models import Role, User, Project
+from typing import List
 
 
-PWD_CONTEXT = CryptContext(schemes=['bcrypt'], deprecated="auto")
-
-
-def hash_password(password: str) -> str:
+async def update_user_of_project(project_ids: List[int], user: User, delete_old: bool = False):
     """
-    密码加密
-    :param password:
+    更新项目成员，
+
+    删掉所有旧的重新添加，TODO：已经存在的不删除重新添加，新增新加，删除去掉
+    :param project_ids:
+    :param user:
+    :param delete_old: 删除旧数据
     :return:
     """
-    return PWD_CONTEXT.hash(password)
+    # TODO 异常回滚
+    if delete_old:
+        await user.projects.clear()
 
-
-def verify_password(plain_password, hashed_password):
-    """
-    验证密码
-    :param plain_password:
-    :param hashed_password:
-    :return:
-    """
-    return PWD_CONTEXT.verify(plain_password, hashed_password)
-
-
-def create_access_token(
-        data: dict,
-        expires_minutes: Optional[int] = None):
-    """
-    用户名、密码验证成功后，生成 token
-    :param data:
-    :param expires_minutes:
-    :return:
-    """
-    to_encode = data.copy()
-    if expires_minutes:
-        expire = datetime.utcnow() + timedelta(minutes=expires_minutes)
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    projects = await Project.objects.filter(id__in=project_ids).all()
+    for _project in projects:
+        await _project.member.add(user)
