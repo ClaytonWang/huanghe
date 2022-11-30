@@ -15,7 +15,7 @@ SOURCE_PATH = Path.joinpath(Path(BASIC_PATH).parent)
 sys.path.insert(0, SOURCE_PATH.__str__())
 
 from basic.config.user import *
-DO_NOT_AUTH_URI = ['/auth/login', '/docs', '/openapi']
+DO_NOT_AUTH_URI = ['/auth/login', '/docs', '/openapi', '/openapi.json']
 SERVICE_PORT = 8000
 DEBUG = True
 
