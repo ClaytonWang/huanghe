@@ -5,12 +5,14 @@
     >Mail    : jindu.yin@digitalbrain.cn
     >Time    : 2022/10/13 07:10
 """
-from fastapi import APIRouter, Depends, HTTPException, status, Path
+from typing import List
+from fastapi import APIRouter, Depends, HTTPException, status, Path, Query
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from models import User, Role, Project
 from api.serializers import AdminUserList
-from api.serializers import UserList, UserCreate, UserEdit, AccountInfo, AccountEdit
+from api.serializers import UserList, UserCreate, UserEdit
+from api.serializers import AccountInfo, AccountEdit, UserItem
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from permissions.services import role_pms
@@ -159,3 +161,19 @@ async def account(
 
     len(update_data) and await request.user.update(**update_data)
     return JSONResponse({})
+
+
+@router_user.get(
+    '/items',
+    description='用户列表指定类型的所有用户，字段只返回ID、用户名和邮箱',
+    response_model=List[UserItem],
+    response_model_exclude_unset=True
+)
+async def list_user(
+            role_name: str = Query(default='owner', description='权限名，默认选择项目负责人')
+):
+    """
+    :param role_name:
+    :return:
+    """
+    return await User.objects.filter(role__name=role_name).all()
