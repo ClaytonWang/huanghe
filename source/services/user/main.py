@@ -48,11 +48,11 @@ app.add_exception_handler(RequestValidationError, validation_ormar_exception_han
 app.add_exception_handler(PostgresError, ormar_db_exception_handler)
 
 # 路由配置
-app.include_router(router_auth, prefix='/v1/auth')
-app.include_router(router_user, prefix='/v1/user')
-app.include_router(router_role, prefix='/v1/role')
-app.include_router(router_pms, prefix='/v1/pms')
-app.include_router(router_project, prefix='/v1/project')
+app.include_router(router_auth, prefix='/auth')
+app.include_router(router_user, prefix='/user')
+app.include_router(router_role, prefix='/role')
+app.include_router(router_pms, prefix='/pms')
+app.include_router(router_project, prefix='/project')
 
 
 if __name__ == '__main__':
