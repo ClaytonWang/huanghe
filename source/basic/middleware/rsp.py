@@ -29,7 +29,7 @@ async def add_common_response_data(request: Request, call_next) -> Response:
     response = await call_next(request)
 
     path: str = request.get('path')
-    if not re.match('^/v\d+', path):
+    if path in ['/docs', '/openapi.json']:
         return response
 
     # 注意性能
