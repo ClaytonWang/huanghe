@@ -10,6 +10,7 @@ from fastapi import Request, Response, status
 from fastapi import HTTPException
 from typing import Optional
 from config import SECRET_KEY
+from config import DO_NOT_AUTH_URI
 from starlette.authentication import AuthCredentials, SimpleUser
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
@@ -30,9 +31,7 @@ async def verify_token(request: Request, call_next):
 
     path: str = request.get('path')
     # 登录接口、docs文档依赖的接口，不做token校验
-    if path.startswith('/v1/auth/login') | \
-            path.startswith('/docs') | \
-            path.startswith('/openapi'):
+    if path in DO_NOT_AUTH_URI:
         return await call_next(request)
     else:
         try:
@@ -70,9 +69,7 @@ class OFOAuth2PasswordBearer(OAuth2PasswordBearer):
 
     async def __call__(self, request: Request) -> Optional[str]:
         path: str = request.get('path')
-        if path.startswith('/v1/auth/login') \
-                | path.startswith('/docs') \
-                | path.startswith('/openapi'):
+        if path in DO_NOT_AUTH_URI:
             return ""
         authorization: str = request.headers.get("Authorization")
         scheme, param = get_authorization_scheme_param(authorization)
