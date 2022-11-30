@@ -17,7 +17,7 @@ from jose.jwt import JWTError
 
 
 async def get_current_user(email=Optional[str]):
-    from source.services.user.models import User
+    from services.user.models import User
     return await User.objects.select_related('role').get_or_none(email=email)
 
 
