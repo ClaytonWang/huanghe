@@ -23,6 +23,7 @@ from api.user_api import router_user
 from role.api import router_role
 from project.api import router_project
 from permissions.api import router_pms
+from setting.api import router_setting
 from models import startup_event, shutdown_event
 
 oauth2_scheme = OFOAuth2PasswordBearer(token_url="/v1/auth/login")
@@ -53,6 +54,7 @@ app.include_router(router_user, prefix='/v1/user')
 app.include_router(router_role, prefix='/v1/role')
 app.include_router(router_pms, prefix='/v1/pms')
 app.include_router(router_project, prefix='/v1/project')
+app.include_router(router_setting, prefix='/v1/settings')
 
 
 if __name__ == '__main__':

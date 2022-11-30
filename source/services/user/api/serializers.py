@@ -69,13 +69,20 @@ class UserList(UserItem):
 
 
 class AdminUserListProject(BaseModel):
-    id: int
-    code: str
-    name: str
+    """
+    项目负责人里不一定会有项目，默认设置空
+    """
+    id: int = None
+    code: str = None
+    name: str = None
 
 
 class AdminUserList(UserList):
     projects: Optional[List[AdminUserListProject]] = None
+
+
+class OwnerUserList(UserList):
+    project: Optional[AdminUserListProject] = None
 
 
 class AccountInfo(UserList):

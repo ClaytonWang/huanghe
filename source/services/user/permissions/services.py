@@ -13,6 +13,7 @@ SINGLE_LAYER_MENU_LENGTH = 4
 
 async def generate_code(parent_code: str, project: str = None) -> (bool, str):
     """
+    TODO 线程安全
     :param parent_code:
     :param project:
     :return:
