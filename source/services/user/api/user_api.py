@@ -10,11 +10,12 @@ from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from models import User, Role, Project
 from api.serializers import AdminUserList
-from api.serializers import UserList, UserCreate, UserEdit, AccountInfo
+from api.serializers import UserList, UserCreate, UserEdit, AccountInfo, AccountEdit
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from permissions.services import role_pms
 from api.services import update_user_of_project
+from auth.services import verify_password
 
 
 router_user = APIRouter()
@@ -128,3 +129,33 @@ async def account(request: Request):
     result['permissions'] = pms_info
     # result['permissions'] = role_pms(request.user.role.name)
     return JSONResponse(result)
+
+
+@router_user.post(
+    '/account',
+    response_description='更新个人账号信息，姓名和修改密码'
+)
+async def account(
+        request: Request,
+        user_info: AccountEdit,
+):
+    update_data = dict()
+    # 修改用户名
+    if user_info.username != request.user.username:
+        update_data['username'] = user_info.username
+
+    # 修改密码
+    # 旧密码有一个输入，做密码更新校验
+    if user_info.old_password or user_info.password:
+        if not verify_password(user_info.old_password, request.user.password):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail='原始密码错误'
+            )
+        if user_info.password is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail='需要输入新密码'
+            )
+        update_data['password'] = user_info.password
+
+    len(update_data) and await request.user.update(**update_data)
+    return JSONResponse({})
