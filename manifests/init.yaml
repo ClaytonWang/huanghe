@@ -21,6 +21,8 @@ data:
   user: |
     PYTHON_ENV: production
     SERVICE_NAME: user
+  frontend: ''
+  cluster: ''
 ---
 # gateway
 apiVersion: networking.istio.io/v1beta1
