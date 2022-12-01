@@ -13,8 +13,9 @@ class ClusterManager(NamespaceMixin, NotebookMixin, PodMixin):
 if __name__ == '__main__':
     cm = ClusterManager
     from api import c
-    cm.create_notebook(c=c, name="jiangshouchen", namespace="default", image="dddssssssss")
-
+    res = cm.create_notebook(c=c, name="jiangshouchen", namespace="default", image="dddssssssss")
+    print(res)
+    print(type(res))
 
 
 
