@@ -106,7 +106,7 @@ const UsersList = () => {
     try {
       const { id } = initialFormValues;
       await api.bamUsersUpdate({
-        id,
+        userId: id,
         ...values,
         password: b64.encode(values.password),
       });
@@ -141,7 +141,7 @@ const UsersList = () => {
       cancelText: '取消',
       onOk: async () => {
         try {
-          await api.bamUsersDelete({ id });
+          await api.bamUsersDelete({ userId: id });
           message.success('用户删除成功！');
           reload();
         } catch (error) {

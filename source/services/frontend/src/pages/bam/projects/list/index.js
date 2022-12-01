@@ -96,6 +96,7 @@ const ProjectList = () => {
   const updateProject = async (values) => {
     try {
       await api.bamProjectsUpdate({
+        // projectId: id
         ...values,
       });
       message.success('项目修改成功！');
@@ -137,7 +138,7 @@ const ProjectList = () => {
       cancelText: '取消',
       onOk: async () => {
         try {
-          await api.bamProjectsDelete({ id });
+          await api.bamProjectsDelete({ projectId: id });
           message.success('项目删除成功！');
         } catch (error) {
           console.log(error);

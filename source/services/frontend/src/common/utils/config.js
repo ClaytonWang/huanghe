@@ -12,20 +12,19 @@ module.exports = {
   apiUriParamsPattern: /:([_a-zA-Z0-9]+)/g,
   api: {
     // login
-    login: 'post|/login',
-    signup: 'post|/signup',
-    logout: 'put|/logout',
+    login: 'post|/user/auth/login',
+    logout: 'put|/user/auth/logout',
 
     // bam
-    bamProjectsList: 'get|/bam/projects',
-    bamProjectsCreate: 'post|/bam/projects',
-    bamProjectsUpdate: 'put|/bam/projects/:id',
-    bamProjectsDelete: 'delete|/bam/projects/:id',
+    bamProjectsList: 'get|/user/project',
+    bamProjectsCreate: 'post|/user/project',
+    bamProjectsUpdate: 'put|/user/project/:project_id',
+    bamProjectsDelete: 'delete|/user/project/:project_id',
     // bamUsersList: 'get|/bam/users',
-    bamUsersList: 'get|/user/users',
-    bamUsersCreate: 'post|/bam/users',
-    bamUsersUpdate: 'put|/bam/users/:id',
-    bamUsersDelete: 'delete|/bam/users/:id',
+    bamUsersList: 'get|/user/user',
+    bamUsersCreate: 'post|/user/user',
+    bamUsersUpdate: 'put|/user/user/:user_id',
+    bamUsersDelete: 'delete|/user/user/:user_id',
 
     // settings
     settingsUsersList: 'get|/settings/users',
@@ -35,8 +34,9 @@ module.exports = {
 
     settingsUsersPasswordReset: 'post|/users/password/reset',
 
-    settingsAccount: 'get|/account',
-    settingsAccountUpdate: 'put|/account/update',
+    // todo, remove settings prefix
+    settingsAccount: 'get|/user/user/account',
+    settingsAccountUpdate: 'post|/user/user/account',
   },
   breadcrumbConfig: {
     '/bam/projects': '项目管理',

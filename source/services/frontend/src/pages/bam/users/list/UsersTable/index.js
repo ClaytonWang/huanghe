@@ -12,7 +12,6 @@ const UsersTable = ({
   onDelete = () => {},
   onPageNoChange = () => {},
 }) => {
-  // const navigate = useNavigate();
   const columns = [
     {
       title: '姓名',
@@ -38,7 +37,7 @@ const UsersTable = ({
     },
     {
       title: '创建时间',
-      dataIndex: 'createDate',
+      dataIndex: 'createAt',
       render(value) {
         return transformDate(value) || '-';
       },

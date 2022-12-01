@@ -3,10 +3,10 @@
  * @Date 2022-11-29 10:48:24
  * @LastEditors guanlin.li guanlin.li@digitalbrain.cn
  * @LastEditTime 2022-11-29 12:13:02
- * @Description 后台管理用户管理列表 Mock Data
+ * @Description 项目负责人列表: 新建项目和编辑项目需要选择项目负责人
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
-const utils = require('../../utils');
+const utils = require('../../../utils');
 module.exports = function (req, res) {
   utils.list(req, res, {
     data: [

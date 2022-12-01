@@ -1,6 +1,9 @@
 /**
- * @description Mock: 获取账号信息
- * @author liguanlin<guanlin.li@digitalbrain.cn>
+ * @Author guanlin.li guanlin.li@digitalbrain.cn
+ * @Date 2022-11-29 10:59:16
+ * @LastEditors guanlin.li guanlin.li@digitalbrain.cn
+ * @LastEditTime 2022-12-01 10:14:16
+ * @Description 个人账号接口
  */
 const admin = [
   // （一）模块级：后台管理模块
@@ -46,7 +49,7 @@ const account = {
         id: 'EN105', // 项目编码，字符串
       },
     ],
-    createDate: 'YYYY-MM-DD', // 创建日期，字符串
+    create_at: 'YYYY-MM-DD', // 创建日期，字符串
     permissions: [...admin, ...owner],
   },
 };

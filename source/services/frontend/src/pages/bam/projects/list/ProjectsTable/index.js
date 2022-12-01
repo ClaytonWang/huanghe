@@ -1,3 +1,10 @@
+/**
+ * @Author guanlin.li guanlin.li@digitalbrain.cn
+ * @Date 2022-11-29 12:19:26
+ * @LastEditors guanlin.li guanlin.li@digitalbrain.cn
+ * @LastEditTime 2022-12-01 14:14:49
+ * @Description 后台管理，项目列表
+ */
 import { useSearchParams } from 'react-router-dom';
 import { Table, Button } from 'antd';
 import qs from 'qs';
@@ -25,7 +32,7 @@ const ProjectsTable = ({
     },
     {
       title: '创建时间',
-      dataIndex: 'createDate',
+      dataIndex: 'createAt',
       render(value) {
         return transformDate(value) || '-';
       },

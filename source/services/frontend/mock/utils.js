@@ -4,7 +4,11 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { get, assign } = require('lodash');
-const { apiPrefix, api } = require('../src/common/utils/config');
+const {
+  apiPrefix,
+  api,
+  apiUriParamsPattern,
+} = require('../src/common/utils/config');
 const success = {
   success: true,
   message: '',
@@ -49,7 +53,7 @@ const genProxy = () => {
         suffix = `/${get(req, 'query.type')}`;
       }
       const filePath = path.replace(
-        /:([a-zA-Z0-9]+)/g,
+        apiUriParamsPattern,
         (_match, field) => field
       );
       const result = require(`.${filePath}${suffix}/${method}.js`);
