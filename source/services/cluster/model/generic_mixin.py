@@ -37,16 +37,16 @@ class GenericMixin(BM):
         """For `print` and `pprint`"""
         return self.to_str()
 
-    # def __eq__(self, other):
-    #     """Returns true if both objects are equal"""
-    #     if not isinstance(other, self.__class__):
-    #         return False
-    #
-    #     return self.to_dict() == other.to_dict()
-    #
-    # def __ne__(self, other):
-    #     """Returns true if both objects are not equal"""
-    #     if not isinstance(other, self.__class__):
-    #         return True
-    #
-    #     return self.to_dict() != other.to_dict()
+    def __eq__(self, other):
+        """Returns true if both objects are equal"""
+        if not isinstance(other, self.__class__):
+            return False
+
+        return self.to_dict() == other.to_dict()
+
+    def __ne__(self, other):
+        """Returns true if both objects are not equal"""
+        if not isinstance(other, self.__class__):
+            return True
+
+        return self.to_dict() != other.to_dict()
