@@ -6,6 +6,7 @@
 import { uniqueId, cloneDeep } from 'lodash';
 import accounting from 'accounting';
 import moment from 'moment';
+import { apiUriParamsPattern } from '@/common/utils/config';
 /**
  * parse router as xxx/:xx to url
  * @param {string} _url
@@ -14,8 +15,8 @@ import moment from 'moment';
  * @return {url}
  */
 export const parseUrl = (_url, params) => {
-  // if url router as xxx/:xx, replace params
-  const url = _url.replace(/:([a-zA-Z0-9]+)/g, (_match, field) => {
+  // if url router as xxx/:xx_xxx, replace params
+  const url = _url.replace(apiUriParamsPattern, (_match, field) => {
     if (field in params) {
       const value = params[field];
       // remove matched value from params
@@ -257,4 +258,106 @@ export const purifyDeep = (obj) => {
     return acc;
   }, result);
   return result;
+};
+/**
+ * 蛇形表达式
+ *
+ * @param {string} value
+ * @return boolen
+ */
+export const isSnakecase = (value) => {
+  console.log();
+  return /\w+_\w+/.test(value);
+};
+/**
+ * 蛇形转驼峰
+ *
+ * @param {string} value
+ * @return string
+ */
+export const parseSnakeToCamel = (value) => {
+  console.log();
+  const pattern = /_([a-z])/;
+  return value.replace(pattern, (_all, letter) => letter.toUpperCase());
+};
+/**
+ * 驼峰表达式
+ *
+ * @param {string} value
+ * @return boolen
+ */
+export const isCamelcase = (value) => {
+  console.log();
+  return /[a-z]+([A-Z])[a-z]+/.test(value);
+};
+/**
+ * 驼峰转蛇形
+ *
+ * @param {string} value
+ * @return string
+ */
+export const parseCamelToSnake = (value) => {
+  console.log();
+  const pattern = /([a-z])([A-Z])/;
+  return value.replace(pattern, (_all, sub1, sub2) => {
+    console.log();
+    return `${sub1}_${sub2.toLowerCase()}`;
+  });
+};
+/**
+ * 遍历Json对象
+ *
+ * @param {string} value
+ * @return string
+ */
+export const tranverseJson = (json, fn) => {
+  if (json instanceof Array) {
+    let arr = json;
+    for (let item of arr) {
+      if (item) {
+        item = tranverseJson(item, fn);
+      }
+    }
+    return arr;
+  }
+  // 根节点为对象
+  if (json instanceof Object) {
+    let obj = json;
+    Object.entries(obj).forEach(([key, value]) => {
+      if (value instanceof Object) {
+        obj[key] = tranverseJson(value, fn);
+      }
+      fn(obj, [key, value]);
+    });
+    return obj;
+  }
+  return json;
+};
+/**
+ * 遍历Json对象
+ *
+ * @param {string} value
+ * @return string
+ */
+export const parseKeyToCamel = (obj, [key, value]) => {
+  if (isSnakecase(key)) {
+    let newKey = key;
+    delete obj[key];
+    newKey = parseSnakeToCamel(key);
+    obj[newKey] = value;
+  }
+};
+/**
+ * 遍历Json对象
+ *
+ * @param {string} value
+ * @return string
+ */
+export const parseKeyToSnake = (obj, [key, value]) => {
+  if (isCamelcase(key)) {
+    let newKey = key;
+    delete obj[key];
+    newKey = parseCamelToSnake(key);
+    obj[newKey] = value;
+  }
 };

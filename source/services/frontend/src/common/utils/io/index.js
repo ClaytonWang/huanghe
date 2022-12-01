@@ -5,11 +5,16 @@
 
 import { message, Modal } from 'antd';
 import axios from 'axios';
-import { isString, isEmpty } from 'lodash';
+import { isString, isEmpty, cloneDeep } from 'lodash';
 import qs from 'qs';
 import { apiPrefix } from '@/common/utils/config';
 import { history } from '@/app/history';
-import { parseUrl } from '../helper';
+import {
+  parseKeyToCamel,
+  parseKeyToSnake,
+  parseUrl,
+  tranverseJson,
+} from '../helper';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据',
@@ -120,7 +125,11 @@ export class IO {
     this.axios.interceptors.response.use((response) => {
       // IE9 不支持 responseType 配置，所以 response.data 始终都不会存在，
       // 手动从 response.request.responseText 中 parse。
-      const data = response.data || JSON.parse(response.request.responseText);
+      let data = cloneDeep(
+        response.data || JSON.parse(response.request.responseText)
+      );
+      data = tranverseJson(data, parseKeyToCamel);
+      console.log('tranversed reponse data to CAMEL CASE', data);
       return requestSuccessHandler.call(this, data);
     }, requestFailureHandler.bind(this));
   }
@@ -172,15 +181,18 @@ export class IO {
             }
             return url;
           }
-          url = parseUrl(url, data);
+          console.log('before parsed requester data', data);
+          let _data = cloneDeep(data);
+          _data = tranverseJson(_data, parseKeyToSnake);
+          url = parseUrl(url, _data);
           console.log('url:', url);
           if (method === 'get') {
             return this.get(url, {
-              params: data,
+              params: _data,
               ...configs,
             });
           }
-          return this[method](url, data, configs);
+          return this[method](url, _data, configs);
         };
       }
     };

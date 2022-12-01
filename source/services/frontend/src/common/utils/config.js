@@ -9,6 +9,7 @@ module.exports = {
   logo: 'static/logo.svg',
   CORS: [],
   apiPrefix: APIV1,
+  apiUriParamsPattern: /:([_a-zA-Z0-9]+)/g,
   api: {
     // login
     login: 'post|/login',
