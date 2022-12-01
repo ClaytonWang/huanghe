@@ -26,7 +26,7 @@ data:
     SERVICE_NAME: user
 ```
 
-约定统一挂载路径 **/config/juece/config.yaml**
+约定统一挂载路径 **/etc/juece/config.yaml**
 
 **微服务容器中挂载的 配置文件样例**
 ```yaml
@@ -43,7 +43,7 @@ try:
 except ImportError:
     from yaml import Loader, Dumper
 
-with open("/config/juece/config.yaml", "r") as stream:
+with open("/etc/juece/config.yaml", "r") as stream:
   data = load(stream, Loader=Loader)
   print(data)
 

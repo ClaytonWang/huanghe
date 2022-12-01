@@ -21,6 +21,8 @@ data:
   user: |
     PYTHON_ENV: production
     SERVICE_NAME: user
+  frontend: ''
+  cluster: ''
 ---
 # gateway
 apiVersion: networking.istio.io/v1beta1
@@ -53,17 +55,7 @@ spec:
   http:
   - match:
     - uri:
-        prefix: /api/project/
-    rewrite:
-      uri: /
-    route:
-    - destination:
-        host: project
-        port:
-          number: 80
-  - match:
-    - uri:
-        prefix: /api/user/
+        prefix: /api/v1/user/
     rewrite:
       uri: /
     route:
