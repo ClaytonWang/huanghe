@@ -27,7 +27,6 @@ import FormModal from '@/common/components/FormModal';
 import './index.less';
 import { parseKVToKeyValue } from '@/common/utils/helper';
 import { USER_ROLE } from '@/common/constants';
-import { b64 } from '@/common/utils/util';
 
 const { Header } = Layout;
 const { Option } = Select;
@@ -80,11 +79,8 @@ const HeaderNav = () => {
     }
   };
   const handleAccountSubmit = (values) => {
-    const { oldPassword = null, password = null } = values;
     updateAccount({
       ...values,
-      oldPassword: b64.encode(oldPassword),
-      password: password && b64.encode(password),
     });
   };
   const handleAccountCancel = () => {
@@ -123,11 +119,7 @@ const HeaderNav = () => {
           onSubmit={handleAccountSubmit}
           onCancel={handleAccountCancel}
         >
-          <Form.Item
-            label="姓名"
-            name="username"
-            rules={[{ required: true, message: '请输入用户姓名' }]}
-          >
+          <Form.Item label="姓名" name="username">
             <Input placeholder="请输入姓名" />
           </Form.Item>
           <Form.Item label="角色" name="role">
@@ -142,11 +134,7 @@ const HeaderNav = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item
-            label="旧密码"
-            name="oldPassword"
-            rules={[{ required: true, message: '请输入旧密码' }]}
-          >
+          <Form.Item label="旧密码" name="oldPassword">
             <Input.Password placeholder="请输入旧密码" />
           </Form.Item>
           <Form.Item

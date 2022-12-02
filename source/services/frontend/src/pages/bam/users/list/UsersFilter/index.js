@@ -1,8 +1,10 @@
 /**
- * @description 负责人所有项目用户列表查询条件
- * @author liguanlin<guanlin.li@digitalbrain.cn>
+ * @Author guanlin.li guanlin.li@digitalbrain.cn
+ * @Date 2022-11-29 12:19:26
+ * @LastEditors guanlin.li guanlin.li@digitalbrain.cn
+ * @LastEditTime 2022-12-02 16:51:41
+ * @Description 负责人所有项目用户列表查询条件
  */
-
 import { useMemo } from 'react';
 import { Form, Input, Select, Button } from 'antd';
 import { USER_ROLE } from '@/common/constants';
@@ -44,7 +46,7 @@ const UsersFilter = ({
       <Form.Item label="姓名" name="username">
         <Input placeholder="输入用户姓名..." style={{ width: 250 }} />
       </Form.Item>
-      <Form.Item label="角色" name="role">
+      <Form.Item label="角色" name="role__name">
         <Select style={{ width: 150 }}>
           <Option key="all" value="all">
             全部
@@ -56,13 +58,13 @@ const UsersFilter = ({
           ))}
         </Select>
       </Form.Item>
-      <Form.Item label="所属项目" name="project">
+      <Form.Item label="所属项目" name="projects__code">
         <Select style={{ width: 100 }}>
           <Option key="all" value="all">
             全部
           </Option>
-          {projectsDataSource.map(({ id, name }) => (
-            <Option key={id} value={id}>
+          {projectsDataSource.map(({ id, code, name }) => (
+            <Option key={id} value={code}>
               {name}
             </Option>
           ))}

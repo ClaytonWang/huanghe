@@ -5,11 +5,16 @@
 
 import { message, Modal } from 'antd';
 import axios from 'axios';
-import { isString, isEmpty } from 'lodash';
+import { isString, isEmpty, cloneDeep } from 'lodash';
 import qs from 'qs';
 import { apiPrefix } from '@/common/utils/config';
 import { history } from '@/app/history';
-import { parseUrl } from '../helper';
+import {
+  parseKeyToCamel,
+  parseKeyToSnake,
+  parseUrl,
+  tranverseJson,
+} from '../helper';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据',
@@ -120,7 +125,11 @@ export class IO {
     this.axios.interceptors.response.use((response) => {
       // IE9 不支持 responseType 配置，所以 response.data 始终都不会存在，
       // 手动从 response.request.responseText 中 parse。
-      const data = response.data || JSON.parse(response.request.responseText);
+      let data = cloneDeep(
+        response.data || JSON.parse(response.request.responseText)
+      );
+      data = tranverseJson(data, parseKeyToCamel);
+      console.log('tranversed reponse data to CAMEL CASE', data);
       return requestSuccessHandler.call(this, data);
     }, requestFailureHandler.bind(this));
   }
@@ -165,22 +174,29 @@ export class IO {
           // 默认跳过以`/download`和`/upload`结尾的路径
           !/\/(?:up)load$/.test(path);
         return (data = {}, configs = {}) => {
+          let uri = url;
           // 不需要生成请求函数的，将参数拼接到URL上
-          if (!isRequester(url)) {
+          if (!isRequester(uri)) {
             if (!isEmpty(data)) {
-              return `${url}?${qs.stringify(data)}`;
+              return `${uri}?${qs.stringify(data)}`;
             }
-            return url;
+            return uri;
           }
-          url = parseUrl(url, data);
-          console.log('url:', url);
+          console.log('before parsed requester data', data);
+          let _data = cloneDeep(data);
+          _data = tranverseJson(_data, parseKeyToSnake);
+          uri = parseUrl(uri, _data);
+          console.log('url:', uri);
           if (method === 'get') {
-            return this.get(url, {
-              params: data,
+            return this.get(uri, {
+              params: _data,
+              paramsSerializer(params) {
+                return qs.stringify(params, { arrayFormat: 'comma' });
+              },
               ...configs,
             });
           }
-          return this[method](url, data, configs);
+          return this[method](uri, _data, configs);
         };
       }
     };
