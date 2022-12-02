@@ -91,6 +91,23 @@ def pms_data():
                     ]
                 },
             ]
+        },
+        {
+            'name': 'project',
+            'value': '项目',
+            'access': [],
+            'children': [
+                {
+                    'name': 'readonly',
+                    'value': '新建',
+                    'access': [],
+                },
+                {
+                    'name': 'edit',
+                    'value': '编辑',
+                    'access': [],
+                }
+            ]
         }
     ]
     return data

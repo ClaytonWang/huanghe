@@ -6,7 +6,7 @@
     >Time    : 2022/11/29 19:11
 """
 import copy
-from fastapi import APIRouter, Depends, HTTPException, status, Path
+from fastapi import APIRouter, Depends, Request, HTTPException, status
 from models import User, Role, Project
 from api.serializers import OwnerUserList
 from basic.common.paginate import *
@@ -18,17 +18,22 @@ router_setting = APIRouter()
 
 @router_setting.get(
     '/user',
-    description='设置模块，用户列表（项目负责人）',
+    description='设置模块，用户列表（项目负责人才可以查看）',
     response_model=Page[OwnerUserList],
     response_model_exclude_unset=True
 )
 async def list_user(
+        request: Request,
         query_params: QueryParameters = Depends(QueryParameters)
 ):
     """
+    :param request:
     :param query_params:
     :return:
     """
+    if request.user.role.name != 'owner':
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='用户没有权限')
+
     filter_params = query_params.filter_
     filter_params['role__name'] = 'owner'
     # 未关联项目查询条件
