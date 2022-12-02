@@ -42,7 +42,7 @@ class UserEdit(BaseModel):
     username: str = Field(None, max_length=80)
     password: str = Field(None, min_length=8, max_length=255)
     role:  Optional[str] = Field(None, description='角色名')
-    project: Optional[List[int]] = Field([], description='全量项目ID')
+    projects: Optional[List[int]] = Field([], description='全量项目ID')
 
     @validator('password')
     def set_password(cls, pwd):

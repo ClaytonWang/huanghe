@@ -85,8 +85,8 @@ async def update_user(
         update_data['role'] = role.id
 
     project_ids = []
-    if 'project' in update_data:
-        project_ids = update_data.pop('project')
+    if 'projects' in update_data:
+        project_ids = update_data.pop('projects')
 
     _user = await User.objects.get_or_none(pk=user_id)
     if not _user:
