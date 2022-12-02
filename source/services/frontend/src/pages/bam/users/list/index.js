@@ -5,7 +5,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Input, message, Form, Select, Modal } from 'antd';
-import { filter } from 'lodash';
+import { filter, map } from 'lodash';
 import qs from 'qs';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { parseKVToKeyValue, purifyDeep } from '@/common/utils/helper';
@@ -13,7 +13,6 @@ import { AuthButton, FormModal } from '@/common/components';
 import api from '@/common/api';
 import UsersTable from './UsersTable';
 import { EMAIL_REG, USER_ROLE } from '@/common/constants';
-import { b64 } from '@/common/utils/util';
 import UsersFilter from './UsersFilter';
 import './index.less';
 
@@ -27,8 +26,8 @@ const UsersList = () => {
       sort: 'id:desc',
       filter: {
         username: '',
-        role: 'all',
-        project: 'all',
+        role__name: 'all',
+        projects__code: 'all',
       },
     }),
     []
@@ -48,7 +47,7 @@ const UsersList = () => {
 
   const requestList = useCallback(
     async (args) => {
-      const params = { ...getFilters(), ...args };
+      const params = purifyDeep({ ...getFilters(), ...args });
       setLoading(true);
       try {
         const { result } = await api.bamUsersList(params);
@@ -90,31 +89,28 @@ const UsersList = () => {
   };
 
   const createUser = async (values) => {
+    const params = { ...values, role: values.role.name };
     try {
-      await api.bamUsersCreate({
-        ...values,
-        password: b64.encode(values.password),
-      });
+      await api.bamUsersCreate(params);
       message.success('用户新建成功!');
       reload();
       handleCreateCancel();
     } catch (error) {
       message.info(`${error}catched`);
+      handleCreateCancel();
     }
   };
   const updateUser = async (values) => {
+    const { id } = initialFormValues;
+    const params = { ...values, role: values.role.name, userId: id };
     try {
-      const { id } = initialFormValues;
-      await api.bamUsersUpdate({
-        userId: id,
-        ...values,
-        password: b64.encode(values.password),
-      });
+      await api.bamUsersUpdate(params);
       message.success('用户更新成功!');
       reload();
       handleEditCancel();
     } catch (error) {
       message.info(`${error}catched`);
+      handleEditCancel();
     }
   };
   const handleCreateClicked = () => {
@@ -125,7 +121,13 @@ const UsersList = () => {
   };
   const handleEditClicked = (record) => {
     setShowEditModal(true);
-    setInitialFormValues(record);
+    const value = record.projects;
+    const projects = (value.length > 0 && map(value, 'id')) || value;
+    setInitialFormValues({
+      ...record,
+      // TODO：project字段改成projects，与列表中字段保持一致。
+      project: projects,
+    });
   };
   const handleEditCancel = () => {
     setShowEditModal(false);
@@ -178,15 +180,17 @@ const UsersList = () => {
       <Form.Item
         label={(type === 'edit' && '新密码') || '密码'}
         name="password"
-        rules={[
-          { required: true, message: '请输入密码' },
-          { len: 8, message: '请输入8位密码' },
-        ]}
+        rules={
+          (type === 'edit' && [{ len: 8, message: '请输入8位密码' }]) || [
+            { required: true, message: '请输入密码' },
+            { len: 8, message: '请输入8位密码' },
+          ]
+        }
       >
         <Input.Password placeholder="请输入8位密码" />
       </Form.Item>
       <Form.Item
-        name="role"
+        name={['role', 'name']}
         label="角色"
         rules={[{ required: true, message: '请选择用户角色' }]}
       >

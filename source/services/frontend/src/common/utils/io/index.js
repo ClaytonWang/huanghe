@@ -174,25 +174,29 @@ export class IO {
           // 默认跳过以`/download`和`/upload`结尾的路径
           !/\/(?:up)load$/.test(path);
         return (data = {}, configs = {}) => {
+          let uri = url;
           // 不需要生成请求函数的，将参数拼接到URL上
-          if (!isRequester(url)) {
+          if (!isRequester(uri)) {
             if (!isEmpty(data)) {
-              return `${url}?${qs.stringify(data)}`;
+              return `${uri}?${qs.stringify(data)}`;
             }
-            return url;
+            return uri;
           }
           console.log('before parsed requester data', data);
           let _data = cloneDeep(data);
           _data = tranverseJson(_data, parseKeyToSnake);
-          url = parseUrl(url, _data);
-          console.log('url:', url);
+          uri = parseUrl(uri, _data);
+          console.log('url:', uri);
           if (method === 'get') {
-            return this.get(url, {
+            return this.get(uri, {
               params: _data,
+              paramsSerializer(params) {
+                return qs.stringify(params, { arrayFormat: 'comma' });
+              },
               ...configs,
             });
           }
-          return this[method](url, _data, configs);
+          return this[method](uri, _data, configs);
         };
       }
     };

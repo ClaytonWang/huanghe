@@ -8,14 +8,14 @@ const { merge } = require('webpack-merge');
 const base = require('./webpack.base.config.js');
 const { apiPrefix } = require('../src/common/utils/config');
 
-const mock = true;
+const mock = false;
 
 const proxy = {
   // target: 'http://124.71.133.7/',
-  target: 'http://124.70.181.17:8000/',
+  target: 'http://121.36.41.231:32767/',
   changeOrigin: true,
   headers: {
-    Host: '124.71.133.7',
+    Host: '121.36.41.231',
   },
 };
 

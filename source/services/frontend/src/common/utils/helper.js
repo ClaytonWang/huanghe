@@ -248,15 +248,14 @@ export const arrayToMapByKey = (arr, key) =>
  */
 export const purifyDeep = (obj) => {
   const result = cloneDeep(obj);
-  Object.keys(obj).reduce((acc, k) => {
-    if (obj[k] instanceof Object) {
-      return purifyDeep(obj[k]);
+  Object.keys(result).forEach((k) => {
+    if (result[k] instanceof Object) {
+      result[k] = purifyDeep(result[k]);
     }
-    if (!obj[k]) {
-      delete acc[k];
+    if (!result[k] || result[k] === 'all') {
+      delete result[k];
     }
-    return acc;
-  }, result);
+  });
   return result;
 };
 /**

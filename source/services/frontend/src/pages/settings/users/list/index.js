@@ -46,7 +46,7 @@ const UsersList = () => {
   );
   const requestList = useCallback(
     async (args) => {
-      const params = { ...getFilters(), ...args };
+      const params = purifyDeep({ ...getFilters(), ...args });
       setLoading(true);
       try {
         const { result } = await api.settingsUsersList(params);
@@ -159,9 +159,9 @@ const UsersList = () => {
         <Form.Item
           name="project"
           label="所属项目"
-          rules={[{ required: true, message: '请选择角色' }]}
+          rules={[{ required: true, message: '请选择项目' }]}
         >
-          <Select placeholder="请选择角色">
+          <Select placeholder="请选择项目">
             {projectsDataSource.map(
               ({ id = uniqueId('settings.projectId'), name = '-' }) => (
                 <Option key={id} value={id}>

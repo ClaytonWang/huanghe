@@ -29,10 +29,13 @@ const ProjectsTable = ({
     {
       title: '项目负责人',
       dataIndex: 'owner',
+      render(value) {
+        return value.username || value;
+      },
     },
     {
       title: '创建时间',
-      dataIndex: 'createAt',
+      dataIndex: 'createdAt',
       render(value) {
         return transformDate(value) || '-';
       },

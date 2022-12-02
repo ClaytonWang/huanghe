@@ -38,7 +38,11 @@ const account = {
   result: {
     username: '张三', // 用户名，字符串
     email: 'san.zhang@digitalbrain.cn', // 用户邮箱，字符串
-    role: 'admin', // 角色代码，可选：admin｜owner｜user
+    role: {
+      id: 2,
+      name: 'owner',
+      value: '项目负责人',
+    },
     project: [
       {
         name: '紫龙游戏', // 项目名称，字符串
