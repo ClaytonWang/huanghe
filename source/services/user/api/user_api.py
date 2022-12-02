@@ -32,7 +32,7 @@ async def create_user(user: UserCreate):
 
     init_data = user.dict()
     role = await Role.objects.get_or_none(id=user.role)
-    if role:
+    if not role:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='角色无效')
     if role.name == 'admin':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='不能创建管理员账号')
