@@ -37,9 +37,11 @@ async def list_user(
     projects = await Project.objects.filter(owner=request.user).values_list(fields=['id'])
     project_ids = [item[0] for item in projects]
 
-    result = await paginate(OperationPms.objects.select_related(['user', 'project', 'permissions']).filter(
-        project__in=project_ids
-    ), params=query_params.params)
+    params_filter = query_params.filter_
+    params_filter['project__in'] = project_ids
+    result = await paginate(OperationPms.objects.select_related(
+        ['user', 'project', 'permissions']
+    ).filter(**params_filter), params=query_params.params)
     result = result.dict()
     data = result['data']
     for item in data:
