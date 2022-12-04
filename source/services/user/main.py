@@ -63,7 +63,7 @@ if __name__ == '__main__':
     from multiprocessing import cpu_count
     print("cpu_count: ", cpu_count())
     service_port = get_integer_variable('USER_SERVICE_PORT', SERVICE_PORT)
-    debug = False if 'PROD' == get_string_variable('ENV', 'DEV') else DEBUG
+    debug = False if 'PRODUCTION' == get_string_variable('ENV', 'DEV') else DEBUG
 
     # -workers INTEGER
     # Number of worker processes. Defaults to the $WEB_CONCURRENCY environment variable if available, or 1.
