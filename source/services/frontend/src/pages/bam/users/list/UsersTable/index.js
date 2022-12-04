@@ -3,7 +3,6 @@ import { Table, Button } from 'antd';
 import qs from 'qs';
 import { map } from 'lodash';
 import { transformDate } from '@/common/utils/helper';
-import { USER_ROLE } from '@/common/constants';
 
 const UsersTable = ({
   tableData = {},
@@ -12,7 +11,6 @@ const UsersTable = ({
   onDelete = () => {},
   onPageNoChange = () => {},
 }) => {
-  // const navigate = useNavigate();
   const columns = [
     {
       title: '姓名',
@@ -26,19 +24,19 @@ const UsersTable = ({
       title: '角色',
       dataIndex: 'role',
       render(value) {
-        return USER_ROLE[value] || value;
+        return value.value || value;
       },
     },
     {
       title: '所属项目',
-      dataIndex: 'project',
+      dataIndex: 'projects',
       render(value) {
         return (value.length > 0 && map(value, 'name').join(',')) || value;
       },
     },
     {
       title: '创建时间',
-      dataIndex: 'createDate',
+      dataIndex: 'createdAt',
       render(value) {
         return transformDate(value) || '-';
       },

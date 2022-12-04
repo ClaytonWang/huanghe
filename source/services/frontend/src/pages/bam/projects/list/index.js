@@ -13,7 +13,7 @@ import ProjectsTable from './ProjectsTable';
 
 const { Option } = Select;
 
-const ProjectList = () => {
+const ProjectsList = () => {
   const defaultFilters = useMemo(
     () => ({
       pageno: 1,
@@ -54,7 +54,7 @@ const ProjectList = () => {
   const requestOwnersDatasource = async () => {
     try {
       const { result } = await api.bamUsersList({
-        filter: { role: 'owner' },
+        filter: { role__name: 'owner' },
       });
       setOwnersDatasource(result.data);
     } catch (error) {
@@ -82,27 +82,27 @@ const ProjectList = () => {
   };
 
   const createProject = async (values) => {
+    const params = { ...values, owner: values.owner.id };
     try {
-      await api.bamProjectsCreate({
-        ...values,
-      });
+      await api.bamProjectsCreate(params);
       message.success('项目新建成功！');
       setShowCreateModal(false);
       reload();
     } catch (error) {
       message.info(`${error}catched`);
+      setShowCreateModal(false);
     }
   };
   const updateProject = async (values) => {
+    const params = { ...values, owner: values.owner.id };
     try {
-      await api.bamProjectsUpdate({
-        ...values,
-      });
+      await api.bamProjectsUpdate(params);
       message.success('项目修改成功！');
       handleEditModalCancel();
       reload();
     } catch (error) {
       message.info(`${error}catched`);
+      handleEditModalCancel();
     }
   };
 
@@ -125,7 +125,7 @@ const ProjectList = () => {
   };
   const handleEditSubmit = (values) => {
     const { id } = initialFormValues;
-    updateProject({ id, ...values });
+    updateProject({ projectId: id, ...values });
   };
   const handleDelete = (record) => {
     const { id } = record;
@@ -137,8 +137,9 @@ const ProjectList = () => {
       cancelText: '取消',
       onOk: async () => {
         try {
-          await api.bamProjectsDelete({ id });
+          await api.bamProjectsDelete({ projectId: id });
           message.success('项目删除成功！');
+          reload();
         } catch (error) {
           console.log(error);
         }
@@ -170,12 +171,12 @@ const ProjectList = () => {
       </Form.Item>
       <Form.Item
         label="项目负责人"
-        name="owner"
+        name={['owner', 'id']}
         rules={[{ required: true, message: '请选择项目负责人' }]}
       >
         <Select placeholder="请选择项目负责人">
           {ownersDatasource.map(({ id, username }) => (
-            <Option key={id} value={username}>
+            <Option key={id} value={id}>
               {username}
             </Option>
           ))}
@@ -208,12 +209,12 @@ const ProjectList = () => {
       </Form.Item>
       <Form.Item
         label="项目负责人"
-        name="owner"
+        name={['owner', 'id']}
         rules={[{ required: true, message: '请选择项目负责人' }]}
       >
         <Select placeholder="请选择项目负责人">
           {ownersDatasource.map(({ id, username }) => (
-            <Option key={id} value={username}>
+            <Option key={id} value={id}>
               {username}
             </Option>
           ))}
@@ -248,4 +249,4 @@ const ProjectList = () => {
     </div>
   );
 };
-export default ProjectList;
+export default ProjectsList;

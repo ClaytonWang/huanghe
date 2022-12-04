@@ -6,14 +6,11 @@
     >Time    : 2022/10/13 07:12
 """
 from typing import Optional, List
-from fastapi import status
-from fastapi.exceptions import HTTPException
 from pydantic import Field
 from pydantic import EmailStr
 from pydantic import validator
 from pydantic import BaseModel
 from datetime import datetime
-from models import Role
 from basic.utils.dt_format import dt_to_string
 from role.serializers import RoleDetailSerializers
 from auth.services import hash_password
@@ -33,7 +30,7 @@ class UserCreate(BaseModel):
     username: str = Field(..., max_length=80)
     password: str = Field(..., min_length=8, max_length=255)
     email: EmailStr
-    role: int = Field(..., ge=1, description='角色ID')
+    role: str = Field(..., description='角色名称')
     project: Optional[List[int]] = []
 
     @validator('password')
@@ -44,8 +41,8 @@ class UserCreate(BaseModel):
 class UserEdit(BaseModel):
     username: str = Field(None, max_length=80)
     password: str = Field(None, min_length=8, max_length=255)
-    role:  Optional[int] = Field(None, description='角色ID')
-    project: Optional[List[int]] = Field([], description='全量项目ID')
+    role:  Optional[str] = Field(None, description='角色名')
+    projects: Optional[List[int]] = Field([], description='全量项目ID')
 
     @validator('password')
     def set_password(cls, pwd):

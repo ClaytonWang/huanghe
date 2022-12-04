@@ -2,29 +2,30 @@
  * @description 全局属性
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
-const APIV1 = '/api/v1';
+const APIV1 = '/api/v1/user';
+// const DEV = '';
 module.exports = {
   name: '决策智能开发平台',
   footerText: 'Shanghai Digital Brain.Lmt.',
   logo: 'static/logo.svg',
   CORS: [],
   apiPrefix: APIV1,
+  apiUriParamsPattern: /:([_a-zA-Z0-9]+)/g,
   api: {
     // login
-    login: 'post|/login',
-    signup: 'post|/signup',
-    logout: 'put|/logout',
+    login: 'post|/auth/login',
+    logout: 'put|/auth/logout',
 
     // bam
-    bamProjectsList: 'get|/bam/projects',
-    bamProjectsCreate: 'post|/bam/projects',
-    bamProjectsUpdate: 'put|/bam/projects/:id',
-    bamProjectsDelete: 'delete|/bam/projects/:id',
+    bamProjectsList: 'get|/project',
+    bamProjectsCreate: 'post|/project',
+    bamProjectsUpdate: 'put|/project/:project_id',
+    bamProjectsDelete: 'delete|/project/:project_id',
     // bamUsersList: 'get|/bam/users',
-    bamUsersList: 'get|/user/users',
-    bamUsersCreate: 'post|/bam/users',
-    bamUsersUpdate: 'put|/bam/users/:id',
-    bamUsersDelete: 'delete|/bam/users/:id',
+    bamUsersList: 'get|/user',
+    bamUsersCreate: 'post|/user',
+    bamUsersUpdate: 'put|/user/:user_id',
+    bamUsersDelete: 'delete|/user/:user_id',
 
     // settings
     settingsUsersList: 'get|/settings/users',
@@ -34,8 +35,9 @@ module.exports = {
 
     settingsUsersPasswordReset: 'post|/users/password/reset',
 
-    settingsAccount: 'get|/account',
-    settingsAccountUpdate: 'put|/account/update',
+    // todo, remove settings prefix
+    settingsAccount: 'get|/user/account',
+    settingsAccountUpdate: 'post|/user/account',
   },
   breadcrumbConfig: {
     '/bam/projects': '项目管理',

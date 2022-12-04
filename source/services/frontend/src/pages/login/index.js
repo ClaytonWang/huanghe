@@ -5,15 +5,15 @@
 import { Form, Input, Button } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { useAuth } from '@/common/hooks/useAuth';
-import { b64 } from '@/common/utils/util';
 import { name } from '@/common/utils/config';
 import './index.less';
 
 const LoginForm = () => {
   const { login } = useAuth();
   const onFinish = (values) => {
-    const encodedPwd = b64.encode(values.password);
-    login({ ...values, password: encodedPwd });
+    login({
+      ...values,
+    });
   };
   return (
     <>

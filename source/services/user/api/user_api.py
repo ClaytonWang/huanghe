@@ -29,16 +29,17 @@ router_user = APIRouter()
     response_model=UserList,
 )
 async def create_user(user: UserCreate):
-
     init_data = user.dict()
-    role = await Role.objects.get_or_none(id=user.role)
-    if role:
+    role = await Role.objects.get_or_none(name=user.role)
+    if not role:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='角色无效')
     if role.name == 'admin':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='不能创建管理员账号')
 
     # TODO 失败回滚
     project_ids = init_data.pop('project', [])
+    # 把原始数据的role换成ID
+    init_data['role'] = role.id
     new_user = await User.objects.create(**init_data)
 
     if role.name == 'owner':
@@ -76,15 +77,16 @@ async def update_user(
     update_data = user.dict(exclude_unset=True)
 
     if 'role' in update_data:
-        role = await Role.objects.get_or_none(id=update_data['role'])
+        role = await Role.objects.get_or_none(name=update_data['role'])
         if not role:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='角色无效')
         if role.name == 'admin':
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='角色不能修改成管理员')
+        update_data['role'] = role.id
 
     project_ids = []
-    if 'project' in update_data:
-        project_ids = update_data.pop('project')
+    if 'projects' in update_data:
+        project_ids = update_data.pop('projects')
 
     _user = await User.objects.get_or_none(pk=user_id)
     if not _user:

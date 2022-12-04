@@ -25,8 +25,8 @@ async def login(body: Login):
     user = await User.objects.get_or_none(email=body.email)
     if not user or not verify_password(body.password, user.password):
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="用户名或密码错误",
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = create_access_token(data={"sub": user.email})
