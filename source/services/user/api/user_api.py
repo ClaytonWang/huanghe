@@ -30,9 +30,7 @@ router_user = APIRouter()
 )
 async def create_user(user: UserCreate):
     init_data = user.dict()
-    role = await Role.objects.get_or_none(name=user.role)
-    if not role:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='角色无效')
+    role = await Role.objects.get(name=user.role)
     if role.name == 'admin':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='不能创建管理员账号')
 
@@ -77,9 +75,7 @@ async def update_user(
     update_data = user.dict(exclude_unset=True)
 
     if 'role' in update_data:
-        role = await Role.objects.get_or_none(name=update_data['role'])
-        if not role:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='角色无效')
+        role = await Role.objects.get(name=update_data['role'])
         if role.name == 'admin':
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='角色不能修改成管理员')
         update_data['role'] = role.id
@@ -88,10 +84,7 @@ async def update_user(
     if 'projects' in update_data:
         project_ids = update_data.pop('projects')
 
-    _user = await User.objects.get_or_none(pk=user_id)
-    if not _user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='用户不存在')
-
+    _user = await User.objects.get(pk=user_id)
     if update_data:
         _user = await _user.update(**update_data)
 
@@ -109,10 +102,7 @@ async def update_user(
 async def delete_user(
         user_id: int = Path(..., ge=1, description='用户ID')
 ):
-    user = await User.objects.get_or_none(id=user_id)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到用户')
-
+    user = await User.objects.get(id=user_id)
     # TODO 判断用户管理资源
     if await user.projects.count():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联项目资源不能删除')

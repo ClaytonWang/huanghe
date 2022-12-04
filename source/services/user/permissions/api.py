@@ -28,10 +28,7 @@ async def list_role(role: str):
 async def list_role(
         name: str = Query(..., description='权限名称')
 ):
-    pms = await Permissions.objects.get_or_none(name=name)
-    if not pms:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='没有菜单')
-
+    pms = await Permissions.objects.get(name=name)
     pms = await Permissions.objects.filter(code__icontains=pms.code).order_by('code').fields(
         ['code', 'name', 'value', 'id']).values()
     order_pms = sorted(pms, key=lambda item: int(item['code']))
