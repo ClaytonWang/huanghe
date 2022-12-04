@@ -8,6 +8,7 @@
 from fastapi import status
 from fastapi.responses import JSONResponse
 from asyncpg.exceptions import UniqueViolationError, ForeignKeyViolationError, DataError
+from ormar.exceptions import NoMatch
 
 
 def validation_pydantic_exception_handler(request, exc):
@@ -28,13 +29,17 @@ def validation_ormar_exception_handler(request, exc):
     return JSONResponse(str(exc), status_code=status.HTTP_400_BAD_REQUEST)
 
 
-def ormar_db_exception_handler(request, exc):
+def pg_db_exception_handler(request, exc):
     """
     :param request:
     :param exc:
     :return:
     """
-    if isinstance(exc, (UniqueViolationError, ForeignKeyViolationError, DataError)):
+    if isinstance(exc, (
+            UniqueViolationError,
+            ForeignKeyViolationError,
+            DataError,
+    )):
         return JSONResponse(
             exc.detail if hasattr(exc, 'detail')
             and getattr(exc, 'detail') is not None
@@ -42,3 +47,11 @@ def ormar_db_exception_handler(request, exc):
             status_code=status.HTTP_400_BAD_REQUEST
         )
     return exc
+
+
+def ormar_db_exception_handler(request, exc):
+    if isinstance(exc, (NoMatch, )):
+        return JSONResponse('No Match', status_code=status.HTTP_400_BAD_REQUEST)
+
+    return exc
+

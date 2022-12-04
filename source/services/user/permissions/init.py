@@ -99,7 +99,7 @@ def pms_data():
             'children': [
                 {
                     'name': 'readonly',
-                    'value': '新建',
+                    'value': '查看',
                     'access': [],
                 },
                 {

@@ -13,6 +13,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from basic.utils.dt_format import dt_to_string
 from role.serializers import RoleDetailSerializers
+from permissions.serializers import PmsSerializers
 from auth.services import hash_password
 
 
@@ -78,8 +79,9 @@ class AdminUserList(UserList):
     projects: Optional[List[AdminUserListProject]] = None
 
 
-class OwnerUserList(UserList):
+class OwnerUserList(UserItem):
     project: Optional[AdminUserListProject] = None
+    permissions: Optional[List[PmsSerializers]] = None
 
 
 class AccountInfo(UserList):

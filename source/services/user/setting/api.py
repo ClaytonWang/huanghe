@@ -5,10 +5,10 @@
     >Mail    : jindu.yin@digitalbrain.cn
     >Time    : 2022/11/29 19:11
 """
-import copy
 from fastapi import APIRouter, Depends, Request, HTTPException, status
-from models import User, Role, Project
+from models import User, Project, Permissions, OperationPms
 from api.serializers import OwnerUserList
+from setting.serializers import ProjectSetUser
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 
@@ -34,27 +34,42 @@ async def list_user(
     if request.user.role.name != 'owner':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='用户没有权限')
 
-    filter_params = query_params.filter_
-    filter_params['role__name'] = 'owner'
-    # 未关联项目查询条件
-    # filter_params['projects__id__isnull'] = False
-    result = await paginate(User.objects.select_related('projects').filter(
-        **query_params.filter_
+    projects = await Project.objects.filter(owner=request.user).values_list(fields=['id'])
+    project_ids = [item[0] for item in projects]
+
+    result = await paginate(OperationPms.objects.select_related(['user', 'project', 'permissions']).filter(
+        project__in=project_ids
     ), params=query_params.params)
-
     result = result.dict()
-    data = result.get('data', [])
-    new_data = []
+    data = result['data']
     for item in data:
-        projects = item.pop('projects')
-        if not projects:
-            item['project'] = {}
-            new_data.append(item)
-            continue
-
-        for pro in projects:
-            new_item = copy.deepcopy(item)
-            new_item['project'] = pro
-            new_data.append(new_item)
-    result['data'] = new_data
+        item.update(**item.get('user'))
     return result
+
+
+@router_setting.post(
+    '/user',
+    description='项目添加普通用户&设置权限',
+    response_model={},
+)
+async def project_set_user(
+        body: ProjectSetUser
+):
+    project = await Project.objects.get(id=body.project)
+    user = await User.objects.get(id=body.user)
+    add_pms = await Permissions.objects.filter(id__in=body.access).all()
+
+    # TODO 失败回滚
+    # 删除指定用户和项目的所有权限
+    pms = await OperationPms.objects.get_or_none(project=project, user=user)
+    pms and pms.permissions.clear()
+
+    if not pms:
+        pms = await OperationPms.objects.create(**dict(
+            project=project.id,
+            user=user.id
+        ))
+
+    # 重新添加权限
+    for _item in add_pms:
+        await pms.permissions.add(_item)

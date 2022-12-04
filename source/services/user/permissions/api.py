@@ -33,7 +33,7 @@ async def list_role(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='没有菜单')
 
     pms = await Permissions.objects.filter(code__icontains=pms.code).order_by('code').fields(
-        ['code', 'name', 'value']).values()
+        ['code', 'name', 'value', 'id']).values()
     order_pms = sorted(pms, key=lambda item: int(item['code']))
     results = []
     for _item in order_pms:

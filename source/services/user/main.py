@@ -18,6 +18,8 @@ from basic.common.env_variable import get_string_variable
 from basic.middleware.exception import validation_pydantic_exception_handler
 from basic.middleware.exception import validation_ormar_exception_handler
 from basic.middleware.exception import ormar_db_exception_handler
+from basic.middleware.exception import pg_db_exception_handler
+from ormar.exceptions import AsyncOrmException
 from auth.auth_api import router_auth
 from api.user_api import router_user
 from role.api import router_role
@@ -43,10 +45,10 @@ app.add_event_handler("startup", startup_event)
 app.add_event_handler("shutdown", shutdown_event)
 
 
-# 异常处理
 app.add_exception_handler(ValidationError, validation_pydantic_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_ormar_exception_handler)
-app.add_exception_handler(PostgresError, ormar_db_exception_handler)
+app.add_exception_handler(PostgresError, pg_db_exception_handler)
+app.add_exception_handler(AsyncOrmException, ormar_db_exception_handler)
 
 # 路由配置
 app.include_router(router_auth, prefix='/auth', tags=['登录验证'])

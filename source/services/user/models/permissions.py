@@ -14,15 +14,6 @@ from models.user import Role, User
 from models.project import Project
 
 
-class PmsOpt(int, Enum):
-    project_edit: 1    # 编辑
-    project_readonly: 2   # 查看
-
-
-class PmsCategory(str, Enum):
-    project: 'project'
-
-
 class Permissions(DateAuditModel):
     """
     模块菜单权限
@@ -45,7 +36,20 @@ class Permissions(DateAuditModel):
 
     role: Optional[List[Role]] = ormar.ManyToMany(Role)
     user: Optional[List[User]] = ormar.ManyToMany(User)
-    project: Optional[List[Project]] = ormar.ManyToMany(Project)
 
     def __repr__(self):
         return f'{self.name}__{self.code}'
+
+
+class OperationPms(DateAuditModel):
+    """
+    功能权限关联
+    """
+    class Meta(ormar.ModelMeta):
+        tablename: str = "bam_pms_operation"
+        metadata = META
+        database = DB
+
+    project: Optional[Project] = ormar.ForeignKey(to=Project)
+    user: Optional[User] = ormar.ForeignKey(to=User)
+    permissions: Optional[List[Permissions]] = ormar.ManyToMany(to=Permissions)
