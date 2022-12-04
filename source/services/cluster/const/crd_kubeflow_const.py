@@ -1,0 +1,9 @@
+KUBEFLOW_V1_API_VERSION = "kubeflow.org/v1"
+
+KUBEFLOW_V1_VERSION = "v1"
+
+KUBEFLOW_NOTEBOOK_KIND = "Notebook"
+
+KUBEFLOW_NOTEBOOK_GROUP = "kubeflow.org"
+
+KUBEFLOW_NOTEBOOK_PLURAL = "notebooks"
