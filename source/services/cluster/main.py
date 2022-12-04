@@ -4,6 +4,7 @@
 import os
 import uvicorn
 from fastapi import FastAPI
+from namespace.api import router_namespace
 
 app = FastAPI()
 
@@ -11,6 +12,8 @@ app = FastAPI()
 @app.get('/status')
 def status():
     return {"status": "ok"}
+
+app.include_router(router_namespace, prefix="/namespace")
 
 
 def start():
