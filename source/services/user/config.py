@@ -7,24 +7,30 @@
 """
 import os
 import sys
-import logging
+import yaml
 from pathlib import Path
 APP_NAME = 'user'
 BASIC_PATH = Path.joinpath(Path(__file__).parent.parent.parent, 'basic')
 SOURCE_PATH = Path.joinpath(Path(BASIC_PATH).parent)
 sys.path.insert(0, SOURCE_PATH.__str__())
+K8S_YAML_CONFIG_PATH = '/etc/juece/config.yaml'
 
 from basic.config.user import *
 DO_NOT_AUTH_URI = ['/auth/login', '/docs', '/openapi', '/openapi.json']
 SERVICE_PORT = 8000
 DEBUG = True
 
-DATABASES = {
-    'USER': 'root',
-    'PASSWORD': 'linshimima2!',
-    'NAME': 'huanghe_dev',
-    'HOST': '123.60.43.172',
-    'PORT': '5432',
-}
+DB_USER = 'root'
+DB_PASSWORD = 'linshimima2!'
+DB_NAME = 'huanghe_dev'
+DB_HOST = '123.60.43.172'
+DB_PORT = '5432'
 
 
+if os.path.exists(K8S_YAML_CONFIG_PATH):
+    try:
+        with open(K8S_YAML_CONFIG_PATH) as f:
+            data = yaml.load(f, Loader=yaml.FullLoader)
+            locals().update(**data)
+    except Exception as e:
+        print(f'Loading k8s config error. {e}')

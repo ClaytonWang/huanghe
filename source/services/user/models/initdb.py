@@ -7,8 +7,8 @@
 """
 import databases
 import sqlalchemy
-from config import DATABASES
-DB_CONN = f'{DATABASES["USER"]}:{DATABASES["PASSWORD"]}@{DATABASES["HOST"]}:{DATABASES["PORT"]}/{DATABASES["NAME"]}'
+from config import DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
+DB_CONN = f'{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
 DB_POSTGRESQL_CONN = f'postgresql://{DB_CONN}'
 

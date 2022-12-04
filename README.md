@@ -15,6 +15,11 @@
 curl $USER_SERVICE_HOST:$USER_SERVICE_PORT
 ```
 
+**服务配置读取顺序**
+- `source/config/[module_name]`
+- `[module_name/config.py]`
+- k8s配置在容器的`/etc/juece/config.yaml`
+
 **微服务模块架构**
 
 ![架构图](doc/source/architecture.jpeg)
