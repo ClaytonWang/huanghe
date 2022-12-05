@@ -18,11 +18,14 @@ from basic.common.env_variable import get_string_variable
 from basic.middleware.exception import validation_pydantic_exception_handler
 from basic.middleware.exception import validation_ormar_exception_handler
 from basic.middleware.exception import ormar_db_exception_handler
+from basic.middleware.exception import pg_db_exception_handler
+from ormar.exceptions import AsyncOrmException
 from auth.auth_api import router_auth
 from api.user_api import router_user
 from role.api import router_role
 from project.api import router_project
 from permissions.api import router_pms
+from setting.api import router_setting
 from models import startup_event, shutdown_event
 
 oauth2_scheme = OFOAuth2PasswordBearer(token_url="/v1/auth/login")
@@ -42,24 +45,25 @@ app.add_event_handler("startup", startup_event)
 app.add_event_handler("shutdown", shutdown_event)
 
 
-# 异常处理
 app.add_exception_handler(ValidationError, validation_pydantic_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_ormar_exception_handler)
-app.add_exception_handler(PostgresError, ormar_db_exception_handler)
+app.add_exception_handler(PostgresError, pg_db_exception_handler)
+app.add_exception_handler(AsyncOrmException, ormar_db_exception_handler)
 
 # 路由配置
-app.include_router(router_auth, prefix='/auth')
-app.include_router(router_user, prefix='/user')
-app.include_router(router_role, prefix='/role')
-app.include_router(router_pms, prefix='/pms')
-app.include_router(router_project, prefix='/project')
+app.include_router(router_auth, prefix='/auth', tags=['登录验证'])
+app.include_router(router_user, prefix='/user', tags=['用户相关接口'])
+app.include_router(router_role, prefix='/role', tags=['角色'])
+app.include_router(router_pms, prefix='/pms', tags=['权限'])
+app.include_router(router_project, prefix='/project', tags=['项目'])
+app.include_router(router_setting, prefix='/settings', tags=['设置'])
 
 
 if __name__ == '__main__':
     from multiprocessing import cpu_count
     print("cpu_count: ", cpu_count())
     service_port = get_integer_variable('USER_SERVICE_PORT', SERVICE_PORT)
-    debug = False if 'PROD' == get_string_variable('ENV', 'DEV') else DEBUG
+    debug = False if 'PRODUCTION' == get_string_variable('ENV', 'DEV') else DEBUG
 
     # -workers INTEGER
     # Number of worker processes. Defaults to the $WEB_CONCURRENCY environment variable if available, or 1.

@@ -7,5 +7,5 @@
 """
 from models.initdb import *
 from models.user import User, Role
-from models.permissions import Permissions
+from models.permissions import Permissions, OperationPms
 from models.project import Project

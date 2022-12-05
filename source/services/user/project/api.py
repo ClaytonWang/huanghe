@@ -38,7 +38,20 @@ async def list_project(
     :param query_params:
     :return:
     """
-    return await paginate(Project.objects.select_related('owner'), params=query_params.params)
+
+    filter_params = query_params.filter_
+    if filter_params and 'owner' in filter_params:
+        owner = filter_params['owner']
+        if not owner.isdigit():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail=f'参数{owner}类型错误'
+            )
+        filter_params['owner'] = int(owner)
+
+    result = await paginate(
+        Project.objects.select_related('owner').filter(**filter_params), params=query_params.params
+    )
+    return result
 
 
 @router_project.put(
@@ -68,10 +81,7 @@ async def delete_project(
         project_id: int = Path(..., ge=1, description='项目ID')
 ):
 
-    project = await Project.objects.get_or_none(id=project_id)
-    if not project:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到项目')
-
+    project = await Project.objects.get(id=project_id)
     if await project.member.count():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联用户，不能删除')
 

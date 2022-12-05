@@ -15,6 +15,10 @@
 curl $USER_SERVICE_HOST:$USER_SERVICE_PORT
 ```
 
+**服务配置说明**
+
+[服务配置](doc/config.md)
+
 **微服务模块架构**
 
 ![架构图](doc/source/architecture.jpeg)
