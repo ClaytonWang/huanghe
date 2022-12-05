@@ -61,7 +61,7 @@ async def project_set_user(
 ):
     project = await Project.objects.get(id=body.project)
     user = await User.objects.get(id=body.user)
-    add_pms = await Permissions.objects.filter(id__in=body.access).all()
+    add_pms = await Permissions.objects.filter(id__in=body.permissions).all()
 
     # TODO 失败回滚
     # 删除指定用户和项目的所有权限
