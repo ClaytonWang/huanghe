@@ -18,7 +18,7 @@ router_project = APIRouter()
 
 @router_project.post(
     '',
-    description='创建项目',
+    description='创建项目 关联用户类型暂时不做强制检查',
     response_model=ProjectList,
 )
 async def create_project(project: ProjectCreate):
