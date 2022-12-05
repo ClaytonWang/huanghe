@@ -82,6 +82,7 @@ class AdminUserList(UserList):
 class OwnerUserList(UserItem):
     project: Optional[AdminUserListProject] = None
     permissions: Optional[List[PmsSerializers]] = None
+    user_id: int
 
 
 class AccountInfo(UserList):

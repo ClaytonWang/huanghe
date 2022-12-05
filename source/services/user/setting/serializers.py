@@ -12,4 +12,4 @@ from typing import Optional, List
 class ProjectSetUser(BaseModel):
     user: int = Field(..., ge=1, description='需要关联的用户ID')
     project: int = Field(..., ge=1, description='项目ID')
-    access: List[int] = Field(..., description='权限列表')
+    permissions: List[int] = Field(..., description='权限列表')
