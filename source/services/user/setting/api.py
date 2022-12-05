@@ -45,7 +45,9 @@ async def list_user(
     result = result.dict()
     data = result['data']
     for item in data:
-        item.update(**item.get('user'))
+        user_data = item.pop('user')
+        user_data['user_id'] = user_data.pop('id')
+        item.update(**user_data)
     return result
 
 
