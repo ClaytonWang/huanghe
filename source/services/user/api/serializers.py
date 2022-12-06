@@ -86,7 +86,7 @@ class OwnerUserList(UserItem):
 
 
 class AccountInfo(UserList):
-    project = []
+    projects: Optional[List[AdminUserListProject]] = None
     permissions = []
 
     class Config:
