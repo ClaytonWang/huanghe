@@ -96,7 +96,7 @@ const UsersList = () => {
       reload();
       handleCreateCancel();
     } catch (error) {
-      message.info(`${error}catched`);
+      console.log(error);
       handleCreateCancel();
     }
   };
@@ -109,7 +109,7 @@ const UsersList = () => {
       reload();
       handleEditCancel();
     } catch (error) {
-      message.info(`${error}catched`);
+      console.log(error);
       handleEditCancel();
     }
   };

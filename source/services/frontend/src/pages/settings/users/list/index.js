@@ -6,18 +6,20 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form, Input, message, Select } from 'antd';
 import { useSearchParams } from 'react-router-dom';
 import qs from 'qs';
-import { uniqueId } from 'lodash';
+import { uniqueId, find, cloneDeep } from 'lodash';
 import { PlusOutlined } from '@ant-design/icons';
+import { purifyDeep } from '@/common/utils/helper';
 import { useAuth } from '@/common/hooks/useAuth';
 import { AuthButton, FormModal } from '@/common/components';
-import { ACCESS_MAP, CREATE, DEFAULT_PASSWORD } from '@/common/constants';
+import { CREATE, DEFAULT_PASSWORD } from '@/common/constants';
 import api from '@/common/api';
-import { parseKVToKeyValue, purifyDeep } from '@/common/utils/helper';
 import UsersTable from './UsersTable';
 import UsersFilter from './UsersFilter';
 import './index.less';
 
+const PROJECT = 'project';
 const { Option } = Select;
+
 const UsersList = () => {
   const defaultFilters = useMemo(
     () => ({
@@ -25,9 +27,9 @@ const UsersList = () => {
       pagesize: 10,
       sort: 'id:desc',
       filter: {
-        username: '',
-        access: 'all',
-        project: 'all',
+        user__username: '',
+        permissions__code: 'all',
+        project__code: 'all',
       },
     }),
     []
@@ -40,13 +42,14 @@ const UsersList = () => {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const projectsDataSource = useMemo(() => user.project || [], [user]);
+  const [permissionsDatasource, setPermissionsDatasource] = useState([]);
   const getFilters = useCallback(
     () => ({ ...defaultFilters, ...qs.parse(searchParams.toString()) }),
     [searchParams, defaultFilters]
   );
   const requestList = useCallback(
     async (args) => {
-      const params = purifyDeep({ ...getFilters(), ...args });
+      const params = purifyDeep({ ...cloneDeep(getFilters()), ...args });
       setLoading(true);
       try {
         const { result } = await api.settingsUsersList(params);
@@ -63,10 +66,21 @@ const UsersList = () => {
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     requestList();
+    requestPermissionsDatasource();
     const filters = getFilters();
     setSearchParams(qs.stringify(filters));
   }, []);
 
+  const requestPermissionsDatasource = async () => {
+    try {
+      // FIXME: project是后端代码逻辑，该接口给前端增加了不相干的硬编码，建议后期做优化。
+      const { result } = await api.access({ name: PROJECT });
+      const { children: data } = find(result, ['name', PROJECT]);
+      setPermissionsDatasource(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const reload = (args) => {
     const filters = getFilters();
     const params = purifyDeep({ ...filters, ...args });
@@ -84,7 +98,7 @@ const UsersList = () => {
       closeModal();
       reload();
     } catch (error) {
-      message.info(error);
+      console.log(error);
     }
   };
   const updateUsers = async (values) => {
@@ -121,6 +135,14 @@ const UsersList = () => {
     setShowEditModal(false);
     setSelectedItem(null);
   };
+  // FIXME: permissions冗余的数组结构引入的「数据处理」代码，如后期无相关前端页面扩展，建议优化
+  const parseSeletedItem = (record) => {
+    const { permissions } = record;
+    return {
+      ...record,
+      permissions: permissions[0],
+    };
+  };
   const handleCreateClicked = () => {
     openModal('create', { password: DEFAULT_PASSWORD });
   };
@@ -128,18 +150,20 @@ const UsersList = () => {
     closeModal();
   };
   const handleCreateSubmit = (values) => {
-    createUser(values);
+    const { permissions } = values;
+    createUser({ ...values, permissions: [permissions.id] });
   };
   const handleEditSubmit = (values) => {
-    const { id } = selectedItem;
-    updateUsers({ ...values, id });
+    const { userId } = selectedItem;
+    const { permissions, project } = values;
+    updateUsers({ user: userId, permissions: [permissions.id], project });
   };
   const handleEditClicked = (record) => {
     openModal('edit', { ...record, project: record.project.id });
   };
-  const handleDelete = (record) => {
-    const { id = '' } = record;
-    deleteUser({ id });
+  const handleDelete = (values) => {
+    const { project, userId } = values;
+    deleteUser({ user: userId, permissions: [], project: project.id });
   };
 
   const renderItems = (type) => {
@@ -172,14 +196,14 @@ const UsersList = () => {
           </Select>
         </Form.Item>
         <Form.Item
-          name="access"
+          name="permissions"
           label="权限"
           rules={[{ required: true, message: '请选择用户权限' }]}
         >
           <Select placeholder="请选择用户权限">
-            {parseKVToKeyValue(ACCESS_MAP, 'k', 'v').map(({ k, v }) => (
-              <Option key={k} value={k}>
-                {v}
+            {permissionsDatasource.map(({ id, name, value }) => (
+              <Option key={id} value={name}>
+                {value}
               </Option>
             ))}
           </Select>
@@ -195,6 +219,7 @@ const UsersList = () => {
         defaultFilters={defaultFilters.filter}
         reload={reload}
         projectsDataSource={projectsDataSource}
+        permissionsDatasource={permissionsDatasource}
       />
       <div className="dbr-table-container">
         <div className="batch-command">
@@ -220,7 +245,6 @@ const UsersList = () => {
         <FormModal
           title="添加成员"
           okText="确认"
-          initialValues={selectedItem}
           onSubmit={handleCreateSubmit}
           onCancel={handleCancelClicked}
         >
@@ -231,9 +255,9 @@ const UsersList = () => {
         <FormModal
           title="编辑成员"
           okText="保存"
-          initialValues={{
+          initialValues={parseSeletedItem({
             ...selectedItem,
-          }}
+          })}
           onSubmit={handleEditSubmit}
           onCancel={handleCancelClicked}
         >

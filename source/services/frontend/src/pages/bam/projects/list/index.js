@@ -89,7 +89,7 @@ const ProjectsList = () => {
       setShowCreateModal(false);
       reload();
     } catch (error) {
-      message.info(`${error}catched`);
+      console.log(error);
       setShowCreateModal(false);
     }
   };
@@ -101,7 +101,7 @@ const ProjectsList = () => {
       handleEditModalCancel();
       reload();
     } catch (error) {
-      message.info(`${error}catched`);
+      console.log(error);
       handleEditModalCancel();
     }
   };

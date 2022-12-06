@@ -4,7 +4,6 @@ import { Table, Modal } from 'antd';
 import qs from 'qs';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { AuthButton } from '@/common/components';
-import { ACCESS_MAP } from '@/common/constants';
 
 const UsersTable = ({
   tableData = {},
@@ -31,9 +30,10 @@ const UsersTable = ({
     },
     {
       title: '权限',
-      dataIndex: 'access',
-      render(value) {
-        return ACCESS_MAP[value] || value;
+      dataIndex: 'permissions',
+      render(arr) {
+        const { value = '-' } = arr[0];
+        return value;
       },
     },
     {
