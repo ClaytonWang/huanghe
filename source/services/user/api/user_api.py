@@ -123,6 +123,8 @@ async def account(request: Request):
     if not hasattr(request, 'user') or not hasattr(request.user, 'role'):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='未登录或角色不存在')
 
+    projects = await Project.objects.filter(owner=request.user).all()
+    setattr(request.user, 'projects', projects)
     result = AccountInfo.from_orm(request.user).dict()
     pms_info = await role_pms(request.user.role.name)
     result['permissions'] = pms_info
