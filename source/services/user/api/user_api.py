@@ -58,9 +58,14 @@ async def list_user(
     :param query_params:
     :return:
     """
-    return await paginate(User.objects.select_related(['role', 'projects']).filter(
+    result = await paginate(User.objects.select_related(['role', 'project_user']).filter(
         **query_params.filter_
     ), params=query_params.params)
+    json_result = result.dict()
+    data = json_result.get('data', [])
+    for index, item in enumerate(data):
+        item['projects'] = item.get('project_user')
+    return json_result
 
 
 @router_user.put(
