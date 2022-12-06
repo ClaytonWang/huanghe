@@ -28,16 +28,17 @@ module.exports = {
     bamUsersDelete: 'delete|/user/:user_id',
 
     // settings
-    settingsUsersList: 'get|/settings/users',
-    settingsUsersCreate: 'post|/settings/users',
-    settingsUsersUpdate: 'put|/settings/users/:id',
-    settingsUsersDelete: 'delete|/settings/users/:id',
-
-    settingsUsersPasswordReset: 'post|/users/password/reset',
+    settingsUsersList: 'get|/settings/user',
+    settingsUsersCreate: 'post|/settings/user',
+    settingsUsersUpdate: 'post|/settings/user',
+    settingsUsersDelete: 'post|/settings/user',
 
     // todo, remove settings prefix
     settingsAccount: 'get|/user/account',
     settingsAccountUpdate: 'post|/user/account',
+
+    // FIXME: 后端获取指定菜单的权限接口
+    access: 'get|/pms/menu',
   },
   breadcrumbConfig: {
     '/bam/projects': '项目管理',

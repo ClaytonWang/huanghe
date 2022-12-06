@@ -1,12 +1,12 @@
 /**
- * @description 负责人所有项目用户列表查询条件
- * @author liguanlin<guanlin.li@digitalbrain.cn>
+ * @Author guanlin.li guanlin.li@digitalbrain.cn
+ * @Date 2022-11-29 12:19:26
+ * @LastEditors guanlin.li guanlin.li@digitalbrain.cn
+ * @LastEditTime 2022-12-06 19:53:37
+ * @Description 负责人所有项目用户列表查询条件
  */
-
 import { useMemo } from 'react';
 import { Form, Input, Select, Button } from 'antd';
-import { ACCESS_MAP } from '@/common/constants';
-import { parseKVToKeyValue } from '@/common/utils/helper';
 const { Option } = Select;
 
 const UsersFilter = ({
@@ -14,6 +14,7 @@ const UsersFilter = ({
   defaultFilters = {},
   reload = () => {},
   projectsDataSource = [],
+  permissionsDatasource = [],
 }) => {
   const [form] = Form.useForm();
   const initialFormValues = useMemo(
@@ -41,28 +42,28 @@ const UsersFilter = ({
       initialValues={initialFormValues}
       onFinish={handleSearch}
     >
-      <Form.Item label="姓名" name="username">
+      <Form.Item label="姓名" name="user__username">
         <Input placeholder="输入用户姓名..." style={{ width: 250 }} />
       </Form.Item>
-      <Form.Item label="权限" name="access">
+      <Form.Item label="权限" name="permissions__code">
         <Select style={{ width: 150 }}>
           <Option key="all" value="all">
             全部
           </Option>
-          {parseKVToKeyValue(ACCESS_MAP, 'k', 'v').map(({ k, v }) => (
-            <Option key={k} value={k}>
-              {v}
+          {permissionsDatasource.map(({ id, code, value }) => (
+            <Option key={id} value={code}>
+              {value}
             </Option>
           ))}
         </Select>
       </Form.Item>
-      <Form.Item label="所属项目" name="project">
+      <Form.Item label="所属项目" name="project__code">
         <Select style={{ width: 100 }}>
           <Option key="all" value="all">
             全部
           </Option>
-          {projectsDataSource.map(({ id, name }) => (
-            <Option key={id} value={id}>
+          {projectsDataSource.map(({ id, code, name }) => (
+            <Option key={id} value={code}>
               {name}
             </Option>
           ))}
