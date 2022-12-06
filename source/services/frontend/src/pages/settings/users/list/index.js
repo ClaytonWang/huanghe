@@ -41,7 +41,7 @@ const UsersList = () => {
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const projectsDataSource = useMemo(() => user.project || [], [user]);
+  const projectsDataSource = useMemo(() => user.projects || [], [user]);
   const [permissionsDatasource, setPermissionsDatasource] = useState([]);
   const getFilters = useCallback(
     () => ({ ...defaultFilters, ...qs.parse(searchParams.toString()) }),

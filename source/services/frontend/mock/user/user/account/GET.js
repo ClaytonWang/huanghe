@@ -43,7 +43,7 @@ const account = {
       name: 'owner',
       value: '项目负责人',
     },
-    project: [
+    projects: [
       {
         name: '紫龙游戏', // 项目名称，字符串
         id: 'EN106', // 项目编码，字符串
