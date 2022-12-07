@@ -32,7 +32,7 @@ const UsersTable = ({
       title: '权限',
       dataIndex: 'permissions',
       render(arr) {
-        const { value = '-' } = arr[0];
+        const { value = '-' } = arr[0] || {};
         return value;
       },
     },

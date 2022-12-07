@@ -737,7 +737,7 @@ module.exports = {
       'always',
       {
         arraysInObjects: true,
-        objectsInObjects: false,
+        objectsInObjects: true,
       },
     ],
     // @fixable 对象字面量内的属性每行必须只有一个

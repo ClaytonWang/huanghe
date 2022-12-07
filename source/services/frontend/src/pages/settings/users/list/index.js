@@ -3,7 +3,7 @@
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Form, Input, message, Select } from 'antd';
+import { Form, message, Select } from 'antd';
 import { useSearchParams } from 'react-router-dom';
 import qs from 'qs';
 import { uniqueId, find, cloneDeep } from 'lodash';
@@ -43,6 +43,7 @@ const UsersList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const projectsDataSource = useMemo(() => user.projects || [], [user]);
   const [permissionsDatasource, setPermissionsDatasource] = useState([]);
+  const [usersDatasource, setUsersDatasource] = useState([]);
   const getFilters = useCallback(
     () => ({ ...defaultFilters, ...qs.parse(searchParams.toString()) }),
     [searchParams, defaultFilters]
@@ -67,6 +68,7 @@ const UsersList = () => {
   useEffect(() => {
     requestList();
     requestPermissionsDatasource();
+    requestUserListItems();
     const filters = getFilters();
     setSearchParams(qs.stringify(filters));
   }, []);
@@ -77,6 +79,17 @@ const UsersList = () => {
       const { result } = await api.access({ name: PROJECT });
       const { children: data } = find(result, ['name', PROJECT]);
       setPermissionsDatasource(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const requestUserListItems = async () => {
+    try {
+      const { result = {} } = await api.bamUsersList({
+        filter: { role__name: 'user' },
+      });
+      const data = result.data || [];
+      setUsersDatasource(data);
     } catch (error) {
       console.log(error);
     }
@@ -137,10 +150,11 @@ const UsersList = () => {
   };
   // FIXME: permissions冗余的数组结构引入的「数据处理」代码，如后期无相关前端页面扩展，建议优化
   const parseSeletedItem = (record) => {
-    const { permissions } = record;
+    const { permissions, userId } = record;
     return {
       ...record,
       permissions: permissions[0],
+      user: userId,
     };
   };
   const handleCreateClicked = () => {
@@ -150,20 +164,20 @@ const UsersList = () => {
     closeModal();
   };
   const handleCreateSubmit = (values) => {
-    const { permissions } = values;
-    createUser({ ...values, permissions: [permissions.id] });
+    const { permissions: permissionId } = values;
+    createUser({ ...values, permissions: [permissionId] });
   };
   const handleEditSubmit = (values) => {
     const { userId } = selectedItem;
-    const { permissions, project } = values;
-    updateUsers({ user: userId, permissions: [permissions.id], project });
+    const { permissions: permissionId, project } = values;
+    updateUsers({ user: userId, permissions: [permissionId], project });
   };
   const handleEditClicked = (record) => {
     openModal('edit', { ...record, project: record.project.id });
   };
   const handleDelete = (values) => {
-    const { project, userId } = values;
-    deleteUser({ user: userId, permissions: [], project: project.id });
+    const { id } = values;
+    deleteUser({ pk: id });
   };
 
   const renderItems = (type) => {
@@ -174,11 +188,24 @@ const UsersList = () => {
     return (
       <>
         <Form.Item
-          name="username"
+          name="user"
           label="姓名"
           rules={[{ required: true, message: '请输入计划名称' }]}
         >
-          <Input placeholder="请输入姓名" disabled={disabled} />
+          <Select
+            placeholder="请选择项目"
+            showSearch
+            filterOption={(input, option) =>
+              (option?.children ?? '').includes(input)
+            }
+            disabled={disabled}
+          >
+            {usersDatasource.map(({ id, username }) => (
+              <Option key={id} value={id}>
+                {username}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
         <Form.Item
           name="project"
@@ -201,8 +228,8 @@ const UsersList = () => {
           rules={[{ required: true, message: '请选择用户权限' }]}
         >
           <Select placeholder="请选择用户权限">
-            {permissionsDatasource.map(({ id, name, value }) => (
-              <Option key={id} value={name}>
+            {permissionsDatasource.map(({ id, value }) => (
+              <Option key={id} value={id}>
                 {value}
               </Option>
             ))}
