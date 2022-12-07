@@ -26,12 +26,13 @@ module.exports = {
     bamUsersCreate: 'post|/user',
     bamUsersUpdate: 'put|/user/:user_id',
     bamUsersDelete: 'delete|/user/:user_id',
+    userListItems: 'get|/user/items',
 
     // settings
     settingsUsersList: 'get|/settings/user',
     settingsUsersCreate: 'post|/settings/user',
     settingsUsersUpdate: 'post|/settings/user',
-    settingsUsersDelete: 'post|/settings/user',
+    settingsUsersDelete: 'delete|/settings/user/:pk',
 
     // todo, remove settings prefix
     settingsAccount: 'get|/user/account',
