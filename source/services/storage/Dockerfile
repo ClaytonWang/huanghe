@@ -1,7 +1,7 @@
 FROM digglerz/python3.8
 
-ARG APP_PATH=services/cluster
-WORKDIR /source/services/cluster
+ARG APP_PATH=services/storage
+WORKDIR /source/services/storage
 
 
 # python dependence
