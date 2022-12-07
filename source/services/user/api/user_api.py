@@ -5,6 +5,7 @@
     >Mail    : jindu.yin@digitalbrain.cn
     >Time    : 2022/10/13 07:10
 """
+import ormar
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, Path, Query
 from fastapi.requests import Request
@@ -58,13 +59,16 @@ async def list_user(
     :param query_params:
     :return:
     """
-    result = await paginate(User.objects.select_related(['role', 'project_user']).filter(
+    result = await paginate(User.objects.select_related(
+        ['role', 'project_user', 'projects']
+    ).filter(
         **query_params.filter_
     ), params=query_params.params)
     json_result = result.dict()
     data = json_result.get('data', [])
     for index, item in enumerate(data):
-        item['projects'] = item.get('project_user')
+        members_projects = item.get('projects', [])
+        item['projects'] = item.get('project_user', []) + members_projects
     return json_result
 
 
@@ -122,8 +126,10 @@ async def delete_user(
 async def account(request: Request):
     if not hasattr(request, 'user') or not hasattr(request.user, 'role'):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='未登录或角色不存在')
-
-    projects = await Project.objects.filter(owner=request.user).all()
+    # owner = request.user,
+    projects = await Project.objects.select_related('member').filter(
+        ormar.or_(owner=request.user, member__id=request.user.id)
+    ).all()
     setattr(request.user, 'projects', projects)
     result = AccountInfo.from_orm(request.user).dict()
     pms_info = await role_pms(request.user.role.name)

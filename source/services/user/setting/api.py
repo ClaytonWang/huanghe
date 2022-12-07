@@ -5,7 +5,7 @@
     >Mail    : jindu.yin@digitalbrain.cn
     >Time    : 2022/11/29 19:11
 """
-from fastapi import APIRouter, Depends, Request, HTTPException, status
+from fastapi import APIRouter, Depends, Request, HTTPException, status, Path
 from models import User, Project, Permissions, OperationPms
 from api.serializers import OwnerUserList
 from setting.serializers import ProjectSetUser
@@ -66,7 +66,7 @@ async def project_set_user(
     # TODO 失败回滚
     # 删除指定用户和项目的所有权限
     pms = await OperationPms.objects.get_or_none(project=project, user=user)
-    pms and pms.permissions.clear()
+    pms and await pms.permissions.clear()
 
     if not pms:
         pms = await OperationPms.objects.create(**dict(
@@ -77,3 +77,17 @@ async def project_set_user(
     # 重新添加权限
     for _item in add_pms:
         await pms.permissions.add(_item)
+
+
+@router_setting.delete(
+    '/user/{pk}',
+    description='删除【设置&用户项目权限】',
+    response_model={},
+)
+async def project_set_user(
+        pk: int = Path(..., ge=1, description='权限模块ID')
+):
+
+    pms = await OperationPms.objects.get(id=pk)
+    await pms.permissions.clear()
+    await pms.delete()
