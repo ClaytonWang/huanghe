@@ -60,7 +60,7 @@ module.exports = {
     {
       key: 'bam',
       label: '后台管理',
-      icon: '',
+      icon: 'bam',
       children: [
         {
           key: 'bam.projects',
@@ -75,7 +75,7 @@ module.exports = {
     {
       key: 'settings',
       label: '设置',
-      icon: '',
+      icon: 'settings',
       children: [
         {
           key: 'settings.users',
@@ -86,7 +86,7 @@ module.exports = {
     {
       key: 'storages',
       label: '存储',
-      icon: '',
+      icon: 'storages',
       children: [
         {
           key: 'storages.list',

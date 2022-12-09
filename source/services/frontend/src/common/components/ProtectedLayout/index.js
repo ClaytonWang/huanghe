@@ -1,6 +1,9 @@
 /**
- * @description Authenticate user info before render component
- * @author liguanlin<guanlin.li@digitalbrain.cn>
+ * @Author guanlin.li guanlin.li@digitalbrain.cn
+ * @Date 2022-11-29 10:59:16
+ * @LastEditors guanlin.li guanlin.li@digitalbrain.cn
+ * @LastEditTime 2022-12-09 17:05:04
+ * @Description Authenticate user info before render component
  */
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Layout, Menu } from 'antd';
@@ -10,6 +13,9 @@ import HeaderNav from '@/common/components/HeaderNav';
 import { useAuth } from '@/common/hooks/useAuth';
 import { tranverseTree, isLeafNode } from '@/common/utils/helper';
 import { menuItemsConfig } from '@/common/utils/config';
+import Icon from '@ant-design/icons';
+import Icons from '@/common/components/Icon';
+import './index.less';
 
 const { Sider, Content } = Layout;
 
@@ -31,6 +37,9 @@ const ProtectedLayout = () => {
         if (permissions.indexOf(item.key) > -1) {
           const path = item.key.split('.').join('/');
           item.label = <Link to={path}>{item.label}</Link>;
+          if (item.icon) {
+            item.icon = <Icon component={Icons[item.icon]} />;
+          }
           result.push(item);
         }
       });
@@ -69,7 +78,7 @@ const ProtectedLayout = () => {
   }, [pathname, items]);
 
   return (
-    <Layout>
+    <Layout className="protected-layout">
       <HeaderNav />
       <Layout>
         <Sider>

@@ -125,14 +125,30 @@ module.exports = {
           },
         ],
       },
+
       {
         /** image loader */
-        test: /\.(png|jpg|gif|svg)$/,
+        test: /\.(png|jpg|gif)$/,
         loader: 'url-loader',
         options: {
           // name: '[name]_[hash].[ext]',
           limit: 3000000,
         },
+      },
+      {
+        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+        use: [
+          {
+            loader: 'babel-loader',
+          },
+          {
+            loader: '@svgr/webpack',
+            options: {
+              babel: false,
+              icon: true,
+            },
+          },
+        ],
       },
     ],
   },

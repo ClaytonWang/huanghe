@@ -2,7 +2,6 @@
  * @description Header Nav
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
-
 import { useState } from 'react';
 import {
   Layout,
@@ -15,8 +14,7 @@ import {
   Form,
   message,
 } from 'antd';
-import {
-  UserOutlined,
+import Icon, {
   DownOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
@@ -24,9 +22,10 @@ import { useAuth } from '@/common/hooks/useAuth';
 import logo from '@/dbr-logo.png';
 import api from '@/common/api';
 import FormModal from '@/common/components/FormModal';
-import './index.less';
 import { parseKVToKeyValue } from '@/common/utils/helper';
 import { USER_ROLE } from '@/common/constants';
+import Icons from '../Icon';
+import './index.less';
 
 const { Header } = Layout;
 const { Option } = Select;
@@ -99,7 +98,7 @@ const HeaderNav = () => {
           <img src={logo} />
         </div>
         <div className="user-info">
-          <UserOutlined />
+          <Icon component={Icons.account} />
           <Dropdown overlay={menu}>
             <a onClick={(e) => e.preventDefault()}>
               <Space>
