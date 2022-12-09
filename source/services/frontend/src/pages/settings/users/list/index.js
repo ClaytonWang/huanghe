@@ -150,10 +150,10 @@ const UsersList = () => {
   };
   // FIXME: permissions冗余的数组结构引入的「数据处理」代码，如后期无相关前端页面扩展，建议优化
   const parseSeletedItem = (record) => {
-    const { permissions, userId } = record;
+    const { permissions = [], userId } = record;
     return {
       ...record,
-      permissions: permissions[0],
+      permissions: permissions[0] && permissions[0].id,
       user: userId,
     };
   };
