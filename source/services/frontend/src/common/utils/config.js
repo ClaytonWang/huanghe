@@ -40,6 +40,12 @@ module.exports = {
 
     // FIXME: 后端获取指定菜单的权限接口
     access: 'get|/pms/menu',
+
+    storagesList: 'get|/storages',
+    storagesListCreate: 'post|/storages',
+    storagesListUpdate: 'put|/storages/:id',
+    storagesListDelete: 'delete|/storages/:id',
+    storagesListReset: 'post|/storages/reset',
   },
   breadcrumbConfig: {
     '/bam/projects': '项目管理',
@@ -47,6 +53,8 @@ module.exports = {
     '/settings/users': '用户列表',
 
     '/settings/account': '我的账号',
+
+    '/storages/list': '存储管理',
   },
   menuItemsConfig: [
     {
@@ -72,6 +80,17 @@ module.exports = {
         {
           key: 'settings.users',
           label: '用户管理',
+        },
+      ],
+    },
+    {
+      key: 'storages',
+      label: '存储',
+      icon: '',
+      children: [
+        {
+          key: 'storages.list',
+          label: '存储管理',
         },
       ],
     },

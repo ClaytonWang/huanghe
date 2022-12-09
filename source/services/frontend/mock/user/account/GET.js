@@ -31,7 +31,14 @@ const owner = [
   'settings.users.create', // 用户-列表页-「新建项目」按钮权限
   'settings.users.edit', // 用户-列表页-「编辑」按钮权限
   'settings.users.delete', // 用户-列表页-「删除」按钮权限
+
+  'storages',
+  'storages.list',
+  'storages.list.create',
+  'storages.list.edit',
+  'storages.list.delete',
 ];
+// const user = [];
 const account = {
   success: true,
   message: '',
@@ -40,8 +47,8 @@ const account = {
     email: 'san.zhang@digitalbrain.cn', // 用户邮箱，字符串
     role: {
       id: 2,
-      name: 'owner',
-      value: '项目负责人',
+      name: 'admin',
+      value: '超级管理员',
     },
     projects: [
       {

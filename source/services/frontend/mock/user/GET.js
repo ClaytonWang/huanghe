@@ -6,23 +6,24 @@
  * @Description 后台管理：用户列表查询
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
-const utils = require('../../utils');
+const utils = require('../utils');
 module.exports = function (req, res) {
   utils.list(req, res, {
     data: [
       {
-        id: '', //
+        id: '1', //
         username: '刘龙飞', // 用户名,字符串
         email: 'longfei.liu@digitalbrain.cn', // 用户邮箱,字符串；
         role: 'admin', // 角色,可选admin｜owner｜user,字符串
-        project: [], // 所属项目名称,数组
+        projects: [], // 所属项目名称,数组
         create_at: '2022-10-10', // 创建时间,字符串
       },
       {
+        id: '2', //
         username: '田政', // 用户名,字符串
         email: 'zheng.tian@digitalbrain.cn', // 用户邮箱,字符串；
         role: 'owner', // 角色,可选admin｜owner｜user,字符串
-        project: [
+        projects: [
           // 所属项目名称,项目对象数组
           {
             id: 'EN106',
@@ -32,10 +33,11 @@ module.exports = function (req, res) {
         create_at: '2022-10-10', // 创建时间,字符串
       },
       {
+        id: '3', //
         username: '温颖', // 用户名,字符串
         email: 'ying@digitalbrain.cn', // 用户邮箱,字符串；
         role: 'owner', // 角色,可选admin｜owner｜user,字符串
-        project: [
+        projects: [
           // 所属项目名称,项目对象数组
           {
             id: 'EN107',
@@ -45,10 +47,11 @@ module.exports = function (req, res) {
         create_at: '2022-10-10', // 创建时间,字符串
       },
       {
+        id: '4', //
         username: '张伟楠', // 用户名,字符串
         email: 'weinan@digitalbrain.cn', // 用户邮箱,字符串；
         role: 'owner', // 角色,可选admin｜owner｜user,字符串
-        project: [
+        projects: [
           // 所属项目名称,项目对象数组
           {
             id: 'EN108',
@@ -58,10 +61,11 @@ module.exports = function (req, res) {
         create_at: '2022-10-10', // 创建时间,字符串
       },
       {
+        id: '5', //
         username: '张三', // 用户名,字符串
         email: 'san@digitalbrain.cn', // 用户邮箱,字符串；
         role: 'user', // 角色,可选admin｜owner｜user,字符串
-        project: [
+        projects: [
           // 所属项目名称,项目对象数组
           {
             id: 'EN106',
@@ -75,10 +79,11 @@ module.exports = function (req, res) {
         create_at: '2022-10-10', // 创建时间,字符串
       },
       {
+        id: '6', //
         username: '李四', // 用户名,字符串
         email: 'si@digitalbrain.cn', // 用户邮箱,字符串；
         role: 'user', // 角色,可选admin｜owner｜user,字符串
-        project: [
+        projects: [
           // 所属项目名称,项目对象数组
           {
             id: 'EN107',
