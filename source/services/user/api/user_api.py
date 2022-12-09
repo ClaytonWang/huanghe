@@ -36,7 +36,7 @@ async def create_user(user: UserCreate):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='不能创建管理员账号')
 
     # TODO 失败回滚
-    project_ids = init_data.pop('project', [])
+    project_ids = init_data.pop('projects', [])
     # 把原始数据的role换成ID
     init_data['role'] = role.id
     new_user = await User.objects.create(**init_data)

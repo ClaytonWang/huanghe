@@ -32,7 +32,7 @@ class UserCreate(BaseModel):
     password: str = Field(..., min_length=8, max_length=255)
     email: EmailStr
     role: str = Field(..., description='角色名称')
-    project: Optional[List[int]] = []
+    projects: Optional[List[int]] = []
 
     @validator('password')
     def set_password(cls, pwd):
