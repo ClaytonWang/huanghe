@@ -125,8 +125,7 @@ const UsersList = () => {
     const projects = (value.length > 0 && map(value, 'id')) || value;
     setInitialFormValues({
       ...record,
-      // TODO：project字段改成projects，与列表中字段保持一致。
-      project: projects,
+      projects,
     });
   };
   const handleEditCancel = () => {
@@ -211,7 +210,7 @@ const UsersList = () => {
             ))}
         </Select>
       </Form.Item>
-      <Form.Item name="project" label="所属项目">
+      <Form.Item name="projects" label="所属项目">
         <Select mode="tags" placeholder="请选择项目">
           {projectsDataSource.map(({ id, name }) => (
             <Option key={id} value={id}>

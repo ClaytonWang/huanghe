@@ -11,7 +11,7 @@ import UserList from './users/list';
 
 const BamRoutes = () => (
   <Routes>
-    <Route path="" element={<Navigate to="bam" />} />
+    <Route path="" element={<Navigate to="users" />} />
     <Route path="projects" element={<ProjectsList />} />
     <Route path="users" element={<UserList />} />
   </Routes>

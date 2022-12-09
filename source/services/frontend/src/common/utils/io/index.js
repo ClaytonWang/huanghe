@@ -40,10 +40,10 @@ const codeMessage = {
  * @param {string} message 错误提示信息
  * @return {Object} 全局错误对象
  */
-function getGlobalError(message) {
+function getGlobalError(msg) {
   return {
     success: false,
-    message,
+    message: msg,
   };
 }
 
@@ -77,13 +77,13 @@ function requestFailureHandler(error) {
   const { response } = error;
   let errorType;
   if (response) {
-    const { status } = response;
+    const { status: _status } = response;
     // 服务器没有正常返回
-    if (status < 200 || (status >= 400 && status !== 401)) {
+    if (_status < 200 || (_status >= 400 && _status !== 401 && _status < 500)) {
       errorType =
         (!(response.data instanceof Blob) && response.data) ||
-        getGlobalError(codeMessage[status]);
-    } else if (status === 401) {
+        getGlobalError(codeMessage[_status]);
+    } else if (_status === 401) {
       Modal.warning({
         title: '系统提示',
         content: '用户登录失效，请重新登录！',
@@ -91,7 +91,11 @@ function requestFailureHandler(error) {
       // clear localstorage token
       window.localStorage.clear();
       history.push('/login');
-      return Promise.reject(codeMessage[status]);
+      return Promise.reject(codeMessage[_status]);
+    } else if (error.message) {
+      errorType = getGlobalError(error.message);
+    } else {
+      errorType = NETWORK_ERROR;
     }
   } else if (error.message) {
     errorType = getGlobalError(error.message);
