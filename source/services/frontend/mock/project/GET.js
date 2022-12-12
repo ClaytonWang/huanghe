@@ -3,7 +3,7 @@
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
-const utils = require('../../utils');
+const utils = require('../utils');
 module.exports = function (req, res) {
   utils.list(req, res, {
     data: [

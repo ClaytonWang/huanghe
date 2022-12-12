@@ -110,7 +110,7 @@ export const parseKeyValueToKV = (arr) => {
 /**
  * 将时间数据转换为 YYYY/MM/DD HH:mm:ss 格式字符串输出
  *
- * @param {number} value
+ * @param {number|string} value
  * @return {string} YYYY/MM/DD HH:mm:ss
  */
 export const transformTime = (value) => {
@@ -124,7 +124,7 @@ export const transformTime = (value) => {
 /**
  * 将日期时间转换为 YYYY-MM-DD 格式字符串输出
  *
- * @param {number} value
+ * @param {number|string} value
  * @return {string} YYYY-MM-DD
  */
 export const transformDate = (value) => {
@@ -360,3 +360,11 @@ export const parseKeyToSnake = (obj, [key, value]) => {
     obj[newKey] = value;
   }
 };
+/**
+ * 给定两个日期，返回相对日期。
+ *
+ * @param {Date} from
+ * @param {Date} to
+ * @return number
+ */
+export const relativeDate = (start, end) => moment(start).diff(end, 'days');

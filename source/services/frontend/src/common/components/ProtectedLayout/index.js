@@ -1,22 +1,27 @@
 /**
- * @description Authenticate user info before render component
- * @author liguanlin<guanlin.li@digitalbrain.cn>
+ * @Author guanlin.li guanlin.li@digitalbrain.cn
+ * @Date 2022-11-29 10:59:16
+ * @LastEditors guanlin.li guanlin.li@digitalbrain.cn
+ * @LastEditTime 2022-12-09 17:05:04
+ * @Description Authenticate user info before render component
  */
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { Layout, Menu } from 'antd';
 import { get, find } from 'lodash';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import HeaderNav from '@/common/components/HeaderNav';
 import { useAuth } from '@/common/hooks/useAuth';
 import { tranverseTree, isLeafNode } from '@/common/utils/helper';
 import { menuItemsConfig } from '@/common/utils/config';
+import Icon from '@ant-design/icons';
+import Icons from '@/common/components/Icon';
+import './index.less';
 
 const { Sider, Content } = Layout;
 
 const ProtectedLayout = () => {
   const { user } = useAuth();
-  const location = useLocation();
-  const { pathname } = location;
+  const navigate = useNavigate();
 
   const permissions = useMemo(() => get(user, 'permissions', []), [user]);
 
@@ -31,6 +36,9 @@ const ProtectedLayout = () => {
         if (permissions.indexOf(item.key) > -1) {
           const path = item.key.split('.').join('/');
           item.label = <Link to={path}>{item.label}</Link>;
+          if (item.icon) {
+            item.icon = <Icon component={Icons[item.icon]} />;
+          }
           result.push(item);
         }
       });
@@ -53,30 +61,28 @@ const ProtectedLayout = () => {
   }, [items]);
 
   const selectedKeys = useMemo(() => {
-    const paths = pathname.split('/').slice(1);
-    const leafNodes = [];
-    let path = paths.join('.');
+    const firstMenu = defaultOpenKeys[0];
+    const item = find(items, ['key', firstMenu]);
+    const pathname = item.children[0].key;
+    return [pathname];
+  }, [defaultOpenKeys, items]);
 
-    tranverseTree(items, (item) => {
-      if (isLeafNode(item)) {
-        leafNodes.push(item);
-      }
-    });
-    if (!find(leafNodes, ['key', path])) {
-      path = [path.split('.')[0], 'list'].join('.');
-    }
-    return [path];
-  }, [pathname, items]);
+  /* eslint-disable react-hooks/exhaustive-deps */
+  useEffect(() => {
+    const pathname = selectedKeys[0];
+    const path = pathname.split('.').join('/');
+    navigate(path);
+  }, []);
 
   return (
-    <Layout>
+    <Layout className="protected-layout">
       <HeaderNav />
       <Layout>
         <Sider>
           <Menu
             defaultOpenKeys={defaultOpenKeys}
             mode="inline"
-            selectedKeys={selectedKeys}
+            defaultSelectedKeys={selectedKeys}
             items={items}
             className="dbr-sider-menu"
           />
