@@ -193,12 +193,8 @@ const ProjectsList = () => {
       onSubmit={handleEditSubmit}
       onCancel={handleEditModalCancel}
     >
-      <Form.Item
-        label="项目编号"
-        name="code"
-        rules={[{ required: true, message: '请输入项目编号' }]}
-      >
-        <Input placeholder="请输入项目编号" />
+      <Form.Item label="项目编号" name="code">
+        <Input placeholder="请输入项目编号" disabled />
       </Form.Item>
       <Form.Item
         label="项目名称"
