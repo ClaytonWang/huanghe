@@ -45,6 +45,10 @@ const UsersTable = ({
     {
       title: '操作',
       render(_value, record) {
+        const { role } = record;
+        if (role.name === 'admin') {
+          return;
+        }
         return (
           <span className="dbr-table-actions">
             <Button

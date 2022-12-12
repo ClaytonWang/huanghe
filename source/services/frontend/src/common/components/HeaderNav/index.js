@@ -118,7 +118,11 @@ const HeaderNav = () => {
           onSubmit={handleAccountSubmit}
           onCancel={handleAccountCancel}
         >
-          <Form.Item label="姓名" name="username">
+          <Form.Item
+            label="姓名"
+            name="username"
+            rules={[{ required: true, message: '请输入用户名' }]}
+          >
             <Input placeholder="请输入姓名" />
           </Form.Item>
           <Form.Item label="角色" name="role">
