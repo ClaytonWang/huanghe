@@ -194,20 +194,14 @@ const UsersList = () => {
         rules={[{ required: true, message: '请选择用户角色' }]}
       >
         <Select placeholder="请选择用户角色">
-          {(type === 'create' &&
-            filter(
-              parseKVToKeyValue(USER_ROLE, 'k', 'v'),
-              ({ k }) => k !== 'admin'
-            ).map(({ k, v }) => (
-              <Option key={k} value={k}>
-                {v}
-              </Option>
-            ))) ||
-            parseKVToKeyValue(USER_ROLE, 'k', 'v').map(({ k, v }) => (
-              <Option key={k} value={k}>
-                {v}
-              </Option>
-            ))}
+          {filter(
+            parseKVToKeyValue(USER_ROLE, 'k', 'v'),
+            ({ k }) => k !== 'admin'
+          ).map(({ k, v }) => (
+            <Option key={k} value={k}>
+              {v}
+            </Option>
+          ))}
         </Select>
       </Form.Item>
       <Form.Item name="projects" label="所属项目">
