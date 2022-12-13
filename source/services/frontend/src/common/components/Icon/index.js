@@ -10,11 +10,17 @@ import BAMSvg from '@/common/images/BAM.svg';
 import SettingsSvg from '@/common/images/Settings.svg';
 import StorageSvg from '@/common/images/storages.svg';
 import UserSvg from '@/common/images/user.svg';
+import DataSvg from '@/common/images/data.svg';
+import CustomSvg from '@/common/images/custom.svg';
+import DevelopSvg from '@/common/images/develop.svg';
 
 const Icons = {
   bam: BAMSvg,
   settings: SettingsSvg,
   storages: StorageSvg,
   account: UserSvg,
+  data: DataSvg,
+  custom: CustomSvg,
+  develop: DevelopSvg,
 };
 export default Icons;
