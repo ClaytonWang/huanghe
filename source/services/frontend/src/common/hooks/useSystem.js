@@ -36,7 +36,13 @@ export const SystemProvider = ({ children }) => {
     }
   }, []);
 
-  const renderLoading = () => <Spin size="large" tip="Loading..." />;
+  const renderLoading = () => (
+    <Spin
+      size="large"
+      tip="Loading..."
+      style={{ width: '100%', height: '100%' }}
+    />
+  );
 
   const value = useMemo(
     () => ({
