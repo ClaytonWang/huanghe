@@ -3,9 +3,10 @@
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
 import { Form, Input, Button } from 'antd';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import Icon, { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { useAuth } from '@/common/hooks/useAuth';
 import { name } from '@/common/utils/config';
+import Icons from '@/common/components/Icon';
 import './index.less';
 
 const LoginForm = () => {
@@ -71,11 +72,12 @@ const LoginForm = () => {
   );
 };
 const Login = () => (
-  <div
-    className="login"
-    style={{ backgroundImage: 'url("/images/transport.png")' }}
-  >
+  <div className="login">
     <div className="title">
+      <Icon
+        component={Icons.develop}
+        style={{ fontSize: '20em', margin: 'auto -10px auto 10%' }}
+      />
       <span>{name}</span>
     </div>
     <LoginForm />
