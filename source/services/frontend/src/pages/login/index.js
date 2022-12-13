@@ -7,6 +7,7 @@ import Icon, { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { useAuth } from '@/common/hooks/useAuth';
 import { name } from '@/common/utils/config';
 import Icons from '@/common/components/Icon';
+import bg from '@/common/images/carousel_0.png';
 import './index.less';
 
 const LoginForm = () => {
@@ -73,6 +74,7 @@ const LoginForm = () => {
 };
 const Login = () => (
   <div className="login">
+    <img className="bg-image" src={bg} />
     <div className="title">
       <Icon
         component={Icons.develop}
