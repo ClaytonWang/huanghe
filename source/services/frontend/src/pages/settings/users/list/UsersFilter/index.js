@@ -46,7 +46,7 @@ const UsersFilter = ({
         <Input placeholder="输入用户姓名..." style={{ width: 250 }} />
       </Form.Item>
       <Form.Item label="权限" name="permissions__code">
-        <Select style={{ width: 150 }}>
+        <Select style={{ width: 100 }}>
           <Option key="all" value="all">
             全部
           </Option>
@@ -58,7 +58,7 @@ const UsersFilter = ({
         </Select>
       </Form.Item>
       <Form.Item label="所属项目" name="project__code">
-        <Select style={{ width: 100 }}>
+        <Select style={{ width: 150 }} dropdownMatchSelectWidth={false}>
           <Option key="all" value="all">
             全部
           </Option>

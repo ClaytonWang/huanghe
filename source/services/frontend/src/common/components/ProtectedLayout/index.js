@@ -51,25 +51,31 @@ const ProtectedLayout = () => {
 
   const defaultOpenKeys = useMemo(() => {
     const result = [];
-    tranverseTree(items, (item) => {
-      const { key } = item;
-      if (!isLeafNode(item)) {
-        result.push(key);
-      }
-    });
+    if (items.length > 0) {
+      tranverseTree(items, (item) => {
+        const { key } = item;
+        if (!isLeafNode(item)) {
+          result.push(key);
+        }
+      });
+    }
     return result;
   }, [items]);
 
   const selectedKeys = useMemo(() => {
-    const firstMenu = defaultOpenKeys[0];
-    const item = find(items, ['key', firstMenu]);
-    const pathname = item.children[0].key;
-    return [pathname];
+    const result = [];
+    if (items.length > 0 && defaultOpenKeys.length > 0) {
+      const firstMenu = defaultOpenKeys[0];
+      const item = find(items, ['key', firstMenu]);
+      const pathname = item.children[0].key;
+      result.push(pathname);
+    }
+    return result;
   }, [defaultOpenKeys, items]);
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
-    const pathname = selectedKeys[0];
+    const pathname = (selectedKeys.length > 0 && selectedKeys[0]) || '';
     const path = pathname.split('.').join('/');
     navigate(path);
   }, []);
