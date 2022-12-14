@@ -4,7 +4,7 @@
  */
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Input, message, Form, Select, Modal } from 'antd';
+import { Input, message, Form, Select, Modal, Tag } from 'antd';
 import { filter, map } from 'lodash';
 import qs from 'qs';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
@@ -205,7 +205,15 @@ const UsersList = () => {
         </Select>
       </Form.Item>
       <Form.Item name="projects" label="所属项目">
-        <Select mode="tags" placeholder="请选择项目">
+        <Select
+          mode="multiple"
+          placeholder="请选择项目"
+          showArrow
+          filterOption={(inputValue, option) =>
+            option.children.includes(inputValue)
+          }
+          tagRender={({ label }) => <Tag color="purple">{label}</Tag>}
+        >
           {projectsDataSource.map(({ id, name }) => (
             <Option key={id} value={id}>
               {name}
