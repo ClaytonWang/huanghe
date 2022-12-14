@@ -1,30 +1,67 @@
 # -*- coding: utf-8 -*-
 
-from pydantic import BaseModel
+from __future__ import annotations
+from typing import Optional, Union
+import datetime
+
+from pydantic import BaseModel, validator
 
 
-class Volume(BaseModel):
-    name: str
-
-
-class VolumeList(BaseModel):
+class Owner(BaseModel):
     id: int
     name: str
 
-# class VolumeCreate(BaseModel):
-#     username: str = Field(..., max_length=80)
-#     current: int = Field(..., )
-#     limit: int = Field()
-#     owner: str = Field
-#     project: Optional[List[int]] = []
-#     is_delete: bool = Field
-#
-#     @validator('password')
-#     def set_password(cls, pwd):
-#         return hash_password(pwd)
+
+class ProjectStr(BaseModel):
+    id: str
+    name: Optional[str] = None
 
 
+class OwnerStr(BaseModel):
+    id: str
+    name: str
 
 
+class Config(BaseModel):
+    value: Optional[int] = 0
+    size: int
 
 
+class Project(BaseModel):
+    id: int
+    name: Optional[str] = None
+
+
+class VolumeCreateReq(BaseModel):
+    name: str
+    project: Union[ProjectStr, None] = None
+    config: Union[Config, None] = None
+    owner: Union[Owner, None] = None
+
+    @validator('name')
+    def k8s_name_validator(cls, name):
+        return name
+
+
+class VolumeEditReq(BaseModel):
+    project: Optional[ProjectStr] = None
+    size: int = None
+    owner: Optional[OwnerStr] = None
+
+    @validator('size')
+    def k8s_name_validator(cls, size):
+        return size
+
+
+# class VolumeResetReq(BaseModel):
+#     id: int
+
+
+class VolumeDetailRes(BaseModel):
+    id: str
+    name: str
+    config: Config
+    project: ProjectStr
+    owner: OwnerStr
+    created_at: datetime.datetime
+    deleted_at: Optional[datetime.datetime] = None
