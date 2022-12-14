@@ -9,6 +9,7 @@ COPY ${APP_PATH}/requirements.txt .
 RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 COPY ${APP_PATH} .
+COPY basic /source/basic/
 
 ENTRYPOINT python3 main.py
 #CMD ["uvicorn", "main:app", "--host=0.0.0.0", "--port=80"]
