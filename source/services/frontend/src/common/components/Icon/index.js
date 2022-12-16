@@ -13,6 +13,7 @@ import UserSvg from '@/common/images/user.svg';
 import DataSvg from '@/common/images/data.svg';
 import CustomSvg from '@/common/images/custom.svg';
 import DevelopSvg from '@/common/images/develop.svg';
+import JupyterSvg from '@/common/images/jupyter.svg';
 
 const Icons = {
   bam: BAMSvg,
@@ -22,5 +23,6 @@ const Icons = {
   data: DataSvg,
   custom: CustomSvg,
   develop: DevelopSvg,
+  notebooks: JupyterSvg,
 };
 export default Icons;

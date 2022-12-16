@@ -46,6 +46,13 @@ module.exports = {
     storagesListUpdate: 'put|/storages/:id',
     storagesListDelete: 'delete|/storages/:id',
     storagesListReset: 'post|/storages/reset',
+
+    notebooksList: 'get|/notebooks',
+    notebooksListCreate: 'post|/notebooks',
+    notebooksListUpdate: 'put|/notebooks/:id',
+    notebooksListDelete: 'delete|/notebooks/:id',
+    imagesList: 'get|/images',
+    sourceList: 'get|/source',
   },
   breadcrumbConfig: {
     '/bam/projects': '项目管理',
@@ -55,6 +62,8 @@ module.exports = {
     '/settings/account': '我的账号',
 
     '/storages/list': '存储管理',
+
+    '/notebooks/list': 'Notebook管理',
   },
   menuItemsConfig: [
     {
@@ -80,6 +89,17 @@ module.exports = {
         {
           key: 'settings.users',
           label: '用户管理',
+        },
+      ],
+    },
+    {
+      key: 'notebooks',
+      label: 'Notebook',
+      icon: 'notebooks',
+      children: [
+        {
+          key: 'notebooks.list',
+          label: 'Notebook管理',
         },
       ],
     },
