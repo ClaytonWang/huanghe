@@ -27,12 +27,16 @@ USER = "user"
 ADMIN = "admin"
 OWNER = "owner"
 
+
 class Role(BaseModel):
     name: str
+
+
 class AccountGetter(BaseModel):
     id: int = Field(..., alias='user_id')
     username: str = Field(..., alias='user_name')
     role: Role
+
     class Config:
         orm_mode = True
         allow_population_by_field_name = True
@@ -50,7 +54,7 @@ async def get_current_user(token: str) -> AccountGetter:
     if MOCK:
         return AccountGetter.parse_obj(MOCK_USER_JSON)
     response = requests.get(f"{ENV_COMMON_URL}{ACCOUNT_PREFIX_URL}",
-                 headers={"Authorization": token})
+                            headers={"Authorization": token})
     json = response.json()
     return AccountGetter.parse_obj(json['result'])
 
