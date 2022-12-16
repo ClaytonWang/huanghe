@@ -1,18 +1,18 @@
-name: Service:user
+name: Service:cluster
 
 on:
   push:
-    branches: [ "main" , "release/*", "develop", "feature/dev-cicd"]
+    branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/jiangshouchen"]
     paths:
      - source/basic/**
-     - source/services/user/**
-     - manifests/service-user.yaml
-     - .github/workflows/service-user.yaml
+     - source/services/cluster/**
+     - manifests/service-cluster.yaml
+     - .github/workflows/service-cluster.yaml
     tags: [ '*' ]
 
 env:
   DOCKER_CLI_EXPERIMENTAL: enabled
-  IMAGE_NAME: ${{ github.repository }}.user
+  IMAGE_NAME: ${{ github.repository }}.cluster
   DOCKER_TAG: latest
   REGISTRY: containers.git.digitalbrain.cn
   GITHOST: git.digitalbrain.cn
@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: Lowercase image name
         run: |
-          echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}.user" >>${GITHUB_ENV}
+          echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}.cluster" >>${GITHUB_ENV}
       - name: Create docker tag
         id: get_docker_tag
         run: |
@@ -58,7 +58,7 @@ jobs:
         uses: docker/build-push-action@v3
         id: build_and_push
         with:
-          file: ./source/services/user/Dockerfile
+          file: ./source/services/cluster/Dockerfile
           context: ./source
           push: true
           tags: ${{ steps.meta.outputs.tags }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{env.DOCKER_TAG}}
@@ -92,5 +92,5 @@ jobs:
           imagepullsecrets: |
             db-container
           manifests: |
-            manifests/service-user.yaml
-          images: containers.git.digitalbrain.cn/engineering-group/huanghe.user:${{needs.docker_build_and_push.outputs.out_docker_tag}}
+            manifests/service-cluster.yaml
+          images: containers.git.digitalbrain.cn/engineering-group/huanghe.cluster:${{needs.docker_build_and_push.outputs.out_docker_tag}}

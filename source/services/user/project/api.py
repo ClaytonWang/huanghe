@@ -16,6 +16,15 @@ from basic.common.query_filter_params import QueryParameters
 router_project = APIRouter()
 
 
+@router_project.get(
+    '/{project_id}',
+    description="项目详情",
+    response_model=ProjectList
+)
+async def get_project(project_id: int = Path(..., ge=1, description='需要查询的项目ID')):
+    _project = await Project.objects.get(pk=project_id)
+    return _project
+
 @router_project.post(
     '',
     description='创建项目 关联用户类型暂时不做强制检查',
