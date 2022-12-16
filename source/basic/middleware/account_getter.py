@@ -14,16 +14,25 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
 from jose.jwt import JWTError
 from pydantic import BaseModel, Field
+import requests
+import os
 
-ENV_COMMON_URL = "http://127.0.0.1:8004"
+ENV_COMMON_URL = "http://121.36.41.231:32767/api/v1"
 ACCOUNT_PREFIX_URL = "/user/user/account"
-PROJECT_PREFIX_URL = "/project"
+PROJECT_PREFIX_URL = "/user/project"
+MOCK = os.getenv("MOCK_ACCOUNT_GETTER", False)
+MOCK_USER_JSON = {"id": 60, 'username': "shouchen"}
+MOCK_PROJECT_JSON = {"id": 1, "name": "决策平台"}
+USER = "user"
+ADMIN = "admin"
+OWNER = "owner"
 
-
+class Role(BaseModel):
+    name: str
 class AccountGetter(BaseModel):
     id: int = Field(..., alias='user_id')
-    name: str = Field(..., alias='user_name')
-
+    username: str = Field(..., alias='user_name')
+    role: Role
     class Config:
         orm_mode = True
         allow_population_by_field_name = True
@@ -38,18 +47,18 @@ class ProjectGetter(BaseModel):
 
 
 async def get_current_user(token: str) -> AccountGetter:
-    # response = requests.get(f"{ENV_COMMON_URL}{ACCOUNT_PREFIX_URL}",
-    #              headers={"Authorization": token}).json()
-    # user_dict = response['result']
-    user_dict = {"id": 60, 'name': "shouchentest"}
-    return AccountGetter.parse_obj(user_dict)
+    if MOCK:
+        return AccountGetter.parse_obj(MOCK_USER_JSON)
+    response = requests.get(f"{ENV_COMMON_URL}{ACCOUNT_PREFIX_URL}",
+                 headers={"Authorization": token})
+    json = response.json()
+    return AccountGetter.parse_obj(json['result'])
 
 
 def get_project(token: str, project_id) -> ProjectGetter:
-    # response = requests.get(f"{ENV_COMMON_URL}{PROJECT_PREFIX_URL}/{project_id}",
-    #                         headers={"Authorization": token}).json()
-    # project_dict = response['result']
-    project_dict = {"id": project_id, "name": "ssss"}
+    response = requests.get(f"{ENV_COMMON_URL}{PROJECT_PREFIX_URL}/{project_id}",
+                            headers={"Authorization": token}).json()
+    project_dict = response['result']
     return ProjectGetter.parse_obj(project_dict)
 
 

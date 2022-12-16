@@ -4,7 +4,7 @@ from models import Volume
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from volume.serializers import VolumeCreateReq, VolumeEditReq, VolumeDetailRes
-from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project
+from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project, ADMIN, USER
 
 router_volume = APIRouter()
 
@@ -25,8 +25,10 @@ async def get_volume(volume_id: int = Path(..., ge=1, description="存储ID")
     description="存储盘列表",
     response_model=Page[VolumeDetailRes],
 )
-async def list_volume(query_params: QueryParameters = Depends(QueryParameters)):
-    volumes = await Volume.undeleted_volumes()
+async def list_volume(request: Request,
+                      query_params: QueryParameters = Depends(QueryParameters)):
+    user: AccountGetter = request.user
+    volumes = await Volume.undeleted_volumes() if user.role.name != USER else await Volume.undeleted_self_volumes(user.id)
     p = await paginate(volumes.filter(
         **query_params.filter_
     ), params=query_params.params)
@@ -55,8 +57,7 @@ async def update_volume(request: Request,
                         ver: VolumeEditReq,
                         volume_id: int = Path(..., ge=1, description="存储ID")):
     # user: AccountGetter = request.user
-    v = await Volume.get_by_id(volume_id)
-    await v.update(**Volume.gen_edit_dict(ver))
+    await Volume.compare_with_old(volume_id, ver)
     return success_common_response()
 
 

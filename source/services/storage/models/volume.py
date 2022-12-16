@@ -32,6 +32,9 @@ class Volume(GenericDateModel):
     # def __repr__(self):
     #     return f'{self.username}_{self.name}'
 
+    def __gt__(self, other: Volume):
+        return self.size > other.size
+
     def gen_volume_pagation_response(self):
         return {
             "id": self.id,
@@ -58,8 +61,8 @@ class Volume(GenericDateModel):
             "created_by_id": ag.id,
             "updated_by_id": ag.id,
             "project_by_id": pg.id,
-            "created_by": ag.name,
-            "updated_by": ag.name,
+            "created_by": ag.username,
+            "updated_by": ag.username,
             "project_by": pg.name,
             "name": vcr.name,
             "owner_by": vcr.owner.name,
@@ -85,8 +88,14 @@ class Volume(GenericDateModel):
             (cls.deleted_at == None) | (cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7)))
 
     @classmethod
+    async def undeleted_self_volumes(cls, owner_id):
+        return cls.objects.filter(
+            (cls.owner_by_id == owner_id) & ((cls.deleted_at == None) | (cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7)))
+        )
+
+    @classmethod
     async def get_by_id(cls, _id) -> Volume:
-        v = await cls.objects.get_or_none(id=_id)
+        v = await cls.objects.get(id=_id)
         return v
 
     @classmethod
@@ -100,3 +109,18 @@ class Volume(GenericDateModel):
         v = await cls.get_by_id(_id)
         await v.update(**{"deleted_at": None})
         return v
+
+
+    @classmethod
+    async def compare_with_old(cls, _id, ver: VolumeEditReq):
+        v = await cls.get_by_id(_id)
+        d = {}
+        if ver.project.id and v.project_by_id != ver.project.id:
+            d.update({"project_by_id": ver.project.id,
+                      "project_by": ver.project.name})
+        if ver.config.size and ver.config.size > v.size:
+            d.update({"size": ver.config.size})
+        if ver.owner and ver.owner.id != v.owner_by_id:
+            d.update({"owner_by": ver.owner.name,
+                      "owner_by_id": ver.owner.id})
+        await v.update(**d)

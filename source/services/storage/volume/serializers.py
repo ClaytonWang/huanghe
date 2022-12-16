@@ -45,12 +45,9 @@ class VolumeCreateReq(BaseModel):
 
 class VolumeEditReq(BaseModel):
     project: Optional[ProjectStr] = None
-    size: int = None
+    config: Optional[Config] = None
     owner: Optional[OwnerStr] = None
 
-    @validator('size')
-    def k8s_name_validator(cls, size):
-        return size
 
 
 # class VolumeResetReq(BaseModel):
