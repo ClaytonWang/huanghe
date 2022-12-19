@@ -41,7 +41,8 @@ async def create_user(user: UserCreate):
     init_data['role'] = role.id
     new_user = await User.objects.create(**init_data)
 
-    if role.name == 'owner':
+    # 新建用户为普通用户时关联项目
+    if project_ids and role.name == 'user':
         await update_user_of_project(project_ids=project_ids, user=new_user)
     return new_user
 
@@ -82,12 +83,14 @@ async def update_user(
         user_id: int = Path(..., ge=1, description='需要更新的用户ID'),
 ):
     update_data = user.dict(exclude_unset=True)
+    role_name = None
 
     if 'role' in update_data:
         role = await Role.objects.get(name=update_data['role'])
         if role.name == 'admin':
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='角色不能修改成管理员')
         update_data['role'] = role.id
+        role_name = update_data['role']
 
     project_ids = []
     if 'projects' in update_data:
@@ -96,8 +99,10 @@ async def update_user(
     _user = await User.objects.get(pk=user_id)
     if update_data:
         _user = await _user.update(**update_data)
+    if role_name is None:
+        role_name = _user.role.name
 
-    if project_ids:
+    if project_ids and role_name == 'user':
         await update_user_of_project(project_ids=project_ids, user=_user, delete_old=True)
 
     return JSONResponse(dict(id=user_id))
