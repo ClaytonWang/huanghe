@@ -96,7 +96,7 @@ async def update_user(
     if 'projects' in update_data:
         project_ids = update_data.pop('projects')
 
-    _user = await User.objects.get(pk=user_id)
+    _user = await User.objects.select_related('role').get(pk=user_id)
     if update_data:
         _user = await _user.update(**update_data)
     if role_name is None:
