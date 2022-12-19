@@ -5,7 +5,7 @@ on:
     branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/jiangshouchen"]
     paths:
      - source/basic/**
-     - source/services/storages/**
+     - source/services/storage/**
      - manifests/service-storage.yaml
      - .github/workflows/service-storage.yaml
     tags: [ '*' ]
@@ -58,7 +58,7 @@ jobs:
         uses: docker/build-push-action@v3
         id: build_and_push
         with:
-          file: ./source/services/storages/Dockerfile
+          file: ./source/services/storage/Dockerfile
           context: ./source
           push: true
           tags: ${{ steps.meta.outputs.tags }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{env.DOCKER_TAG}}
