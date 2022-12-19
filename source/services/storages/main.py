@@ -42,9 +42,9 @@ app.add_event_handler("shutdown", shutdown_event)
 
 
 def start():
-    service_port = int(os.getenv('STORAGE_SERVICE_PORT', 80))
+    service_port = int(os.getenv('STORAGE_SERVICE_PORT', 8003))
     uvicorn.run(
-        'main:app', host='0.0.0.0', port=service_port,
+        'main:app', port=service_port,
         reload=False,
         # debug=DEBUG,
         workers=2,

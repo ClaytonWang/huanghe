@@ -45,6 +45,10 @@ async def create_volume(request: Request,
                         vcr: VolumeCreateReq):
     user: AccountGetter = request.user
     project: ProjectGetter = get_project(request.headers.get('authorization'), vcr.project.id)
+    if user.role != ADMIN and vcr.config.size > 1024:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{user.role}只能创建1024以内大小的存储')
+    if await Volume.objects.filter(name=vcr.name, project_by_id=project.id, created_by_id=user.id).exists():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'同一个项目下，同一个用户，不能创建相同名称的盘')
     await Volume.objects.create(**Volume.gen_create_dict(user, project, vcr))
     return success_common_response()
 
