@@ -70,18 +70,6 @@ class Volume(GenericDateModel):
             "size": vcr.config.size,
         }
 
-    @staticmethod
-    def gen_edit_dict(ver: VolumeEditReq):
-        d = {}
-        if ver.project:
-            d.update({"project_by_id": ver.project.id})
-        if ver.size:
-            d.update({"size": ver.size})
-        if ver.owner:
-            d.update({"owner_by": ver.owner.name,
-                      "owner_by_id": ver.owner.id})
-        return d
-
     @classmethod
     async def undeleted_volumes(cls):
         return cls.objects.filter(
