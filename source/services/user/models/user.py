@@ -36,6 +36,7 @@ class User(DateAuditModel):
         orders_by = ['-id']
 
     username: str = ormar.String(max_length=80, comment='用户名')
+    en_name: str = ormar.String(max_length=20, comment='英文用户名', unique=True)
     email: str = ormar.String(max_length=80, comment='邮箱', unique=True, )
     password: str = ormar.String(max_length=255, comment='密码')
     first_name: str = ormar.String(max_length=20, nullable=True)

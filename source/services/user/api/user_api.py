@@ -35,6 +35,11 @@ async def create_user(user: UserCreate):
     if role.name == 'admin':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='不能创建管理员账号')
 
+    # 用户英文名根据邮箱生成,创建后不能修改邮箱故不变,首字母为数字时添加前缀字符
+    en_name = ''.join(filter(str.isalnum, user.email.split('@')[0]))
+    en_name = 'u' + en_name if en_name[0].isdigit() else en_name
+    init_data['en_name'] = en_name
+
     # TODO 失败回滚
     project_ids = init_data.pop('projects', [])
     # 把原始数据的role换成ID

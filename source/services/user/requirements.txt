@@ -29,6 +29,7 @@ pyparsing==3.0.9
 pytest==7.2.0
 python-jose==3.3.0
 python-multipart==0.0.5
+pypinyin==0.47.1
 rfc3986==1.5.0
 rsa==4.9
 six==1.16.0
