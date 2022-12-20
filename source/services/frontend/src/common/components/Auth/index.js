@@ -11,7 +11,7 @@ const Auth = ({ required, children, condition }) => {
     return permissions.indexOf(required) > -1 ? children : null;
   }
   if (condition) {
-    return condition(user) && children;
+    return condition(user, children);
   }
   console.error('missing props required or condition');
 };
