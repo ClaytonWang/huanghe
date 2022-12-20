@@ -1,5 +1,5 @@
 # coding: utf-8
-from __future__ import annotations
+from __future__ import annotations as anno
 from k8s.model.generic_mixin import GenericMixin
 from typing import Optional, List, Dict
 from datetime import datetime
@@ -66,12 +66,12 @@ class V1ObjectMeta(GenericMixin):
     Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: http://kubernetes.io/docs/user-guide/labels  # noqa: E501
     """
 
-    managed_fields: Optional[List[str]] # changed it
+    managed_fields: Optional[List[str]]  # changed it
     """
     ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like \"ci-cd\". The set of fields is always in the version that the workflow used when modifying the object.  # noqa: E501
     """
 
-    owner_references: Optional[str] # changed it
+    owner_references: Optional[str]  # changed it
     """
     list of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.  # noqa: E501
     """
@@ -128,11 +128,9 @@ class V1ObjectMeta(GenericMixin):
     }
 
     @classmethod
-    def default(cls, name, namespace = None):
-        return cls.new(name=name, namespace=namespace)
+    def default(cls, name, namespace=None, annotations=None, labels=None):
+        return cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
 
     @staticmethod
-    def new(name: str, namespace: str):
-        return V1ObjectMeta(name=name, namespace=namespace)
-
-
+    def new(name: str, namespace: str, annotations: Dict[str, str], labels: Dict[str, str]):
+        return V1ObjectMeta(name=name, namespace=namespace, annotations=annotations, labels=labels)
