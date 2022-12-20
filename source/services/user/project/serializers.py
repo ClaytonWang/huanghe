@@ -23,6 +23,7 @@ class ProjectList(BaseModel):
     id: int
     code: str
     name: str
+    en_name: str
     owner: UserItem
     project: Optional[List[int]] = None
     created_at: Optional[datetime]
