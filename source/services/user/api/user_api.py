@@ -67,8 +67,18 @@ async def list_user(
     json_result = result.dict()
     data = json_result.get('data', [])
     for index, item in enumerate(data):
-        members_projects = item.get('projects', [])
-        item['projects'] = item.get('project_user', []) + members_projects
+        if item.get('role') and item['role'].get('name') == 'admin':
+            item['projects'] = []
+        else:
+            members_projects = item.get('projects', [])
+            projects_list = item.get('project_user', []) + members_projects
+            project_ids = set()
+            res = []
+            for project in projects_list:
+                if project['id'] not in project_ids:
+                    project_ids.add(project['id'])
+                    res.append(project)
+            item['projects'] = res
     return json_result
 
 
