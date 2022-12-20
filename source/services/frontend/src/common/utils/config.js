@@ -2,7 +2,7 @@
  * @description 全局属性
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
-const APIV1 = '/api/v1/user';
+const APIV1 = '/api/v1';
 // const DEV = '';
 module.exports = {
   name: '决策智能开发平台',
@@ -13,39 +13,39 @@ module.exports = {
   apiUriParamsPattern: /:([_a-zA-Z0-9]+)/g,
   api: {
     // login
-    login: 'post|/auth/login',
-    logout: 'put|/auth/logout',
+    login: 'post|/user/auth/login',
+    logout: 'put|/user/auth/logout',
 
     // bam
-    bamProjectsList: 'get|/project',
-    bamProjectsCreate: 'post|/project',
-    bamProjectsUpdate: 'put|/project/:project_id',
-    bamProjectsDelete: 'delete|/project/:project_id',
-    // bamUsersList: 'get|/bam/users',
-    bamUsersList: 'get|/user',
-    bamUsersCreate: 'post|/user',
-    bamUsersUpdate: 'put|/user/:user_id',
-    bamUsersDelete: 'delete|/user/:user_id',
-    userListItems: 'get|/user/items',
+    bamProjectsList: 'get|/user/project',
+    bamProjectsCreate: 'post|/user/project',
+    bamProjectsUpdate: 'put|/user/project/:project_id',
+    bamProjectsDelete: 'delete|/user/project/:project_id',
+    // bamUsersList: 'get|/user/bam/users',
+    bamUsersList: 'get|/user/user',
+    bamUsersCreate: 'post|/user/user',
+    bamUsersUpdate: 'put|/user/user/:user_id',
+    bamUsersDelete: 'delete|/user/user/:user_id',
+    userListItems: 'get|/user/user/items',
 
     // settings
-    settingsUsersList: 'get|/settings/user',
-    settingsUsersCreate: 'post|/settings/user',
-    settingsUsersUpdate: 'post|/settings/user',
-    settingsUsersDelete: 'delete|/settings/user/:pk',
+    settingsUsersList: 'get|/user/settings/user',
+    settingsUsersCreate: 'post|/user/settings/user',
+    settingsUsersUpdate: 'post|/user/settings/user',
+    settingsUsersDelete: 'delete|/user/settings/user/:pk',
 
     // todo, remove settings prefix
-    settingsAccount: 'get|/user/account',
-    settingsAccountUpdate: 'post|/user/account',
+    settingsAccount: 'get|/user/user/account',
+    settingsAccountUpdate: 'post|/user/user/account',
 
     // FIXME: 后端获取指定菜单的权限接口
-    access: 'get|/pms/menu',
+    access: 'get|/user/pms/menu',
 
-    storagesList: 'get|/storages',
-    storagesListCreate: 'post|/storages',
-    storagesListUpdate: 'put|/storages/:id',
-    storagesListDelete: 'delete|/storages/:id',
-    storagesListReset: 'post|/storages/reset',
+    storagesList: 'get|/storages/volume',
+    storagesListCreate: 'post|/storages/volume',
+    storagesListUpdate: 'put|/storages/volume/:id',
+    storagesListDelete: 'delete|/storages/volume/:id',
+    storagesListReset: 'post|/storages/volume/:id/reset',
   },
   breadcrumbConfig: {
     '/bam/projects': '项目管理',

@@ -48,8 +48,8 @@ const StoragesTable = ({
     {
       title: '操作',
       render(_value, record) {
-        const { deleteTime = null } = record;
-        if (deleteTime) {
+        const { deletedAt = null } = record;
+        if (deletedAt) {
           return (
             <span className="dbr-table-actions">
               <Button

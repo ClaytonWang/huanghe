@@ -2,18 +2,19 @@
  * @description 存储列表
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
-import api from '@/common/api';
-import { Auth, AuthButton, FormModal } from '@/common/components';
-import { purifyDeep, relativeDate } from '@/common/utils/helper';
-import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { Form, Input, InputNumber, message, Modal, Select } from 'antd';
-import { get } from 'lodash';
-import qs from 'qs';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Form, Input, InputNumber, message, Modal, Select } from 'antd';
+import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { find } from 'lodash';
+import { useAuth } from '@/common/hooks/useAuth';
+import { ADMIN, CREATE, EDIT, OWNER, USER } from '@/common/constants';
+import { AuthButton, FormModal } from '@/common/components';
+import { purifyDeep, relativeDate } from '@/common/utils/helper';
+import api from '@/common/api';
+import qs from 'qs';
 import StoragesTable from './StoragesTable';
 import './index.less';
-import { useAuth } from '@/common/hooks/useAuth';
 
 const { Option } = Select;
 
@@ -59,18 +60,41 @@ const StoragesList = () => {
   );
   const requestProjects = async () => {
     try {
-      const { result } = await api.bamProjectsList();
-      setProjectsDataSource(result.data);
+      if (user.role.name === ADMIN) {
+        const { result } = await api.bamProjectsList();
+        setProjectsDataSource(result.data);
+      } else {
+        // 项目负责任项目列表返回自己所属项目
+        setProjectsDataSource(user?.projects ?? []);
+      }
     } catch (error) {
       console.log(error);
     }
   };
   const requestUserListItems = async () => {
     try {
-      const { result = {} } = await api.bamUsersList({
-        filter: { role__name: 'user' },
-      });
-      const data = result.data || [];
+      let data = [];
+      if (user.role.name === ADMIN) {
+        // admin返回所有项目负责人和普通用户
+        const { result = {} } = await api.userListItems({
+          filter: { role__name: [USER, OWNER] },
+        });
+        data = result || [];
+      } else if (user.role.name === OWNER) {
+        // 项目负责人，返回所有其项目下普通用户。
+        const { result = {} } = await api.userListItems({
+          filter: { role__name: [USER, OWNER], projects: user.projects },
+        });
+        data = result || [];
+      } else {
+        // 普通用户，所有人的用户列表只有自己。
+        data = [
+          {
+            id: user.id,
+            username: user.username,
+          },
+        ];
+      }
       setUsersDatasource(data);
     } catch (error) {
       console.log(error);
@@ -81,9 +105,7 @@ const StoragesList = () => {
   useEffect(() => {
     requestList();
     requestProjects();
-    if (user.role.name === 'admin') {
-      requestUserListItems();
-    }
+    requestUserListItems();
     const filters = getFilters();
     setSearchParams(qs.stringify(filters));
   }, []);
@@ -102,9 +124,7 @@ const StoragesList = () => {
   const createStorage = async (values) => {
     const params = {
       ...values,
-      config: get(values, 'config.size'),
-      project: get(values, 'project.id'),
-      owner: get(values, 'owner.id'),
+      owner: find(usersDatasource, values.owner),
     };
     try {
       await api.storagesListCreate(params);
@@ -120,10 +140,8 @@ const StoragesList = () => {
     const { id } = initialFormValues;
     const params = {
       ...values,
-      config: get(values, 'config.size'),
-      project: get(values, 'project.id'),
-      owner: get(values, 'owner.id'),
       id,
+      owner: find(usersDatasource, values.owner),
     };
     try {
       await api.storagesListUpdate(params);
@@ -156,10 +174,19 @@ const StoragesList = () => {
     }
   };
   const handleCreateClicked = () => {
+    const values = { config: { size: 0 } };
+    const { id, username } = user;
+    if (user.role.name === USER) {
+      Object.assign(values, {
+        owner: { id, username },
+      });
+    }
+    setInitialFormValues(values);
     setShowCreateModal(true);
   };
   const handleCreateCancel = () => {
     setShowCreateModal(false);
+    setInitialFormValues(null);
   };
   const handleEditClicked = (record) => {
     setShowEditModal(true);
@@ -184,7 +211,8 @@ const StoragesList = () => {
         </>
       ),
       icon: <ExclamationCircleOutlined />,
-      okText: '确认',
+      okText: '删除',
+      okType: 'danger',
       cancelText: '取消',
       onOk: () => {
         deleteStorage(record);
@@ -192,32 +220,15 @@ const StoragesList = () => {
     });
   };
   const handleReset = (values) => {
-    const { deleteTime } = values;
+    const { deletedAt } = values;
     const now = new Date();
-    const days = relativeDate(now, new Date(deleteTime));
+    const days = relativeDate(now, new Date(deletedAt));
     if (days > 7) {
       Modal.info({
         title: '该资源已删除超过7天，无法恢复。',
       });
     } else {
-      Modal.confirm({
-        title: '恢复',
-        icon: <ExclamationCircleOutlined />,
-        content: (
-          <>
-            <span>会导致全部数据丢失，是否要删除该存储？</span>
-            <br />
-            <span>该存储盘中没有Notebook或Job挂载可完成删除。</span>
-            <br />
-            <span>删除后7天之内可恢复。</span>
-          </>
-        ),
-        okText: '确认',
-        cancelText: '取消',
-        onOk: () => {
-          resetStorage(values);
-        },
-      });
+      resetStorage(values);
     }
   };
   const handleCreateSubmit = (values) => {
@@ -226,56 +237,74 @@ const StoragesList = () => {
   const handleEditSubmit = (values) => {
     updateStorage(values);
   };
-  const renderFormItems = () => (
-    <>
-      <Form.Item
-        label="名称"
-        name="name"
-        rules={[
-          { required: true, message: '请输入用户名' },
-          { pattern: /^\w+/, message: '请输入英文名称' },
-        ]}
-      >
-        <Input placeholder="请输入用户名" />
-      </Form.Item>
-      <Form.Item
-        name={['project', 'id']}
-        label="所属项目"
-        rules={[{ required: true, message: '请输入用户名' }]}
-      >
-        <Select placeholder="请选择项目">
-          {projectsDataSource.map(({ id, name }) => (
-            <Option key={id} value={id}>
-              {name}
-            </Option>
-          ))}
-        </Select>
-      </Form.Item>
-      <Form.Item
-        label="配置"
-        name={['config', 'size']}
-        rules={[
-          { required: true, message: '请输入所需最大容量' },
-          {
-            min: 0,
-            message: '请输入大于0的整数',
-            type: 'number',
-          },
-          {
-            max: 1024,
-            message: '申请最大容量不能超过1024GB',
-            type: 'number',
-          },
-        ]}
-      >
-        <InputNumber
-          placeholder="请输入所需最大容量"
-          formatter={(value) => `${value} GB`}
-          parser={(value) => value && value.replace('GB', '')}
-          style={{ width: '30%' }}
-        />
-      </Form.Item>
-      <Auth condition={(user) => user.role.name === 'admin'}>
+  const renderFormItems = (type) => {
+    const role = user.role.name;
+    // admin无最大申请空间限制
+    const adminConfigRules = [
+      { required: true, message: '请输入所需最大容量' },
+      {
+        min: 0,
+        message: '请输入大于0的整数',
+        type: 'number',
+      },
+    ];
+    const defaultConfigRules = [
+      { required: true, message: '请输入所需最大容量' },
+      {
+        min: 0,
+        message: '请输入大于0的整数',
+        type: 'number',
+      },
+      {
+        max: 1024,
+        message: '申请最大容量不能超过1024GB',
+        type: 'number',
+      },
+    ];
+    const isNameDisabled = () => type === EDIT;
+    const isOwnerDisabled = () => user.role.name === USER;
+    return (
+      <>
+        <Form.Item
+          label="名称"
+          name="name"
+          rules={[
+            { required: true, message: '请输入用户名' },
+            {
+              pattern: /^[a-zA-Z]\w*/,
+              message:
+                '名字需字母开头，由字母、数字、下划线组合，长度不超过20位',
+            },
+            { max: 20, message: '最长不超过20字符' },
+          ]}
+        >
+          <Input placeholder="请输入用户名" disabled={isNameDisabled()} />
+        </Form.Item>
+        <Form.Item
+          name={['project', 'id']}
+          label="所属项目"
+          rules={[{ required: true, message: '请输入用户名' }]}
+        >
+          <Select placeholder="请选择项目">
+            {projectsDataSource.map(({ id, name }) => (
+              <Option key={id} value={id}>
+                {name}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+        <Form.Item
+          label="配置"
+          name={['config', 'size']}
+          rules={(role === ADMIN && adminConfigRules) || defaultConfigRules}
+        >
+          <InputNumber
+            placeholder="请输入所需最大容量"
+            formatter={(value) => `${value} GB`}
+            parser={(value) => value && value.replace('GB', '')}
+            style={{ width: '30%' }}
+          />
+        </Form.Item>
         <Form.Item
           label="所有人"
           name={['owner', 'id']}
@@ -287,6 +316,7 @@ const StoragesList = () => {
             filterOption={(input, option) =>
               (option?.children ?? '').includes(input)
             }
+            disabled={isOwnerDisabled()}
           >
             {usersDatasource.map(({ id, username }) => (
               <Option key={id} value={id}>
@@ -295,9 +325,9 @@ const StoragesList = () => {
             ))}
           </Select>
         </Form.Item>
-      </Auth>
-    </>
-  );
+      </>
+    );
+  };
   const renderCreateModal = () => (
     <FormModal
       title="新建存储"
@@ -305,9 +335,9 @@ const StoragesList = () => {
       cancelText="取消"
       onSubmit={handleCreateSubmit}
       onCancel={handleCreateCancel}
-      initialValues={{ config: { size: 0 } }}
+      initialValues={initialFormValues}
     >
-      {renderFormItems('create')}
+      {renderFormItems(CREATE)}
     </FormModal>
   );
 
@@ -320,7 +350,7 @@ const StoragesList = () => {
       onSubmit={handleEditSubmit}
       onCancel={handleEditCancel}
     >
-      {renderFormItems('edit')}
+      {renderFormItems(EDIT)}
     </FormModal>
   );
   return (
@@ -328,7 +358,7 @@ const StoragesList = () => {
       <div className="dbr-table-container">
         <div className="batch-command">
           <AuthButton
-            required="bam.projects.create"
+            required="storages.list.create"
             style={{ float: 'left' }}
             type="primary"
             onClick={handleCreateClicked}
