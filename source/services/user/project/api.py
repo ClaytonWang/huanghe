@@ -11,6 +11,7 @@ from models.project import Project
 from project.serializers import ProjectCreate, ProjectList, ProjectEdit
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
+from pypinyin import lazy_pinyin, Style
 
 
 router_project = APIRouter()
@@ -31,7 +32,11 @@ async def get_project(project_id: int = Path(..., ge=1, description='需要查�
     response_model=ProjectList,
 )
 async def create_project(project: ProjectCreate):
-    return await Project.objects.create(**project.dict())
+    init_data = project.dict()
+    # TODO 避免首字母冲突
+    en_name = ''.join(lazy_pinyin(init_data['name'], style=Style.FIRST_LETTER)).upper()
+    init_data['en_name'] = 'U' + en_name if en_name[0].isdigit() else en_name
+    return await Project.objects.create(**init_data)
 
 
 @router_project.get(
@@ -75,6 +80,9 @@ async def update_project(
     update_data = project.dict(exclude_unset=True)
     if not update_data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
+    if 'name' in update_data:
+        en_name = ''.join(lazy_pinyin(update_data['name'], style=Style.FIRST_LETTER)).upper()
+        update_data['en_name'] = 'U' + en_name if en_name[0].isdigit() else en_name
     _project = await Project.objects.get_or_none(pk=project_id)
     if not (_project and await _project.update(**update_data)):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='项目不存在')
