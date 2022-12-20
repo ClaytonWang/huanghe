@@ -70,18 +70,6 @@ class Volume(GenericDateModel):
             "size": vcr.config.size,
         }
 
-    @staticmethod
-    def gen_edit_dict(ver: VolumeEditReq):
-        d = {}
-        if ver.project:
-            d.update({"project_by_id": ver.project.id})
-        if ver.size:
-            d.update({"size": ver.size})
-        if ver.owner:
-            d.update({"owner_by": ver.owner.name,
-                      "owner_by_id": ver.owner.id})
-        return d
-
     @classmethod
     async def undeleted_volumes(cls):
         return cls.objects.filter(
@@ -90,7 +78,8 @@ class Volume(GenericDateModel):
     @classmethod
     async def undeleted_self_volumes(cls, owner_id):
         return cls.objects.filter(
-            (cls.owner_by_id == owner_id) & ((cls.deleted_at == None) | (cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7)))
+            (cls.owner_by_id == owner_id) & ((cls.deleted_at == None) | (
+                        cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7)))
         )
 
     @classmethod
@@ -109,7 +98,6 @@ class Volume(GenericDateModel):
         v = await cls.get_by_id(_id)
         await v.update(**{"deleted_at": None})
         return v
-
 
     @classmethod
     async def compare_with_old(cls, _id, ver: VolumeEditReq):

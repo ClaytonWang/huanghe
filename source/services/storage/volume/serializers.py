@@ -34,7 +34,7 @@ class Project(BaseModel):
 
 class VolumeCreateReq(BaseModel):
     name: str
-    project: Union[ProjectStr, None] = None
+    project: Union[Project, None] = None
     config: Union[Config, None] = None
     owner: Union[Owner, None] = None
 
@@ -44,9 +44,9 @@ class VolumeCreateReq(BaseModel):
 
 
 class VolumeEditReq(BaseModel):
-    project: Optional[ProjectStr] = None
+    project: Optional[Project] = None
     config: Optional[Config] = None
-    owner: Optional[OwnerStr] = None
+    owner: Optional[Owner] = None
 
 
 
@@ -58,7 +58,7 @@ class VolumeDetailRes(BaseModel):
     id: str
     name: str
     config: Config
-    project: ProjectStr
-    owner: OwnerStr
+    project: Project
+    owner: Owner
     created_at: datetime.datetime
     deleted_at: Optional[datetime.datetime] = None
