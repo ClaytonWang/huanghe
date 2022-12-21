@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Form, Input, InputNumber, message, Modal, Select } from 'antd';
 import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { find } from 'lodash';
+import { find, map } from 'lodash';
 import { useAuth } from '@/common/hooks/useAuth';
 import { ADMIN, CREATE, EDIT, OWNER, USER } from '@/common/constants';
 import { AuthButton, FormModal } from '@/common/components';
@@ -83,7 +83,8 @@ const StoragesList = () => {
       } else if (user.role.name === OWNER) {
         // 项目负责人，返回所有其项目下普通用户。
         const { result = {} } = await api.userListItems({
-          filter: { role__name: [USER, OWNER], projects: user.projects },
+          roleName: [USER, OWNER],
+          projects: map(user.projects, 'id'),
         });
         data = result || [];
       } else {
