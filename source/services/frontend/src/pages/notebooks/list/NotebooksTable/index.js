@@ -1,11 +1,16 @@
 import { useSearchParams } from 'react-router-dom';
-import { Table, Button } from 'antd';
+import { Table } from 'antd';
 import qs from 'qs';
+import { get } from 'lodash';
 import { transformDate } from '@/common/utils/helper';
+import { AuthButton } from '@/common/components';
 
 const NotebooksTable = ({
   tableData = {},
   loading = false,
+  onOpen = () => {},
+  onStart = () => {},
+  onStop = () => {},
   onEdit = () => {},
   onDelete = () => {},
   onPageNoChange = () => {},
@@ -62,40 +67,61 @@ const NotebooksTable = ({
     {
       title: '操作',
       render(_value, record) {
+        const statusName = get(record, 'status.name');
         return (
           <span className="dbr-table-actions">
-            <Button
+            <AuthButton
+              required="notebooks.list"
               type="link"
               onClick={() => {
-                handleEditClicked(record);
+                handleOpenClicked(record);
               }}
+              condition={() => ['running'].indexOf(statusName) > -1}
             >
               打开
-            </Button>
-            <Button
+            </AuthButton>
+            {statusName === 'stopped' && (
+              <AuthButton
+                required="notebooks.list.edit"
+                type="link"
+                onClick={() => {
+                  handleStartClicked(record);
+                }}
+              >
+                启动
+              </AuthButton>
+            )}
+            {statusName !== 'stopped' && (
+              <AuthButton
+                required="notebooks.list.edit"
+                type="link"
+                onClick={() => {
+                  handleStopClicked(record);
+                }}
+              >
+                停止
+              </AuthButton>
+            )}
+            <AuthButton
+              required="notebooks.list.edit"
               type="link"
               onClick={() => {
                 handleEditClicked(record);
               }}
-            >
-              启动/停止
-            </Button>
-            <Button
-              type="link"
-              onClick={() => {
-                handleEditClicked(record);
-              }}
+              condition={() => ['running', 'stopped'].indexOf(statusName) > -1}
             >
               编辑
-            </Button>
-            <Button
+            </AuthButton>
+            <AuthButton
+              required="notebooks.list.edit"
               type="link"
               onClick={() => {
                 handleDeleteClicked(record);
               }}
+              condition={() => ['stopped'].indexOf(statusName) > -1}
             >
               删除
-            </Button>
+            </AuthButton>
           </span>
         );
       },
@@ -113,6 +139,15 @@ const NotebooksTable = ({
     total,
     onChange: onPageNoChange,
     showSizeChanger: false,
+  };
+  const handleOpenClicked = (record) => {
+    onOpen(record);
+  };
+  const handleStartClicked = (record) => {
+    onStart(record);
+  };
+  const handleStopClicked = (record) => {
+    onStop(record);
   };
   const handleEditClicked = (record) => {
     onEdit(record);

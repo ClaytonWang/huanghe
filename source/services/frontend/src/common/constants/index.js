@@ -33,3 +33,17 @@ export const INFO = 'info';
 export const PASSWORD = 'password';
 export const CREATE = 'create';
 export const EDIT = 'edit';
+
+// notebooks
+export const NOTEBOOK_STATUS = {
+  stopped: 0,
+  pending: 1,
+  error: 2,
+  running: 3,
+};
+export const START = 'start';
+export const STOP = 'stop';
+export const NOTEBOOK_ACTION = {
+  [START]: 1,
+  [STOP]: 0,
+};

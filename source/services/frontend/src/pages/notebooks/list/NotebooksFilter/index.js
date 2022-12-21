@@ -15,7 +15,7 @@ const NotebooksFilter = ({
   initialValues = {},
   defaultFilters = {},
   reload = () => {},
-  projectsDataSource = [],
+  projectsDatasource = [],
 }) => {
   const [form] = Form.useForm();
   const initialFormValues = useMemo(
@@ -58,12 +58,12 @@ const NotebooksFilter = ({
           ))}
         </Select>
       </Form.Item>
-      <Form.Item label="所属项目" name="projects__code">
+      <Form.Item label="所属项目" name="project__code">
         <Select style={{ width: 150 }} dropdownMatchSelectWidth={false}>
           <Option key="all" value="all">
             全部
           </Option>
-          {projectsDataSource.map(({ id, code, name }) => (
+          {projectsDatasource.map(({ id, code, name }) => (
             <Option key={id} value={code}>
               {name}
             </Option>

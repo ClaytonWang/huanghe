@@ -4,15 +4,16 @@
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Modal } from 'antd';
+import { Modal, message } from 'antd';
 import qs from 'qs';
 import api from '@/common/api';
 import { AuthButton } from '@/common/components';
 import { purifyDeep } from '@/common/utils/helper';
-import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import NotebooksFilter from './NotebooksFilter';
 import NotebooksTable from './NotebooksTable';
 import './index.less';
+import { NOTEBOOK_ACTION, START, STOP } from '@/common/constants';
 
 const NotebooksList = () => {
   const defaultFilters = useMemo(
@@ -30,10 +31,6 @@ const NotebooksList = () => {
   );
   const [tableData, setTableData] = useState();
   const [projectsDatasource, setProjectsDatasource] = useState([]);
-  // const [sourceDatasource, setSourceDatasource] = useState([]);
-  // const [imagesDatasource, setImagesDatasource] = useState([]);
-  // const [storagesDatasource, setStoragesDatasource] = useState([]);
-  // const [initialFormValues, setInitialFormValues] = useState(null);
   const [loading, setLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -65,46 +62,11 @@ const NotebooksList = () => {
       console.log(error);
     }
   };
-  // const requestImages = async () => {
-  //   try {
-  //     const { result = {} } = await api.imagesList({
-  //       filter: { role__name: 'user' },
-  //     });
-  //     const data = result.data || [];
-  //     setImagesDatasource(data);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-  const requestSource = async () => {
-    try {
-      const { result = {} } = await api.sourceList({
-        filter: { role__name: 'user' },
-      });
-      const _data = result.data || [];
-      // setSourceDatasource(data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const requestStorages = async () => {
-    try {
-      const { result = {} } = await api.storagesList({
-        filter: { role__name: 'user' },
-      });
-      const _data = result.data || [];
-      // setStoragesDatasource(data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     requestList();
     requestProjects();
-    requestSource();
-    requestStorages();
     const filters = getFilters();
     setSearchParams(qs.stringify(filters));
   }, []);
@@ -120,44 +82,53 @@ const NotebooksList = () => {
     reload({ pageno, pagesize });
   };
 
-  // const createNotebooks = async (_values) => {};
-  // const deleteNotebook = async (record) => {
-  //   const { id } = record;
-  //   try {
-  //     await api.storagesListDelete({ id });
-  //     message.success('存储删除成功！');
-  //     reload();
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  const handleCreateClicked = () => {
-    // setShowCreateModal(true);
+  const deleteNotebook = async (record) => {
+    const { id } = record;
+    try {
+      await api.notebooksListDelete({ id });
+      message.success('存储Notebook成功！');
+      reload();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handleEditClicked = (_record) => {};
-  // const handleCreate = () => {};
-  // const handleEdit = () => {};
-  // const handleOpen = () => {};
-  // const handleStart = () => {};
-  // const handleStop = () => {};
-  const handleDelete = (_record) => {
+  const handleCreateClicked = () => {
+    // router to create page
+  };
+  const handleOpenClicked = (record) => {
+    // 打开notebooks地址
+    const { url } = record;
+    window.open(url);
+  };
+  const handleStartClicked = async (record) => {
+    try {
+      const { id } = record;
+      await api.notebooksListAction({ id, action: NOTEBOOK_ACTION[START] });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleStopClicked = async (record) => {
+    try {
+      const { id } = record;
+      await api.notebooksListAction({ id, action: NOTEBOOK_ACTION[STOP] });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleEditClicked = () => {
+    // router to create page
+  };
+  const handleDelete = (record) => {
     Modal.confirm({
-      title: '确定要删除该用户吗？',
-      content: (
-        <>
-          <span>会导致全部数据丢失，是否要删除该存储？</span>
-          <br />
-          <span>该存储盘中没有Notebook或Job挂载可完成删除。</span>
-          <br />
-          <span>删除后7天之内可恢复。</span>
-        </>
-      ),
-      icon: <ExclamationCircleOutlined />,
-      okText: '确认',
+      title: '确定要删除该Notebook吗？',
+      okText: '删除',
+      okType: 'danger',
       cancelText: '取消',
-      onOk: () => {},
+      onOk: () => {
+        deleteNotebook(record);
+      },
     });
   };
   return (
@@ -184,6 +155,9 @@ const NotebooksList = () => {
           tableData={tableData}
           reload={reload}
           loading={loading}
+          onOpen={handleOpenClicked}
+          onStart={handleStartClicked}
+          onStop={handleStopClicked}
           onEdit={handleEditClicked}
           onDelete={handleDelete}
           onPageNoChange={onPageNoChange}
