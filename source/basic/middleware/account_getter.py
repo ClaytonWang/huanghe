@@ -35,6 +35,7 @@ class Role(BaseModel):
 class AccountGetter(BaseModel):
     id: int = Field(..., alias='user_id')
     username: str = Field(..., alias='user_name')
+    en_name: str
     role: Role
 
     class Config:
