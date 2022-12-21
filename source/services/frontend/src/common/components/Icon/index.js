@@ -14,6 +14,10 @@ import DataSvg from '@/common/images/data.svg';
 import CustomSvg from '@/common/images/custom.svg';
 import DevelopSvg from '@/common/images/develop.svg';
 import JupyterSvg from '@/common/images/jupyter.svg';
+import SuccessSvg from '@/common/images/success.svg';
+import LoadingSvg from '@/common/images/loading.svg';
+import ErrorFillSvg from '@/common/images/error-fill.svg';
+import StoppedSvg from '@/common/images/stopped.svg';
 
 const Icons = {
   bam: BAMSvg,
@@ -24,5 +28,9 @@ const Icons = {
   custom: CustomSvg,
   develop: DevelopSvg,
   notebooks: JupyterSvg,
+  running: SuccessSvg,
+  pending: LoadingSvg,
+  error: ErrorFillSvg,
+  stopped: StoppedSvg,
 };
 export default Icons;

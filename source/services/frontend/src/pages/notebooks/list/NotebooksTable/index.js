@@ -1,9 +1,11 @@
 import { useSearchParams } from 'react-router-dom';
-import { Table } from 'antd';
+import { Table, Tooltip } from 'antd';
 import qs from 'qs';
 import { get } from 'lodash';
+import Icon from '@ant-design/icons';
 import { transformDate } from '@/common/utils/helper';
 import { AuthButton } from '@/common/components';
+import Icons from '@/common/components/Icon';
 
 const NotebooksTable = ({
   tableData = {},
@@ -21,7 +23,11 @@ const NotebooksTable = ({
       dataIndex: 'status',
       width: 80,
       render(value) {
-        return value.name;
+        return (
+          <Tooltip title={value.desc}>
+            <Icon style={{ fontSize: 24 }} component={Icons[value.name]} />
+          </Tooltip>
+        );
       },
     },
     {
