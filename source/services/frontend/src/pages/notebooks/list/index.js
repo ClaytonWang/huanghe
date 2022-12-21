@@ -63,14 +63,6 @@ const NotebooksList = () => {
     }
   };
 
-  /* eslint-disable react-hooks/exhaustive-deps */
-  useEffect(() => {
-    requestList();
-    requestProjects();
-    const filters = getFilters();
-    setSearchParams(qs.stringify(filters));
-  }, []);
-
   const reload = (args) => {
     const filters = getFilters();
     const params = purifyDeep({ ...filters, ...args });
@@ -78,6 +70,22 @@ const NotebooksList = () => {
     setSearchParams(qs.stringify(params));
     requestList(params);
   };
+  /* eslint-disable react-hooks/exhaustive-deps */
+  useEffect(() => {
+    requestList();
+    requestProjects();
+    const filters = getFilters();
+    setSearchParams(qs.stringify(filters));
+  }, []);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      requestList();
+    }, 3000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
   const onPageNoChange = (pageno, pagesize) => {
     reload({ pageno, pagesize });
   };
