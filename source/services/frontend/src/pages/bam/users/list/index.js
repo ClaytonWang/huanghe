@@ -12,7 +12,7 @@ import { parseKVToKeyValue, purifyDeep } from '@/common/utils/helper';
 import { AuthButton, FormModal } from '@/common/components';
 import api from '@/common/api';
 import UsersTable from './UsersTable';
-import { EMAIL_REG, USER_ROLE } from '@/common/constants';
+import { EDIT, EMAIL_REG, USER, USER_ROLE } from '@/common/constants';
 import UsersFilter from './UsersFilter';
 import './index.less';
 
@@ -157,73 +157,80 @@ const UsersList = () => {
   const handleEditSubmit = (values) => {
     updateUser(values);
   };
-  const renderFormItems = (type) => (
-    <>
-      <Form.Item
-        label="姓名"
-        name="username"
-        rules={[{ required: true, message: '请输入用户名' }]}
-      >
-        <Input placeholder="请输入用户名" />
-      </Form.Item>
-      <Form.Item
-        label="邮箱"
-        name="email"
-        rules={[
-          { required: true, message: '请输入邮箱' },
-          { pattern: EMAIL_REG, message: '请输入有效邮箱' },
-        ]}
-      >
-        <Input placeholder="请输入邮箱" disabled={type === 'edit'} />
-      </Form.Item>
-      <Form.Item
-        label={(type === 'edit' && '新密码') || '密码'}
-        name="password"
-        rules={
-          (type === 'edit' && [{ len: 8, message: '请输入8位密码' }]) || [
-            { required: true, message: '请输入密码' },
-            { len: 8, message: '请输入8位密码' },
-          ]
-        }
-      >
-        <Input.Password placeholder="请输入8位密码" />
-      </Form.Item>
-      <Form.Item
-        name={['role', 'name']}
-        label="角色"
-        rules={[{ required: true, message: '请选择用户角色' }]}
-      >
-        <Select placeholder="请选择用户角色">
-          {filter(
-            parseKVToKeyValue(USER_ROLE, 'k', 'v'),
-            ({ k }) => k !== 'admin'
-          ).map(({ k, v }) => (
-            <Option key={k} value={k}>
-              {v}
-            </Option>
-          ))}
-        </Select>
-      </Form.Item>
-      <Form.Item name="projects" label="所属项目">
-        <Select
-          mode="multiple"
-          placeholder="请选择项目"
-          showArrow
-          filterOption={(inputValue, option) =>
-            option.children.includes(inputValue)
-          }
-          tagRender={({ label }) => <Tag color="purple">{label}</Tag>}
+  const FormChildren = ({ type }) => {
+    const form = Form.useFormInstance();
+    const roleFormItem = Form.useWatch(['role', 'name'], form);
+    return (
+      <>
+        <Form.Item
+          label="姓名"
+          name="username"
+          rules={[{ required: true, message: '请输入用户名' }]}
         >
-          {projectsDataSource.map(({ id, name }) => (
-            <Option key={id} value={id}>
-              {name}
-            </Option>
-          ))}
-        </Select>
-      </Form.Item>
-    </>
-  );
-  const renderCreateModal = () => (
+          <Input placeholder="请输入用户名" />
+        </Form.Item>
+        <Form.Item
+          label="邮箱"
+          name="email"
+          rules={[
+            { required: true, message: '请输入邮箱' },
+            { pattern: EMAIL_REG, message: '请输入有效邮箱' },
+          ]}
+        >
+          <Input placeholder="请输入邮箱" disabled={type === 'edit'} />
+        </Form.Item>
+        <Form.Item
+          label={(type === 'edit' && '新密码') || '密码'}
+          name="password"
+          rules={
+            (type === 'edit' && [{ len: 8, message: '请输入8位密码' }]) || [
+              { required: true, message: '请输入密码' },
+              { len: 8, message: '请输入8位密码' },
+            ]
+          }
+        >
+          <Input.Password placeholder="请输入8位密码" />
+        </Form.Item>
+        <Form.Item
+          name={['role', 'name']}
+          label="角色"
+          rules={[{ required: true, message: '请选择用户角色' }]}
+          onMetaChange
+        >
+          <Select placeholder="请选择用户角色" disabled={type === EDIT}>
+            {filter(
+              parseKVToKeyValue(USER_ROLE, 'k', 'v'),
+              ({ k }) => k !== 'admin'
+            ).map(({ k, v }) => (
+              <Option key={k} value={k}>
+                {v}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+        {roleFormItem === USER && (
+          <Form.Item name="projects" label="所属项目">
+            <Select
+              mode="multiple"
+              placeholder="请选择项目"
+              showArrow
+              filterOption={(inputValue, option) =>
+                option.children.includes(inputValue)
+              }
+              tagRender={({ label }) => <Tag color="purple">{label}</Tag>}
+            >
+              {projectsDataSource.map(({ id, name }) => (
+                <Option key={id} value={id}>
+                  {name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
+      </>
+    );
+  };
+  const CreateModal = () => (
     <FormModal
       title="新建用户"
       okText="新建"
@@ -231,11 +238,11 @@ const UsersList = () => {
       onSubmit={handleCreateSubmit}
       onCancel={handleCreateCancel}
     >
-      {renderFormItems('create')}
+      <FormChildren type="create" />
     </FormModal>
   );
 
-  const renderEditModal = () => (
+  const EditModal = () => (
     <FormModal
       title="编辑用户"
       okText="保存"
@@ -244,7 +251,7 @@ const UsersList = () => {
       onSubmit={handleEditSubmit}
       onCancel={handleEditCancel}
     >
-      {renderFormItems('edit')}
+      <FormChildren type="edit" />
     </FormModal>
   );
   return (
@@ -276,8 +283,8 @@ const UsersList = () => {
           onPageNoChange={onPageNoChange}
         />
       </div>
-      {showCreateModal && renderCreateModal()}
-      {showEditModal && renderEditModal()}
+      {showCreateModal && <CreateModal />}
+      {showEditModal && <EditModal />}
     </div>
   );
 };
