@@ -256,7 +256,7 @@ const UsersList = () => {
       <div className="dbr-table-container">
         <div className="batch-command">
           <AuthButton
-            required="bam.projects.create"
+            required="bam.users.create"
             style={{ float: 'left' }}
             type="primary"
             onClick={handleCreateClicked}
