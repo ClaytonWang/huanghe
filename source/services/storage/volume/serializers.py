@@ -9,17 +9,7 @@ from pydantic import BaseModel, validator
 
 class Owner(BaseModel):
     id: int
-    name: str
-
-
-class ProjectStr(BaseModel):
-    id: str
-    name: Optional[str] = None
-
-
-class OwnerStr(BaseModel):
-    id: str
-    name: str
+    username: str
 
 
 class Config(BaseModel):

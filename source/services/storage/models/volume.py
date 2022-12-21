@@ -49,7 +49,7 @@ class Volume(GenericDateModel):
             },
             "owner": {
                 "id": self.owner_by_id,
-                "name": self.owner_by,
+                "username": self.owner_by,
             },
             "created_at": self.created_at,
             "deleted_at": self.deleted_at,
@@ -61,11 +61,12 @@ class Volume(GenericDateModel):
             "created_by_id": ag.id,
             "updated_by_id": ag.id,
             "project_by_id": pg.id,
+            "create_en_by": ag.en_name,
             "created_by": ag.username,
             "updated_by": ag.username,
             "project_by": pg.name,
             "name": vcr.name,
-            "owner_by": vcr.owner.name,
+            "owner_by": vcr.owner.username,
             "owner_by_id": vcr.owner.id,
             "size": vcr.config.size,
         }
@@ -109,6 +110,6 @@ class Volume(GenericDateModel):
         if ver.config.size and ver.config.size > v.size:
             d.update({"size": ver.config.size})
         if ver.owner and ver.owner.id != v.owner_by_id:
-            d.update({"owner_by": ver.owner.name,
+            d.update({"owner_by": ver.owner.username,
                       "owner_by_id": ver.owner.id})
         await v.update(**d)
