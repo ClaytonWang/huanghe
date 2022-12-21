@@ -6,7 +6,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Input, message, Form, Select, Modal } from 'antd';
 import qs from 'qs';
-import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { AuthButton, FormModal } from '@/common/components';
 import api from '@/common/api';
 import ProjectsTable from './ProjectsTable';
@@ -132,8 +132,8 @@ const ProjectsList = () => {
     Modal.confirm({
       title: '确定要删除该项目吗？',
       content: '将项目中的成员移除且占用资源清空后，可删除该项目。',
-      icon: <ExclamationCircleOutlined />,
-      okText: '确认',
+      okText: '删除',
+      okType: 'danger',
       cancelText: '取消',
       onOk: async () => {
         try {
