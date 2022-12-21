@@ -79,7 +79,7 @@ module.exports = {
       children: [
         {
           key: 'settings.users',
-          label: '用户管理',
+          label: '用户权限',
         },
       ],
     },

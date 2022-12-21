@@ -2,7 +2,6 @@ import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Table, Modal } from 'antd';
 import qs from 'qs';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { AuthButton } from '@/common/components';
 
 const UsersTable = ({
@@ -91,8 +90,8 @@ const UsersTable = ({
   const handleRemove = (record) => {
     Modal.confirm({
       title: '确定要移除该用户吗？',
-      icon: <ExclamationCircleOutlined />,
-      okText: '确认',
+      okText: '移除',
+      okType: 'danger',
       cancelText: '取消',
       onOk: async () => {
         onDelete(record);

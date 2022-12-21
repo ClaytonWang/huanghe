@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Form, Input, InputNumber, message, Modal, Select } from 'antd';
-import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { find, map } from 'lodash';
 import { useAuth } from '@/common/hooks/useAuth';
 import { ADMIN, CREATE, EDIT, OWNER, USER } from '@/common/constants';
@@ -211,7 +211,6 @@ const StoragesList = () => {
           <span>删除后7天之内可恢复。</span>
         </>
       ),
-      icon: <ExclamationCircleOutlined />,
       okText: '删除',
       okType: 'danger',
       cancelText: '取消',
