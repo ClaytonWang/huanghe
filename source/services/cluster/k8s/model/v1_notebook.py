@@ -37,14 +37,11 @@ class V1Notebook(BaseModel):
     }
 
     @classmethod
-    def default(cls, name, namespace, image, env, platform):
+    def default(cls, name, namespace, image, labels, resource, envs, volumes, tolerations):
         return cls.new(api_version=KUBEFLOW_V1_API_VERSION,
                        kind=KUBEFLOW_NOTEBOOK_KIND,
-                       metadata=V1ObjectMeta.default(name=name, namespace=namespace, labels={
-                           "env": env,
-                           "platform": platform
-                       }),
-                       spec=V1NotebookSpec.default(name=name, image=image),
+                       metadata=V1ObjectMeta.default(name=name, namespace=namespace, labels=labels),
+                       spec=V1NotebookSpec.default(name=name, image=image, resource=resource, envs=envs, volumes=volumes, tolerations=tolerations),
                        status=None)
 
     @staticmethod

@@ -20,8 +20,12 @@ class NotebookMixin(CustomerObjectApi):
                                                                         body=V1Notebook.default(name=nb.name,
                                                                                                 namespace=nb.namespace,
                                                                                                 image=nb.image,
-                                                                                                env=nb.env,
-                                                                                                platform=nb.platform),
+                                                                                                labels=nb.labels,
+                                                                                                resource=nb.resource,
+                                                                                                envs=nb.envs,
+                                                                                                volumes=nb.volumes,
+                                                                                                tolerations=nb.tolerations,
+                                                                                                ),
                                                                         )
 
 
