@@ -12,14 +12,14 @@ router_pvc = APIRouter()
     description='创建存储卷',
     response_model=PVC,
 )
-def create_namespace(pvc: PVC):
+def create_pvc(pvc: PVC):
     cc.create_namespaced_persistent_volume_claim(pvc)
     return pvc
 #
 # @router_pvc.delete(
 #     '',
 #     description='删除存储卷',
-#     response_model=PVC,
+#     response_model=PVC,x
 # )
 # def delete_namespace(pvc: PVC):
 #     cc.delete_namespace(pvc)
