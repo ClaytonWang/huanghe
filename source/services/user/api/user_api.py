@@ -105,13 +105,13 @@ async def update_user(
         if role.name == 'admin':
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='角色不能修改成管理员')
         update_data['role'] = role.id
-        role_name = update_data['role']
+        role_name = role.name
 
     project_ids = []
     if 'projects' in update_data:
         project_ids = update_data.pop('projects')
 
-    _user = await User.objects.select_related('role').get(pk=user_id)
+    _user = await User.objects.select_related(['role', 'projects']).get(pk=user_id)
     if update_data:
         _user = await _user.update(**update_data)
     if role_name is None:
