@@ -139,6 +139,11 @@ async def create_notebook(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='不是用户所属项目')
     init_data['project_id'] = project_id
 
+    source = init_data.pop('source')
+    sources = await Source.objects.all()
+    source_map = {x.get_str(): x.id for x in sources}
+    init_data['source_id'] = source_map.get(source)
+
     image_id = init_data.pop('image')['id']
     _image = await Image.objects.get_or_none(pk=int(image_id))
     if not _image:
@@ -185,6 +190,12 @@ async def update_notebook(request: Request,
         if request.user.role.name != 'admin' and int(project_id) not in request.user.project_ids:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='不是用户所属项目')
         update_data['project_id'] = project_id
+
+    if 'source' in update_data:
+        source = update_data.pop('source')
+        sources = await Source.objects.all()
+        source_map = {x.get_str(): x.id for x in sources}
+        update_data['source_id'] = source_map.get(source)
 
     if 'image' in update_data:
         image_id = update_data.pop('image')['id']
