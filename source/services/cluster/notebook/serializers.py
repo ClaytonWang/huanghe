@@ -17,6 +17,7 @@ class NoteBookCreateReq(BaseModel):
     image: str
     # 对应环境
     env: str = "dev"
+    platform: str = "mvp"
     cpu: int = 0
     memory: int = 0
     gpu: int = 0
@@ -38,7 +39,9 @@ class NoteBookCreateReq(BaseModel):
 class NoteBookDeleteReq(BaseModel):
     pass
 
-
+class NoteBookListReq(BaseModel):
+    platform: str
+    env: str
 
 class NoteBook(BaseModel):
     name: str

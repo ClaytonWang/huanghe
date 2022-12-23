@@ -3,7 +3,7 @@ from kubernetes.client import CoreV1Api, CustomObjectsApi, StorageV1Api
 
 class Core():
     def __init__(self):
-        load_kube_config("/Users/jiangshouchen/Downloads/config")
+        load_kube_config()
         self._core_v1_api = CoreV1Api()
         self._custom_object_api = CustomObjectsApi()
         self._storage_v1_api = StorageV1Api()
