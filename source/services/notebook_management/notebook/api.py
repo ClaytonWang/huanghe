@@ -130,7 +130,7 @@ async def create_notebook(request: Request,
     stat = await Status.objects.get(name='stopped')
     init_data['status'] = stat.id
 
-    duplicate_name = await Notebook.objects.filter(name=init_data['name'])
+    duplicate_name = await Notebook.objects.filter(name=init_data['name']).count()
     if duplicate_name:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不能重名')
 
@@ -181,7 +181,7 @@ async def update_notebook(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook未停止')
 
     if 'name' in update_data:
-        duplicate_name = await Notebook.objects.filter(name=update_data['name'])
+        duplicate_name = await Notebook.objects.filter(name=update_data['name']).count()
         if duplicate_name:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不能重名')
 
