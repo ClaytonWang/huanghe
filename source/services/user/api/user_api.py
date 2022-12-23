@@ -65,10 +65,18 @@ async def list_user(
     :param query_params:
     :return:
     """
+    query_filter = query_params.filter_
+    # 项目负责人不是项目成员之一，无法用projects__code获取
+    if 'projects__code' in query_filter:
+        projects_code = query_filter.pop('projects__code')
+        code_filter = ormar.or_(projects__code=projects_code, project_user__code=projects_code)
+        query_filter = ormar.and_(code_filter, **query_filter)
+    if isinstance(query_filter, dict):
+        query_filter = ormar.queryset.clause.FilterGroup(**query_filter)
     result = await paginate(User.objects.select_related(
         ['role', 'project_user', 'projects']
     ).filter(
-        **query_params.filter_
+        query_filter
     ), params=query_params.params)
     json_result = result.dict()
     data = json_result.get('data', [])
