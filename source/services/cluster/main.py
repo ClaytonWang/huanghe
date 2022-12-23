@@ -7,6 +7,10 @@ from fastapi import FastAPI
 from namespace.api import router_namespace
 from pvc.api import router_pvc
 from notebook.api import router_notebook
+from starlette.middleware.base import BaseHTTPMiddleware
+from basic.middleware.exception import validation_pydantic_exception_handler
+from basic.middleware.rsp import add_common_response_data
+from pydantic.error_wrappers import ValidationError
 
 app = FastAPI()
 
@@ -18,6 +22,12 @@ def status():
 app.include_router(router_namespace, prefix="/namespace")
 app.include_router(router_pvc, prefix="/pvc")
 app.include_router(router_notebook, prefix="/notebook")
+
+
+app.add_middleware(BaseHTTPMiddleware, dispatch=add_common_response_data)
+
+# 异常处理
+app.add_exception_handler(ValidationError, validation_pydantic_exception_handler)
 
 def start():
     service_port = int(os.getenv('CLUSTER_SERVICE_PORT', 80))
