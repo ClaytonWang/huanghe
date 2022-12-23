@@ -13,7 +13,7 @@ from models import DB, META
 
 class Status(ormar.Model):
     class Meta(ormar.ModelMeta):
-        tablename: str = "status"
+        tablename: str = "bam_status"
         metadata = META
         database = DB
         orders_by = ['-id']
@@ -26,7 +26,7 @@ class Status(ormar.Model):
 
 class Source(DateModel):
     class Meta(ormar.ModelMeta):
-        tablename: str = "source"
+        tablename: str = "bam_source"
         metadata = META
         database = DB
         orders_by = ['id']
@@ -53,7 +53,7 @@ class Source(DateModel):
 
 class Notebook(DateModel):
     class Meta(ormar.ModelMeta):
-        tablename: str = "notebook"
+        tablename: str = "bam_notebook"
         metadata = META
         database = DB
         orders_by = ['-id']
