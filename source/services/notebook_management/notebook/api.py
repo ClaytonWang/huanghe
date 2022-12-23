@@ -142,7 +142,7 @@ async def create_notebook(request: Request,
     source = init_data.pop('source')
     sources = await Source.objects.all()
     source_map = {x.get_str(): x.id for x in sources}
-    init_data['source_id'] = source_map.get(source)
+    init_data['source'] = source_map.get(source)
 
     image_id = init_data.pop('image')['id']
     _image = await Image.objects.get_or_none(pk=int(image_id))
@@ -195,7 +195,7 @@ async def update_notebook(request: Request,
         source = update_data.pop('source')
         sources = await Source.objects.all()
         source_map = {x.get_str(): x.id for x in sources}
-        update_data['source_id'] = source_map.get(source)
+        update_data['source'] = source_map.get(source)
 
     if 'image' in update_data:
         image_id = update_data.pop('image')['id']

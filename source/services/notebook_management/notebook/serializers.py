@@ -88,7 +88,6 @@ class NotebookCreateAfter(BaseModel):
     id: int
     status: StatusItem
     name: str
-    source: str
     creator_id: int
     project_id: int
     image_id: int
