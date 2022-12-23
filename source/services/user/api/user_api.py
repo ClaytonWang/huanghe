@@ -107,7 +107,7 @@ async def update_user(
         update_data['role'] = role.id
         role_name = role.name
 
-    project_ids = []
+    project_ids = None
     if 'projects' in update_data:
         project_ids = update_data.pop('projects')
 
@@ -117,7 +117,7 @@ async def update_user(
     if role_name is None:
         role_name = _user.role.name
 
-    if project_ids and role_name == 'user':
+    if project_ids is not None and role_name == 'user':
         await update_user_of_project(project_ids=project_ids, user=_user, delete_old=True)
 
     return JSONResponse(dict(id=user_id))
