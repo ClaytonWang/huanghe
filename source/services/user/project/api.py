@@ -36,6 +36,7 @@ async def create_project(project: ProjectCreate):
     # TODO 避免首字母冲突
     en_name = ''.join(lazy_pinyin(init_data['name'], style=Style.FIRST_LETTER)).upper()
     init_data['en_name'] = 'U' + en_name if en_name[0].isdigit() else en_name
+    #cluster.create_namespace()
     return await Project.objects.create(**init_data)
 
 
@@ -82,7 +83,7 @@ async def update_project(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
     if 'name' in update_data:
         en_name = ''.join(lazy_pinyin(update_data['name'], style=Style.FIRST_LETTER)).upper()
-        update_data['en_name'] = 'U' + en_name if en_name[0].isdigit() else en_name
+        # update_data['en_name'] = 'U' + en_name if en_name[0].isdigit() else en_name
     _project = await Project.objects.get_or_none(pk=project_id)
     if not (_project and await _project.update(**update_data)):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='项目不存在')
@@ -101,5 +102,5 @@ async def delete_project(
     project = await Project.objects.get(id=project_id)
     if await project.member.count():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联用户，不能删除')
-
+    #delete namespace
     await project.delete()

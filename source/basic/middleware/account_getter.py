@@ -13,7 +13,7 @@ from config import DO_NOT_AUTH_URI
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
 from jose.jwt import JWTError
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 import requests
 import os
 
@@ -41,14 +41,30 @@ class AccountGetter(BaseModel):
     class Config:
         orm_mode = True
         allow_population_by_field_name = True
-
+    @validator("en_name")
+    def name_match(cls, en_name: str):
+        ans = []
+        for ch in en_name:
+            if ch.isalpha() or ch.isdigit():
+                ans.append(ch.lower())
+        return ''.join(ans)
 
 class ProjectGetter(BaseModel):
     id: int = Field(..., alias='project_id')
     name: str = Field(..., alias='project_by')
-
+    en_name: str
     class Config:
         allow_population_by_field_name = True
+
+    @validator("en_name")
+    def name_match(cls, en_name: str):
+        ans = []
+        for ch in en_name:
+            if ch == "-":
+                ans.append(ch)
+            if ch.isalpha():
+                ans.append(ch.lower())
+        return ''.join(ans)
 
 
 async def get_current_user(token: str) -> AccountGetter:

@@ -100,6 +100,7 @@ class GenericDateModel(ormar.Model):
     project_by: str = ormar.String(max_length=12, nullable=True, comment="创建项目")
 
     create_en_by: str = ormar.String(max_length=20, nullable=True, comment="创建者英文名")
+    project_en_by: str = ormar.String(max_length=20, nullable=True, comment="创建项目英文名")
 
     created_at: datetime = ormar.DateTime(server_default=func.now(), comment='创建日期')
     updated_at: datetime = ormar.DateTime(server_default=func.now(), onupdate=func.now(), comment='更新日期')
