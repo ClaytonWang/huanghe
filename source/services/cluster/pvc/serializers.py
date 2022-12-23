@@ -12,6 +12,7 @@ class PVC(BaseModel):
     size: str
     # 对应环境
     env: str = "dev"
+    platform: str = "mvp"
 
 
 
