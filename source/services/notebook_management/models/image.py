@@ -14,7 +14,7 @@ from models import DB, META
 # todo 镜像放在notebook里做临时方案,先用主键关联凑合下后期看是否分离单独配置,不用外键了怕麻烦
 class Image(DateModel):
     class Meta(ormar.ModelMeta):
-        tablename: str = "image"
+        tablename: str = "bam_image"
         metadata = META
         database = DB
         orders_by = ['-id']

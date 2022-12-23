@@ -47,7 +47,7 @@ except ModuleNotFoundError:
 
 DB_USER = 'root'
 DB_PASSWORD = 'linshimima2!'
-DB_NAME = 'xinkai_notebook'
+DB_NAME = 'huanghe_dev'
 DB_HOST = '123.60.43.172'
 DB_PORT = '5432'
 
