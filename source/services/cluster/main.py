@@ -20,9 +20,9 @@ app.include_router(router_pvc, prefix="/pvc")
 app.include_router(router_notebook, prefix="/notebook")
 
 def start():
-    service_port = int(os.getenv('CLUSTER_SERVICE_PORT', 8005))
+    service_port = int(os.getenv('CLUSTER_SERVICE_PORT', 80))
     uvicorn.run(
-        'main:app', port=service_port,
+        'main:app', host="0.0.0.0", port=service_port,
         reload=False,
         # debug=DEBUG,
         workers=2
