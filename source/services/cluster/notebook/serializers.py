@@ -37,7 +37,8 @@ class NoteBookCreateReq(BaseModel):
             "volumes": [v.dict() for v in self.volumes]
         }
 class NoteBookDeleteReq(BaseModel):
-    pass
+    name: str
+    namespace: str
 
 class NoteBookListReq(BaseModel):
     platform: str
