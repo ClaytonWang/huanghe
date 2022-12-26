@@ -73,11 +73,11 @@ class V1Container(GenericMixin):
         'working_dir': 'workingDir',
     }
 
-    def set_env(self, envs: Dict[str, str]):
+    def set_envs(self, envs: Dict[str, str]):
         self.env = [V1EnvVar.new(env_key, env_value) for env_key, env_value in envs.items()]
         return self
 
-    def extend_env(self, envs: Dict[str, str]):
+    def extend_envs(self, envs: Dict[str, str]):
         if not self.env:
             self.env = []
         self.env.extend([V1EnvVar.new(env_key, env_value) for env_key, env_value in envs.items()])
@@ -97,10 +97,19 @@ class V1Container(GenericMixin):
         self.volume_mounts.extend([V1VolumeMount.parse_obj(vm) for vm in volume_mounts])
         return self
 
+    def extend_dshm_volume_mounts(self):
+        if not self.volume_mounts:
+            self.volume_mounts = []
+        self.volume_mounts.extend([V1VolumeMount.default(name="dshm", mount_path="/dev/shm")])
+
     def set_image_pull_policy(self, image_pull_policy: str):
         self.image_pull_policy = image_pull_policy
         return self
 
+    @classmethod
+    def default(cls, name: str, image: str):
+        return cls.new(name=name, image=image, resources=None, command=None)
+
     @staticmethod
-    def new(name: str, image: str):
-        return V1Container(name=name, image=image, command=["sleep 50000"])
+    def new(name: str, image: str, resources: Optional[V1ResourceRequirements], command: Optional[List[str]]):
+        return V1Container(name=name, image=image, resources=resources, command=command)

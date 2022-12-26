@@ -1,6 +1,9 @@
 # coding: utf-8
 from __future__ import annotations
+from typing import Optional
 from k8s.model.generic_mixin import GenericMixin
+from k8s.model.v1_persistent_volume_claim_volume_source import V1PersistentVolumeClaimVolumeSource
+from k8s.model.v1_empty_dir_volume_source import V1EmptyDirVolumeSource
 """
     Kubernetes
 
@@ -25,6 +28,8 @@ class V1Volume(GenericMixin):
                             and the value is json key in definition.
     """
     name: str
+    persistent_volume_claim: Optional[V1PersistentVolumeClaimVolumeSource]
+    empty_dir: Optional[V1EmptyDirVolumeSource]
     openapi_types = {
     #     'aws_elastic_block_store': 'V1AWSElasticBlockStoreVolumeSource',
     #     'azure_disk': 'V1AzureDiskVolumeSource',
@@ -34,7 +39,7 @@ class V1Volume(GenericMixin):
     #     'config_map': 'V1ConfigMapVolumeSource',
     #     'csi': 'V1CSIVolumeSource',
     #     'downward_api': 'V1DownwardAPIVolumeSource',
-    #     'empty_dir': 'V1EmptyDirVolumeSource',
+        'empty_dir': 'V1EmptyDirVolumeSource',
     #     'ephemeral': 'V1EphemeralVolumeSource',
     #     'fc': 'V1FCVolumeSource',
     #     'flex_volume': 'V1FlexVolumeSource',
@@ -46,7 +51,7 @@ class V1Volume(GenericMixin):
     #     'iscsi': 'V1ISCSIVolumeSource',
         'name': 'str',
     #     'nfs': 'V1NFSVolumeSource',
-    #     'persistent_volume_claim': 'V1PersistentVolumeClaimVolumeSource',
+        'persistent_volume_claim': 'V1PersistentVolumeClaimVolumeSource',
     #     'photon_persistent_disk': 'V1PhotonPersistentDiskVolumeSource',
     #     'portworx_volume': 'V1PortworxVolumeSource',
     #     'projected': 'V1ProjectedVolumeSource',
@@ -90,9 +95,16 @@ class V1Volume(GenericMixin):
         'storageos': 'storageos',
         'vsphere_volume': 'vsphereVolume'
     }
+    @classmethod
+    def pvc(cls, name: str):
+        return cls.new(name=name, persistent_volume_claim=V1PersistentVolumeClaimVolumeSource.default(claim_name=name))
+
+    @classmethod
+    def dshm(cls):
+        return cls.new(name="dshm", empty_dir=V1EmptyDirVolumeSource.default())
 
     @staticmethod
-    def new() -> V1Volume:
-        return V1Volume()
+    def new(name, persistent_volume_claim = None, empty_dir = None) -> V1Volume:
+        return V1Volume(name=name, persistent_volume_claim=persistent_volume_claim, empty_dir=empty_dir)
 
 

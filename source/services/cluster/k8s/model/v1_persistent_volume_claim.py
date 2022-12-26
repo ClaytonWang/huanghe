@@ -39,7 +39,6 @@ class V1PersistentVolumeClaim(BaseModel):
 
     @classmethod
     def default(cls, name: str, namespace: str, size: str, env: str, platform: str):
-        name = f"{platform[0]}-{name}"
         return cls.new(api_version=API_VERSION_V1, kind=PERSISTENT_VOLUME_CLAIM_KIND,
                        metadata=V1ObjectMeta.default(name=name, namespace=namespace, labels={"env": env,
                                                                                              "platform": platform}),
