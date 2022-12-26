@@ -38,8 +38,11 @@ class V1Namespace(BaseModel):
         'status': 'status'
     }
     @classmethod
-    def default(cls, name: str):
-        return cls.new(api_version=API_VERSION_V1, kind=NAMESPACE_KIND, metadata=V1ObjectMeta.default(name), spec=V1NamespaceSpec.new(None), status=None)
+    def default(cls, name: str, labels):
+        return cls.new(api_version=API_VERSION_V1, kind=NAMESPACE_KIND, metadata=V1ObjectMeta.default(name=name, labels=labels), spec=V1NamespaceSpec.new(None), status=None)
+
+
+
 
     @staticmethod
     def new(api_version: str, kind: str, metadata: V1ObjectMeta, spec: V1NamespaceSpec, status: Optional[V1NamespaceStatus]):
