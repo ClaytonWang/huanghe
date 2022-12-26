@@ -6,7 +6,7 @@ from pydantic import BaseModel, validator
 
 
 
-class PVC(BaseModel):
+class PVCCreateReq(BaseModel):
     name: str
     namespace: str
     size: str
