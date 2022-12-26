@@ -203,8 +203,8 @@ async def list_user(
     :return:
     """
     role_name = role_name.split(",")
-    project_id = list(map(int, project_id.split(",")))
     if project_id:
+        project_id = list(map(int, project_id.split(",")))
         return await User.objects.select_related(['role', 'project_user', 'projects']).filter(projectuser__project__in=project_id).filter(role__name__in=role_name).all()
 
 
