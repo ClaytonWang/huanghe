@@ -10,7 +10,7 @@ class NamespaceMixin(CoreV1Api):
         super(NamespaceMixin, self).__init__(c=c)
 
     def create_namespace(self, ns: Namespace) -> V1Namespace:
-        return self.core_v1_api.create_namespace(body=V1Namespace.default(name=ns.name))
+        return self.core_v1_api.create_namespace(body=V1Namespace.default(name=ns.name, labels=ns.labels))
 
     def delete_namespace(self, ns: Namespace) -> V1Status:
         return self.core_v1_api.delete_namespace(name=ns.name)

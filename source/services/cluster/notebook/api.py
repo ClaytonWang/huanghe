@@ -20,7 +20,6 @@ def create_notebook(nbcr: NoteBookCreateReq):
 @router_notebook.post(
     '/batch',
     description='批量查询notebook',
-    response_model=NoteBookCreateReq,
 )
 def list_notebook(nblr: NoteBookListReq):
     res = cc.list_notebook(nblr)
