@@ -22,6 +22,7 @@ async def update_user_of_project(project_ids: List[int], user: User, delete_old:
     # TODO 异常回滚
     if delete_old:
         await user.projects.clear()
+        await OperationPms.objects.filter(user=user).delete()
 
     projects = await Project.objects.filter(id__in=project_ids).all()
     # 普通用户项目权限默认编辑
