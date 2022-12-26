@@ -59,7 +59,7 @@ async def list_user(
 async def project_set_user(
         body: ProjectSetUser
 ):
-    project = await Project.objects.get(id=body.project)
+    project = await Project.objects.select_related('member').get(id=body.project)
     user = await User.objects.get(id=body.user)
     add_pms = await Permissions.objects.filter(id__in=body.permissions).all()
 
@@ -78,6 +78,10 @@ async def project_set_user(
     for _item in add_pms:
         await pms.permissions.add(_item)
 
+    # 添加项目普通用户关联
+    if user not in project.member:
+        await project.member.add(user)
+
 
 @router_setting.delete(
     '/user/{pk}',
@@ -88,6 +92,11 @@ async def project_set_user(
         pk: int = Path(..., ge=1, description='权限模块ID')
 ):
 
-    pms = await OperationPms.objects.get(id=pk)
+    pms = await OperationPms.objects.select_related(['project', 'project__member']).get(id=pk)
+    # 从项目的普通成员中删除该用户
+    _user = pms.user
+    _project = pms.project
+    if _user in _project.member:
+        await _project.member.remove(_user)
     await pms.permissions.clear()
     await pms.delete()
