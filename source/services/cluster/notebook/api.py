@@ -22,9 +22,7 @@ def create_notebook(nbcr: NoteBookCreateReq):
     description='批量查询notebook',
 )
 def list_notebook(nblr: NoteBookListReq):
-    res = cc.list_notebook(nblr)
-    print(res)
-    return nblr
+    return cc.list_notebook(nblr)
 
 @router_notebook.delete(
     '',
