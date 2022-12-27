@@ -26,3 +26,27 @@ async def create_notebook_k8s(token, payloads):
             return response.status
 
 
+async def delete_notebook_k8s(token, payloads):
+    async with aiohttp.ClientSession() as session:
+        url = K8S_SERVICE_PATH + "/notebook"
+        headers = {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+        }
+        async with session.delete(url, headers=headers, payloads=payloads) as response:
+            print("status:{}".format(response.status))
+            response = await response.json()
+            return response.status
+
+
+async def list_notebook_k8s(token, payloads):
+    async with aiohttp.ClientSession() as session:
+        url = K8S_SERVICE_PATH + "/notebook/batch"
+        headers = {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+        }
+        async with session.post(url, headers=headers, payloads=payloads) as response:
+            print("status:{}".format(response.status))
+            response = await response.json()
+            return response.status

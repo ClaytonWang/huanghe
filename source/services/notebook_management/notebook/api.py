@@ -15,7 +15,7 @@ from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from utils.user_request import get_user_list, get_project_list
 from utils.storage_request import volume_check
-from utils.k8s_request import create_notebook_k8s
+from utils.k8s_request import create_notebook_k8s, delete_notebook_k8s
 from utils.auth import operate_auth
 from collections import defaultdict
 
@@ -269,9 +269,18 @@ async def operate_notebook(request: Request,
 )
 async def delete_notebook(request: Request,
                           notebook_id: int = Path(..., ge=1, description="NotebookID")):
+    authorization: str = request.headers.get('authorization')
     _notebook, reason = await operate_auth(request, notebook_id)
     if not _notebook:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
+    payloads = {
+        'name': f"{request.user.en_name}-{_notebook.name}",  # todo user的en_name + notebook的name
+        'namespace': request.user.project_ids.get(_notebook.project_id),
+    }
+    # print(payloads)
+    # response = await delete_notebook_k8s(authorization, payloads)
+    # if response.status != 200:
+    #     _notebook.status = None
     await _notebook.delete()
 
 
