@@ -5,6 +5,8 @@ from k8s.model.v1_affinity import V1Affinity
 from k8s.model.v1_container import V1Container
 from k8s.model.v1_volume import V1Volume
 from k8s.model.v1_toleration import V1Toleration
+from k8s.const.workloads_const import IMAGE_PULL_POLICY_IF_NOT_PRESENT
+from notebook.serializers import Volume
 
 
 class V1PodSpec(GenericMixin):
@@ -34,7 +36,7 @@ class V1PodSpec(GenericMixin):
     node_name: Optional[str]
     node_selector: Optional[Dict[str, str]]
     service_account: Optional[str]
-    volumes: Optional[List[V1Volume]]
+    volumes: Optional[List[V1Volume]] = None
     tolerations: Optional[List[V1Toleration]]
 
     openapi_types = {
@@ -116,14 +118,43 @@ class V1PodSpec(GenericMixin):
         'volumes': 'volumes'
     }
 
+    def add_pvc_volume_and_volume_mount(self, volumes: List[Volume]):
+        if not self.volumes:
+            self.volumes = []
+        self.volumes.extend([V1Volume.pvc(volume.name) for volume in volumes])
+        for container in self.containers:
+            container.set_volume_mounts([v.dict() for v in volumes])
+        return self
+
+    def add_dshm(self):
+        if not self.volumes:
+            self.volumes = []
+        self.volumes.extend([V1Volume.dshm()])
+        for container in self.containers:
+            container.extend_dshm_volume_mounts()
+        return self
+
+    def add_tolerations(self, tolerations: List[str]):
+        if not self.tolerations:
+            self.tolerations = []
+        self.tolerations.extend([V1Toleration.exist(toleration) for toleration in tolerations])
+        return self
+
     @classmethod
     def default(cls, name, image):
-        return cls.new([V1Container.new(name=name, image=image)])
+        return cls.new([V1Container.default(name=name, image=image)])
 
-
+    @classmethod
+    def notebook(cls, name: str, image: str, resource: Dict[str, str], envs: Dict[str, str], volumes,
+                 tolerations: List[str]):
+        c = V1Container.default(name=name, image=image)
+        c.set_envs(envs).set_resources(resource).set_image_pull_policy(IMAGE_PULL_POLICY_IF_NOT_PRESENT)
+        spec = cls.new([c])
+        spec.add_pvc_volume_and_volume_mount(volumes).add_tolerations(tolerations).add_dshm()
+        return spec
     @staticmethod
-    def new(containers: List[V1Container]):
-        return V1PodSpec(containers=containers)
+    def new(containers: List[V1Container], volumes: Optional[List[V1Volume]] = None):
+        return V1PodSpec(containers=containers, volumes=volumes)
 
 
 

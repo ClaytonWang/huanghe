@@ -14,7 +14,8 @@ from notebook.serializers import NotebookList, NotebookCreate, NotebookEdit, Not
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from utils.user_request import get_user_list, get_project_list
-from utils.storage_request import get_volume_list
+from utils.storage_request import volume_check
+from utils.k8s_request import create_notebook_k8s, delete_notebook_k8s
 from utils.auth import operate_auth
 from collections import defaultdict
 
@@ -134,15 +135,16 @@ async def create_notebook(request: Request,
     if duplicate_name:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不能重名')
 
-    project_id = init_data.pop('project')['id']
-    if request.user.role.name != 'admin' and int(project_id) not in request.user.project_ids:
+    project_id = int(init_data.pop('project')['id'])
+    if request.user.role.name != 'admin' and project_id not in request.user.project_ids:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='不是用户所属项目')
     init_data['project_id'] = project_id
 
     source = init_data.pop('source')
     sources = await Source.objects.all()
-    source_map = {x.get_str(): x.id for x in sources}
-    init_data['source'] = source_map.get(source)
+    source_map = {x.get_str(): x for x in sources}
+    _source = source_map.get(source)
+    init_data['source'] = _source.id
 
     image_id = init_data.pop('image')['id']
     _image = await Image.objects.get_or_none(pk=int(image_id))
@@ -150,14 +152,29 @@ async def create_notebook(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='镜像不存在')
     init_data['image_id'] = image_id
 
-    # todo hooks检查
-    """
-    volume_list = await get_volume_list(authorization)
-    volume_ids = [x['id'] for x in volume_list]
-    """
+    # 存储检查
     hooks = init_data.pop('hooks')
-    init_data['storage'] = json.dumps(hooks)
-    return await Notebook.objects.create(**init_data)
+    storages, volumes_k8s = await volume_check(authorization, hooks)
+    init_data['storage'] = json.dumps(storages)
+
+    _notebook = await Notebook.objects.create(**init_data)
+    # todo 同notebook集群发送
+    payloads = {
+        'name': f"{request.user.en_name}-{init_data['name']}",  # todo user的en_name + notebook的name
+        'namespace': request.user.project_ids.get(project_id),
+        'image': _image.name,
+        'env': 'dev',  # todo 填当前环境，从不同环境去读
+        'cpu': _source.cpu,
+        'memory': _source.memory,
+        'gpu': _source.gpu,
+        'volumes': volumes_k8s,
+    }
+    # print(payloads)
+    # todo response返回不为200时更新notebook状态到异常
+    # response = await create_notebook_k8s(authorization, payloads)
+    # if response.status != 200:
+    #     _notebook.status = None
+    return _notebook
 
 
 @router_notebook.put(
@@ -169,6 +186,7 @@ async def update_notebook(request: Request,
                           notebook_id: int = Path(..., ge=1, description="NotebookID"),
                           ):
     # user: AccountGetter = request.user
+    authorization: str = request.headers.get('authorization')
     update_data = notebook.dict(exclude_unset=True)
     if not update_data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
@@ -204,10 +222,14 @@ async def update_notebook(request: Request,
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='镜像不存在')
         update_data['image_id'] = image_id
 
-    # todo volume检查同创建
+    if 'hooks' in update_data:
+        hooks = update_data.pop('hooks')
+        storages, volumes_k8s = await volume_check(authorization, hooks)
+        update_data['storage'] = json.dumps(storages)
 
     if not await _notebook.update(**update_data):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不存在')
+    # todo 更新notebook集群
     return JSONResponse(dict(id=notebook_id))
 
 
@@ -247,9 +269,18 @@ async def operate_notebook(request: Request,
 )
 async def delete_notebook(request: Request,
                           notebook_id: int = Path(..., ge=1, description="NotebookID")):
+    authorization: str = request.headers.get('authorization')
     _notebook, reason = await operate_auth(request, notebook_id)
     if not _notebook:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
+    payloads = {
+        'name': f"{request.user.en_name}-{_notebook.name}",  # todo user的en_name + notebook的name
+        'namespace': request.user.project_ids.get(_notebook.project_id),
+    }
+    # print(payloads)
+    # response = await delete_notebook_k8s(authorization, payloads)
+    # if response.status != 200:
+    #     _notebook.status = None
     await _notebook.delete()
 
 

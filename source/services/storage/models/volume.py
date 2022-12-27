@@ -62,6 +62,7 @@ class Volume(GenericDateModel):
             "updated_by_id": ag.id,
             "project_by_id": pg.id,
             "create_en_by": ag.en_name,
+            "project_en_by": pg.en_name,
             "created_by": ag.username,
             "updated_by": ag.username,
             "project_by": pg.name,

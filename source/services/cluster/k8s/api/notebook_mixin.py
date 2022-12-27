@@ -5,7 +5,7 @@ from k8s.api.custom_object_api import CustomerObjectApi
 from k8s.const.crd_kubeflow_const import KUBEFLOW_NOTEBOOK_GROUP, KUBEFLOW_V1_VERSION, KUBEFLOW_NOTEBOOK_PLURAL
 from k8s.model.v1_notebook import V1Notebook
 from typing import Optional, Dict
-from notebook.serializers import NoteBook
+from notebook.serializers import NoteBook, NoteBookListReq, NoteBookDeleteReq
 
 class NotebookMixin(CustomerObjectApi):
     def __init__(self, c: Core):
@@ -20,18 +20,24 @@ class NotebookMixin(CustomerObjectApi):
                                                                         body=V1Notebook.default(name=nb.name,
                                                                                                 namespace=nb.namespace,
                                                                                                 image=nb.image,
-                                                                                                env=nb.env,
-                                                                                                platform=nb.platform),
+                                                                                                labels=nb.labels,
+                                                                                                resource=nb.resource,
+                                                                                                envs=nb.envs,
+                                                                                                volumes=nb.volumes,
+                                                                                                tolerations=nb.tolerations,
+                                                                                                ),
                                                                         )
 
 
-    def delete_notebook(self, name: str, namespace: str) -> V1Status:
-        return self.custom_object_api.delete_namespaced_custom_object(name=name, namespace=namespace)
+    def delete_notebook(self, nbdr: NoteBookDeleteReq) -> V1Status:
+        return self.custom_object_api.delete_namespaced_custom_object(name=nbdr.name, namespace=nbdr.namespace)
 
-    def list_notebook(self):
-        return self.custom_object_api.list_namespaced_custom_object(group=KUBEFLOW_NOTEBOOK_GROUP,
-                                                                        version=KUBEFLOW_V1_VERSION,
-                                                                        plural=KUBEFLOW_NOTEBOOK_PLURAL,)
+    def list_notebook(self, nblr: NoteBookListReq):
+        return self.custom_object_api.list_cluster_custom_object(group=KUBEFLOW_NOTEBOOK_GROUP,
+                                                                 version=KUBEFLOW_V1_VERSION,
+                                                                 plural=KUBEFLOW_NOTEBOOK_PLURAL,
+                                                                 label_selector=f"env={nblr.env}"
+                                                                    )
 
     def watch_notebook(self):
         return self.custom_object_api.list_namespaced_custom_object

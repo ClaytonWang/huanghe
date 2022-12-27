@@ -19,8 +19,7 @@ class ClusterClient(NamespaceMixin, NotebookMixin, PodMixin, PersistentVolumeCla
 cc = ClusterClient()
 
 if __name__ == '__main__':
-    print(cc.create_namespace("sssss"))
-
+    pass
 
 
 
