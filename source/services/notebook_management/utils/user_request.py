@@ -112,7 +112,7 @@ async def get_user_list(token, page_no=1):
             user_data = text['result']['data']
             for user in user_data:
                 projects = user.pop('projects')
-                user['project_ids'] = [x["id"] for x in projects]
+                user['project_ids'] = {x["id"]: x["en_name"] for x in projects}
                 res.append(UserInfo.parse_obj(user))
             # print(text)
     return [x.get_dict() for x in res]
