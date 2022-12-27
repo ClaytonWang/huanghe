@@ -9,6 +9,8 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from basic.utils.dt_format import dt_to_string
+from image.serializers import ImageItem
+from source.serializers import SourceList
 from pydantic import validator
 
 
@@ -16,13 +18,6 @@ class StatusItem(BaseModel):
     code: str = None
     name: str = None
     desc: str = None
-
-
-class SourceItem(BaseModel):
-    id: int
-    cpu: int
-    memory: int
-    gpu: int
 
 
 class UserStr(BaseModel):
@@ -33,12 +28,6 @@ class UserStr(BaseModel):
 class ProjectStr(BaseModel):
     id: str
     name: Optional[str] = None
-
-
-class ImageItem(BaseModel):
-    id: Optional[str]
-    name: str
-    desc: Optional[str] = None
 
 
 class VolumeConfig(BaseModel):
@@ -52,7 +41,12 @@ class VolumeItem(BaseModel):
 
 
 class HookItem(BaseModel):
-    volume_id: int
+    storage: int
+    path: str
+
+
+class StorageItem(BaseModel):
+    storage: VolumeItem
     path: str
 
 
@@ -61,10 +55,10 @@ class NotebookOp(BaseModel):
 
 
 class NotebookList(BaseModel):
-    id: int
+    id: str
     status: StatusItem
     name: str
-    source: str
+    source: Optional[SourceList]
     creator: Optional[UserStr]
     project: Optional[ProjectStr]
     image: ImageItem
@@ -78,9 +72,9 @@ class NotebookList(BaseModel):
 
 class NotebookCreate(BaseModel):
     name: str = Field(..., max_length=20)
-    source: str = Field(..., max_length=80)
-    project: ProjectStr
-    image: ImageItem
+    source: str
+    project: str
+    image: str
     hooks: List[HookItem] = []
 
     @validator('name')
@@ -89,22 +83,24 @@ class NotebookCreate(BaseModel):
         return name
 
 
-class NotebookCreateAfter(BaseModel):
+class NotebookDetail(BaseModel):
     id: int
     status: StatusItem
     name: str
+    source: SourceList
     creator_id: int
     project_id: int
     image_id: int
+    hooks: List[StorageItem]
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
 
 
 class NotebookEdit(BaseModel):
     name: str = Field(..., max_length=20)
-    source: Optional[str] = Field(..., max_length=80)
-    project: ProjectStr
-    image: Optional[ImageItem]
+    source: Optional[str]
+    project: Optional[str]
+    image: Optional[str]
     hooks: Optional[List[HookItem]] = []
 
     @validator('name')

@@ -50,6 +50,12 @@ class Source(DateModel):
     def get_str(self):
         return f"{self.gpu}*{self.gpu_type} {self.cpu}C {self.memory}G"
 
+    def get_info(self):
+        return {
+            "id": self.id,
+            "source": self.get_str(),
+        }
+
 
 class Notebook(DateModel):
     class Meta(ormar.ModelMeta):
@@ -59,7 +65,8 @@ class Notebook(DateModel):
         orders_by = ['-id']
 
     id: int = ormar.Integer(primary_key=True)
-    name: str = ormar.String(max_length=20, comnet='名称', unique=True)
+    name: str = ormar.String(max_length=20, comnet='名称', unique=True)  # todo 只能显示英文名字，加校验
+    url: str = ormar.String(max_length=80, comnet='url地址', nullable=True)
     status: Status = ormar.ForeignKey(Status, related_name='notebook_status')
     source: Source = ormar.ForeignKey(Source, related_name='notebook_source')
 
@@ -69,6 +76,7 @@ class Notebook(DateModel):
 
     # 对多个volume如何处理
     storage: str = ormar.JSON(comment='存储信息')
+    k8s_info: str = ormar.JSON(comment='集群信息')
 
     # def __repr__(self):
     #     return f'{self.name}_{self.value}'
