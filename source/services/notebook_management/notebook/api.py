@@ -153,7 +153,7 @@ async def create_notebook(request: Request,
     check, extra_info = await project_check(request, project_id)
     if not check:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
-    init_data['project_id'] = extra_info
+    init_data['project_id'] = project_id
 
     source_id = int(init_data.pop('source'))
     _source = await Source.objects.get_or_none(pk=source_id)
