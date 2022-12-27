@@ -26,10 +26,7 @@ COMMON_CONFIG_PATH = f'basic.config.{APP_NAME}'
 
 # USER_SERVICE_PATH = 'http://localhost:8000'
 USER_SERVICE_PATH = 'http://121.36.41.231:32767/api/v1/user'
-# IMAGE_SERVICE_PATH = 'http://localhost:8000'
-# STORAGE_SERVICE_PATH = 'http://localhost:8000'
 STORAGE_SERVICE_PATH = 'http://121.36.41.231:32767/api/v1/storages'
-# K8S_SERVICE_PATH = 'http://localhost:8000'
 K8S_SERVICE_PATH = 'http://121.36.41.231:32767/api/v1/cluster'
 
 try:
