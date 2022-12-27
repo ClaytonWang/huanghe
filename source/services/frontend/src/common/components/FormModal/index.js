@@ -29,7 +29,7 @@ const FormModal = ({
       title={title}
       okText={okText}
       cancelText="取消"
-      visible={true}
+      open={true}
       onOk={handleOkClicked}
       onCancel={handleCancelClicked}
     >

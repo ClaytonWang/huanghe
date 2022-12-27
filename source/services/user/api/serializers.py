@@ -54,6 +54,7 @@ class UserItem(BaseModel):
     id: int
     username: str = None
     email: str = None
+    en_name: str = None
 
 
 class UserList(UserItem):
@@ -73,6 +74,7 @@ class AdminUserListProject(BaseModel):
     id: int = None
     code: str = None
     name: str = None
+    en_name: str = None
 
 
 class AdminUserList(UserList):

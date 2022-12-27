@@ -35,13 +35,19 @@ async def create_user(user: UserCreate):
     if role.name == 'admin':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='不能创建管理员账号')
 
+    # 用户英文名根据邮箱生成,创建后不能修改邮箱故不变,首字母为数字时添加前缀字符
+    en_name = ''.join(filter(str.isalnum, user.email.split('@')[0]))
+    en_name = 'u' + en_name if en_name[0].isdigit() else en_name
+    init_data['en_name'] = en_name
+
     # TODO 失败回滚
     project_ids = init_data.pop('projects', [])
     # 把原始数据的role换成ID
     init_data['role'] = role.id
     new_user = await User.objects.create(**init_data)
 
-    if role.name == 'owner':
+    # 新建用户为普通用户时关联项目
+    if project_ids and role.name == 'user':
         await update_user_of_project(project_ids=project_ids, user=new_user)
     return new_user
 
@@ -59,16 +65,34 @@ async def list_user(
     :param query_params:
     :return:
     """
+    query_filter = query_params.filter_
+    # 项目负责人不是项目成员之一，无法用projects__code获取
+    if 'projects__code' in query_filter:
+        projects_code = query_filter.pop('projects__code')
+        code_filter = ormar.or_(projects__code=projects_code, project_user__code=projects_code)
+        query_filter = ormar.and_(code_filter, **query_filter)
+    if isinstance(query_filter, dict):
+        query_filter = ormar.queryset.clause.FilterGroup(**query_filter)
     result = await paginate(User.objects.select_related(
         ['role', 'project_user', 'projects']
     ).filter(
-        **query_params.filter_
+        query_filter
     ), params=query_params.params)
     json_result = result.dict()
     data = json_result.get('data', [])
     for index, item in enumerate(data):
-        members_projects = item.get('projects', [])
-        item['projects'] = item.get('project_user', []) + members_projects
+        if item.get('role') and item['role'].get('name') == 'admin':
+            item['projects'] = []
+        else:
+            members_projects = item.get('projects', [])
+            projects_list = item.get('project_user', []) + members_projects
+            project_ids = set()
+            res = []
+            for project in projects_list:
+                if project['id'] not in project_ids:
+                    project_ids.add(project['id'])
+                    res.append(project)
+            item['projects'] = res
     return json_result
 
 
@@ -82,22 +106,26 @@ async def update_user(
         user_id: int = Path(..., ge=1, description='需要更新的用户ID'),
 ):
     update_data = user.dict(exclude_unset=True)
+    role_name = None
 
     if 'role' in update_data:
         role = await Role.objects.get(name=update_data['role'])
         if role.name == 'admin':
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='角色不能修改成管理员')
         update_data['role'] = role.id
+        role_name = role.name
 
-    project_ids = []
+    project_ids = None
     if 'projects' in update_data:
         project_ids = update_data.pop('projects')
 
-    _user = await User.objects.get(pk=user_id)
+    _user = await User.objects.select_related(['role', 'projects']).get(pk=user_id)
     if update_data:
         _user = await _user.update(**update_data)
+    if role_name is None:
+        role_name = _user.role.name
 
-    if project_ids:
+    if project_ids is not None and role_name == 'user':
         await update_user_of_project(project_ids=project_ids, user=_user, delete_old=True)
 
     return JSONResponse(dict(id=user_id))
@@ -175,10 +203,17 @@ async def account(
     response_model_exclude_unset=True
 )
 async def list_user(
-            role_name: str = Query(default='owner', description='权限名，默认选择项目负责人')
+            role_name: str = Query(default='owner', description='权限名，默认选择项目负责人'),
+            project_id: str = Query(default='', description='权限名，默认选择项目负责人')
 ):
     """
     :param role_name:
     :return:
     """
-    return await User.objects.filter(role__name=role_name).all()
+    role_name = role_name.split(",")
+    if project_id:
+        project_id = list(map(int, project_id.split(",")))
+        return await User.objects.select_related(['role', 'project_user', 'projects']).filter(projectuser__project__in=project_id).filter(role__name__in=role_name).all()
+
+
+    return await User.objects.filter(role__name__in=role_name).all()

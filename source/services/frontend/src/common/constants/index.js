@@ -8,6 +8,9 @@ export const USER_ROLE = {
   owner: '项目负责人',
   user: '普通用户',
 };
+export const ADMIN = 'admin';
+export const OWNER = 'owner';
+export const USER = 'user';
 // 普通用户权限
 export const ACCESS_MAP = {
   edit: '编辑',

@@ -8,7 +8,7 @@
 import re
 import json
 from fastapi import Request, Response
-
+from fastapi.responses import JSONResponse
 
 class ReadDataWrap:
     def __init__(self, obj):
@@ -66,3 +66,7 @@ async def add_common_response_data(request: Request, call_next) -> Response:
         headers=headers,
         media_type=response.media_type
     )
+
+
+def success_common_response() -> JSONResponse:
+    return JSONResponse({})
