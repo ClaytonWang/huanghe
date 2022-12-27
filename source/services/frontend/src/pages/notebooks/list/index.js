@@ -3,7 +3,7 @@
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Modal, message } from 'antd';
 import qs from 'qs';
 import api from '@/common/api';
@@ -12,8 +12,14 @@ import { purifyDeep } from '@/common/utils/helper';
 import { PlusOutlined } from '@ant-design/icons';
 import NotebooksFilter from './NotebooksFilter';
 import NotebooksTable from './NotebooksTable';
+import {
+  CREATE,
+  NOTEBOOK_ACTION,
+  START,
+  STOP,
+  UPDATE,
+} from '@/common/constants';
 import './index.less';
-import { NOTEBOOK_ACTION, START, STOP } from '@/common/constants';
 
 const NotebooksList = () => {
   const defaultFilters = useMemo(
@@ -33,6 +39,7 @@ const NotebooksList = () => {
   const [projectsDatasource, setProjectsDatasource] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const getFilters = useCallback(
     () => ({ ...defaultFilters, ...qs.parse(searchParams.toString()) }),
@@ -102,7 +109,11 @@ const NotebooksList = () => {
   };
 
   const handleCreateClicked = () => {
-    // router to create page
+    navigate('create', {
+      state: {
+        type: CREATE,
+      },
+    });
   };
   const handleOpenClicked = (record) => {
     // 打开notebooks地址
@@ -125,8 +136,13 @@ const NotebooksList = () => {
       console.log(error);
     }
   };
-  const handleEditClicked = () => {
-    // router to create page
+  const handleEditClicked = (values) => {
+    navigate('update', {
+      state: {
+        params: values,
+        type: UPDATE,
+      },
+    });
   };
   const handleDelete = (record) => {
     Modal.confirm({

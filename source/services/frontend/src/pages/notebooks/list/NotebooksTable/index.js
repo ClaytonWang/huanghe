@@ -4,7 +4,7 @@ import qs from 'qs';
 import { get } from 'lodash';
 import Icon from '@ant-design/icons';
 import { transformDate } from '@/common/utils/helper';
-import { AuthButton } from '@/common/components';
+import { AuthButton, Auth } from '@/common/components';
 import Icons from '@/common/components/Icon';
 
 const NotebooksTable = ({
@@ -75,60 +75,62 @@ const NotebooksTable = ({
       render(_value, record) {
         const statusName = get(record, 'status.name');
         return (
-          <span className="dbr-table-actions">
-            <AuthButton
-              required="notebooks.list"
-              type="link"
-              onClick={() => {
-                handleOpenClicked(record);
-              }}
-              condition={() => ['running'].indexOf(statusName) > -1}
-            >
-              打开
-            </AuthButton>
-            {statusName === 'stopped' && (
+          <Auth required="notebooks.list.edit">
+            <span className="dbr-table-actions">
+              <AuthButton
+                required="notebooks.list"
+                type="link"
+                onClick={() => {
+                  handleOpenClicked(record);
+                }}
+                condition={() => ['running'].indexOf(statusName) > -1}
+              >
+                打开
+              </AuthButton>
+              {statusName === 'stopped' && (
+                <AuthButton
+                  required="notebooks.list.edit"
+                  type="link"
+                  onClick={() => {
+                    handleStartClicked(record);
+                  }}
+                >
+                  启动
+                </AuthButton>
+              )}
+              {statusName !== 'stopped' && (
+                <AuthButton
+                  required="notebooks.list.edit"
+                  type="link"
+                  onClick={() => {
+                    handleStopClicked(record);
+                  }}
+                >
+                  停止
+                </AuthButton>
+              )}
               <AuthButton
                 required="notebooks.list.edit"
                 type="link"
                 onClick={() => {
-                  handleStartClicked(record);
+                  handleEditClicked(record);
                 }}
+                condition={() => ['stopped'].indexOf(statusName) > -1}
               >
-                启动
+                编辑
               </AuthButton>
-            )}
-            {statusName !== 'stopped' && (
               <AuthButton
                 required="notebooks.list.edit"
                 type="link"
                 onClick={() => {
-                  handleStopClicked(record);
+                  handleDeleteClicked(record);
                 }}
+                condition={() => ['stopped'].indexOf(statusName) > -1}
               >
-                停止
+                删除
               </AuthButton>
-            )}
-            <AuthButton
-              required="notebooks.list.edit"
-              type="link"
-              onClick={() => {
-                handleEditClicked(record);
-              }}
-              condition={() => ['running', 'stopped'].indexOf(statusName) > -1}
-            >
-              编辑
-            </AuthButton>
-            <AuthButton
-              required="notebooks.list.edit"
-              type="link"
-              onClick={() => {
-                handleDeleteClicked(record);
-              }}
-              condition={() => ['stopped'].indexOf(statusName) > -1}
-            >
-              删除
-            </AuthButton>
-          </span>
+            </span>
+          </Auth>
         );
       },
     },

@@ -33,6 +33,7 @@ export const INFO = 'info';
 export const PASSWORD = 'password';
 export const CREATE = 'create';
 export const EDIT = 'edit';
+export const UPDATE = 'update';
 
 // notebooks
 export const NOTEBOOK_STATUS = {

@@ -2,18 +2,18 @@
  * @description 存储列表
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { get } from 'lodash';
+import qs from 'qs';
+import { Form, Input, InputNumber, message, Modal, Select } from 'antd';
+import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import api from '@/common/api';
 import { Auth, AuthButton, FormModal } from '@/common/components';
 import { purifyDeep, relativeDate } from '@/common/utils/helper';
-import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { Form, Input, InputNumber, message, Modal, Select } from 'antd';
-import { get } from 'lodash';
-import qs from 'qs';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useAuth } from '@/common/hooks/useAuth';
 import StoragesTable from './StoragesTable';
 import './index.less';
-import { useAuth } from '@/common/hooks/useAuth';
 
 const { Option } = Select;
 
@@ -232,16 +232,16 @@ const StoragesList = () => {
         label="名称"
         name="name"
         rules={[
-          { required: true, message: '请输入用户名' },
+          { required: true, message: '请输入存储名' },
           { pattern: /^\w+/, message: '请输入英文名称' },
         ]}
       >
-        <Input placeholder="请输入用户名" />
+        <Input placeholder="请输入存储名" />
       </Form.Item>
       <Form.Item
         name={['project', 'id']}
         label="所属项目"
-        rules={[{ required: true, message: '请输入用户名' }]}
+        rules={[{ required: true, message: '请输入所属项目' }]}
       >
         <Select placeholder="请选择项目">
           {projectsDataSource.map(({ id, name }) => (

@@ -48,6 +48,7 @@ module.exports = {
     storagesListReset: 'post|/storages/reset',
 
     notebooksList: 'get|/notebooks',
+    notebooksDetail: 'get|/notebooks/:id',
     notebooksListCreate: 'post|/notebooks',
     notebooksListAction: 'post|/notebooks/:id',
     notebooksListUpdate: 'put|/notebooks/:id',
@@ -65,6 +66,8 @@ module.exports = {
     '/storages/list': '存储管理',
 
     '/notebooks/list': 'Notebook管理',
+    '/notebooks/list/update': '编辑Notebook',
+    '/notebooks/list/create': '创建Notebook',
   },
   menuItemsConfig: [
     {

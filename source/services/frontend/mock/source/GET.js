@@ -11,10 +11,10 @@ module.exports = {
   message: '',
   result: {
     data: [
-      '1*A100 16C 256G',
-      '2*A100 16C 512G',
-      '3*A100 24C 768G',
-      '4*A100 48C 1024G',
+      { name: '1*A100 16C 256G', id: '1' },
+      { name: '2*A100 16C 512G', id: '2' },
+      { name: '3*A100 24C 768G', id: '3' },
+      { name: '4*A100 48C 1024G', id: '4' },
     ],
   },
 };

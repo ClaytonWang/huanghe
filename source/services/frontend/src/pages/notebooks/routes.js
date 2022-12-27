@@ -7,11 +7,14 @@
  */
 import { Navigate, Route, Routes } from 'react-router-dom';
 import NotebooksList from './list';
+import NotebookUpdate from './update';
 
 const NotebooksRoutes = () => (
   <Routes>
     <Route path="" element={<Navigate to="list" />} />
     <Route path="list" element={<NotebooksList />} />
+    <Route path="list/create" element={<NotebookUpdate />} />
+    <Route path="list/update" element={<NotebookUpdate />} />
   </Routes>
 );
 export default NotebooksRoutes;

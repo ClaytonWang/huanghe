@@ -15,7 +15,10 @@ const success = {
   status: 200,
   result: {},
 };
-const ok = (data) => assign({}, success, { result: data });
+const ok = (_req, res, data) => {
+  const result = data;
+  end(res, { result });
+};
 const error = () => ({
   success: false,
   message: '',
@@ -38,7 +41,7 @@ const list = (req, res, obj) => {
 const end = (res, data) => {
   setTimeout(() => {
     res.end(JSON.stringify(assign({}, success, data)));
-  }, 800);
+  }, 200);
 };
 // 代理生成器
 const genProxy = () => {
