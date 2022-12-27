@@ -41,7 +41,7 @@ class NoteBookDeleteReq(BaseModel):
     namespace: str
 
 class NoteBookListReq(BaseModel):
-    platform: str
+    platform: str = "mvp"
     env: str
 
 class NoteBook(BaseModel):
