@@ -40,12 +40,20 @@ module.exports = {
 
     // FIXME: 后端获取指定菜单的权限接口
     access: 'get|/user/pms/menu',
-
     storagesList: 'get|/storages/volume',
     storagesListCreate: 'post|/storages/volume',
     storagesListUpdate: 'put|/storages/volume/:id',
     storagesListDelete: 'delete|/storages/volume/:id',
     storagesListReset: 'post|/storages/volume/:id/reset',
+
+    notebooksList: 'get|/notebooks',
+    notebooksDetail: 'get|/notebooks/:id',
+    notebooksListCreate: 'post|/notebooks',
+    notebooksListAction: 'post|/notebooks/:id',
+    notebooksListUpdate: 'put|/notebooks/:id',
+    notebooksListDelete: 'delete|/notebooks/:id',
+    imagesList: 'get|/images',
+    sourceList: 'get|/source',
   },
   breadcrumbConfig: {
     '/bam/projects': '项目管理',
@@ -55,6 +63,10 @@ module.exports = {
     '/settings/account': '我的账号',
 
     '/storages/list': '存储管理',
+
+    '/notebooks/list': 'Notebook管理',
+    '/notebooks/list/update': '编辑Notebook',
+    '/notebooks/list/create': '创建Notebook',
   },
   menuItemsConfig: [
     {
@@ -80,6 +92,17 @@ module.exports = {
         {
           key: 'settings.users',
           label: '用户权限',
+        },
+      ],
+    },
+    {
+      key: 'notebooks',
+      label: 'Notebook',
+      icon: 'notebooks',
+      children: [
+        {
+          key: 'notebooks.list',
+          label: 'Notebook管理',
         },
       ],
     },

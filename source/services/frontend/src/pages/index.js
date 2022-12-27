@@ -10,6 +10,7 @@ import ProtectedLayout from '@/common/components/ProtectedLayout';
 import Bam from '@/pages/bam';
 import Settings from '@/pages/settings';
 import Storages from '@/pages/storages';
+import Notebooks from '@/pages/notebooks';
 import './index.less';
 
 const Pages = () => (
@@ -18,6 +19,7 @@ const Pages = () => (
       <Route path="bam/*" element={<Bam />} />
       <Route path="settings/*" element={<Settings />} />
       <Route path="storages/*" element={<Storages />} />
+      <Route path="notebooks/*" element={<Notebooks />} />
     </Route>
   </Routes>
 );

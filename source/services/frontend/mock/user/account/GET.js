@@ -37,6 +37,12 @@ const owner = [
   'storages.list.create',
   'storages.list.edit',
   'storages.list.delete',
+
+  'notebooks',
+  'notebooks.list',
+  'notebooks.list.create',
+  'notebooks.list.edit',
+  'notebooks.list.delete',
 ];
 // const user = [];
 const account = {

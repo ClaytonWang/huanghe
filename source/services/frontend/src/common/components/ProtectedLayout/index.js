@@ -9,11 +9,11 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { Layout, Menu } from 'antd';
 import { get, find } from 'lodash';
 import { useCallback, useEffect, useMemo } from 'react';
+import Icon from '@ant-design/icons';
 import HeaderNav from '@/common/components/HeaderNav';
 import { useAuth } from '@/common/hooks/useAuth';
 import { tranverseTree, isLeafNode } from '@/common/utils/helper';
 import { menuItemsConfig } from '@/common/utils/config';
-import Icon from '@ant-design/icons';
 import Icons from '@/common/components/Icon';
 import './index.less';
 
@@ -75,6 +75,7 @@ const ProtectedLayout = () => {
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
+    // if location is empty, auto direct to first submenu; else maintain;
     const pathname = (selectedKeys.length > 0 && selectedKeys[0]) || '';
     const path = pathname.split('.').join('/');
     navigate(path);
