@@ -61,7 +61,7 @@ class Notebook(DateModel):
     id: int = ormar.Integer(primary_key=True)
     name: str = ormar.String(max_length=20, comnet='名称', unique=True)
     status: Status = ormar.ForeignKey(Status, related_name='notebook_status')
-    source = ormar.ForeignKey(Source, related_name='notebook_source')
+    source: Source = ormar.ForeignKey(Source, related_name='notebook_source')
 
     creator_id: int = ormar.Integer(comment='创建者id')
     project_id: int = ormar.Integer(comment='项目id')

@@ -52,7 +52,7 @@ class VolumeItem(BaseModel):
 
 
 class HookItem(BaseModel):
-    storage: VolumeItem
+    volume_id: int
     path: str
 
 
@@ -83,12 +83,16 @@ class NotebookCreate(BaseModel):
     image: ImageItem
     hooks: List[HookItem] = []
 
+    @validator('name')
+    def notebook_name_validator(cls, name):
+        # todo 要符合k8s的命名，全英文
+        return name
+
 
 class NotebookCreateAfter(BaseModel):
     id: int
     status: StatusItem
     name: str
-    source: str
     creator_id: int
     project_id: int
     image_id: int
@@ -101,4 +105,9 @@ class NotebookEdit(BaseModel):
     source: Optional[str] = Field(..., max_length=80)
     project: ProjectStr
     image: Optional[ImageItem]
-    projects: Optional[List[HookItem]] = []
+    hooks: Optional[List[HookItem]] = []
+
+    @validator('name')
+    def notebook_name_validator(cls, name):
+        # todo 要符合k8s的命名，全英文
+        return name

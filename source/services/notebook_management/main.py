@@ -47,6 +47,12 @@ app.add_exception_handler(RequestValidationError, validation_ormar_exception_han
 app.add_exception_handler(PostgresError, pg_db_exception_handler)
 app.add_exception_handler(AsyncOrmException, ormar_db_exception_handler)
 
+
+@app.get('/status')
+def status():
+    return {"status": "ok"}
+
+
 # 路由配置
 app.include_router(router_notebook, prefix='/notebooks', tags=['Notebook'])
 
