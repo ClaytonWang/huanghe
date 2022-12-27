@@ -25,6 +25,7 @@ class Image(DateModel):
 
     def get_dict(self):
         return {
+            "id": self.id,
             "name": self.name,
             "desc": self.desc,
         }

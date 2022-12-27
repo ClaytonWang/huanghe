@@ -54,7 +54,7 @@ async def verify_token(request: Request, call_next):
 
 
 async def operate_auth(request: Request, notebook_id: int):
-    _notebook = await Notebook.objects.get_or_none(pk=notebook_id)
+    _notebook = await Notebook.objects.select_related('status').get_or_none(pk=notebook_id)
     if not _notebook:
         return None, 'Notebook不存在'
     # 正确返回notebook
