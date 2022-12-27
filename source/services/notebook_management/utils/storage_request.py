@@ -68,7 +68,7 @@ async def volume_check(authorization: str, hooks: List[Dict]):
     volumes_k8s = []
 
     for hook in hooks:
-        volume_id = hook['volume_id']
+        volume_id = hook['storage']
         path = hook['path']
         volume_info = volume_map.get(volume_id)
         volumes_k8s.append({'name': volume_info['name'], 'mount_path': path})

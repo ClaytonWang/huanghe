@@ -21,6 +21,8 @@ from basic.middleware.exception import pg_db_exception_handler
 from ormar.exceptions import AsyncOrmException
 from utils.auth import verify_token
 from notebook.api import router_notebook
+from source.api import router_source
+from image.api import router_image
 from models import startup_event, shutdown_event
 
 
@@ -55,6 +57,8 @@ def status():
 
 # 路由配置
 app.include_router(router_notebook, prefix='/notebooks', tags=['Notebook'])
+app.include_router(router_source, prefix='/source', tags=['Source'])
+app.include_router(router_image, prefix='/image', tags=['Image'])
 
 
 if __name__ == '__main__':
