@@ -18,22 +18,37 @@ from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 from utils.user_request import get_current_user_aio
 from utils.k8s_request import list_notebook_k8s
 from models.notebook import Notebook, Status
+from utils.k8s_request import list_notebook_k8s, NoteBookListReq
+from models.initdb import startup_event
 
-
-def job_func(job_id, token):
+async def job_func(job_id):
+    await startup_event()
     print(f"job {job_id} run in {datetime.now()}")
-    # todo 这里写刷新逻辑
-    payloads = {}
-    # 查询列表
-    notebook_list = await list_notebook_k8s(token, payloads)
-
-    stop_stat = await Status.objects.get(name='stop')
-    stop_query = await Notebook.objects.filter(status=stop_stat).all()
-    # todo 更新状态
-
-    start_stat = await Status.objects.get(name='start')
-    start_query = await Notebook.objects.filter(status=start_stat).all()
-    # todo 更新状态
+    notebooks = list_notebook_k8s(NoteBookListReq())
+    notebook_dic = {}
+    for notebook in notebooks:
+        name = notebook['name']
+        namespace = notebook['namespace']
+        status = notebook['status']
+        url = notebook['url']
+        notebook_dic[f'{name}-{namespace}'] = {"status": status, 'url': url}
+    print(notebook_dic)
+    status_dic = {}
+    status_objs = await Status.objects.all()
+    for status in status_objs:
+        status_dic[status.name] = status.id
+    db_notebooks = await Notebook.objects.select_related(['status']).filter(k8s_info__isnull=False).exclude(Notebook.status.name.startswith('stop')).all()
+    bulk_update = False
+    for nb in db_notebooks:
+        name = nb.k8s_info.get('name')
+        namespace = nb.k8s_info.get('namespace')
+        obj = notebook_dic[f'{name}-{namespace}']
+        if name and namespace and obj:
+            bulk_update = True
+            nb.url = obj['url']
+            Notebook.compare_status_and_update(nb, obj['status'], status_dic)
+    if bulk_update:
+        await Notebook.objects.bulk_update(db_notebooks)
 
 
 def job_listener(event):

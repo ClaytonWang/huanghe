@@ -6,11 +6,16 @@
     >Time   : 2022/12/14 18:58
 """
 
+from __future__ import annotations
 import ormar
 from basic.common.base_model import DateModel
 from models import DB, META
 
-
+NOTEBOOK_STATUS_RUNNING = "RUNNING"
+NOTEBOOK_STATUS_PENDING = "PENDING"
+NOTEBOOK_STATUS_ERROR = "ERROR"
+NOTEBOOK_STATUS_WAITING = "WAITING"
+NOTEBOOK_STATUS_ON = "ON"
 class Status(ormar.Model):
     class Meta(ormar.ModelMeta):
         tablename: str = "bam_status"
@@ -80,3 +85,14 @@ class Notebook(DateModel):
 
     # def __repr__(self):
     #     return f'{self.name}_{self.value}'
+
+    @classmethod
+    def compare_status_and_update(cls, nb: Notebook, status: str, status_dic):
+        if status == NOTEBOOK_STATUS_ON:
+            nb.status = status_dic['running']
+        elif status == NOTEBOOK_STATUS_ERROR:
+            nb.status = status_dic['error']
+        elif status == NOTEBOOK_STATUS_PENDING:
+            nb.status = status_dic["pending"]
+        elif status == NOTEBOOK_STATUS_RUNNING:
+            nb.status = status_dic['start']
