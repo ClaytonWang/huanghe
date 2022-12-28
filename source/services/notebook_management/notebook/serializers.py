@@ -62,6 +62,7 @@ class NotebookList(BaseModel):
     creator: Optional[UserStr]
     project: Optional[ProjectStr]
     image: ImageItem
+    url: Optional[str]
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
 
@@ -92,6 +93,7 @@ class NotebookDetail(BaseModel):
     project_id: int
     image_id: int
     hooks: List[StorageItem]
+    url: Optional[str]
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
 

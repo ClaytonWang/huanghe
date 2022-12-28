@@ -9,7 +9,7 @@
 import aiohttp
 import json
 
-from typing import List, Dict
+from typing import List, Dict, Set
 from config import USER_SERVICE_PATH
 from collections import defaultdict
 from pydantic import BaseModel, Field
@@ -25,7 +25,7 @@ class UserInfo(BaseModel):
     username: str = Field(..., alias='user_name')
     en_name: str = Field(..., )
     role: RoleInfo
-    project_ids: Dict
+    project_ids: Set
 
     class Config:
         orm_mode = True
@@ -92,7 +92,7 @@ async def get_current_user_aio(token):
             # return text
             user_dict = text['result']
             projects = user_dict.pop('projects')
-            user_dict['project_ids'] = {x["id"]: x["en_name"] for x in projects}
+            user_dict['project_ids'] = {x["id"] for x in projects}
             userinfo = UserInfo.parse_obj(user_dict)
             return userinfo
 
@@ -112,7 +112,7 @@ async def get_user_list(token, page_no=1):
             user_data = text['result']['data']
             for user in user_data:
                 projects = user.pop('projects')
-                user['project_ids'] = {x["id"]: x["en_name"] for x in projects}
+                user['project_ids'] = {x["id"] for x in projects}
                 res.append(UserInfo.parse_obj(user))
             # print(text)
     return [x.get_dict() for x in res]
@@ -146,6 +146,14 @@ async def get_project(token, proj_id):
         async with session.get(url, headers=headers) as response:
             print("status:{}".format(response.status))
             text = await response.json()
-            print(text)
-            return text['result']
+            # print(text)
+            return text['status'], text['result']
 
+
+async def project_check(request, project_id):
+    if request.user.role.name != 'admin' and project_id not in request.user.project_ids:
+        return False, '不是用户所属项目'
+    stat, proj = await get_project(request.headers.get('authorization'), project_id)
+    if stat != 200:
+        return False, '项目不存在'
+    return True, proj['en_name']
