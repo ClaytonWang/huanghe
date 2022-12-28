@@ -11,11 +11,13 @@ import Bam from '@/pages/bam';
 import Settings from '@/pages/settings';
 import Storages from '@/pages/storages';
 import Notebooks from '@/pages/notebooks';
+import Overview from '@/pages/overview';
 import './index.less';
 
 const Pages = () => (
   <Routes>
     <Route path="/*" element={<ProtectedLayout />}>
+      <Route path="overview/*" element={<Overview />} />
       <Route path="bam/*" element={<Bam />} />
       <Route path="settings/*" element={<Settings />} />
       <Route path="storages/*" element={<Storages />} />
