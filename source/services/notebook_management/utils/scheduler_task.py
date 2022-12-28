@@ -21,10 +21,11 @@ from models.notebook import Notebook, Status
 from utils.k8s_request import list_notebook_k8s, NoteBookListReq
 from models.initdb import startup_event
 
+
 async def job_func(job_id):
     await startup_event()
     print(f"job {job_id} run in {datetime.now()}")
-    notebooks = list_notebook_k8s(NoteBookListReq())
+    notebooks = await list_notebook_k8s(NoteBookListReq())
     notebook_dic = {}
     for notebook in notebooks:
         name = notebook['name']
