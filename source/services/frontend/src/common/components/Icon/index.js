@@ -18,8 +18,10 @@ import SuccessSvg from '@/common/images/success.svg';
 import LoadingSvg from '@/common/images/loading.svg';
 import ErrorFillSvg from '@/common/images/error-fill.svg';
 import StoppedSvg from '@/common/images/stopped.svg';
+import OverviewSvg from '@/common/images/Overview.svg';
 
 const Icons = {
+  overview: OverviewSvg,
   bam: BAMSvg,
   settings: SettingsSvg,
   storages: StorageSvg,

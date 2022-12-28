@@ -33,7 +33,7 @@ const ProtectedLayout = () => {
         if (item.children) {
           item.children = getMenuItems(item.children);
         }
-        if (permissions.indexOf(item.key) > -1) {
+        if (!item.permission || permissions.indexOf(item.permission) > -1) {
           const path = item.key.split('.').join('/');
           item.label = <Link to={path}>{item.label}</Link>;
           if (item.icon) {

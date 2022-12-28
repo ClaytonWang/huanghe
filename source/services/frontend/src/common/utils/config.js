@@ -56,6 +56,7 @@ module.exports = {
     sourceList: 'get|/source',
   },
   breadcrumbConfig: {
+    '/overview/list': '总览',
     '/bam/projects': '项目管理',
     '/bam/users': '用户管理',
     '/settings/users': '用户列表',
@@ -70,17 +71,31 @@ module.exports = {
   },
   menuItemsConfig: [
     {
+      key: 'overview',
+      label: '总览',
+      icon: 'overview',
+      children: [
+        {
+          key: 'overview.list',
+          label: '总览',
+        },
+      ],
+    },
+    {
       key: 'bam',
       label: '后台管理',
       icon: 'bam',
+      permission: 'bam',
       children: [
         {
           key: 'bam.projects',
           label: '项目管理',
+          permission: 'bam.projects',
         },
         {
           key: 'bam.users',
           label: '用户管理',
+          permission: 'bam.users',
         },
       ],
     },
@@ -88,10 +103,12 @@ module.exports = {
       key: 'settings',
       label: '设置',
       icon: 'settings',
+      permission: 'settings',
       children: [
         {
           key: 'settings.users',
           label: '用户权限',
+          permission: 'settings.users',
         },
       ],
     },
@@ -99,10 +116,12 @@ module.exports = {
       key: 'notebooks',
       label: 'Notebook',
       icon: 'notebooks',
+      permission: 'notebooks',
       children: [
         {
           key: 'notebooks.list',
           label: 'Notebook管理',
+          permission: 'notebooks.list',
         },
       ],
     },
@@ -110,10 +129,12 @@ module.exports = {
       key: 'storages',
       label: '存储',
       icon: 'storages',
+      permission: 'storages',
       children: [
         {
           key: 'storages.list',
           label: '存储管理',
+          permission: 'storages.list',
         },
       ],
     },
