@@ -69,9 +69,8 @@ async def update_volume(request: Request,
         project: ProjectGetter = get_project(request.headers.get('authorization'), ver.project.id)
         size = ver.config.size if ver.config.size and ver.config.size > v.size else v.size
         # create new project pvc
-        create_pvc(PVCCreateReq(name=f"{v.create_en_by}-{v.name}", namespace=project.en_name, size=size))
-        # delete already project pvc
-        delete_pvc(PVCDeleteReq(name=f"{v.create_en_by}-{v.name}", namespace=project.en_name))
+        create_pvc(PVCCreateReq(name=f"{v.create_en_by}-{v.name}", namespace=project.en_name, size=size),
+                   ignore_exist=True)
         d.update({"project_by_id": project.id,
                   "project_by": project.name,
                   "project_en_by": project.en_name,})
