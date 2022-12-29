@@ -21,4 +21,4 @@ class SourceItem(BaseModel):
 
 class SourceList(BaseModel):
     id: str
-    source: str
+    name: str

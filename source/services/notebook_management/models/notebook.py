@@ -58,7 +58,7 @@ class Source(DateModel):
     def get_info(self):
         return {
             "id": self.id,
-            "source": self.get_str(),
+            "name": self.get_str(),
         }
 
 

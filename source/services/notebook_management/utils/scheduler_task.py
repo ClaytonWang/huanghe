@@ -6,7 +6,7 @@
     >Time   : 2022/12/22 18:55
 """
 
-
+import asyncio
 import logging
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -38,7 +38,8 @@ async def job_func(job_id):
     status_objs = await Status.objects.all()
     for status in status_objs:
         status_dic[status.name] = status.id
-    db_notebooks = await Notebook.objects.select_related(['status']).filter(k8s_info__isnull=False).exclude(Notebook.status.name.startswith('stop')).all()
+    db_notebooks = await Notebook.objects.select_related(['status']).filter(k8s_info__isnull=False).exclude(
+        Notebook.status.name.startswith('stop')).all()
     bulk_update = False
     for nb in db_notebooks:
         name = nb.k8s_info.get('name')
@@ -69,8 +70,6 @@ if __name__ == '__main__':
     # scheduler = BlockingScheduler()
 
     scheduler = AsyncIOScheduler()
-    # todo 怎么从user的auth导入token
-    # todo 考虑一直用一个管理员账号去login获取token?
 
     scheduler.add_job(job_func, trigger='interval', args=[1], id='1', name='a test job', max_instances=10,
                       jobstore='default', executor='default', seconds=10)
@@ -78,3 +77,8 @@ if __name__ == '__main__':
 
     print("sch start")
     scheduler.start()
+
+    try:
+        asyncio.get_event_loop().run_forever()
+    except (KeyboardInterrupt, SystemExit):
+        pass
