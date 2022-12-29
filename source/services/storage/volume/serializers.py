@@ -11,6 +11,10 @@ class Owner(BaseModel):
     id: int
     username: str
 
+class Creator(BaseModel):
+    id: int
+    username: str
+    en_name: str
 
 class Config(BaseModel):
     value: Optional[int] = 0
@@ -50,5 +54,6 @@ class VolumeDetailRes(BaseModel):
     config: Config
     project: Project
     owner: Owner
+    creator: Creator
     created_at: datetime.datetime
     deleted_at: Optional[datetime.datetime] = None
