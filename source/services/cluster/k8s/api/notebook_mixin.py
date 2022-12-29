@@ -36,7 +36,11 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                                                                       )
 
     def delete_notebook(self, nbdr: NoteBookDeleteReq) -> V1Status:
-        return self.custom_object_api.delete_namespaced_custom_object(name=nbdr.name, namespace=nbdr.namespace)
+        return self.custom_object_api.delete_namespaced_custom_object(group=KUBEFLOW_NOTEBOOK_GROUP,
+                                                                      version=KUBEFLOW_V1_VERSION,
+                                                                      namespace=nbdr.namespace,
+                                                                      plural=KUBEFLOW_NOTEBOOK_PLURAL,
+                                                                      name=nbdr.name,)
 
     def list_notebook(self, nblr: NoteBookListReq):
         notebooks = []
