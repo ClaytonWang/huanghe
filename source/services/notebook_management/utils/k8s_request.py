@@ -24,7 +24,8 @@ async def create_notebook_k8s(token, payloads):
         async with session.post(url, headers=headers, data=payloads) as response:
             print("status:{}".format(response.status))
             response = await response.json()
-            return response.status
+            # print(response)
+            return response['status']
 
 
 async def delete_notebook_k8s(token, payloads):
@@ -37,7 +38,8 @@ async def delete_notebook_k8s(token, payloads):
         async with session.delete(url, headers=headers, data=payloads) as response:
             print("status:{}".format(response.status))
             response = await response.json()
-            return response.status
+            # print(response)
+            return response['status']
 
 
 class NoteBookListReq(BaseModel):

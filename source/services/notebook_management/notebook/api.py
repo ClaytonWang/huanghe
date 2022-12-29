@@ -32,7 +32,7 @@ router_notebook = APIRouter()
 async def get_notebook(notebook_id: int = Path(..., ge=1, description='需要查询的notebook ID')):
     _notebook = await Notebook.objects.select_related(['status', 'source']).get(pk=notebook_id)
     result = _notebook.dict()
-    result['source'] = _notebook.source.get_info()
+    result['source'] = _notebook.source.id
     result['hooks'] = result.pop('storage')
     return result
 
@@ -186,7 +186,7 @@ async def create_notebook(request: Request,
 
     _notebook = await Notebook.objects.create(**init_data)
     result = _notebook.dict()
-    result['source'] = _source.get_info()
+    result['source'] = _source.id
     result['hooks'] = result.pop('storage')
     return result
 
@@ -263,29 +263,36 @@ async def update_notebook(request: Request,
 async def operate_notebook(request: Request,
                            data: NotebookOp,
                            notebook_id: int = Path(..., ge=1, description="NotebookID")):
+    authorization: str = request.headers.get('authorization')
     action = int(data.dict()['action'])
-    update_data = {}
     _notebook, reason = await operate_auth(request, notebook_id)
     if not _notebook:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
     if action not in [0, 1]:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
-    # todo 同notebook集群发送
-    payloads = _notebook.k8s_info
-    # print("cluster payloads")
-    # print(payloads)
+    payloads = json.dumps(_notebook.k8s_info)
 
-    if _notebook.status.name in ['start', 'running', 'pending'] and int(action) == 0:
+    # 数字，0（停止）｜1（启动）
+    # todo 状态还需要调整
+    update_data = {}
+    if action == 0:
+        if _notebook.status.name not in ['start', 'running', 'pending']:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
         stat = await Status.objects.get(name='stop')
         update_data['status'] = stat.id
-    elif _notebook.status.name == 'stopped' and int(action) == 1:
-        # TODO 做一大堆启动操作，包含volume启动与状态轮训
+        response = await delete_notebook_k8s(authorization, payloads)
+        # if response.status != 200:
+        #     _notebook.status = None
+    else:
+        if _notebook.status.name != 'stopped':
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
         stat = await Status.objects.get(name='start')
         update_data['status'] = stat.id
         # todo response返回不为200时更新notebook状态到异常
-        # response = await create_notebook_k8s(authorization, payloads)
+        response = await create_notebook_k8s(authorization, payloads)
         # if response.status != 200:
         #     _notebook.status = None
+    # print(response)
 
     if not update_data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
@@ -306,9 +313,13 @@ async def delete_notebook(request: Request,
     check, extra_info = await project_check(request, _notebook.project_id)
     if not check:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
+    if _notebook.status.name not in ['stopped', 'error']:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook未停止')
     payloads = _notebook.k8s_info
-    # print(payloads)
-    # response = await delete_notebook_k8s(authorization, payloads)
-    # if response.status != 200:
-    #     _notebook.status = None
+    # error状态调用删除需要释放资源
+    if _notebook.status.name == 'error':
+        authorization: str = request.headers.get('authorization')
+        response = await delete_notebook_k8s(authorization, payloads)
+        # if response.status != 200:
+        #     _notebook.status = None
     await _notebook.delete()

@@ -29,6 +29,7 @@ class VolumeConfigInfo(BaseModel):
 class VolumeInfo(BaseModel):
     id: int = Field(..., alias='volume_id')
     name: str = Field(..., alias='volume_name')
+    creator_en_name: str = Field(..., alias='creator_en_name')
     config: VolumeConfigInfo
 
     class Config:
@@ -37,9 +38,10 @@ class VolumeInfo(BaseModel):
 
     def get_dict(self):
         return {
-            "id": self.id,
-            "name": self.name,
-            "config": self.config.vol_config(),
+            'id': self.id,
+            'name': self.name,
+            'creator_en_name': self.creator_en_name,
+            'config': self.config.vol_config(),
         }
 
 
@@ -57,6 +59,7 @@ async def get_volume_list(token, page_no=1):
             # print(text)
             volume_data = text['result']['data']
             for vol in volume_data:
+                vol['creator_en_name'] = vol['creator']['en_name']
                 res.append(VolumeInfo.parse_obj(vol))
     return [x.get_dict() for x in res]
 
@@ -71,6 +74,6 @@ async def volume_check(authorization: str, hooks: List[Dict]):
         volume_id = hook['storage']
         path = hook['path']
         volume_info = volume_map.get(volume_id)
-        volumes_k8s.append({'name': volume_info['name'], 'mount_path': path})
+        volumes_k8s.append({'name': f"{volume_info['creator_en_name']}-{volume_info['name']}", 'mount_path': path})
         storages.append({'storage': volume_info, 'path': path})
     return storages, volumes_k8s

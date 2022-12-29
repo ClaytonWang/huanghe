@@ -88,7 +88,7 @@ class NotebookDetail(BaseModel):
     id: int
     status: StatusItem
     name: str
-    source: SourceList
+    source: int
     creator_id: int
     project_id: int
     image_id: int

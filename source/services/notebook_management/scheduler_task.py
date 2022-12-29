@@ -8,6 +8,7 @@
 
 import asyncio
 import logging
+import ormar
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -44,13 +45,28 @@ async def job_func(job_id):
     for nb in db_notebooks:
         name = nb.k8s_info.get('name')
         namespace = nb.k8s_info.get('namespace')
-        obj = notebook_dic.get(f'{name}-{namespace}')
+        obj = notebook_dic.get(f'{name}-{namespace}') if name and namespace else None
         if name and namespace and obj:
             bulk_update = True
             nb.url = obj['url']
             Notebook.compare_status_and_update(nb, obj['status'], status_dic)
     if bulk_update:
         await Notebook.objects.bulk_update(db_notebooks)
+    # 更新停止任务
+    stop_notebooks = await Notebook.objects.select_related('status').filter(
+        ormar.and_(k8s_info__isnull=False, status__name='stop')).all()
+    stopped_status = await Status.objects.get(name='stopped')
+    bulk_update = False
+    for nb in stop_notebooks:
+        name = nb.k8s_info.get('name')
+        namespace = nb.k8s_info.get('namespace')
+        obj = notebook_dic.get(f'{name}-{namespace}') if name and namespace else None
+        if name and namespace and not obj:
+            bulk_update = True
+            nb.url = None
+            nb.status = stopped_status
+    if bulk_update:
+        await Notebook.objects.bulk_update(stop_notebooks)
 
 
 def job_listener(event):
