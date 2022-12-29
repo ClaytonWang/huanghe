@@ -44,7 +44,7 @@ async def job_func(job_id):
     for nb in db_notebooks:
         name = nb.k8s_info.get('name')
         namespace = nb.k8s_info.get('namespace')
-        obj = notebook_dic[f'{name}-{namespace}']
+        obj = notebook_dic.get(f'{name}-{namespace}')
         if name and namespace and obj:
             bulk_update = True
             nb.url = obj['url']
@@ -75,7 +75,7 @@ if __name__ == '__main__':
                       jobstore='default', executor='default', seconds=10)
     scheduler.add_listener(job_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
 
-    print("sch start")
+    print("apscheduler start")
     scheduler.start()
 
     try:
