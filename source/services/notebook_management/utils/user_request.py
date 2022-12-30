@@ -9,7 +9,7 @@
 import aiohttp
 import json
 
-from typing import List, Dict, Set
+from typing import Optional, List, Dict, Set
 from config import USER_SERVICE_PATH
 from collections import defaultdict
 from pydantic import BaseModel, Field
@@ -25,7 +25,7 @@ class UserInfo(BaseModel):
     username: str = Field(..., alias='user_name')
     en_name: str = Field(..., )
     role: RoleInfo
-    permissions: List[str]
+    permissions: Optional[List[str]]
     project_ids: Set
 
     class Config:
@@ -61,24 +61,6 @@ class ProjectInfo(BaseModel):
             "en_name": self.en_name,
         }
 
-# def get_auth_token():
-#     url = f"{USER_SERVICE_PATH}/auth/login"
-#     payload = json.dumps({
-#         "username": "admin",
-#         "password": "admin123",
-#         "email": "admin@admin.com"
-#     })
-#     headers = {
-#         'Content-Type': 'application/json'
-#     }
-#     response = requests.request("POST", url, headers=headers, data=payload)
-#     if response.status_code != 200:
-#         print('报错')
-#         return
-#
-#     res_json = response.json()['result']
-#     return f"{res_json['token_type']} {res_json['token']}"
-
 
 async def get_current_user_aio(token):
     async with aiohttp.ClientSession() as session:
@@ -89,6 +71,9 @@ async def get_current_user_aio(token):
         }
         async with session.get(url, headers=headers) as response:
             print("status:{}".format(response.status))
+            # 把401传递出去
+            if response.status != 200:
+                return None
             text = await response.json()
             # print(text)
             # return text
