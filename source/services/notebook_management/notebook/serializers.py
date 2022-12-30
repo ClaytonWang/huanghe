@@ -30,23 +30,8 @@ class ProjectStr(BaseModel):
     name: Optional[str] = None
 
 
-class VolumeConfig(BaseModel):
-    value: int
-    size: int
-
-
-class VolumeItem(BaseModel):
-    name: str
-    config: VolumeConfig
-
-
 class HookItem(BaseModel):
     storage: int
-    path: str
-
-
-class StorageItem(BaseModel):
-    storage: VolumeItem
     path: str
 
 
@@ -92,7 +77,7 @@ class NotebookDetail(BaseModel):
     creator: int
     project: int
     image: int
-    hooks: List[StorageItem]
+    hooks: List[HookItem]
     url: Optional[str]
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
