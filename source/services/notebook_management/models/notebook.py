@@ -70,7 +70,7 @@ class Notebook(DateModel):
         orders_by = ['-id']
 
     id: int = ormar.Integer(primary_key=True)
-    name: str = ormar.String(max_length=20, comnet='名称', unique=True)  # todo 只能显示英文名字，加校验
+    name: str = ormar.String(max_length=20, comnet='名称')  # todo 只能显示英文名字，加校验
     url: str = ormar.String(max_length=80, comnet='url地址', nullable=True)
     status: Status = ormar.ForeignKey(Status, related_name='notebook_status')
     source: Source = ormar.ForeignKey(Source, related_name='notebook_source')

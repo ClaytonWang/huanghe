@@ -21,12 +21,12 @@ class StatusItem(BaseModel):
 
 
 class UserStr(BaseModel):
-    id: str
+    id: int
     username: str = None
 
 
 class ProjectStr(BaseModel):
-    id: str
+    id: int
     name: Optional[str] = None
 
 
@@ -40,7 +40,7 @@ class NotebookOp(BaseModel):
 
 
 class NotebookList(BaseModel):
-    id: str
+    id: int
     status: StatusItem
     name: str
     source: Optional[SourceList]

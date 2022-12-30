@@ -155,15 +155,15 @@ async def create_notebook(request: Request,
     stat = await Status.objects.get(name='stopped')
     init_data['status'] = stat.id
 
-    duplicate_name = await Notebook.objects.filter(name=init_data['name']).count()
-    if duplicate_name:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不能重名')
-
     project_id = int(init_data.pop('project'))
     check, extra_info = await project_check(request, project_id)
     if not check:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
     init_data['project_id'] = project_id
+
+    duplicate_name = await Notebook.objects.filter(name=init_data['name'], project_id=project_id).count()
+    if duplicate_name:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不能重名')
 
     source_id = int(init_data.pop('source'))
     _source = await Source.objects.get_or_none(pk=source_id)
@@ -220,41 +220,37 @@ async def update_notebook(request: Request,
     if _notebook.status.name != 'stopped':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook未停止')
 
-    if 'name' in update_data:
-        duplicate_name = await Notebook.objects.filter(name=update_data['name']).exclude(id=_notebook.id).count()
-        if duplicate_name:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不能重名')
-        k8s_info['name'] = f"{request.user.en_name}-{update_data['name']}"
+    project_id = int(update_data.pop('project'))
+    check, extra_info = await project_check(request, project_id)
+    if not check:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
+    update_data['project_id'] = project_id
+    k8s_info['namespace'] = extra_info
 
-    if 'project' in update_data:
-        project_id = int(update_data.pop('project'))
-        check, extra_info = await project_check(request, project_id)
-        if not check:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
-        update_data['project_id'] = project_id
-        k8s_info['namespace'] = extra_info
+    duplicate_name = await Notebook.objects.filter(
+        name=update_data['name'], project_id=project_id).exclude(id=_notebook.id).count()
+    if duplicate_name:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不能重名')
+    k8s_info['name'] = f"{request.user.en_name}-{update_data['name']}"
 
-    if 'source' in update_data:
-        source_id = int(update_data.pop('source'))
-        _source = await Source.objects.get_or_none(pk=source_id)
-        if not _source:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='资源配置不存在')
-        update_data['source'] = _source
-        k8s_info.update({'cpu': _source.cpu, 'memory': _source.memory, 'gpu': _source.gpu,})
+    source_id = int(update_data.pop('source'))
+    _source = await Source.objects.get_or_none(pk=source_id)
+    if not _source:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='资源配置不存在')
+    update_data['source'] = _source
+    k8s_info.update({'cpu': _source.cpu, 'memory': _source.memory, 'gpu': _source.gpu})
 
-    if 'image' in update_data:
-        image_id = int(update_data.pop('image'))
-        _image = await Image.objects.get_or_none(pk=image_id)
-        if not _image:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='镜像不存在')
-        update_data['image_id'] = image_id
-        k8s_info['image'] = _image.name
+    image_id = int(update_data.pop('image'))
+    _image = await Image.objects.get_or_none(pk=image_id)
+    if not _image:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='镜像不存在')
+    update_data['image_id'] = image_id
+    k8s_info['image'] = _image.name
 
-    if 'hooks' in update_data:
-        hooks = update_data.pop('hooks')
-        storages, volumes_k8s = await volume_check(authorization, hooks)
-        update_data['storage'] = json.dumps(storages)
-        k8s_info['volumes'] = volumes_k8s
+    hooks = update_data.pop('hooks')
+    storages, volumes_k8s = await volume_check(authorization, hooks)
+    update_data['storage'] = json.dumps(storages)
+    k8s_info['volumes'] = volumes_k8s
 
     update_data['k8s_info'] = json.dumps(k8s_info)
 

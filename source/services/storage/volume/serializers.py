@@ -45,7 +45,7 @@ class VolumeEditReq(BaseModel):
 
 
 class VolumeDetailRes(BaseModel):
-    id: str
+    id: int
     name: str
     config: Config
     project: Project
