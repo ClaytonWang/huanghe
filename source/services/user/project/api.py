@@ -12,7 +12,7 @@ from project.serializers import ProjectCreate, ProjectList, ProjectEdit
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from pypinyin import lazy_pinyin, Style
-from basic.middleware.account_getter import create_ns, delete_ns, Namespace
+from basic.middleware.account_getter import create_ns, Namespace, create_secret, SecretNamespace
 
 router_project = APIRouter()
 
@@ -37,6 +37,7 @@ async def create_project(project: ProjectCreate):
     en_name = ''.join(lazy_pinyin(init_data['name'], style=Style.FIRST_LETTER)).lower()
     init_data['en_name'] = 'u' + en_name if en_name[0].isdigit() else en_name
     create_ns(Namespace(name=init_data['en_name']))
+    create_secret(SecretNamespace(namespace=init_data['en_name']), ignore_exist=True)
     return await Project.objects.create(**init_data)
 
 
@@ -99,6 +100,5 @@ async def delete_project(
     project = await Project.objects.get(id=project_id)
     if await project.member.count():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联用户，不能删除')
-    delete_ns(Namespace(name=project.en_name))
 
     await project.delete()
