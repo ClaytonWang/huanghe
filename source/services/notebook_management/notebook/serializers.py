@@ -89,9 +89,9 @@ class NotebookDetail(BaseModel):
     status: StatusItem
     name: str
     source: int
-    creator_id: int
-    project_id: int
-    image_id: int
+    creator: int
+    project: int
+    image: int
     hooks: List[StorageItem]
     url: Optional[str]
     created_at: Optional[datetime]

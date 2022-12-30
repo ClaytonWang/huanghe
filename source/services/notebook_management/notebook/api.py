@@ -33,6 +33,9 @@ async def get_notebook(notebook_id: int = Path(..., ge=1, description='需要查
     _notebook = await Notebook.objects.select_related(['status', 'source']).get(pk=notebook_id)
     result = _notebook.dict()
     result['source'] = _notebook.source.id
+    result['creator'] = result.pop('creator_id')
+    result['project'] = result.pop('project_id')
+    result['image'] = result.pop('image_id')
     result['hooks'] = result.pop('storage')
     return result
 
@@ -90,8 +93,8 @@ async def list_notebook(request: Request,
 
     if params_filter:
         name_filter, role_filter = None, None
-        if 'name' in params_filter:
-            name = params_filter.pop('name')
+        if 'username' in params_filter:
+            name = params_filter.pop('username')
             name_filter = set(name_userid_map.get(name, []))
         if 'project__code' in params_filter:
             project_code = params_filter.pop('project__code')
@@ -104,8 +107,8 @@ async def list_notebook(request: Request,
                     name_filter is None or role_filter is None) else list(name_filter or role_filter)
             params_filter['creator_id__in'] = creator_ids
     # todo 要修改合理的params_filter，不然会报错
-    # print("show filter")
-    # print(params_filter)
+    print("show filter")
+    print(params_filter)
 
     result = await paginate(Notebook.objects.select_related(
         'status'
@@ -187,6 +190,9 @@ async def create_notebook(request: Request,
     _notebook = await Notebook.objects.create(**init_data)
     result = _notebook.dict()
     result['source'] = _source.id
+    result['creator'] = result.pop('creator_id')
+    result['project'] = result.pop('project_id')
+    result['image'] = result.pop('image_id')
     result['hooks'] = result.pop('storage')
     return result
 
