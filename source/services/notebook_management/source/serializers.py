@@ -20,5 +20,5 @@ class SourceItem(BaseModel):
 
 
 class SourceList(BaseModel):
-    id: str
+    id: int
     name: str
