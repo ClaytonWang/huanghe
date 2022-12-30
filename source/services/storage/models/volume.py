@@ -51,6 +51,11 @@ class Volume(GenericDateModel):
                 "id": self.owner_by_id,
                 "username": self.owner_by,
             },
+            "creator": {
+                "id": self.created_by_id,
+                "username": self.created_by,
+                "en_name": self.create_en_by,
+            },
             "created_at": self.created_at,
             "deleted_at": self.deleted_at,
         }

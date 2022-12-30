@@ -22,6 +22,7 @@ ACCOUNT_PREFIX_URL = "/user/user/account"
 PROJECT_PREFIX_URL = "/user/project"
 CLUSTER_PVC_PREFIX_URL = "/cluster/pvc"
 CLUSTER_NAMESPACE_PREFIX_URL = "/cluster/namespace"
+CLUSTER_SECRET_PREFIX_URL = "/cluster/secret"
 MOCK = os.getenv("MOCK_ACCOUNT_GETTER", False)
 MOCK_USER_JSON = {"id": 60, 'username': "shouchen"}
 MOCK_PROJECT_JSON = {"id": 1, "name": "决策平台"}
@@ -29,6 +30,8 @@ USER = "user"
 ADMIN = "admin"
 OWNER = "owner"
 
+class SecretNamespace(BaseModel):
+    namespace: str
 
 class PVCCreateReq(BaseModel):
     name: str
@@ -117,9 +120,21 @@ def get_project(token: str, project_id) -> ProjectGetter:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='获取项目失败')
     return pg
 
-def create_pvc(pvc: PVCCreateReq):
+def create_secret(sn: SecretNamespace, ignore_exist=False):
+    try:
+        response = requests.post(f"{ENV_COMMON_URL}{CLUSTER_SECRET_PREFIX_URL}", json=sn.dict()).json()
+        if ignore_exist and response["success"] is not True and response["message"] == "AlreadyExists":
+            return True
+        assert response['success'] is True
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='创建secret失败, 请确认是否存在namespace， 或者secret是否已经存在')
+
+    return True
+def create_pvc(pvc: PVCCreateReq, ignore_exist=False):
     try:
         response = requests.post(f"{ENV_COMMON_URL}{CLUSTER_PVC_PREFIX_URL}", json=pvc.dict()).json()
+        if ignore_exist and response["success"] is not True and response["message"] == "AlreadyExists":
+            return True
         assert response['success'] is True
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='创建pvc失败, 请确认是否存在namespace， 或者pvc是否已经存在')

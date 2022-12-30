@@ -8,6 +8,7 @@ from typing import Optional, Dict, List
 class Volume(BaseModel):
     name: str
     mount_path: str
+    mount_propagation: Optional[str] = "HostToContainer"
 
 
 
@@ -41,7 +42,7 @@ class NoteBookDeleteReq(BaseModel):
     namespace: str
 
 class NoteBookListReq(BaseModel):
-    platform: str
+    platform: str = "mvp"
     env: str
 
 class NoteBook(BaseModel):
