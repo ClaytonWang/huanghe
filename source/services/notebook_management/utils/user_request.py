@@ -25,6 +25,7 @@ class UserInfo(BaseModel):
     username: str = Field(..., alias='user_name')
     en_name: str = Field(..., )
     role: RoleInfo
+    permissions: List[str]
     project_ids: Set
 
     class Config:
@@ -38,6 +39,7 @@ class UserInfo(BaseModel):
             "en_name": self.en_name,
             "role_id": self.role.id,
             "role_name": self.role.name,
+            "permissions": self.permissions,
             "project_ids": self.project_ids,
         }
 

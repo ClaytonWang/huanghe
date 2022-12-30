@@ -62,7 +62,11 @@ async def operate_auth(request: Request, notebook_id: int):
         return _notebook, None
     # 普通用户
     if request.user.role.name == 'user':
-        return None, '不能编辑非自己创建的Notebook'
+        permissions = request.user.permissions
+        if ['notebooks.list.create', 'notebooks.list.edit', 'notebooks.list.delete'] in permissions:
+            return None, '不能编辑非自己创建的Notebook'
+        else:
+            return None, '用户没有编辑权限'
     # 项目负责人
     stat, _project = await get_project(request.headers.get('authorization'), _notebook.project_id)
     if stat != 200:

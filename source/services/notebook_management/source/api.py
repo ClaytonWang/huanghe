@@ -13,10 +13,6 @@ from models import Notebook, Status, Image, Source
 from source.serializers import SourceList
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
-from utils.user_request import get_user_list, get_project_list
-from utils.storage_request import volume_check
-from utils.k8s_request import create_notebook_k8s, delete_notebook_k8s
-from utils.auth import operate_auth
 from collections import defaultdict
 
 
