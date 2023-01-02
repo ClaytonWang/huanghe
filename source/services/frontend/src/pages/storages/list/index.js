@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Form, Input, InputNumber, message, Modal, Select } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { find, map } from 'lodash';
 import { useAuth } from '@/common/hooks/useAuth';
 import { ADMIN, CREATE, EDIT, OWNER, USER } from '@/common/constants';
@@ -76,15 +76,13 @@ const StoragesList = () => {
       let data = [];
       if (user.role.name === ADMIN) {
         // admin返回所有项目负责人和普通用户
-        const { result = {} } = await api.userListItems({
-          filter: { role__name: [USER, OWNER] },
-        });
+        const { result = {} } = await api.userListItems();
         data = result || [];
       } else if (user.role.name === OWNER) {
         // 项目负责人，返回所有其项目下普通用户。
         const { result = {} } = await api.userListItems({
           roleName: [USER, OWNER],
-          projectId: map(user.projects, 'id'),
+          project: map(user.projects, 'id'),
         });
         data = result || [];
       } else {
@@ -175,13 +173,11 @@ const StoragesList = () => {
     }
   };
   const handleCreateClicked = () => {
-    const values = { config: { size: 0 } };
     const { id, username } = user;
-    if (user.role.name === USER) {
-      Object.assign(values, {
-        owner: { id, username },
-      });
-    }
+    const values = {
+      config: { size: 1 },
+      owner: { id, username },
+    };
     setInitialFormValues(values);
     setShowCreateModal(true);
   };
@@ -201,7 +197,7 @@ const StoragesList = () => {
   };
   const handleDelete = (record) => {
     Modal.confirm({
-      title: '确定要删除该用户吗？',
+      title: '确定要删除该存储吗？',
       content: (
         <>
           <span>会导致全部数据丢失，是否要删除该存储？</span>
@@ -269,23 +265,27 @@ const StoragesList = () => {
           label="名称"
           name="name"
           rules={[
-            { required: true, message: '请输入用户名' },
+            { required: true, message: '请输入存储名称' },
             {
               pattern: /^[a-zA-Z]\w*/,
               message:
-                '名字需字母开头，由字母、数字、下划线组合，长度不超过20位',
+                '名字需字母开头，由字母、数字、中划线组合，长度不超过20位',
             },
             { max: 20, message: '最长不超过20字符' },
           ]}
+          tooltip={{
+            title: '名字需字母开头，由字母、数字、中划线组合，长度不超过20位',
+            icon: <InfoCircleOutlined />,
+          }}
         >
-          <Input placeholder="请输入用户名" disabled={isNameDisabled()} />
+          <Input placeholder="请输入存储名称" disabled={isNameDisabled()} />
         </Form.Item>
         <Form.Item
-          name={['project', 'id']}
           label="所属项目"
-          rules={[{ required: true, message: '请输入用户名' }]}
+          name={['project', 'id']}
+          rules={[{ required: true, message: '请选择所属项目' }]}
         >
-          <Select placeholder="请选择项目">
+          <Select placeholder="请选择所属项目">
             {projectsDataSource.map(({ id, name }) => (
               <Option key={id} value={id}>
                 {name}
@@ -293,17 +293,22 @@ const StoragesList = () => {
             ))}
           </Select>
         </Form.Item>
-        <Form.Item
-          label="配置"
-          name={['config', 'size']}
-          rules={(role === ADMIN && adminConfigRules) || defaultConfigRules}
-        >
-          <InputNumber
-            placeholder="请输入所需最大容量"
-            formatter={(value) => `${value} GB`}
-            parser={(value) => value && value.replace('GB', '')}
-            style={{ width: '30%' }}
-          />
+        <Form.Item label="存储配置">
+          <Form.Item
+            name={['config', 'size']}
+            rules={(role === ADMIN && adminConfigRules) || defaultConfigRules}
+            tooltip={{
+              title: '可联系超级管理员扩容',
+              icon: <InfoCircleOutlined />,
+            }}
+            noStyle
+          >
+            <InputNumber
+              placeholder="请输入所需最大容量"
+              style={{ width: '40%' }}
+            />
+          </Form.Item>
+          <span style={{ marginLeft: 8 }}>GB</span>
         </Form.Item>
         <Form.Item
           label="所有人"
