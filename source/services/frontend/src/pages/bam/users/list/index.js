@@ -4,7 +4,7 @@
  */
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Input, message, Form, Select, Modal, Tag } from 'antd';
+import { Input, message, Form, Select, Modal } from 'antd';
 import { filter, map } from 'lodash';
 import qs from 'qs';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
@@ -12,7 +12,7 @@ import { parseKVToKeyValue, purifyDeep } from '@/common/utils/helper';
 import { AuthButton, FormModal } from '@/common/components';
 import api from '@/common/api';
 import UsersTable from './UsersTable';
-import { EDIT, EMAIL_REG, USER, USER_ROLE } from '@/common/constants';
+import { EDIT, EMAIL_REG, USER_ROLE } from '@/common/constants';
 import UsersFilter from './UsersFilter';
 import './index.less';
 
@@ -157,79 +157,56 @@ const UsersList = () => {
   const handleEditSubmit = (values) => {
     updateUser(values);
   };
-  const FormChildren = ({ type }) => {
-    const form = Form.useFormInstance();
-    const roleFormItem = Form.useWatch(['role', 'name'], form);
-    return (
-      <>
-        <Form.Item
-          label="姓名"
-          name="username"
-          rules={[{ required: true, message: '请输入用户名' }]}
-        >
-          <Input placeholder="请输入用户名" />
-        </Form.Item>
-        <Form.Item
-          label="邮箱"
-          name="email"
-          rules={[
-            { required: true, message: '请输入邮箱' },
-            { pattern: EMAIL_REG, message: '请输入有效邮箱' },
-          ]}
-        >
-          <Input placeholder="请输入邮箱" disabled={type === 'edit'} />
-        </Form.Item>
-        <Form.Item
-          label={(type === 'edit' && '新密码') || '密码'}
-          name="password"
-          rules={
-            (type === 'edit' && [{ len: 8, message: '请输入8位密码' }]) || [
-              { required: true, message: '请输入密码' },
-              { len: 8, message: '请输入8位密码' },
-            ]
-          }
-        >
-          <Input.Password placeholder="请输入8位密码" />
-        </Form.Item>
-        <Form.Item
-          name={['role', 'name']}
-          label="角色"
-          rules={[{ required: true, message: '请选择用户角色' }]}
-          onMetaChange
-        >
-          <Select placeholder="请选择用户角色" disabled={type === EDIT}>
-            {filter(
-              parseKVToKeyValue(USER_ROLE, 'k', 'v'),
-              ({ k }) => k !== 'admin'
-            ).map(({ k, v }) => (
-              <Option key={k} value={k}>
-                {v}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
-        {roleFormItem === USER && (
-          <Form.Item name="projects" label="所属项目">
-            <Select
-              mode="multiple"
-              placeholder="请选择项目"
-              showArrow
-              filterOption={(inputValue, option) =>
-                option.children.includes(inputValue)
-              }
-              tagRender={({ label }) => <Tag color="purple">{label}</Tag>}
-            >
-              {projectsDataSource.map(({ id, name }) => (
-                <Option key={id} value={id}>
-                  {name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-        )}
-      </>
-    );
-  };
+  const FormChildren = ({ type }) => (
+    <>
+      <Form.Item
+        label="姓名"
+        name="username"
+        rules={[{ required: true, message: '请输入用户名' }]}
+      >
+        <Input placeholder="请输入用户名" />
+      </Form.Item>
+      <Form.Item
+        label="邮箱"
+        name="email"
+        rules={[
+          { required: true, message: '请输入邮箱' },
+          { pattern: EMAIL_REG, message: '请输入有效邮箱' },
+        ]}
+      >
+        <Input placeholder="请输入邮箱" disabled={type === 'edit'} />
+      </Form.Item>
+      <Form.Item
+        label={(type === 'edit' && '新密码') || '密码'}
+        name="password"
+        rules={
+          (type === 'edit' && [{ len: 8, message: '请输入8位密码' }]) || [
+            { required: true, message: '请输入密码' },
+            { len: 8, message: '请输入8位密码' },
+          ]
+        }
+      >
+        <Input.Password placeholder="请输入8位密码" />
+      </Form.Item>
+      <Form.Item
+        name={['role', 'name']}
+        label="角色"
+        rules={[{ required: true, message: '请选择用户角色' }]}
+        onMetaChange
+      >
+        <Select placeholder="请选择用户角色" disabled={type === EDIT}>
+          {filter(
+            parseKVToKeyValue(USER_ROLE, 'k', 'v'),
+            ({ k }) => k !== 'admin'
+          ).map(({ k, v }) => (
+            <Option key={k} value={k}>
+              {v}
+            </Option>
+          ))}
+        </Select>
+      </Form.Item>
+    </>
+  );
   const CreateModal = () => (
     <FormModal
       title="新建用户"

@@ -1,7 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { Table, Button } from 'antd';
 import qs from 'qs';
-import { map } from 'lodash';
 import { transformDate } from '@/common/utils/helper';
 import './index.less';
 
@@ -29,14 +28,6 @@ const UsersTable = ({
       width: 100,
       render(value) {
         return value.value || value;
-      },
-    },
-    {
-      title: '所属项目',
-      dataIndex: 'projects',
-      width: 180,
-      render(value) {
-        return (value.length > 0 && map(value, 'name').join(',')) || value;
       },
     },
     {
