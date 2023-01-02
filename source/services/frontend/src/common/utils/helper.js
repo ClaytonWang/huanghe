@@ -117,8 +117,7 @@ export const transformTime = (value) => {
   if (!value) {
     return '';
   }
-  const time = new Date(value);
-  return moment(time).format('YYYY/MM/DD HH:mm:ss');
+  return moment(value).format('YYYY/MM/DD HH:mm:ss');
 };
 
 /**
@@ -131,8 +130,7 @@ export const transformDate = (value) => {
   if (!value) {
     return '';
   }
-  const time = new Date(value);
-  return moment(time).format('YYYY-MM-DD');
+  return moment(value).format('YYYY-MM-DD');
 };
 /**
  * promise顺序执行task
