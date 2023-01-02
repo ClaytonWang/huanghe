@@ -8,7 +8,7 @@
 import './index.less';
 const OverviewList = () => {
   const grafana = `https://grafana.digitalbrain.cn:32443/d/l_ZkLT5Vz
-  /ji-qun-jian-kong?orgId=1&from=1672197744699&to=1672219344700&theme=light&kiosk`;
+  /ji-qun-jian-kong?orgId=1&from=now-3h&to=now&theme=light&kiosk=tv&refresh=10s `;
 
   return (
     <div className="overview-list">

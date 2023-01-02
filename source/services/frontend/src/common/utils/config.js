@@ -46,14 +46,14 @@ module.exports = {
     storagesListDelete: 'delete|/storages/volume/:id',
     storagesListReset: 'post|/storages/volume/:id/reset',
 
-    notebooksList: 'get|/notebooks',
-    notebooksDetail: 'get|/notebooks/:id',
-    notebooksListCreate: 'post|/notebooks',
-    notebooksListAction: 'post|/notebooks/:id',
-    notebooksListUpdate: 'put|/notebooks/:id',
-    notebooksListDelete: 'delete|/notebooks/:id',
-    imagesList: 'get|/images',
-    sourceList: 'get|/source',
+    notebooksList: 'get|/notebook/notebooks',
+    notebooksDetail: 'get|/notebook/notebooks/:id',
+    notebooksListCreate: 'post|/notebook/notebooks',
+    notebooksListAction: 'post|/notebook/notebooks/:id',
+    notebooksListUpdate: 'put|/notebook/notebooks/:id',
+    notebooksListDelete: 'delete|/notebook/notebooks/:id',
+    imagesList: 'get|/notebook/image',
+    sourceList: 'get|/notebook/source',
   },
   breadcrumbConfig: {
     '/overview/list': '总览',
@@ -65,7 +65,7 @@ module.exports = {
 
     '/storages/list': '存储管理',
 
-    '/notebooks/list': 'Notebook管理',
+    '/notebooks/list': 'Notebook列表',
     '/notebooks/list/update': '编辑Notebook',
     '/notebooks/list/create': '创建Notebook',
   },
@@ -114,13 +114,13 @@ module.exports = {
     },
     {
       key: 'notebooks',
-      label: 'Notebook',
+      label: 'Notebook管理',
       icon: 'notebooks',
       permission: 'notebooks',
       children: [
         {
           key: 'notebooks.list',
-          label: 'Notebook管理',
+          label: 'Notebook列表',
           permission: 'notebooks.list',
         },
       ],

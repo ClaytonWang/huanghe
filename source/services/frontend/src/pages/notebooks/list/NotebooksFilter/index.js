@@ -43,8 +43,8 @@ const NotebooksFilter = ({
       initialValues={initialFormValues}
       onFinish={handleSearch}
     >
-      <Form.Item label="姓名" name="username">
-        <Input placeholder="输入用户姓名..." style={{ width: 250 }} />
+      <Form.Item label="创建人" name="username">
+        <Input placeholder="输入创建人姓名..." style={{ width: 250 }} />
       </Form.Item>
       <Form.Item label="角色" name="role__name">
         <Select style={{ width: 100 }}>
