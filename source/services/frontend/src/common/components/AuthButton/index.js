@@ -6,7 +6,7 @@
  * @Description 受权限控制的Button组件, 根据用户权限控制Button是否可点击
  */
 import { Button } from 'antd';
-import { get } from 'lodash';
+import { get, some } from 'lodash';
 import { useAuth } from '@/common/hooks/useAuth';
 
 const AuthButton = ({ required, children, condition, ...rest }) => {
@@ -16,8 +16,10 @@ const AuthButton = ({ required, children, condition, ...rest }) => {
   if (permissions.indexOf(required) < 0) {
     props = { ...props, disabled: true };
   }
-  if (condition && !condition()) {
-    props = { ...props, disabled: true };
+  if (condition && condition.length > 0) {
+    if (some(condition, (fn) => !fn(user))) {
+      props = { ...props, disabled: true };
+    }
   }
   return <Button {...props}>{children}</Button>;
 };

@@ -16,6 +16,7 @@ import DevelopSvg from '@/common/images/develop.svg';
 import JupyterSvg from '@/common/images/jupyter.svg';
 import SuccessSvg from '@/common/images/success.svg';
 import LoadingSvg from '@/common/images/loading.svg';
+import PendingSvg from '@/common/images/pending.svg';
 import ErrorFillSvg from '@/common/images/error-fill.svg';
 import StoppedSvg from '@/common/images/stopped.svg';
 import OverviewSvg from '@/common/images/Overview.svg';
@@ -30,8 +31,10 @@ const Icons = {
   custom: CustomSvg,
   develop: DevelopSvg,
   notebooks: JupyterSvg,
+  start: LoadingSvg,
+  stop: LoadingSvg,
   running: SuccessSvg,
-  pending: LoadingSvg,
+  pending: PendingSvg,
   error: ErrorFillSvg,
   stopped: StoppedSvg,
 };

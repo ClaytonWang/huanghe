@@ -18,8 +18,10 @@ import {
   START,
   STOP,
   UPDATE,
+  ADMIN,
 } from '@/common/constants';
 import './index.less';
+import { useAuth } from '@/common/hooks/useAuth';
 
 const NotebooksList = () => {
   const defaultFilters = useMemo(
@@ -39,6 +41,7 @@ const NotebooksList = () => {
   const [projectsDatasource, setProjectsDatasource] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const getFilters = useCallback(
@@ -63,8 +66,13 @@ const NotebooksList = () => {
   );
   const requestProjects = async () => {
     try {
-      const { result } = await api.bamProjectsList();
-      setProjectsDatasource(result.data);
+      if (user.role.name === ADMIN) {
+        const { result } = await api.bamProjectsList();
+        setProjectsDatasource(result.data);
+      } else {
+        // 除超级管理员角色，其他项目列表返回自己所属项目
+        setProjectsDatasource(user?.projects ?? []);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -86,7 +94,7 @@ const NotebooksList = () => {
   }, []);
   useEffect(() => {
     const timer = setInterval(() => {
-      requestList();
+      reload();
     }, 3000);
     return () => {
       clearInterval(timer);
@@ -101,7 +109,7 @@ const NotebooksList = () => {
     const { id } = record;
     try {
       await api.notebooksListDelete({ id });
-      message.success('存储Notebook成功！');
+      message.success('删除Notebook成功！');
       reload();
     } catch (error) {
       console.log(error);
@@ -124,6 +132,7 @@ const NotebooksList = () => {
     try {
       const { id } = record;
       await api.notebooksListAction({ id, action: NOTEBOOK_ACTION[START] });
+      message.success('已触发启动！');
     } catch (error) {
       console.log(error);
     }
@@ -132,6 +141,7 @@ const NotebooksList = () => {
     try {
       const { id } = record;
       await api.notebooksListAction({ id, action: NOTEBOOK_ACTION[STOP] });
+      message.success('已触发停止！');
     } catch (error) {
       console.log(error);
     }

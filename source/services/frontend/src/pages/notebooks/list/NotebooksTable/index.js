@@ -6,6 +6,7 @@ import Icon from '@ant-design/icons';
 import { transformDate } from '@/common/utils/helper';
 import { AuthButton, Auth } from '@/common/components';
 import Icons from '@/common/components/Icon';
+import { USER } from '@/common/constants';
 
 const NotebooksTable = ({
   tableData = {},
@@ -40,7 +41,7 @@ const NotebooksTable = ({
       dataIndex: 'project',
       width: 180,
       render(value) {
-        return value.name || value;
+        return get(value, 'name', '-');
       },
     },
     {
@@ -48,19 +49,22 @@ const NotebooksTable = ({
       dataIndex: 'image',
       width: 180,
       render(value) {
-        return value.name || value;
+        return get(value, 'name', '-');
       },
     },
     {
       title: '资源',
       dataIndex: 'source',
       width: 180,
+      render(value) {
+        return get(value, 'name', '-');
+      },
     },
     {
       title: '创建人',
       dataIndex: 'creator',
       render(value) {
-        return value.username || '-';
+        return get(value, 'username', '-');
       },
     },
     {
@@ -83,7 +87,14 @@ const NotebooksTable = ({
                 onClick={() => {
                   handleOpenClicked(record);
                 }}
-                condition={() => ['running'].indexOf(statusName) > -1}
+                condition={[
+                  () => ['running'].indexOf(statusName) > -1,
+                  (user) =>
+                    (user.role.name === USER &&
+                      get(record, 'creator.username') ===
+                        get(user, 'username')) ||
+                    true,
+                ]}
               >
                 打开
               </AuthButton>
@@ -94,6 +105,13 @@ const NotebooksTable = ({
                   onClick={() => {
                     handleStartClicked(record);
                   }}
+                  condition={[
+                    (user) =>
+                      (user.role.name === USER &&
+                        get(record, 'creator.username') ===
+                          get(user, 'username')) ||
+                      true,
+                  ]}
                 >
                   启动
                 </AuthButton>
@@ -105,6 +123,13 @@ const NotebooksTable = ({
                   onClick={() => {
                     handleStopClicked(record);
                   }}
+                  condition={[
+                    (user) =>
+                      (user.role.name === USER &&
+                        get(record, 'creator.username') ===
+                          get(user, 'username')) ||
+                      true,
+                  ]}
                 >
                   停止
                 </AuthButton>
@@ -115,7 +140,14 @@ const NotebooksTable = ({
                 onClick={() => {
                   handleEditClicked(record);
                 }}
-                condition={() => ['stopped'].indexOf(statusName) > -1}
+                condition={[
+                  () => ['stopped'].indexOf(statusName) > -1,
+                  (user) =>
+                    (user.role.name === USER &&
+                      get(record, 'creator.username') ===
+                        get(user, 'username')) ||
+                    true,
+                ]}
               >
                 编辑
               </AuthButton>
@@ -125,7 +157,14 @@ const NotebooksTable = ({
                 onClick={() => {
                   handleDeleteClicked(record);
                 }}
-                condition={() => ['stopped'].indexOf(statusName) > -1}
+                condition={[
+                  () => ['stopped', 'error'].indexOf(statusName) > -1,
+                  (user) =>
+                    (user.role.name === USER &&
+                      get(record, 'creator.username') ===
+                        get(user, 'username')) ||
+                    true,
+                ]}
               >
                 删除
               </AuthButton>

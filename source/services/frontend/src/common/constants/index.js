@@ -40,10 +40,12 @@ export const UPDATE = 'update';
 
 // notebooks
 export const NOTEBOOK_STATUS = {
-  stopped: 0,
-  pending: 1,
-  error: 2,
-  running: 3,
+  starting: '01',
+  stopping: '02',
+  pending: '03',
+  running: '04',
+  stopped: '05',
+  error: '06',
 };
 export const START = 'start';
 export const STOP = 'stop';

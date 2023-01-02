@@ -368,3 +368,32 @@ export const parseKeyToSnake = (obj, [key, value]) => {
  * @return number
  */
 export const relativeDate = (start, end) => moment(start).diff(end, 'days');
+/**
+ * 给定前缀，返回该前缀唯一Id
+ *
+ * @param {String} prefix
+ * @return string
+ */
+const Counter = function () {
+  let counter = 0;
+  this.getCounter = function () {
+    counter = counter + 1;
+    return counter;
+  };
+};
+const ID = function () {
+  let obj = {};
+  this.getValue = function (prefix) {
+    if (!obj[prefix]) {
+      obj[prefix] = new Counter();
+    }
+    return `${prefix}${obj[prefix].getCounter()}`;
+  };
+};
+const id = new ID();
+export const genUniqueIdByPrefix = (prefix) => {
+  if (!prefix) {
+    throw new Error('need a prefix');
+  }
+  return id.getValue(prefix);
+};
