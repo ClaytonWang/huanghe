@@ -43,6 +43,9 @@ async def job_func(job_id):
         Notebook.status.name.startswith('stop')).all()
     bulk_update = False
     for nb in db_notebooks:
+        # 过滤脏数据
+        if not nb.k8s_info:
+            continue
         name = nb.k8s_info.get('name')
         namespace = nb.k8s_info.get('namespace')
         obj = notebook_dic.get(f'{name}-{namespace}') if name and namespace else None
@@ -58,6 +61,9 @@ async def job_func(job_id):
     stopped_status = await Status.objects.get(name='stopped')
     bulk_update = False
     for nb in stop_notebooks:
+        # 过滤脏数据
+        if not nb.k8s_info:
+            continue
         name = nb.k8s_info.get('name')
         namespace = nb.k8s_info.get('namespace')
         obj = notebook_dic.get(f'{name}-{namespace}') if name and namespace else None
