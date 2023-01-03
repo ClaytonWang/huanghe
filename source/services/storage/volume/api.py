@@ -63,7 +63,7 @@ async def create_volume(request: Request,
 async def update_volume(request: Request,
                         ver: VolumeEditReq,
                         volume_id: int = Path(..., ge=1, description="存储ID")):
-    # user: AccountGetter = request.user
+    user: AccountGetter = request.user
     v = await Volume.get_by_id(volume_id)
     d = {}
     if ver.project.id and v.project_by_id != ver.project.id:
@@ -76,6 +76,8 @@ async def update_volume(request: Request,
                   "project_by": project.name,
                   "project_en_by": project.en_name,})
     if ver.config.size and ver.config.size > v.size:
+        if user.role == ADMIN and v.max == 1024:
+            d.update({"max": 9999999})
         d.update({"size": ver.config.size})
     if ver.owner and ver.owner.id != v.owner_by_id:
         d.update({"owner_by": ver.owner.username,

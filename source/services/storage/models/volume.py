@@ -13,7 +13,7 @@ import ormar
 from basic.common.base_model import GenericDateModel
 from models import DB, META
 from volume.serializers import VolumeCreateReq, VolumeEditReq
-from basic.middleware.account_getter import AccountGetter, ProjectGetter
+from basic.middleware.account_getter import AccountGetter, ProjectGetter, ADMIN
 
 
 class Volume(GenericDateModel):
@@ -28,6 +28,7 @@ class Volume(GenericDateModel):
     owner_by_id: int = ormar.Integer(comment='持有者id', nullable=True)
     value: int = ormar.Integer(minimum=0, maximum=99999, default=0, comment="当前容量")
     size: int = ormar.Integer(minimum=0, maximum=99999, comment="最大容量")
+    max: int = ormar.Integer(minimum=0, maximum=9999999, default=1024, comment="当前限制")
 
     # def __repr__(self):
     #     return f'{self.username}_{self.name}'
@@ -42,6 +43,7 @@ class Volume(GenericDateModel):
             "config": {
                 "value": self.value,
                 "size": self.size,
+                "max": self.max,
             },
             "project": {
                 "id": self.project_by_id,
@@ -75,6 +77,7 @@ class Volume(GenericDateModel):
             "owner_by": vcr.owner.username,
             "owner_by_id": vcr.owner.id,
             "size": vcr.config.size,
+            "max": 9999999 if ag.role.name == ADMIN else 1024
         }
 
     @classmethod
