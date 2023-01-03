@@ -20,7 +20,7 @@ class Image(DateModel):
         orders_by = ['-id']
 
     id: int = ormar.Integer(primary_key=True)
-    name: str = ormar.String(max_length=40, comnet='镜像名称', unique=True)
+    name: str = ormar.String(max_length=100, comnet='镜像名称', unique=True)
     desc: str = ormar.String(max_length=80, default='', comnet='镜像描述')
 
     def get_dict(self):

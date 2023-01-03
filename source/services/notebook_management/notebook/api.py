@@ -191,6 +191,7 @@ async def create_notebook(request: Request,
         'cpu': _source.cpu,
         'memory': _source.memory,
         'gpu': _source.gpu,
+        'type': _source.type,
         'volumes': volumes_k8s,
     }
     init_data['k8s_info'] = json.dumps(k8s_info)
@@ -239,7 +240,12 @@ async def update_notebook(request: Request,
     if not _source:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='资源配置不存在')
     update_data['source'] = _source
-    k8s_info.update({'cpu': _source.cpu, 'memory': _source.memory, 'gpu': _source.gpu})
+    k8s_info.update({
+        'cpu': _source.cpu,
+        'memory': _source.memory,
+        'gpu': _source.gpu,
+        'type': _source.type,
+    })
 
     image_id = int(update_data.pop('image'))
     _image = await Image.objects.get_or_none(pk=image_id)
