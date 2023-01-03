@@ -48,6 +48,11 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
+        env:
+        - name: KUBECONFIG
+          value: /source/services/cluster/config
+        - name: PYTHONPATH
+          value: /source
         volumeMounts:
         - name: service-config
           mountPath: /etc/juece/config.yaml
