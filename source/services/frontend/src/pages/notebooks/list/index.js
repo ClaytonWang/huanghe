@@ -30,7 +30,7 @@ const NotebooksList = () => {
       pagesize: 10,
       sort: 'id:desc',
       filter: {
-        name: null,
+        username: null,
         role__name: 'all',
         project__code: 'all',
       },
