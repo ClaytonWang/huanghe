@@ -16,7 +16,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 8
 
 ENV_COMMON_URL = "http://121.36.41.231:32767/api/v1"
 AUTH_PREFIX_URL = "/user/v1/auth/login"
-USER_PREFIX_URL = "/user/user/"
+USER_PREFIX_URL = "/user/user"
 ACCOUNT_PREFIX_URL = "/user/user/account"
 PROJECT_PREFIX_URL = "/user/project"
 VOLUME_PREFIX_URL = "/storages/volume"
@@ -65,7 +65,7 @@ LOGGING = {
 }
 
 DEBUG = True
-SERVICE_PORT = 8000
+SERVICE_PORT = 8001
 DO_NOT_AUTH_URI = ['/auth/login', '/docs', '/openapi', '/openapi.json']
 
 APP_NAME = Path(__file__).parent.name
