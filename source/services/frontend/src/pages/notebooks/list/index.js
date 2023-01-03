@@ -39,7 +39,6 @@ const NotebooksList = () => {
   );
   const [tableData, setTableData] = useState();
   const [projectsDatasource, setProjectsDatasource] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -52,14 +51,11 @@ const NotebooksList = () => {
   const requestList = useCallback(
     async (args) => {
       const params = purifyDeep({ ...getFilters(), ...args });
-      setLoading(true);
       try {
         const { result } = await api.notebooksList(params);
         setTableData(result);
-        setLoading(false);
       } catch (error) {
         console.log(error);
-        setLoading(false);
       }
     },
     [getFilters]
@@ -188,7 +184,6 @@ const NotebooksList = () => {
         <NotebooksTable
           tableData={tableData}
           reload={reload}
-          loading={loading}
           onOpen={handleOpenClicked}
           onStart={handleStartClicked}
           onStop={handleStopClicked}
