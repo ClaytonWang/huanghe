@@ -96,23 +96,32 @@ const NotebooksUpdate = () => {
   const saveNotebook = async (values) => {
     try {
       await api.notebooksListCreate(values);
-      const msg = (type === CREATE && '创建成功！') || '保存成功';
-      message.success(msg);
+      message.success('创建成功！');
       backToList();
     } catch (error) {
       console.log(error);
     }
   };
+  const updateNotebook = async (values) => {
+    try {
+      await api.notebooksListUpdate(values);
+      message.success('保存成功!');
+      backToList();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const backToList = () => {
     navigate('/notebooks/list', { state: null });
   };
   const handleSubmit = () => {
     const values = form.getFieldsValue();
     const { id = null } = get(location, 'state.params', {});
-    if (id) {
-      saveNotebook({ id, ...values });
-    } else {
+    if (type === CREATE) {
       saveNotebook(values);
+    } else {
+      updateNotebook({ id, ...values });
     }
   };
   const handleCancelClicked = () => {
