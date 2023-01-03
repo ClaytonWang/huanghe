@@ -217,5 +217,8 @@ async def list_user(
         params_filter['role__name__in'] = role_names
     if project_id:
         project_ids = list(map(int, project_id.split(",")))
-        params_filter['projectuser__project__in'] = project_ids
-    return await User.objects.select_related(['role', 'project_user', 'projects']).filter(**params_filter).all()
+        code_filter = ormar.or_(projectuser__project__in=project_ids, project_user__id__in=project_ids)
+        params_filter = ormar.and_(code_filter, **params_filter)
+    if isinstance(params_filter, dict):
+        params_filter = ormar.queryset.clause.FilterGroup(**params_filter)
+    return await User.objects.select_related(['role', 'project_user', 'projects']).filter(params_filter).all()
