@@ -191,10 +191,10 @@ const UsersList = () => {
         <Form.Item
           name="user"
           label="姓名"
-          rules={[{ required: true, message: '请输入计划名称' }]}
+          rules={[{ required: true, message: '请选择成员' }]}
         >
           <Select
-            placeholder="请选择项目"
+            placeholder="请选择成员"
             showSearch
             filterOption={(input, option) =>
               (option?.children ?? '').includes(input)

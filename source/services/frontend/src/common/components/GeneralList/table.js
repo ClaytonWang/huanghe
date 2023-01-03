@@ -170,6 +170,7 @@ const GeneralTable = ({
       columns={genColumns()}
       dataSource={dataSource}
       pagination={pagination}
+      tableLayout="auto"
     />
   );
 };

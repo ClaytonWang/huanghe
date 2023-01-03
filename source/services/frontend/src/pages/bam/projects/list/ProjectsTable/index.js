@@ -96,6 +96,7 @@ const ProjectsTable = ({
       loading={loading}
       dataSource={genTableData(data)}
       pagination={pagination}
+      tableLayout="auto"
     />
   );
 };
