@@ -108,6 +108,7 @@ const UsersTable = ({
       columns={columns}
       dataSource={genTableData(data)}
       pagination={pagination}
+      tableLayout="auto"
     />
   );
 };

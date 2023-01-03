@@ -213,6 +213,7 @@ const NotebooksTable = ({
       loading={loading}
       dataSource={genTableData(data)}
       pagination={pagination}
+      tableLayout="auto"
     />
   );
 };

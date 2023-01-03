@@ -2,10 +2,9 @@
  * @description 请求发送器
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
-
 import { message, Modal } from 'antd';
 import axios from 'axios';
-import { isString, isEmpty, cloneDeep } from 'lodash';
+import { isString, isEmpty, cloneDeep, throttle } from 'lodash';
 import qs from 'qs';
 import { apiPrefix } from '@/common/utils/config';
 import { history } from '@/app/history';
@@ -84,10 +83,16 @@ function requestFailureHandler(error) {
         (!(response.data instanceof Blob) && response.data) ||
         getGlobalError(codeMessage[_status]);
     } else if (_status === 401) {
-      Modal.warning({
-        title: '系统提示',
-        content: '用户登录失效，请重新登录！',
-      });
+      throttle(
+        Modal.warning({
+          title: '系统提示',
+          content: '用户登录失效，请重新登录！',
+        }),
+        60000,
+        {
+          leading: true,
+        }
+      );
       // clear localstorage token
       window.localStorage.clear();
       history.push('/login');
@@ -133,7 +138,6 @@ export class IO {
         response.data || JSON.parse(response.request.responseText)
       );
       data = tranverseJson(data, parseKeyToCamel);
-      console.log('tranversed reponse data to CAMEL CASE', data);
       return requestSuccessHandler.call(this, data);
     }, requestFailureHandler.bind(this));
   }
@@ -186,11 +190,9 @@ export class IO {
             }
             return uri;
           }
-          console.log('before parsed requester data', data);
           let _data = cloneDeep(data);
           _data = tranverseJson(_data, parseKeyToSnake);
           uri = parseUrl(uri, _data);
-          console.log('url:', uri);
           if (method === 'get') {
             return this.get(uri, {
               params: _data,

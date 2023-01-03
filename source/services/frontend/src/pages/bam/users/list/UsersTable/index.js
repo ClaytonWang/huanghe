@@ -15,17 +15,14 @@ const UsersTable = ({
     {
       title: '姓名',
       dataIndex: 'username',
-      width: 120,
     },
     {
       title: '邮箱',
       dataIndex: 'email',
-      width: 120,
     },
     {
       title: '角色',
       dataIndex: 'role',
-      width: 100,
       render(value) {
         return value.value || value;
       },
@@ -98,6 +95,7 @@ const UsersTable = ({
       loading={loading}
       dataSource={genTableData(data)}
       pagination={pagination}
+      tableLayout="auto"
     />
   );
 };
