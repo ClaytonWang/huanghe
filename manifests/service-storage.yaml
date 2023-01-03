@@ -51,7 +51,7 @@ spec:
         volumeMounts:
         - name: service-config
           mountPath: /etc/juece/config.yaml
-          subPath: user
+          subPath: storage
         env:
         - name: PYTHONPATH
           value: /source
