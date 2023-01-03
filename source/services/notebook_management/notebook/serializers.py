@@ -5,6 +5,7 @@
     >Mail   : xinkai.tao@digitalbrain.cn
     >Time   : 2022/12/15 10:21
 """
+import re
 from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Optional, List
@@ -65,7 +66,7 @@ class NotebookCreate(BaseModel):
 
     @validator('name')
     def notebook_name_validator(cls, name):
-        if not name or not all([name.isalnum(), name[0].isalpha()]):
+        if not name or not re.match('^[a-zA-Z][0-9a-zA-Z]*$', name):
             raise ValueError("Notebook命名必须为英文数字组合且首位必须是字母")
         return name.lower()
 
@@ -93,6 +94,6 @@ class NotebookEdit(BaseModel):
 
     @validator('name')
     def notebook_name_validator(cls, name):
-        if not name or not all([name.isalnum(), name[0].isalpha()]):
+        if not name or not re.match('^[a-zA-Z][0-9a-zA-Z]*$', name):
             raise ValueError("Notebook命名必须为英文数字组合且首位必须是字母")
         return name.lower()
