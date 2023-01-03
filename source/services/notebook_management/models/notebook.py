@@ -40,7 +40,7 @@ class Source(DateModel):
     cpu: int = ormar.Integer(comment='CPU数量')
     memory: int = ormar.Integer(comment='存储容量G')
     gpu: int = ormar.Integer(comment='GPU数量')
-    type: str = ormar.String(max_length=20, default='', comnet='CPU/GPU类型')
+    type: str = ormar.String(max_length=40, default='', comnet='CPU/GPU类型')
     desc: str = ormar.String(max_length=80, default='', comnet='备注')
 
     def get_str(self):
@@ -62,7 +62,7 @@ class Notebook(DateModel):
 
     id: int = ormar.Integer(primary_key=True)
     name: str = ormar.String(max_length=20, comnet='名称')
-    url: str = ormar.String(max_length=80, comnet='url地址', nullable=True)
+    url: str = ormar.String(max_length=160, comnet='url地址', nullable=True)
     status: Status = ormar.ForeignKey(Status, related_name='notebook_status')
     source: Source = ormar.ForeignKey(Source, related_name='notebook_source')
 

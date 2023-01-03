@@ -9,6 +9,7 @@
 import aiohttp
 import json
 from fastapi import HTTPException, status
+from basic.common.env_variable import get_string_variable
 from pydantic import BaseModel
 from typing import List
 from config import K8S_SERVICE_PATH
@@ -43,7 +44,7 @@ async def delete_notebook_k8s(token, payloads):
 
 
 class NoteBookListReq(BaseModel):
-    env: str = "dev"
+    env: str = get_string_variable('ENV', 'DEV').lower()
 
 
 async def list_notebook_k8s(nblr: NoteBookListReq):
