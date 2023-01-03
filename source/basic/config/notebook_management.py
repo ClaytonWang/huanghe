@@ -65,7 +65,7 @@ LOGGING = {
 }
 
 DEBUG = True
-SERVICE_PORT = 8001
+SERVICE_PORT = 8000
 DO_NOT_AUTH_URI = ['/auth/login', '/docs', '/openapi', '/openapi.json']
 
 APP_NAME = Path(__file__).parent.name
