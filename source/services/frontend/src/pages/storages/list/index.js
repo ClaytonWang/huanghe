@@ -7,12 +7,12 @@ import { useSearchParams } from 'react-router-dom';
 import { Form, Input, InputNumber, message, Modal, Select } from 'antd';
 import { PlusOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { find, map } from 'lodash';
+import qs from 'qs';
 import { useAuth } from '@/common/hooks/useAuth';
 import { ADMIN, CREATE, EDIT, OWNER, USER } from '@/common/constants';
 import { AuthButton, FormModal } from '@/common/components';
 import { purifyDeep, relativeDate } from '@/common/utils/helper';
 import api from '@/common/api';
-import qs from 'qs';
 import StoragesTable from './StoragesTable';
 import './index.less';
 
@@ -175,7 +175,7 @@ const StoragesList = () => {
   const handleCreateClicked = () => {
     const { id, username } = user;
     const values = {
-      config: { size: 1 },
+      config: { size: 1, max: 1024 },
       owner: { id, username },
     };
     setInitialFormValues(values);
@@ -233,8 +233,10 @@ const StoragesList = () => {
   const handleEditSubmit = (values) => {
     updateStorage(values);
   };
-  const renderFormItems = (type) => {
+  const SubFormItems = ({ type }) => {
     const role = user.role.name;
+    const form = Form.useFormInstance();
+    const max = form.getFieldValue(['config', 'max']);
     // admin无最大申请空间限制
     const adminConfigRules = [
       { required: true, message: '请输入所需最大容量' },
@@ -252,8 +254,8 @@ const StoragesList = () => {
         type: 'number',
       },
       {
-        max: 1024,
-        message: '申请最大容量不能超过1024GB',
+        max,
+        message: `申请最大容量不能超过${max}GB`,
         type: 'number',
       },
     ];
@@ -342,7 +344,7 @@ const StoragesList = () => {
       onCancel={handleCreateCancel}
       initialValues={initialFormValues}
     >
-      {renderFormItems(CREATE)}
+      <SubFormItems type={CREATE} />
     </FormModal>
   );
 
@@ -355,7 +357,7 @@ const StoragesList = () => {
       onSubmit={handleEditSubmit}
       onCancel={handleEditCancel}
     >
-      {renderFormItems(EDIT)}
+      <SubFormItems type={EDIT} />
     </FormModal>
   );
   return (
