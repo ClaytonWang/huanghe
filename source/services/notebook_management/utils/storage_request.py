@@ -10,9 +10,10 @@ import aiohttp
 import json
 
 from typing import List, Dict
-from config import STORAGE_SERVICE_PATH
+# from config import STORAGE_SERVICE_PATH
 from collections import defaultdict
 from pydantic import BaseModel, Field
+from basic.config.notebook_management import *
 
 
 class VolumeConfigInfo(BaseModel):
@@ -48,7 +49,8 @@ class VolumeInfo(BaseModel):
 async def get_volume_list(token, page_no=1):
     res = []
     async with aiohttp.ClientSession() as session:
-        url = STORAGE_SERVICE_PATH + f"/volume?pagesize=100&pageno={page_no}"
+        # url = STORAGE_SERVICE_PATH + f"/volume?pagesize=100&pageno={page_no}"
+        url = f"{ENV_COMMON_URL}{VOLUME_PREFIX_URL}?pagesize=100&pageno={page_no}"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'

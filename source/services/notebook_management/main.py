@@ -18,6 +18,7 @@ from basic.middleware.exception import validation_pydantic_exception_handler
 from basic.middleware.exception import validation_ormar_exception_handler
 from basic.middleware.exception import ormar_db_exception_handler
 from basic.middleware.exception import pg_db_exception_handler
+from basic.config.notebook_management import *
 from ormar.exceptions import AsyncOrmException
 from utils.auth import verify_token
 from notebook.api import router_notebook
@@ -27,7 +28,8 @@ from models import startup_event, shutdown_event
 
 
 # oauth2_scheme = OFOAuth2PasswordBearer(token_url="/v1/auth/login")
-oauth2_scheme = OFOAuth2PasswordBearer(token_url=USER_SERVICE_PATH + "/v1/auth/login")
+# oauth2_scheme = OFOAuth2PasswordBearer(token_url=USER_SERVICE_PATH + "/v1/auth/login")
+oauth2_scheme = OFOAuth2PasswordBearer(token_url=ENV_COMMON_URL + AUTH_PREFIX_URL)
 configure_logging('logging.config.dictConfig', LOGGING)
 app = FastAPI(
     title='notebook管理',
