@@ -63,7 +63,7 @@ async def operate_auth(request: Request, notebook_id: int):
     # 普通用户
     if request.user.role.name == 'user':
         permissions = request.user.permissions
-        if ['notebooks.list.create', 'notebooks.list.edit', 'notebooks.list.delete'] in permissions:
+        if {'notebooks.list.create', 'notebooks.list.edit', 'notebooks.list.delete'}.issubset(permissions):
             return None, '不能编辑非自己创建的Notebook'
         else:
             return None, '用户没有编辑权限'
