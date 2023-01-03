@@ -21,6 +21,7 @@ ACCOUNT_PREFIX_URL = "/user/user/account"
 PROJECT_PREFIX_URL = "/user/project"
 VOLUME_PREFIX_URL = "/storages/volume"
 CLUSTER_NOTEBOOK_PREFIX_URL = "/cluster/notebook"
+ENV = "uat"
 MOCK = os.getenv("MOCK_ACCOUNT_GETTER", False)
 MOCK_USER_JSON = {"id": 60, 'username': "shouchen"}
 MOCK_PROJECT_JSON = {"id": 1, "name": "决策平台"}
