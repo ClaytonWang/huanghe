@@ -4,7 +4,7 @@
  */
 import { message, Modal } from 'antd';
 import axios from 'axios';
-import { isString, isEmpty, cloneDeep, throttle } from 'lodash';
+import { isString, isEmpty, cloneDeep } from 'lodash';
 import qs from 'qs';
 import { apiPrefix } from '@/common/utils/config';
 import { history } from '@/app/history';
@@ -83,16 +83,10 @@ function requestFailureHandler(error) {
         (!(response.data instanceof Blob) && response.data) ||
         getGlobalError(codeMessage[_status]);
     } else if (_status === 401) {
-      throttle(
-        Modal.warning({
-          title: '系统提示',
-          content: '用户登录失效，请重新登录！',
-        }),
-        60000,
-        {
-          leading: true,
-        }
-      );
+      Modal.warning({
+        title: '系统提示',
+        content: '用户登录失效，请重新登录！',
+      });
       // clear localstorage token
       window.localStorage.clear();
       history.push('/login');
