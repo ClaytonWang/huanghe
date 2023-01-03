@@ -19,6 +19,7 @@ class Creator(BaseModel):
 class Config(BaseModel):
     value: Optional[int] = 0
     size: int
+    max: Optional[int]
 
 
 class Project(BaseModel):

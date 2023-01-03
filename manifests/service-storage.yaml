@@ -52,6 +52,9 @@ spec:
         - name: service-config
           mountPath: /etc/juece/config.yaml
           subPath: user
+        env:
+        - name: PYTHONPATH
+          value: /source
       volumes:
       - name: service-config
         configMap:
