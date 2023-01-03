@@ -23,6 +23,19 @@ from collections import defaultdict
 router_notebook = APIRouter()
 
 
+def format_notebook_detail(notebook: Notebook):
+    result = notebook.dict()
+    result['source'] = notebook.source.id
+    result['creator'] = result.pop('creator_id')
+    result['project'] = result.pop('project_id')
+    result['image'] = result.pop('image_id')
+    storages = result.pop('storage')
+    for item in storages:
+        item['storage'] = item.pop('storage')['id']
+    result['hooks'] = storages
+    return result
+
+
 @router_notebook.get(
     '/{notebook_id}',
     description="notebook详情",
@@ -31,10 +44,7 @@ router_notebook = APIRouter()
 )
 async def get_notebook(notebook_id: int = Path(..., ge=1, description='需要查询的notebook ID')):
     _notebook = await Notebook.objects.select_related(['status', 'source']).get(pk=notebook_id)
-    result = _notebook.dict()
-    result['source'] = _notebook.source.get_info()
-    result['hooks'] = result.pop('storage')
-    return result
+    return format_notebook_detail(_notebook)
 
 
 @router_notebook.get(
@@ -90,8 +100,8 @@ async def list_notebook(request: Request,
 
     if params_filter:
         name_filter, role_filter = None, None
-        if 'name' in params_filter:
-            name = params_filter.pop('name')
+        if 'username' in params_filter:
+            name = params_filter.pop('username')
             name_filter = set(name_userid_map.get(name, []))
         if 'project__code' in params_filter:
             project_code = params_filter.pop('project__code')
@@ -145,15 +155,15 @@ async def create_notebook(request: Request,
     stat = await Status.objects.get(name='stopped')
     init_data['status'] = stat.id
 
-    duplicate_name = await Notebook.objects.filter(name=init_data['name']).count()
-    if duplicate_name:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不能重名')
-
     project_id = int(init_data.pop('project'))
     check, extra_info = await project_check(request, project_id)
     if not check:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
     init_data['project_id'] = project_id
+
+    duplicate_name = await Notebook.objects.filter(name=init_data['name'], project_id=project_id).count()
+    if duplicate_name:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不能重名')
 
     source_id = int(init_data.pop('source'))
     _source = await Source.objects.get_or_none(pk=source_id)
@@ -185,10 +195,7 @@ async def create_notebook(request: Request,
     init_data['k8s_info'] = json.dumps(k8s_info)
 
     _notebook = await Notebook.objects.create(**init_data)
-    result = _notebook.dict()
-    result['source'] = _source.get_info()
-    result['hooks'] = result.pop('storage')
-    return result
+    return format_notebook_detail(_notebook)
 
 
 @router_notebook.put(
@@ -213,41 +220,37 @@ async def update_notebook(request: Request,
     if _notebook.status.name != 'stopped':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook未停止')
 
-    if 'name' in update_data:
-        duplicate_name = await Notebook.objects.filter(name=update_data['name']).exclude(id=_notebook.id).count()
-        if duplicate_name:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不能重名')
-        k8s_info['name'] = f"{request.user.en_name}-{update_data['name']}"
+    project_id = int(update_data.pop('project'))
+    check, extra_info = await project_check(request, project_id)
+    if not check:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
+    update_data['project_id'] = project_id
+    k8s_info['namespace'] = extra_info
 
-    if 'project' in update_data:
-        project_id = int(update_data.pop('project'))
-        check, extra_info = await project_check(request, project_id)
-        if not check:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
-        update_data['project_id'] = project_id
-        k8s_info['namespace'] = extra_info
+    duplicate_name = await Notebook.objects.filter(
+        name=update_data['name'], project_id=project_id).exclude(id=_notebook.id).count()
+    if duplicate_name:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不能重名')
+    k8s_info['name'] = f"{request.user.en_name}-{update_data['name']}"
 
-    if 'source' in update_data:
-        source_id = int(update_data.pop('source'))
-        _source = await Source.objects.get_or_none(pk=source_id)
-        if not _source:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='资源配置不存在')
-        update_data['source'] = _source
-        k8s_info.update({'cpu': _source.cpu, 'memory': _source.memory, 'gpu': _source.gpu,})
+    source_id = int(update_data.pop('source'))
+    _source = await Source.objects.get_or_none(pk=source_id)
+    if not _source:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='资源配置不存在')
+    update_data['source'] = _source
+    k8s_info.update({'cpu': _source.cpu, 'memory': _source.memory, 'gpu': _source.gpu})
 
-    if 'image' in update_data:
-        image_id = int(update_data.pop('image'))
-        _image = await Image.objects.get_or_none(pk=image_id)
-        if not _image:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='镜像不存在')
-        update_data['image_id'] = image_id
-        k8s_info['image'] = _image.name
+    image_id = int(update_data.pop('image'))
+    _image = await Image.objects.get_or_none(pk=image_id)
+    if not _image:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='镜像不存在')
+    update_data['image_id'] = image_id
+    k8s_info['image'] = _image.name
 
-    if 'hooks' in update_data:
-        hooks = update_data.pop('hooks')
-        storages, volumes_k8s = await volume_check(authorization, hooks)
-        update_data['storage'] = json.dumps(storages)
-        k8s_info['volumes'] = volumes_k8s
+    hooks = update_data.pop('hooks')
+    storages, volumes_k8s = await volume_check(authorization, hooks)
+    update_data['storage'] = json.dumps(storages)
+    k8s_info['volumes'] = volumes_k8s
 
     update_data['k8s_info'] = json.dumps(k8s_info)
 
@@ -263,29 +266,36 @@ async def update_notebook(request: Request,
 async def operate_notebook(request: Request,
                            data: NotebookOp,
                            notebook_id: int = Path(..., ge=1, description="NotebookID")):
+    authorization: str = request.headers.get('authorization')
     action = int(data.dict()['action'])
-    update_data = {}
     _notebook, reason = await operate_auth(request, notebook_id)
     if not _notebook:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
     if action not in [0, 1]:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
-    # todo 同notebook集群发送
-    payloads = _notebook.k8s_info
-    # print("cluster payloads")
-    # print(payloads)
+    payloads = json.dumps(_notebook.k8s_info)
 
-    if _notebook.status.name in ['start', 'running', 'pending'] and int(action) == 0:
+    # 数字，0（停止）｜1（启动）
+    # todo 状态还需要调整
+    update_data = {}
+    if action == 0:
+        if _notebook.status.name not in ['start', 'running', 'pending']:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
         stat = await Status.objects.get(name='stop')
         update_data['status'] = stat.id
-    elif _notebook.status.name == 'stopped' and int(action) == 1:
-        # TODO 做一大堆启动操作，包含volume启动与状态轮训
+        response = await delete_notebook_k8s(authorization, payloads)
+        # if response.status != 200:
+        #     _notebook.status = None
+    else:
+        if _notebook.status.name != 'stopped':
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
         stat = await Status.objects.get(name='start')
         update_data['status'] = stat.id
         # todo response返回不为200时更新notebook状态到异常
-        # response = await create_notebook_k8s(authorization, payloads)
+        response = await create_notebook_k8s(authorization, payloads)
         # if response.status != 200:
         #     _notebook.status = None
+    # print(response)
 
     if not update_data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
@@ -306,9 +316,13 @@ async def delete_notebook(request: Request,
     check, extra_info = await project_check(request, _notebook.project_id)
     if not check:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
+    if _notebook.status.name not in ['stopped', 'error']:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook未停止')
     payloads = _notebook.k8s_info
-    # print(payloads)
-    # response = await delete_notebook_k8s(authorization, payloads)
-    # if response.status != 200:
-    #     _notebook.status = None
+    # error状态调用删除需要释放资源
+    if _notebook.status.name == 'error':
+        authorization: str = request.headers.get('authorization')
+        response = await delete_notebook_k8s(authorization, payloads)
+        # if response.status != 200:
+        #     _notebook.status = None
     await _notebook.delete()

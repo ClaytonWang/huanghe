@@ -21,32 +21,17 @@ class StatusItem(BaseModel):
 
 
 class UserStr(BaseModel):
-    id: str
+    id: int
     username: str = None
 
 
 class ProjectStr(BaseModel):
-    id: str
+    id: int
     name: Optional[str] = None
-
-
-class VolumeConfig(BaseModel):
-    value: int
-    size: int
-
-
-class VolumeItem(BaseModel):
-    name: str
-    config: VolumeConfig
 
 
 class HookItem(BaseModel):
     storage: int
-    path: str
-
-
-class StorageItem(BaseModel):
-    storage: VolumeItem
     path: str
 
 
@@ -55,7 +40,7 @@ class NotebookOp(BaseModel):
 
 
 class NotebookList(BaseModel):
-    id: str
+    id: int
     status: StatusItem
     name: str
     source: Optional[SourceList]
@@ -88,11 +73,11 @@ class NotebookDetail(BaseModel):
     id: int
     status: StatusItem
     name: str
-    source: SourceList
-    creator_id: int
-    project_id: int
-    image_id: int
-    hooks: List[StorageItem]
+    source: int
+    creator: int
+    project: int
+    image: int
+    hooks: List[HookItem]
     url: Optional[str]
     created_at: Optional[datetime]
     updated_at: Optional[datetime]

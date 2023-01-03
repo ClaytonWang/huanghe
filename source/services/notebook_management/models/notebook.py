@@ -6,11 +6,16 @@
     >Time   : 2022/12/14 18:58
 """
 
+from __future__ import annotations
 import ormar
 from basic.common.base_model import DateModel
 from models import DB, META
 
-
+NOTEBOOK_STATUS_RUNNING = "RUNNING"
+NOTEBOOK_STATUS_PENDING = "PENDING"
+NOTEBOOK_STATUS_ERROR = "ERROR"
+NOTEBOOK_STATUS_WAITING = "WAITING"
+NOTEBOOK_STATUS_ON = "ON"
 class Status(ormar.Model):
     class Meta(ormar.ModelMeta):
         tablename: str = "bam_status"
@@ -53,7 +58,7 @@ class Source(DateModel):
     def get_info(self):
         return {
             "id": self.id,
-            "source": self.get_str(),
+            "name": self.get_str(),
         }
 
 
@@ -65,7 +70,7 @@ class Notebook(DateModel):
         orders_by = ['-id']
 
     id: int = ormar.Integer(primary_key=True)
-    name: str = ormar.String(max_length=20, comnet='名称', unique=True)  # todo 只能显示英文名字，加校验
+    name: str = ormar.String(max_length=20, comnet='名称')  # todo 只能显示英文名字，加校验
     url: str = ormar.String(max_length=80, comnet='url地址', nullable=True)
     status: Status = ormar.ForeignKey(Status, related_name='notebook_status')
     source: Source = ormar.ForeignKey(Source, related_name='notebook_source')
@@ -80,3 +85,14 @@ class Notebook(DateModel):
 
     # def __repr__(self):
     #     return f'{self.name}_{self.value}'
+
+    @classmethod
+    def compare_status_and_update(cls, nb: Notebook, status: str, status_dic):
+        if status == NOTEBOOK_STATUS_ON:
+            nb.status = status_dic['running']
+        elif status == NOTEBOOK_STATUS_ERROR:
+            nb.status = status_dic['error']
+        elif status == NOTEBOOK_STATUS_PENDING:
+            nb.status = status_dic["pending"]
+        elif status == NOTEBOOK_STATUS_RUNNING:
+            nb.status = status_dic['start']

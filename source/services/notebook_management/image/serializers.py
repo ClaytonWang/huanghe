@@ -13,6 +13,6 @@ from pydantic import validator
 
 
 class ImageItem(BaseModel):
-    id: Optional[str]
+    id: Optional[int]
     name: str
     desc: Optional[str] = None
