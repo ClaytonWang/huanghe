@@ -82,7 +82,7 @@ const StoragesList = () => {
         // 项目负责人，返回所有其项目下普通用户。
         const { result = {} } = await api.userListItems({
           roleName: [USER, OWNER],
-          project: map(user.projects, 'id'),
+          projectId: map(user.projects, 'id'),
         });
         data = result || [];
       } else {

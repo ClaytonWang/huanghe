@@ -39,6 +39,13 @@ const StoragesTable = ({
       },
     },
     {
+      title: '创建人',
+      dataIndex: 'creator',
+      render(creator = {}) {
+        return creator.username || '-';
+      },
+    },
+    {
       title: '创建时间',
       dataIndex: 'createdAt',
       render(value) {
