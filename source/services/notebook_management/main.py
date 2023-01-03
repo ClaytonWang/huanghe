@@ -67,8 +67,6 @@ if __name__ == '__main__':
     service_port = get_integer_variable('NOTEBOOK_SERVICE_PORT', SERVICE_PORT)
     debug = False if 'PRODUCTION' == get_string_variable('ENV', 'DEV') else DEBUG
 
-    # todo 把轮询k8s的scheduler放在一起启动
-
     # -workers INTEGER
     # Number of worker processes. Defaults to the $WEB_CONCURRENCY environment variable if available, or 1.
     # Not valid with --reload.
