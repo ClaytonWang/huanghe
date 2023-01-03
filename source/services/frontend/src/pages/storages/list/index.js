@@ -236,7 +236,7 @@ const StoragesList = () => {
   const SubFormItems = ({ type }) => {
     const role = user.role.name;
     const form = Form.useFormInstance();
-    const max = form.getFieldValue(['config', 'max']);
+    const max = form.getFieldValue(['config', 'max']) || 1024;
     // admin无最大申请空间限制
     const adminConfigRules = [
       { required: true, message: '请输入所需最大容量' },
