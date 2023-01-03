@@ -16,19 +16,8 @@ from jose.jwt import JWTError
 from pydantic import BaseModel, Field, validator
 import requests
 import os
+from basic.config.storage import *
 
-ENV_COMMON_URL = "http://121.36.41.231:32767/api/v1"
-ACCOUNT_PREFIX_URL = "/user/user/account"
-PROJECT_PREFIX_URL = "/user/project"
-CLUSTER_PVC_PREFIX_URL = "/cluster/pvc"
-CLUSTER_NAMESPACE_PREFIX_URL = "/cluster/namespace"
-CLUSTER_SECRET_PREFIX_URL = "/cluster/secret"
-MOCK = os.getenv("MOCK_ACCOUNT_GETTER", False)
-MOCK_USER_JSON = {"id": 60, 'username': "shouchen"}
-MOCK_PROJECT_JSON = {"id": 1, "name": "决策平台"}
-USER = "user"
-ADMIN = "admin"
-OWNER = "owner"
 
 class SecretNamespace(BaseModel):
     namespace: str
