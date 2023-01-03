@@ -15,6 +15,11 @@ from source.serializers import SourceList
 from pydantic import validator
 
 
+def k8s_format(name):
+    if not name or not re.match('^[a-zA-Z][0-9a-zA-Z-]*$', name):
+        raise ValueError("Notebook命名必须为英文数字中划线组合,且首位必须是字母")
+    return name.lower()
+
 class StatusItem(BaseModel):
     code: str = None
     name: str = None
@@ -66,9 +71,7 @@ class NotebookCreate(BaseModel):
 
     @validator('name')
     def notebook_name_validator(cls, name):
-        if not name or not re.match('^[a-zA-Z][0-9a-zA-Z]*$', name):
-            raise ValueError("Notebook命名必须为英文数字组合且首位必须是字母")
-        return name.lower()
+        return k8s_format(name)
 
 
 class NotebookDetail(BaseModel):
@@ -94,6 +97,4 @@ class NotebookEdit(BaseModel):
 
     @validator('name')
     def notebook_name_validator(cls, name):
-        if not name or not re.match('^[a-zA-Z][0-9a-zA-Z]*$', name):
-            raise ValueError("Notebook命名必须为英文数字组合且首位必须是字母")
-        return name.lower()
+        return k8s_format(name)
