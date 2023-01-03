@@ -33,8 +33,7 @@ async def get_project(project_id: int = Path(..., ge=1, description='需要查�
 )
 async def create_project(project: ProjectCreate):
     init_data = project.dict()
-    # TODO 避免首字母冲突
-    en_name = ''.join(lazy_pinyin(init_data['name'], style=Style.FIRST_LETTER)).lower()
+    en_name = ''.join(lazy_pinyin(init_data['name'] + init_data['code'], style=Style.FIRST_LETTER)).lower()
     init_data['en_name'] = 'u' + en_name if en_name[0].isdigit() else en_name
     create_ns(Namespace(name=init_data['en_name']))
     create_secret(SecretNamespace(namespace=init_data['en_name']), ignore_exist=True)
