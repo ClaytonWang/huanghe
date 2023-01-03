@@ -10,9 +10,10 @@ import aiohttp
 import json
 
 from typing import Optional, List, Dict, Set
-from config import USER_SERVICE_PATH
+# from config import USER_SERVICE_PATH
 from collections import defaultdict
 from pydantic import BaseModel, Field
+from basic.config.notebook_management import *
 
 
 class RoleInfo(BaseModel):
@@ -64,7 +65,8 @@ class ProjectInfo(BaseModel):
 
 async def get_current_user_aio(token):
     async with aiohttp.ClientSession() as session:
-        url = USER_SERVICE_PATH + "/user/account"
+        # url = USER_SERVICE_PATH + "/user/account"
+        url = ENV_COMMON_URL + ACCOUNT_PREFIX_URL
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
@@ -88,7 +90,8 @@ async def get_user_list(token, page_no=1):
     res = []
     async with aiohttp.ClientSession() as session:
         # TODO 分页器目前限制100，超过100后报错，用户项目多后会有问题（也可以反复循环到result为空）
-        url = USER_SERVICE_PATH + f"/user?pagesize=100&pageno={page_no}"
+        # url = USER_SERVICE_PATH + f"/user?pagesize=100&pageno={page_no}"
+        url = f"{ENV_COMMON_URL}{USER_PREFIX_URL}?pagesize=100&pageno={page_no}"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
@@ -108,7 +111,8 @@ async def get_user_list(token, page_no=1):
 async def get_project_list(token, page_no=1):
     res = []
     async with aiohttp.ClientSession() as session:
-        url = USER_SERVICE_PATH + f"/project?pagesize=100&pageno={page_no}"
+        # url = USER_SERVICE_PATH + f"/project?pagesize=100&pageno={page_no}"
+        url = f"{ENV_COMMON_URL}{PROJECT_PREFIX_URL}?pagesize=100&pageno={page_no}"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
@@ -125,7 +129,8 @@ async def get_project_list(token, page_no=1):
 
 async def get_project(token, proj_id):
     async with aiohttp.ClientSession() as session:
-        url = USER_SERVICE_PATH + f"/project/{proj_id}"
+        # url = USER_SERVICE_PATH + f"/project/{proj_id}"
+        url = f"{ENV_COMMON_URL}{PROJECT_PREFIX_URL}/{proj_id}"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
