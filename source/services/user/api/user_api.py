@@ -203,7 +203,7 @@ async def account(
     response_model_exclude_unset=True
 )
 async def list_user(
-            role_name: str = Query(..., description='权限名'),
+            role_name: str = Query(None, description='权限名'),
             project_id: str = Query(None, description='项目名')
 ):
     """
@@ -211,9 +211,11 @@ async def list_user(
     :param project_id:
     :return:
     """
-    role_name = role_name.split(",")
+    params_filter = dict()
+    if role_name:
+        role_names = role_name.split(",")
+        params_filter['role__name__in'] = role_names
     if project_id:
-        project_id = list(map(int, project_id.split(",")))
-        return await User.objects.select_related(['role', 'project_user', 'projects']).filter(projectuser__project__in=project_id).filter(role__name__in=role_name).all()
-
-    return await User.objects.filter(role__name__in=role_name).all()
+        project_ids = list(map(int, project_id.split(",")))
+        params_filter['projectuser__project__in'] = project_ids
+    return await User.objects.select_related(['role', 'project_user', 'projects']).filter(**params_filter).all()
