@@ -13,6 +13,7 @@ from models import Notebook, Status, Image, Source
 from notebook.serializers import NotebookList, NotebookCreate, NotebookEdit, NotebookOp, NotebookDetail
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
+from basic.common.env_variable import get_string_variable
 from utils.user_request import get_user_list, get_project_list, project_check
 from utils.storage_request import volume_check
 from utils.k8s_request import create_notebook_k8s, delete_notebook_k8s
@@ -186,7 +187,7 @@ async def create_notebook(request: Request,
         'name': f"{request.user.en_name}-{init_data['name']}",
         'namespace': extra_info,
         'image': _image.name,
-        'env': 'dev',  # todo 填当前环境，从不同环境去读
+        'env': get_string_variable('ENV', 'DEV'),
         'cpu': _source.cpu,
         'memory': _source.memory,
         'gpu': _source.gpu,
