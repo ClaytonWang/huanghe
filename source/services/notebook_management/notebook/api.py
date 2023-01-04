@@ -100,20 +100,22 @@ async def list_notebook(request: Request,
         params_filter['project_id__in'] = viewable_project_ids
 
     if params_filter:
-        name_filter, role_filter = None, None
+        name_filter, role_filter, need_filter = {}, {}, False
         if 'username' in params_filter:
             name = params_filter.pop('username')
             name_filter = set(name_userid_map.get(name, []))
+            need_filter = True
         if 'project__code' in params_filter:
             project_code = params_filter.pop('project__code')
             params_filter['project_id'] = code_id_map.get(project_code)
         if 'role__name' in params_filter:
             role__name = params_filter.pop('role__name')
             role_filter = set(role_userid_map.get(role__name, []))
-        if not (name_filter is None and role_filter is None):
-            creator_ids = list(name_filter.intersection(role_filter)) if not (
-                    name_filter is None or role_filter is None) else list(name_filter or role_filter)
-            params_filter['creator_id__in'] = creator_ids
+            need_filter = True
+        if name_filter and role_filter:
+            params_filter['creator_id__in'] = list(name_filter.intersection(role_filter))
+        elif need_filter:
+            params_filter['creator_id__in'] = list(name_filter or role_filter)
     # todo 要修改合理的params_filter，不然会报错
     # print("show filter")
     # print(params_filter)
