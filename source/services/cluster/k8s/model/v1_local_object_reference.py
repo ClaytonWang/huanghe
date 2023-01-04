@@ -17,7 +17,6 @@ class V1LocalObjectReference(GenericMixin):
                             and the value is json key in definition.
     """
     name: str
-    value: str
     openapi_types = {
         'name': 'str',
     }
