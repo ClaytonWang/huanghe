@@ -1,4 +1,4 @@
-name: backend-base
+name: base-cluster
 
 on:
   push:
@@ -9,12 +9,12 @@ on:
 #     - source/services/cluster/**
 #     - manifests/service-cluster.yaml
 #     - .github/workflows/service-cluster.yaml
-     - dockerfile_base/Dockerfile_backend_base
+      - source/services/cluster/Dockerfile_base_cluster
     tags: [ '*' ]
 
 env:
   DOCKER_CLI_EXPERIMENTAL: enabled
-  IMAGE_NAME: ${{ github.repository }}.backend-base
+  IMAGE_NAME: ${{ github.repository }}.base-cluster
   DOCKER_TAG: latest
   REGISTRY: containers.git.digitalbrain.cn
   GITHOST: git.digitalbrain.cn
@@ -29,7 +29,7 @@ jobs:
     steps:
       - name: Lowercase image name
         run: |
-          echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}.backend-base" >>${GITHUB_ENV}
+          echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}.base-cluster" >>${GITHUB_ENV}
       - name: Create docker tag
         id: get_docker_tag
         run: |
@@ -60,8 +60,8 @@ jobs:
         uses: docker/build-push-action@v3
         id: build_and_push
         with:
-          file: ./dockerfile_base/Dockerfile_backend_base
-          context: ./dockerfile_base
+          file: ./source/services/cluster/Dockerfile_base_cluster
+          context: ./source
           push: true
           tags: ${{ steps.meta.outputs.tags }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{env.DOCKER_TAG}}
           labels: ${{ steps.meta.outputs.labels }}
