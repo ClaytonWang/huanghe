@@ -5,7 +5,8 @@ from k8s.model.v1_affinity import V1Affinity
 from k8s.model.v1_container import V1Container
 from k8s.model.v1_volume import V1Volume
 from k8s.model.v1_toleration import V1Toleration
-from k8s.const.workloads_const import IMAGE_PULL_POLICY_IF_NOT_PRESENT
+from k8s.const.workloads_const import IMAGE_PULL_POLICY_IF_NOT_PRESENT, SECRET_NAME_DOCKER_CONFIG
+from k8s.model.v1_local_object_reference import V1LocalObjectReference
 from notebook.serializers import Volume
 
 class V1PodSpec(GenericMixin):
@@ -37,6 +38,7 @@ class V1PodSpec(GenericMixin):
     service_account: Optional[str]
     volumes: Optional[List[V1Volume]] = None
     tolerations: Optional[List[V1Toleration]]
+    image_pull_secrets: Optional[List[V1LocalObjectReference]]
 
     openapi_types = {
         'active_deadline_seconds': 'int',
@@ -53,7 +55,7 @@ class V1PodSpec(GenericMixin):
         # 'host_pid': 'bool',
         # 'host_users': 'bool',
         # 'hostname': 'str',
-        # 'image_pull_secrets': 'list[V1LocalObjectReference]',
+        'image_pull_secrets': 'list[V1LocalObjectReference]',
         'init_containers': 'list[V1Container]',
         'node_name': 'str',
         'node_selector': 'dict(str, str)',
@@ -139,6 +141,11 @@ class V1PodSpec(GenericMixin):
         self.tolerations.extend([V1Toleration.exist(toleration) for toleration in tolerations])
         return self
 
+    def add_image_pull_secrets(self, image_pull_secrets: List[str]):
+        if not self.image_pull_secrets:
+            self.image_pull_secrets = []
+        self.image_pull_secrets.extend([V1LocalObjectReference.new(ims) for ims in image_pull_secrets])
+
     @classmethod
     def default(cls, name, image):
         return cls.new([V1Container.default(name=name, image=image)])
@@ -149,7 +156,7 @@ class V1PodSpec(GenericMixin):
         c = V1Container.default(name=name, image=image)
         c.set_envs(envs).set_resources(resource).set_image_pull_policy(IMAGE_PULL_POLICY_IF_NOT_PRESENT)
         spec = cls.new([c])
-        spec.add_pvc_volume_and_volume_mount(volumes).add_tolerations(tolerations).add_dshm()
+        spec.add_pvc_volume_and_volume_mount(volumes).add_tolerations(tolerations).add_dshm().add_image_pull_secrets([SECRET_NAME_DOCKER_CONFIG])
         return spec
     @staticmethod
     def new(containers: List[V1Container], volumes: Optional[List[V1Volume]] = None):
