@@ -5,16 +5,12 @@ on:
 #    branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/jiangshouchen"]
     branches: [ "feature/jiangshouchen" ]
     paths:
-#     - source/basic/**
-#     - source/services/cluster/**
-#     - manifests/service-cluster.yaml
-#     - .github/workflows/service-cluster.yaml
       - source/services/storage/Dockerfile_base_storage
     tags: [ '*' ]
 
 env:
   DOCKER_CLI_EXPERIMENTAL: enabled
-  IMAGE_NAME: ${{ github.repository }}.base-cluster
+  IMAGE_NAME: ${{ github.repository }}.base-storage
   DOCKER_TAG: latest
   REGISTRY: containers.git.digitalbrain.cn
   GITHOST: git.digitalbrain.cn
@@ -60,7 +56,7 @@ jobs:
         uses: docker/build-push-action@v3
         id: build_and_push
         with:
-          file: ./source/services/cluster/Dockerfile_base_storage
+          file: ./source/services/storage/Dockerfile_base_storage
           context: ./source
           push: true
           tags: ${{ steps.meta.outputs.tags }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{env.DOCKER_TAG}}
