@@ -5,9 +5,9 @@
  * @LastEditTime 2022-12-23 09:40:59
  * @Description Notebook新建/编辑页
  */
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Divider, Form, Input, message, Select } from 'antd';
+import { Button, Divider, Form, Input, message, Select, Tooltip } from 'antd';
 import { uniqueId, get, map } from 'lodash';
 import {
   DeleteFilled,
@@ -17,8 +17,8 @@ import {
 import api from '@/common/api';
 import { CREATE, UPDATE, ADMIN } from '@/common/constants';
 import { useAuth } from '@/common/hooks/useAuth';
+import { genUniqueIdByPrefix, ID } from '@/common/utils/helper';
 import './index.less';
-import { genUniqueIdByPrefix } from '@/common/utils/helper';
 
 const { Option } = Select;
 
@@ -29,6 +29,7 @@ const NotebooksUpdate = () => {
   const [storagesDatasource, setStoragesDatasource] = useState([]);
   const [selectedStorages, setSelectedStorages] = useState([]);
   const [type, setType] = useState(CREATE);
+  const notebookUniqueID = useRef();
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -157,6 +158,7 @@ const NotebooksUpdate = () => {
     requestImages();
     requestSource();
     requestStorages();
+    notebookUniqueID.current = new ID();
   }, []);
 
   useEffect(() => {
@@ -191,17 +193,26 @@ const NotebooksUpdate = () => {
                 filterOption={(input, option) =>
                   (option?.children ?? '').includes(input)
                 }
-                options={filteredStorageOptions.map(({ id, name, config }) => ({
-                  label: (
-                    <>
-                      {`${name || '-'}`}
-                      <span
-                        style={{ color: '#bfbfbf', float: 'right' }}
-                      >{`${config.value}G/${config.size}G`}</span>
-                    </>
-                  ),
-                  value: id,
-                }))}
+                options={filteredStorageOptions.map(
+                  ({ id, name = '-', config, creator }) => ({
+                    label: (
+                      <>
+                        <Tooltip title={name}>{name}</Tooltip>
+                        <span
+                          style={{ color: '#bfbfbf', float: 'right' }}
+                        >{`${config.value}G/${config.size}G`}</span>
+                        <span
+                          style={{
+                            color: '#bfbfbf',
+                            float: 'right',
+                            marginRight: 8,
+                          }}
+                        >{`${(creator && creator.username) || '-'}创建`}</span>
+                      </>
+                    ),
+                    value: id,
+                  })
+                )}
               />
             </Form.Item>
             <Form.Item
@@ -275,7 +286,7 @@ const NotebooksUpdate = () => {
           >
             {imagesDatasource.map(({ id, name }) => (
               <Option key={id} value={id}>
-                {name}
+                <Tooltip title={name}>{name}</Tooltip>
               </Option>
             ))}
           </Select>
@@ -294,7 +305,7 @@ const NotebooksUpdate = () => {
           >
             {sourceDatasource.map(({ id, name }) => (
               <Option key={id} value={id}>
-                {name}
+                <Tooltip title={name}>{name}</Tooltip>
               </Option>
             ))}
           </Select>
@@ -326,7 +337,10 @@ const NotebooksUpdate = () => {
                   style={{ width: '100%' }}
                   onClick={() =>
                     add({
-                      path: `/home/jovyan/${genUniqueIdByPrefix('vol-')}`,
+                      path: `/home/jovyan/${genUniqueIdByPrefix(
+                        'vol-',
+                        notebookUniqueID.current
+                      )}`,
                     })
                   }
                 >

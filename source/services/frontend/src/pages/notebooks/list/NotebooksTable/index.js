@@ -22,7 +22,7 @@ const NotebooksTable = ({
     {
       title: '状态',
       dataIndex: 'status',
-      width: 80,
+      width: '5%',
       render(value) {
         let icon = (
           <Icon style={{ fontSize: 24 }} component={Icons[value.name]} />
@@ -47,12 +47,12 @@ const NotebooksTable = ({
     {
       title: '名称',
       dataIndex: 'name',
-      width: 120,
+      width: '10%',
     },
     {
       title: '项目',
       dataIndex: 'project',
-      width: 180,
+      width: '15%',
       render(value) {
         return get(value, 'name', '-');
       },
@@ -60,15 +60,15 @@ const NotebooksTable = ({
     {
       title: '镜像',
       dataIndex: 'image',
-      width: 180,
+      width: '15%',
       render(value) {
         return get(value, 'name', '-');
       },
     },
     {
       title: '资源',
+      width: '15%',
       dataIndex: 'source',
-      width: 180,
       render(value) {
         return get(value, 'name', '-');
       },
@@ -76,6 +76,7 @@ const NotebooksTable = ({
     {
       title: '创建人',
       dataIndex: 'creator',
+      width: '10%',
       render(value) {
         return get(value, 'username', '-');
       },
@@ -83,12 +84,14 @@ const NotebooksTable = ({
     {
       title: '创建时间',
       dataIndex: 'createdAt',
+      width: '10%',
       render(value) {
         return transformDate(value) || '-';
       },
     },
     {
       title: '操作',
+      width: '15%',
       render(_value, record) {
         const statusName = get(record, 'status.name');
         return (
@@ -227,7 +230,6 @@ const NotebooksTable = ({
       loading={loading}
       dataSource={genTableData(data)}
       pagination={pagination}
-      tableLayout="auto"
     />
   );
 };

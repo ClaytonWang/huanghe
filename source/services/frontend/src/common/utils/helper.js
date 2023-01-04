@@ -379,7 +379,7 @@ const Counter = function () {
     return counter;
   };
 };
-const ID = function () {
+export const ID = function () {
   let obj = {};
   this.getValue = function (prefix) {
     if (!obj[prefix]) {
@@ -388,10 +388,13 @@ const ID = function () {
     return `${prefix}${obj[prefix].getCounter()}`;
   };
 };
-const id = new ID();
-export const genUniqueIdByPrefix = (prefix) => {
+const globalID = new ID();
+export const genUniqueIdByPrefix = (prefix, instance) => {
   if (!prefix) {
     throw new Error('need a prefix');
   }
-  return id.getValue(prefix);
+  if (instance) {
+    return instance.getValue(prefix);
+  }
+  return globalID.getValue(prefix);
 };
