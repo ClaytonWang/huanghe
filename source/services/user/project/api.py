@@ -6,13 +6,16 @@
     >Time    : 2022/11/28 19:52
 """
 from fastapi import APIRouter, Depends, HTTPException, status, Path
+from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from models.project import Project
 from project.serializers import ProjectCreate, ProjectList, ProjectEdit
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
+from basic.common.env_variable import get_string_variable
 from pypinyin import lazy_pinyin, Style
 from basic.middleware.account_getter import create_ns, Namespace, create_secret, SecretNamespace
+from project.service_request import get_notebook_list, get_volume_list
 
 router_project = APIRouter()
 
@@ -25,6 +28,7 @@ router_project = APIRouter()
 async def get_project(project_id: int = Path(..., ge=1, description='需要查询的项目ID')):
     _project = await Project.objects.get(pk=project_id)
     return _project
+
 
 @router_project.post(
     '',
@@ -93,11 +97,20 @@ async def update_project(
     status_code=status.HTTP_200_OK,
 )
 async def delete_project(
+        request: Request,
         project_id: int = Path(..., ge=1, description='项目ID')
 ):
-
+    authorization: str = request.headers.get('authorization')
     project = await Project.objects.get(id=project_id)
     if await project.member.count():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联用户，不能删除')
+
+    notebook_list = await get_notebook_list(authorization, project.code)
+    if notebook_list:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联notebook，不能删除')
+    volume_list = await get_volume_list(authorization)
+    volume_filter = list(filter(lambda x: x['project_id'] == project_id, volume_list))
+    if volume_filter:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联存储，不能删除')
 
     await project.delete()
