@@ -1,4 +1,4 @@
-name: base-cluster
+name: base-storage
 
 on:
   push:
