@@ -9,7 +9,7 @@ on:
 #     - source/services/cluster/**
 #     - manifests/service-cluster.yaml
 #     - .github/workflows/service-cluster.yaml
-      - source/services/cluster/Dockerfile_base_cluster
+      - dockerfile_base/cluster/Dockerfile_base_cluster
     tags: [ '*' ]
 
 env:
@@ -60,8 +60,8 @@ jobs:
         uses: docker/build-push-action@v3
         id: build_and_push
         with:
-          file: ./source/services/cluster/Dockerfile_base_cluster
-          context: ./source
+          file: ./dockerfile_base/cluster/Dockerfile_base_cluster
+          context: ./dockerfile_base
           push: true
           tags: ${{ steps.meta.outputs.tags }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{env.DOCKER_TAG}}
           labels: ${{ steps.meta.outputs.labels }}

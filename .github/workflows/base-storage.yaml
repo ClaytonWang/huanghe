@@ -5,7 +5,7 @@ on:
 #    branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/jiangshouchen"]
     branches: [ "feature/jiangshouchen" ]
     paths:
-      - source/services/storage/Dockerfile_base_storage
+      - dockerfile_base/storage/Dockerfile_base_storage
     tags: [ '*' ]
 
 env:
