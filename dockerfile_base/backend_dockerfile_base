@@ -8,7 +8,7 @@ WORKDIR /source/services/storage
 
 RUN sed -i s@/archive.ubuntu.com//@/mirrors.aliyun.com/@g /etc/apt/sources.list \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
-    && apt-get clean \
+    && apt-get clean
 
 RUN set -eux \
     && apt-get update \
