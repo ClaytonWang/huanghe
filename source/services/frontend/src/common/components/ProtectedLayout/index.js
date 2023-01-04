@@ -8,13 +8,14 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { Layout, Menu } from 'antd';
 import { get, find } from 'lodash';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Icon from '@ant-design/icons';
 import HeaderNav from '@/common/components/HeaderNav';
 import { useAuth } from '@/common/hooks/useAuth';
 import { tranverseTree, isLeafNode } from '@/common/utils/helper';
 import { menuItemsConfig } from '@/common/utils/config';
 import Icons from '@/common/components/Icon';
+import useLocationChange from '@/common/hooks/useLocationChange';
 import './index.less';
 
 const { Sider, Content } = Layout;
@@ -22,6 +23,7 @@ const { Sider, Content } = Layout;
 const ProtectedLayout = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [selectedKeys, setSelectedKeys] = useState([]);
 
   const permissions = useMemo(() => get(user, 'permissions', []), [user]);
 
@@ -61,8 +63,7 @@ const ProtectedLayout = () => {
     }
     return result;
   }, [items]);
-
-  const selectedKeys = useMemo(() => {
+  const defaultSelectedKeys = useMemo(() => {
     const result = [];
     if (items.length > 0 && defaultOpenKeys.length > 0) {
       const firstMenu = defaultOpenKeys[0];
@@ -73,13 +74,36 @@ const ProtectedLayout = () => {
     return result;
   }, [defaultOpenKeys, items]);
 
+  const getSelectedKeys = (key) => {
+    let relativeKey = key;
+    if (!key) {
+      return [];
+    }
+    tranverseTree(items, (item) => {
+      const { key: menuKey } = item;
+      if (isLeafNode(item) && key.includes(menuKey)) {
+        relativeKey = menuKey;
+      }
+    });
+    return [relativeKey];
+  };
+
   /* eslint-disable react-hooks/exhaustive-deps */
-  useEffect(() => {
-    // if location is empty, auto direct to first submenu; else maintain;
-    const pathname = (selectedKeys.length > 0 && selectedKeys[0]) || '';
-    const path = pathname.split('.').join('/');
-    navigate(path);
-  }, []);
+  useLocationChange((location, prevLocation) => {
+    if (location.pathname === '/') {
+      const pathname =
+        (defaultSelectedKeys.length > 0 && defaultSelectedKeys[0]) || '';
+      const path = pathname.split('.').join('/');
+      navigate(path);
+    }
+    if (!prevLocation || prevLocation.pathname !== location.pathname) {
+      const key = location.pathname
+        .split('/')
+        .filter((value) => value)
+        .join('.');
+      setSelectedKeys(getSelectedKeys(key));
+    }
+  });
 
   return (
     <Layout className="protected-layout">
@@ -89,7 +113,7 @@ const ProtectedLayout = () => {
           <Menu
             defaultOpenKeys={defaultOpenKeys}
             mode="inline"
-            defaultSelectedKeys={selectedKeys}
+            selectedKeys={selectedKeys}
             items={items}
             className="dbr-sider-menu"
           />

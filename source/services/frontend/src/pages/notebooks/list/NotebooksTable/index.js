@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import { Table, Tooltip } from 'antd';
+import { Spin, Table, Tooltip } from 'antd';
 import qs from 'qs';
 import { get } from 'lodash';
 import Icon from '@ant-design/icons';
@@ -24,11 +24,24 @@ const NotebooksTable = ({
       dataIndex: 'status',
       width: 80,
       render(value) {
-        return (
-          <Tooltip title={value.desc}>
-            <Icon style={{ fontSize: 24 }} component={Icons[value.name]} />
-          </Tooltip>
+        let icon = (
+          <Icon style={{ fontSize: 24 }} component={Icons[value.name]} />
         );
+        if (/^(stop|start|pending)$/.test(value.name)) {
+          icon = (
+            <Spin
+              indicator={
+                <Icon
+                  style={{ fontSize: 24 }}
+                  component={Icons[value.name]}
+                  spin
+                  rotate={(/pending/.test(value.name) && 180) || 0}
+                />
+              }
+            />
+          );
+        }
+        return <Tooltip title={value.desc}>{icon}</Tooltip>;
       },
     },
     {

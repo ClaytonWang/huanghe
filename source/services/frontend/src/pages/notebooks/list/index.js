@@ -39,6 +39,7 @@ const NotebooksList = () => {
   );
   const [tableData, setTableData] = useState();
   const [projectsDatasource, setProjectsDatasource] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -50,12 +51,16 @@ const NotebooksList = () => {
 
   const requestList = useCallback(
     async (args) => {
-      const params = purifyDeep({ ...getFilters(), ...args });
+      const { loading = false, ...rest } = args;
+      const params = purifyDeep({ ...getFilters(), ...rest });
       try {
+        setLoading(loading);
         const { result } = await api.notebooksList(params);
         setTableData(result);
+        setLoading(false);
       } catch (error) {
         console.log(error);
+        setLoading(false);
       }
     },
     [getFilters]
@@ -83,7 +88,7 @@ const NotebooksList = () => {
   };
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
-    requestList();
+    requestList({ loading: true });
     requestProjects();
     const filters = getFilters();
     setSearchParams(qs.stringify(filters));
@@ -95,7 +100,7 @@ const NotebooksList = () => {
     return () => {
       clearInterval(timer);
     };
-  }, []);
+  }, [searchParams]);
 
   const onPageNoChange = (pageno, pagesize) => {
     reload({ pageno, pagesize });
@@ -184,6 +189,7 @@ const NotebooksList = () => {
         <NotebooksTable
           tableData={tableData}
           reload={reload}
+          loading={loading}
           onOpen={handleOpenClicked}
           onStart={handleStartClicked}
           onStop={handleStopClicked}
