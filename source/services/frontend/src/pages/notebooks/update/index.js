@@ -7,7 +7,7 @@
  */
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Divider, Form, Input, message, Select } from 'antd';
+import { Button, Divider, Form, Input, message, Select, Tooltip } from 'antd';
 import { uniqueId, get, map } from 'lodash';
 import {
   DeleteFilled,
@@ -194,10 +194,10 @@ const NotebooksUpdate = () => {
                   (option?.children ?? '').includes(input)
                 }
                 options={filteredStorageOptions.map(
-                  ({ id, name, config, creator }) => ({
+                  ({ id, name = '-', config, creator }) => ({
                     label: (
                       <>
-                        {`${name || '-'}`}
+                        <Tooltip title={name}>{name}</Tooltip>
                         <span
                           style={{ color: '#bfbfbf', float: 'right' }}
                         >{`${config.value}G/${config.size}G`}</span>
@@ -286,7 +286,7 @@ const NotebooksUpdate = () => {
           >
             {imagesDatasource.map(({ id, name }) => (
               <Option key={id} value={id}>
-                {name}
+                <Tooltip title={name}>{name}</Tooltip>
               </Option>
             ))}
           </Select>
@@ -305,7 +305,7 @@ const NotebooksUpdate = () => {
           >
             {sourceDatasource.map(({ id, name }) => (
               <Option key={id} value={id}>
-                {name}
+                <Tooltip title={name}>{name}</Tooltip>
               </Option>
             ))}
           </Select>
