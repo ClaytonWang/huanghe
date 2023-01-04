@@ -20,6 +20,7 @@ def k8s_format(name):
         raise ValueError("Notebook命名必须为英文数字中划线组合,且首位必须是字母")
     return name.lower()
 
+
 class StatusItem(BaseModel):
     code: str = None
     name: str = None
