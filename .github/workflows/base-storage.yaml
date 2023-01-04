@@ -56,8 +56,8 @@ jobs:
         uses: docker/build-push-action@v3
         id: build_and_push
         with:
-          file: ./source/services/storage/Dockerfile_base_storage
-          context: ./source
+          file: ./dockerfile_base/storage/Dockerfile_base_storage
+          context: ./dockerfile_base
           push: true
           tags: ${{ steps.meta.outputs.tags }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{env.DOCKER_TAG}}
           labels: ${{ steps.meta.outputs.labels }}
