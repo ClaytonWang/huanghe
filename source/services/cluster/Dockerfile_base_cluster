@@ -5,5 +5,5 @@ FROM $BASE_IMG
 WORKDIR /source/services/cluster
 
 # python dependence
-COPY $APP_PATH/requirements.txt .
+COPY services/cluster/requirements.txt .
 RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
