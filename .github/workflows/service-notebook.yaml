@@ -2,7 +2,7 @@ name: Service:notebook
 
 on:
   push:
-    branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/notebook"]
+    branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/notebook", "feature/xinkai"]
     paths:
      - source/basic/**
      - source/services/notebook_management/**
