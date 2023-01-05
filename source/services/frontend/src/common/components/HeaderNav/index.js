@@ -94,8 +94,9 @@ const HeaderNav = () => {
   return (
     <>
       <Header className="dbr-header">
-        <div className="dbr-logo">
+        <div className="dbr-title">
           <img src={logo} />
+          <span>决策中台</span>
         </div>
         <div className="user-info">
           <Icon component={Icons.account} />
