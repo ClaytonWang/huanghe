@@ -11,8 +11,8 @@ import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { parseKVToKeyValue, purifyDeep } from '@/common/utils/helper';
 import { AuthButton, FormModal } from '@/common/components';
 import api from '@/common/api';
-import UsersTable from './UsersTable';
 import { EDIT, EMAIL_REG, USER_ROLE } from '@/common/constants';
+import UsersTable from './UsersTable';
 import UsersFilter from './UsersFilter';
 import './index.less';
 
@@ -164,7 +164,7 @@ const UsersList = () => {
         name="username"
         rules={[{ required: true, message: '请输入用户名' }]}
       >
-        <Input placeholder="请输入用户名" />
+        <Input placeholder="请输入用户名" disabled={type === EDIT} />
       </Form.Item>
       <Form.Item
         label="邮箱"
@@ -174,7 +174,7 @@ const UsersList = () => {
           { pattern: EMAIL_REG, message: '请输入有效邮箱' },
         ]}
       >
-        <Input placeholder="请输入邮箱" disabled={type === 'edit'} />
+        <Input placeholder="请输入邮箱" disabled={type === EDIT} />
       </Form.Item>
       <Form.Item
         label={(type === 'edit' && '新密码') || '密码'}

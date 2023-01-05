@@ -123,7 +123,7 @@ const HeaderNav = () => {
             name="username"
             rules={[{ required: true, message: '请输入用户名' }]}
           >
-            <Input placeholder="请输入姓名" />
+            <Input placeholder="请输入姓名" disabled />
           </Form.Item>
           <Form.Item label="角色" name="role">
             <Select disabled>
