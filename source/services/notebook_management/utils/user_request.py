@@ -86,12 +86,10 @@ async def get_current_user_aio(token):
             return userinfo
 
 
-async def get_user_list(token, page_no=1):
-    res = []
+async def get_user_list(token):
     async with aiohttp.ClientSession() as session:
-        # TODO 分页器目前限制100，超过100后报错，用户项目多后会有问题（也可以反复循环到result为空）
         # url = USER_SERVICE_PATH + f"/user?pagesize=100&pageno={page_no}"
-        url = f"{ENV_COMMON_URL}{USER_PREFIX_URL}?pagesize=100&pageno={page_no}"
+        url = f"{ENV_COMMON_URL}{USER_PREFIX_URL}/items"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
@@ -100,19 +98,18 @@ async def get_user_list(token, page_no=1):
             print("status:{}".format(response.status))
             text = await response.json()
             user_data = text['result']['data']
+            res = []
             for user in user_data:
                 projects = user.pop('projects')
                 user['project_ids'] = {x["id"] for x in projects}
                 res.append(UserInfo.parse_obj(user))
-            # print(text)
-    return [x.get_dict() for x in res]
+            return [x.get_dict() for x in res]
 
 
-async def get_project_list(token, page_no=1):
-    res = []
+async def get_project_list(token):
     async with aiohttp.ClientSession() as session:
         # url = USER_SERVICE_PATH + f"/project?pagesize=100&pageno={page_no}"
-        url = f"{ENV_COMMON_URL}{PROJECT_PREFIX_URL}?pagesize=100&pageno={page_no}"
+        url = f"{ENV_COMMON_URL}{PROJECT_PREFIX_URL}/items"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
@@ -122,9 +119,10 @@ async def get_project_list(token, page_no=1):
             text = await response.json()
             # print(text)
             proj_data = text['result']['data']
+            res = []
             for proj in proj_data:
                 res.append(ProjectInfo.parse_obj(proj))
-    return [x.get_dict() for x in res]
+            return [x.get_dict() for x in res]
 
 
 async def get_project(token, proj_id):
