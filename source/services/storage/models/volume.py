@@ -8,7 +8,7 @@
 from __future__ import annotations
 
 import datetime
-
+from fastapi import HTTPException, status
 import ormar
 from basic.common.base_model import GenericDateModel
 from models import DB, META
@@ -98,8 +98,16 @@ class Volume(GenericDateModel):
         return v
 
     @classmethod
-    async def set_deleted(cls, _id) -> Volume:
-        v = await cls.get_by_id(_id)
+    async def get_by_self_id(cls, _id, owner_id) -> Volume:
+        v = await cls.objects.get_or_none(id=_id, owner_by_id=owner_id)
+        if not v:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail=f'该盘的所属人不为当前用户')
+        return v
+
+    @classmethod
+    async def set_deleted(cls, _id, owner_id) -> Volume:
+        v = await cls.get_by_self_id(_id, owner_id)
         await v.update(**{"deleted_at": datetime.datetime.now()})
         return v
 
@@ -108,17 +116,3 @@ class Volume(GenericDateModel):
         v = await cls.get_by_id(_id)
         await v.update(**{"deleted_at": None})
         return v
-
-    @classmethod
-    async def compare_with_old(cls, _id, ver: VolumeEditReq):
-        v = await cls.get_by_id(_id)
-        d = {}
-        if ver.project.id and v.project_by_id != ver.project.id:
-            d.update({"project_by_id": ver.project.id,
-                      "project_by": ver.project.name})
-        if ver.config.size and ver.config.size > v.size:
-            d.update({"size": ver.config.size})
-        if ver.owner and ver.owner.id != v.owner_by_id:
-            d.update({"owner_by": ver.owner.username,
-                      "owner_by_id": ver.owner.id})
-        await v.update(**d)
