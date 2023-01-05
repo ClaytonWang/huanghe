@@ -45,6 +45,25 @@ async def all_path_exist():
 
 
 @router_notebook.get(
+    '/volume/{volume_id}',
+    description='存储-notebook列表',
+)
+async def get_volume_notebook(volume_id: int = Path(..., ge=1, description='需要查询的存储 ID')):
+    _notebook = await Notebook.objects.all()
+    storage_list = [(x.storage, x.id) for x in _notebook]
+    volume_note_dict = defaultdict(set)
+    for storage, notebook_id in storage_list:
+        for x in storage:
+            volume_note_dict[x['storage']['id']].add(notebook_id)
+    note_ids = volume_note_dict.get(volume_id, [])
+    if not note_ids:
+        return []
+    note_map = {x.id: {"id": x.id, "name": x.name} for x in _notebook}
+    result = [note_map[x] for x in note_ids]
+    return result
+
+
+@router_notebook.get(
     '/{notebook_id}',
     description="notebook详情",
     response_model=NotebookDetail,
