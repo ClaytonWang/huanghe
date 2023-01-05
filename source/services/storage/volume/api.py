@@ -27,9 +27,13 @@ async def get_volume(volume_id: int = Path(..., ge=1, description="存储ID")
     response_model=Page[VolumeDetailRes],
 )
 async def list_volume(request: Request,
-                      query_params: QueryParameters = Depends(QueryParameters)):
+                      query_params: QueryParameters = Depends(QueryParameters),
+                      isdeleted: bool = False):
     user: AccountGetter = request.user
-    volumes = await Volume.undeleted_volumes() if user.role.name != USER else await Volume.undeleted_self_volumes(user.id)
+    volumes = await Volume.undeleted_volumes() if user.role.name == ADMIN else await Volume.undeleted_self_project_volumes([project.id for project in user.projects])
+    if isdeleted:
+        query_params.filter_["deleted_at"] = None
+        query_params.filter_["owner_by_id"] = user.id
     p = await paginate(volumes.filter(
         **query_params.filter_
     ), params=query_params.params)
@@ -75,6 +79,8 @@ async def update_volume(request: Request,
         d.update({"project_by_id": project.id,
                   "project_by": project.name,
                   "project_en_by": project.en_name,})
+    if ver.config.size and ver.config.size < v.size:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'输入的更新值不能小于当前值')
     if ver.config.size and ver.config.size > v.size:
         if user.role == ADMIN and v.max == 1024:
             d.update({"max": 9999999})
@@ -92,8 +98,8 @@ async def update_volume(request: Request,
 )
 async def delete_volume(request: Request,
                         volume_id: int = Path(..., ge=1, description="存储ID")):
-    # user: AccountGetter = request.user
-    await Volume.set_deleted(volume_id)
+    user: AccountGetter = request.user
+    await Volume.set_deleted(volume_id, user.id)
     return success_common_response()
 
 
