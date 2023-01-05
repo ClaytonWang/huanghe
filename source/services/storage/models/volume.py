@@ -86,9 +86,9 @@ class Volume(GenericDateModel):
             (cls.deleted_at == None) | (cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7)))
 
     @classmethod
-    async def undeleted_self_volumes(cls, owner_id):
+    async def undeleted_self_project_volumes(cls, project_ids):
         return cls.objects.filter(
-            (cls.owner_by_id == owner_id) & ((cls.deleted_at == None) | (
+            (cls.project_by_id << project_ids) & ((cls.deleted_at == None) | (
                         cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7)))
         )
 

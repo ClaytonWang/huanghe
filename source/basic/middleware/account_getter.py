@@ -8,7 +8,7 @@
 from __future__ import annotations
 from fastapi import Request, Response, status
 from fastapi import HTTPException
-from typing import Optional
+from typing import Optional, List
 from config import DO_NOT_AUTH_URI
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
@@ -18,6 +18,22 @@ import requests
 import os
 from basic.config.storage import *
 
+class ProjectGetter(BaseModel):
+    id: int = Field(..., alias='project_id')
+    name: str = Field(..., alias='project_by')
+    en_name: str
+    class Config:
+        allow_population_by_field_name = True
+
+    @validator("en_name")
+    def name_match(cls, en_name: str):
+        ans = []
+        for ch in en_name:
+            if ch == "-":
+                ans.append(ch)
+            if ch.isalpha() or ch.isdigit():
+                ans.append(ch.lower())
+        return ''.join(ans)
 
 class SecretNamespace(BaseModel):
     namespace: str
@@ -56,6 +72,7 @@ class AccountGetter(BaseModel):
     username: str = Field(..., alias='user_name')
     en_name: str
     role: Role
+    projects: List[ProjectGetter]
 
     class Config:
         orm_mode = True
@@ -64,23 +81,6 @@ class AccountGetter(BaseModel):
     def name_match(cls, en_name: str):
         ans = []
         for ch in en_name:
-            if ch.isalpha() or ch.isdigit():
-                ans.append(ch.lower())
-        return ''.join(ans)
-
-class ProjectGetter(BaseModel):
-    id: int = Field(..., alias='project_id')
-    name: str = Field(..., alias='project_by')
-    en_name: str
-    class Config:
-        allow_population_by_field_name = True
-
-    @validator("en_name")
-    def name_match(cls, en_name: str):
-        ans = []
-        for ch in en_name:
-            if ch == "-":
-                ans.append(ch)
             if ch.isalpha() or ch.isdigit():
                 ans.append(ch.lower())
         return ''.join(ans)
