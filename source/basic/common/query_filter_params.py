@@ -37,4 +37,6 @@ class QueryParameters:
             sub_key = re.findall('^filter\[(.*)\]$', key)
             if not sub_key:
                 continue
+            if value == 'None':
+                value = None
             self.filter_[sub_key[0]] = value
