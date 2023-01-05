@@ -75,6 +75,8 @@ async def update_volume(request: Request,
         d.update({"project_by_id": project.id,
                   "project_by": project.name,
                   "project_en_by": project.en_name,})
+    if ver.config.size and ver.config.size < v.size:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'输入的更新值不能小于当前值')
     if ver.config.size and ver.config.size > v.size:
         if user.role == ADMIN and v.max == 1024:
             d.update({"max": 9999999})
@@ -92,8 +94,8 @@ async def update_volume(request: Request,
 )
 async def delete_volume(request: Request,
                         volume_id: int = Path(..., ge=1, description="存储ID")):
-    # user: AccountGetter = request.user
-    await Volume.set_deleted(volume_id)
+    user: AccountGetter = request.user
+    await Volume.set_deleted(volume_id, user.id)
     return success_common_response()
 
 
