@@ -181,9 +181,9 @@ const UsersList = () => {
     createUser({ ...values, permissions: [permissionId] });
   };
   const handleEditSubmit = (values) => {
-    const { userId } = selectedItem;
+    const { userId, id } = selectedItem;
     const { permissions: permissionId, project } = values;
-    updateUsers({ user: userId, permissions: [permissionId], project });
+    updateUsers({ pk: id, user: userId, permissions: [permissionId], project });
   };
   const handleEditClicked = (record) => {
     openModal('edit', { ...record, project: record.project.id });

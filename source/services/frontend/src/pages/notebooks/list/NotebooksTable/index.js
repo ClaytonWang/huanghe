@@ -160,10 +160,7 @@ const NotebooksTable = ({
                 condition={[
                   () => ['stopped'].indexOf(statusName) > -1,
                   (user) =>
-                    (user.role.name === USER &&
-                      get(record, 'creator.username') ===
-                        get(user, 'username')) ||
-                    true,
+                    get(record, 'creator.username') === get(user, 'username'),
                 ]}
               >
                 编辑
