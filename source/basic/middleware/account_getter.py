@@ -90,23 +90,19 @@ async def get_current_user(token: str) -> AccountGetter:
     if MOCK:
         return AccountGetter.parse_obj(MOCK_USER_JSON)
     try:
-        print(f"{USER_SERVICE_URL}{ACCOUNT_PREFIX_URL}")
 
         response = requests.get(f"http://{USER_SERVICE_URL}{ACCOUNT_PREFIX_URL}",
                                 headers={"Authorization": token})
-        print(f"{USER_SERVICE_URL}{ACCOUNT_PREFIX_URL}")
-        print(response)
         json = response.json()
         ag = AccountGetter.parse_obj(json['result'])
     except Exception as e:
-        print(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='获取用户失败，请检查token')
     return ag
 
 
 def get_project(token: str, project_id) -> ProjectGetter:
     try:
-        response = requests.get(f"{USER_SERVICE_URL}{PROJECT_PREFIX_URL}/{project_id}",
+        response = requests.get(f"http://{USER_SERVICE_URL}{PROJECT_PREFIX_URL}/{project_id}",
                                 headers={"Authorization": token}).json()
         project_dict = response['result']
         pg = ProjectGetter.parse_obj(project_dict)
