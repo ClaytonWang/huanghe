@@ -35,8 +35,8 @@ async def verify_token(request: Request, call_next):
         try:
             # 从header读取token
             authorization: str = request.headers.get('authorization')
-            print("that's it token")
-            print(authorization)
+            # print("that's it token")
+            # print(authorization)
             if not authorization:
                 return auth_error
 

@@ -53,7 +53,8 @@ class VolumeInfo(BaseModel):
 async def get_notebook_list(token, project_code):
     res = []
     async with aiohttp.ClientSession() as session:
-        url = f"{ENV_COMMON_URL}{NOTEBOOK_PREFIX_URL}?filter[project__code]={project_code}"
+        # url = f"{ENV_COMMON_URL}{NOTEBOOK_PREFIX_URL}?filter[project__code]={project_code}"
+        url = f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_PREFIX_URL}?filter[project__code]={project_code}"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
@@ -71,7 +72,8 @@ async def get_notebook_list(token, project_code):
 async def get_volume_list(token):
     res = []
     async with aiohttp.ClientSession() as session:
-        url = f"{ENV_COMMON_URL}{VOLUME_PREFIX_URL}"
+        # url = f"{ENV_COMMON_URL}{VOLUME_PREFIX_URL}"
+        url = f"http://{STORAGE_SERVICE_URL}{VOLUME_PREFIX_URL}"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'

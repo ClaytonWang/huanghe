@@ -16,8 +16,14 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 8
 
 ENV_COMMON_URL = "http://121.36.41.231:32767/api/v1"
-NOTEBOOK_PREFIX_URL = "/notebook/notebooks"
-VOLUME_PREFIX_URL = "/storages/volume"
+# NOTEBOOK_PREFIX_URL = "/notebook/notebooks"
+# VOLUME_PREFIX_URL = "/storages/volume"
+ENV_COMMON_NAMESPCE = "juece"
+ENV_COMMON_AFTER = "svc.cluster.local"
+NOTEBOOK_SERVICE_URL = f"notebook.{ENV_COMMON_NAMESPCE}.{ENV_COMMON_AFTER}"
+STORAGE_SERVICE_URL = f"storage.{ENV_COMMON_NAMESPCE}.{ENV_COMMON_AFTER}"
+NOTEBOOK_PREFIX_URL = "/notebooks"
+VOLUME_PREFIX_URL = "/volume"
 
 LOGGING = {
     "version": 1,

@@ -19,7 +19,8 @@ from basic.config.notebook_management import *
 async def create_notebook_k8s(token, payloads):
     async with aiohttp.ClientSession() as session:
         # url = K8S_SERVICE_PATH + "/notebook"
-        url = ENV_COMMON_URL + CLUSTER_NOTEBOOK_PREFIX_URL
+        # url = ENV_COMMON_URL + CLUSTER_NOTEBOOK_PREFIX_URL
+        url = f"http://{CLUSTER_SERVICE_URL}{CLUSTER_NOTEBOOK_PREFIX_URL}"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
@@ -34,7 +35,8 @@ async def create_notebook_k8s(token, payloads):
 async def delete_notebook_k8s(token, payloads):
     async with aiohttp.ClientSession() as session:
         # url = K8S_SERVICE_PATH + "/notebook"
-        url = ENV_COMMON_URL + CLUSTER_NOTEBOOK_PREFIX_URL
+        # url = ENV_COMMON_URL + CLUSTER_NOTEBOOK_PREFIX_URL
+        url = f"http://{CLUSTER_SERVICE_URL}{CLUSTER_NOTEBOOK_PREFIX_URL}"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
@@ -53,7 +55,8 @@ class NoteBookListReq(BaseModel):
 async def list_notebook_k8s(nblr: NoteBookListReq):
     async with aiohttp.ClientSession() as session:
         # url = K8S_SERVICE_PATH + "/notebook/batch"
-        url = f"{ENV_COMMON_URL}{CLUSTER_NOTEBOOK_PREFIX_URL}/batch"
+        # url = f"{ENV_COMMON_URL}{CLUSTER_NOTEBOOK_PREFIX_URL}/batch"
+        url = f"http://{CLUSTER_SERVICE_URL}{CLUSTER_NOTEBOOK_PREFIX_URL}/batch"
         headers = {
             'Content-Type': 'application/json'
         }
