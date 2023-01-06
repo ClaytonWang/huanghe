@@ -2,7 +2,7 @@ name: Service:user
 
 on:
   push:
-    branches: [ "main" , "release/*", "develop", "feature/dev-cicd"]
+    branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/xinkai"]
     paths:
      - source/basic/**
      - source/services/user/**
