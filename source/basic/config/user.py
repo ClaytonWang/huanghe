@@ -20,8 +20,6 @@ ENV_COMMON_URL = "http://121.36.41.231:32767/api/v1"
 # VOLUME_PREFIX_URL = "/storages/volume"
 ENV_COMMON_NAMESPACE = "juece"
 ENV_COMMON_AFTER = "svc.cluster.local"
-NOTEBOOK_SERVICE_URL = f"notebook.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
-STORAGE_SERVICE_URL = f"storage.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
 NOTEBOOK_PREFIX_URL = "/notebooks"
 VOLUME_PREFIX_URL = "/volume"
 
@@ -89,3 +87,6 @@ if os.path.exists(K8S_YAML_CONFIG_PATH):
             locals().update(**data)
     except Exception as e:
         print(f'Loading k8s config error. {e}')
+
+NOTEBOOK_SERVICE_URL = f"notebook.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
+STORAGE_SERVICE_URL = f"storage.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
