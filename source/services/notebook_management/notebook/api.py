@@ -37,13 +37,6 @@ def format_notebook_detail(notebook: Notebook):
     return result
 
 
-async def all_path_exist():
-    result = await Notebook.objects.all()
-    path_list = [[x['path'] for x in y.storage] for y in result]
-    path_expand = set(sum(path_list, []))
-    return path_expand
-
-
 @router_notebook.get(
     '/volume/{volume_id}',
     description='存储-notebook列表',
@@ -210,8 +203,7 @@ async def create_notebook(request: Request,
     hooks = init_data.pop('hooks')
     storages, volumes_k8s = await volume_check(authorization, hooks)
     path_set = {x['path'] for x in storages}
-    exist_path = await all_path_exist()
-    if len(path_set) != len(storages) or path_set.intersection(exist_path):
+    if len(path_set) != len(storages):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
     init_data['storage'] = json.dumps(storages)
 
@@ -287,11 +279,9 @@ async def update_notebook(request: Request,
     k8s_info['image'] = _image.name
 
     hooks = update_data.pop('hooks')
-    _path = {x['path'] for x in _notebook.storage}
     storages, volumes_k8s = await volume_check(authorization, hooks)
     path_set = {x['path'] for x in storages}
-    exist_path = await all_path_exist()
-    if len(path_set) != len(storages) or (path_set - _path).intersection(exist_path):
+    if len(path_set) != len(storages):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
     update_data['storage'] = json.dumps(storages)
     k8s_info['volumes'] = volumes_k8s
