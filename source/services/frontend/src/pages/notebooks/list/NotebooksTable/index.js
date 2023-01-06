@@ -140,7 +140,7 @@ const NotebooksTable = ({
                     handleStopClicked(record);
                   }}
                   condition={[
-                    () => ['error'].indexOf(statusName) < 0,
+                    () => ['error', 'stop'].indexOf(statusName) < 0,
                     (user) =>
                       (user.role.name === USER &&
                         get(record, 'creator.username') ===
