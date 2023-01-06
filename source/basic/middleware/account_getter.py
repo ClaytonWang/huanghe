@@ -92,12 +92,14 @@ async def get_current_user(token: str) -> AccountGetter:
     try:
         print(f"{USER_SERVICE_URL}{ACCOUNT_PREFIX_URL}")
 
-        response = requests.get(f"{USER_SERVICE_URL}{ACCOUNT_PREFIX_URL}",
+        response = requests.get(f"http://{USER_SERVICE_URL}{ACCOUNT_PREFIX_URL}",
                                 headers={"Authorization": token})
+        print(f"{USER_SERVICE_URL}{ACCOUNT_PREFIX_URL}")
         print(response)
         json = response.json()
         ag = AccountGetter.parse_obj(json['result'])
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='获取用户失败，请检查token')
     return ag
 
@@ -225,3 +227,5 @@ class OFOAuth2PasswordBearer(OAuth2PasswordBearer):
             else:
                 return None
         return param
+
+
