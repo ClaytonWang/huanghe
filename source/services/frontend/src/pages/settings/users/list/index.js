@@ -38,6 +38,7 @@ const UsersList = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [initialFormValues, setInitialFormValues] = useState(null);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -140,14 +141,25 @@ const UsersList = () => {
     }
     if (type === CREATE) {
       setShowCreateModal(true);
+      setInitialFormValues({
+        // FIXME：AIDP-159，hard code编辑权限，31为编辑权限id
+        permissions: 31,
+      });
     } else {
       setShowEditModal(true);
+      setInitialFormValues({
+        ...parseSeletedItem({
+          ...values,
+        }),
+        permissions: 31,
+      });
     }
   };
   const closeModal = () => {
     setShowCreateModal(false);
     setShowEditModal(false);
     setSelectedItem(null);
+    setInitialFormValues(null);
   };
   // FIXME: permissions冗余的数组结构引入的「数据处理」代码，如后期无相关前端页面扩展，建议优化
   const parseSeletedItem = (record) => {
@@ -228,7 +240,7 @@ const UsersList = () => {
           label="权限"
           rules={[{ required: true, message: '请选择用户权限' }]}
         >
-          <Select placeholder="请选择用户权限">
+          <Select placeholder="请选择用户权限" disabled>
             {permissionsDatasource.map(({ id, value }) => (
               <Option key={id} value={id}>
                 {value}
@@ -273,6 +285,7 @@ const UsersList = () => {
         <FormModal
           title="添加成员"
           okText="确认"
+          initialValues={initialFormValues}
           onSubmit={handleCreateSubmit}
           onCancel={handleCancelClicked}
         >
@@ -283,9 +296,7 @@ const UsersList = () => {
         <FormModal
           title="编辑成员"
           okText="保存"
-          initialValues={parseSeletedItem({
-            ...selectedItem,
-          })}
+          initialValues={initialFormValues}
           onSubmit={handleEditSubmit}
           onCancel={handleCancelClicked}
         >

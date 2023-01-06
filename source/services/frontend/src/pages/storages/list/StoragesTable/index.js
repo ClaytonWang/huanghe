@@ -20,8 +20,8 @@ const StoragesTable = ({
       title: '配置',
       dataIndex: 'config',
       render(config = {}) {
-        const { value = 0, size = 0 } = config;
-        return `${value}/${size}GB`;
+        const { size = 0 } = config;
+        return `${size}GB`;
       },
     },
     {

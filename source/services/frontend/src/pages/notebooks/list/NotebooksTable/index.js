@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import { Spin, Table, Tooltip } from 'antd';
+import { Modal, Spin, Table, Tooltip } from 'antd';
 import qs from 'qs';
 import { get } from 'lodash';
 import Icon from '@ant-design/icons';
@@ -211,7 +211,14 @@ const NotebooksTable = ({
     onStart(record);
   };
   const handleStopClicked = (record) => {
-    onStop(record);
+    Modal.confirm({
+      title: '可能会导致数据丢失，是否要停止该notebook服务？',
+      okText: '停止',
+      cancelText: '取消',
+      onOk: () => {
+        onStop(record);
+      },
+    });
   };
   const handleEditClicked = (record) => {
     onEdit(record);

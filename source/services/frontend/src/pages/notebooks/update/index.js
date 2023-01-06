@@ -116,19 +116,7 @@ const NotebooksUpdate = () => {
   const backToList = () => {
     navigate('/notebooks/list', { state: null });
   };
-  const handleSubmit = () => {
-    const values = form.getFieldsValue();
-    const { id = null } = get(location, 'state.params', {});
-    if (type === CREATE) {
-      saveNotebook(values);
-    } else {
-      updateNotebook({ id, ...values });
-    }
-  };
-  const handleCancelClicked = () => {
-    backToList();
-  };
-  const handleFieldsChange = (changedFields, allFields) => {
+  const updateStorage = (changedFields, allFields) => {
     const changedStorage = changedFields.find((field) =>
       /hooks,[0-9]+,storage/.test(field.name.toString())
     );
@@ -149,6 +137,25 @@ const NotebooksUpdate = () => {
         values.map(({ storage }) => storage || false).filter((value) => value)
       );
     }
+  };
+  const handleSubmit = () => {
+    const values = form.getFieldsValue();
+    const { id = null } = get(location, 'state.params', {});
+    if (type === CREATE) {
+      saveNotebook(values);
+    } else {
+      updateNotebook({ id, ...values });
+    }
+  };
+  const handleSubmitFailed = ({ errorFields }) => {
+    message.error(errorFields[0].errors[0]);
+    console.log(errorFields);
+  };
+  const handleCancelClicked = () => {
+    backToList();
+  };
+  const handleFieldsChange = (changedFields, allFields) => {
+    updateStorage(changedFields, allFields);
     return changedFields;
   };
 
@@ -157,7 +164,7 @@ const NotebooksUpdate = () => {
     requestProjects();
     requestImages();
     requestSource();
-    requestStorages();
+    requestStorages({ filter: { isdeleted: false } });
     notebookUniqueID.current = new ID();
   }, []);
 
@@ -200,7 +207,7 @@ const NotebooksUpdate = () => {
                         <Tooltip title={name}>{name}</Tooltip>
                         <span
                           style={{ color: '#bfbfbf', float: 'right' }}
-                        >{`${config.value}G/${config.size}G`}</span>
+                        >{`${config.size}G`}</span>
                         <span
                           style={{
                             color: '#bfbfbf',
@@ -238,6 +245,7 @@ const NotebooksUpdate = () => {
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
+        onFinishFailed={handleSubmitFailed}
         onCancel={handleCancelClicked}
         onFieldsChange={handleFieldsChange}
       >
@@ -258,19 +266,6 @@ const NotebooksUpdate = () => {
           }}
         >
           <Input placeholder="请输入Notebook名称" />
-        </Form.Item>
-        <Form.Item
-          name="project"
-          label="所属项目"
-          rules={[{ required: true, message: '请选择项目' }]}
-        >
-          <Select placeholder="请选择项目">
-            {projectsDatasource.map(({ id, name = '-' }) => (
-              <Option key={id} value={id}>
-                {name}
-              </Option>
-            ))}
-          </Select>
         </Form.Item>
         <Form.Item
           name="image"
@@ -306,6 +301,19 @@ const NotebooksUpdate = () => {
             {sourceDatasource.map(({ id, name }) => (
               <Option key={id} value={id}>
                 <Tooltip title={name}>{name}</Tooltip>
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+        <Form.Item
+          name="project"
+          label="所属项目"
+          rules={[{ required: true, message: '请选择项目' }]}
+        >
+          <Select placeholder="请选择项目">
+            {projectsDatasource.map(({ id, name = '-' }) => (
+              <Option key={id} value={id}>
+                {name}
               </Option>
             ))}
           </Select>
