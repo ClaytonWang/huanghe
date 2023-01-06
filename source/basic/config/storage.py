@@ -19,6 +19,7 @@ PROJECT_PREFIX_URL = "/user/project"
 CLUSTER_PVC_PREFIX_URL = "/cluster/pvc"
 CLUSTER_NAMESPACE_PREFIX_URL = "/cluster/namespace"
 CLUSTER_SECRET_PREFIX_URL = "/cluster/secret"
+NOTEBOOK_VOLUME_PREFIX_URL = "/notebook/notebooks/volume"
 MOCK = os.getenv("MOCK_ACCOUNT_GETTER", False)
 MOCK_USER_JSON = {"id": 60, 'username': "shouchen"}
 MOCK_PROJECT_JSON = {"id": 1, "name": "决策平台"}
