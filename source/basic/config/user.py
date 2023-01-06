@@ -22,6 +22,7 @@ ENV_COMMON_NAMESPACE = "juece"
 ENV_COMMON_AFTER = "svc.cluster.local"
 NOTEBOOK_PREFIX_URL = "/notebooks"
 VOLUME_PREFIX_URL = "/volume"
+ENV = "uat"
 
 LOGGING = {
     "version": 1,
