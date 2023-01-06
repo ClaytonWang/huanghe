@@ -8,7 +8,7 @@
 from __future__ import annotations
 from fastapi import Request, Response, status
 from fastapi import HTTPException
-from typing import Optional, List
+from typing import Optional, List, Dict
 from config import DO_NOT_AUTH_URI
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
@@ -155,6 +155,16 @@ def delete_ns(ns: Namespace):
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='删除namespace失败')
     return True
+
+def query_notebook_volume(token: str, volume_id) -> List[Dict]:
+    try:
+        response = requests.get(f"{ENV_COMMON_URL}{NOTEBOOK_VOLUME_PREFIX_URL}/{volume_id}", headers={"Authorization": token}).json()
+        assert response['success'] is True
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='查询notebook存储盘失败')
+    return response['result']
+
+
 
 async def verify_token(request: Request, call_next):
     auth_error = Response(

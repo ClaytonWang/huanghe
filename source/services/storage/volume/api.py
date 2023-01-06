@@ -5,7 +5,7 @@ from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from volume.serializers import VolumeCreateReq, VolumeEditReq, VolumeDetailRes
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project,\
-    ADMIN, USER, create_pvc, delete_pvc,PVCCreateReq, PVCDeleteReq
+    ADMIN, USER, create_pvc, delete_pvc,PVCCreateReq, PVCDeleteReq, query_notebook_volume
 
 router_volume = APIRouter()
 
@@ -99,6 +99,9 @@ async def update_volume(request: Request,
 async def delete_volume(request: Request,
                         volume_id: int = Path(..., ge=1, description="存储ID")):
     user: AccountGetter = request.user
+    result = query_notebook_volume(request.headers.get('authorization'), volume_id)
+    if len(result) != 0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'还存留notebook挂载这个盘， 不能删除')
     await Volume.set_deleted(volume_id, user.id)
     return success_common_response()
 
