@@ -90,8 +90,9 @@ async def get_current_user(token: str) -> AccountGetter:
     if MOCK:
         return AccountGetter.parse_obj(MOCK_USER_JSON)
     try:
-        response = requests.get(f"{ENV_COMMON_URL}{ACCOUNT_PREFIX_URL}",
+        response = requests.get(f"{USER_SERVICE_URL}{ACCOUNT_PREFIX_URL}",
                                 headers={"Authorization": token})
+        print(response)
         json = response.json()
         ag = AccountGetter.parse_obj(json['result'])
     except Exception as e:
@@ -101,7 +102,7 @@ async def get_current_user(token: str) -> AccountGetter:
 
 def get_project(token: str, project_id) -> ProjectGetter:
     try:
-        response = requests.get(f"{ENV_COMMON_URL}{PROJECT_PREFIX_URL}/{project_id}",
+        response = requests.get(f"{USER_SERVICE_URL}{PROJECT_PREFIX_URL}/{project_id}",
                                 headers={"Authorization": token}).json()
         project_dict = response['result']
         pg = ProjectGetter.parse_obj(project_dict)
