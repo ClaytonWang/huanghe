@@ -160,7 +160,7 @@ def delete_ns(ns: Namespace):
 def query_notebook_volume(token: str, volume_id) -> List[Dict]:
     # http://{USER_SERVICE_URL}{PROJECT_PREFIX_URL}/{project_id}
     try:
-        response = requests.get(f"{ENV_COMMON_URL}{NOTEBOOK_VOLUME_PREFIX_URL}/{volume_id}", headers={"Authorization": token}).json()
+        response = requests.get(f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_VOLUME_PREFIX_URL}/{volume_id}", headers={"Authorization": token}).json()
         assert response['success'] is True
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='查询notebook存储盘失败')
