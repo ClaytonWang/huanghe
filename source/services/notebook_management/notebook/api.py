@@ -287,10 +287,11 @@ async def update_notebook(request: Request,
     k8s_info['image'] = _image.name
 
     hooks = update_data.pop('hooks')
+    _path = {x['path'] for x in _notebook.storage}
     storages, volumes_k8s = await volume_check(authorization, hooks)
     path_set = {x['path'] for x in storages}
     exist_path = await all_path_exist()
-    if len(path_set) != len(storages) or path_set.intersection(exist_path):
+    if len(path_set) != len(storages) or (path_set - _path).intersection(exist_path):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
     update_data['storage'] = json.dumps(storages)
     k8s_info['volumes'] = volumes_k8s
