@@ -86,7 +86,9 @@ const NotebooksUpdate = () => {
   };
   const requestStorages = async () => {
     try {
-      const { result } = await api.storagesList();
+      const { result } = await api.storagesList({
+        filter: { isdeleted: false },
+      });
       setStoragesDatasource(
         result.data.map(({ id, ...rest }) => ({ id: Number(id), ...rest }))
       );
@@ -164,7 +166,7 @@ const NotebooksUpdate = () => {
     requestProjects();
     requestImages();
     requestSource();
-    requestStorages({ filter: { isdeleted: false } });
+    requestStorages();
     notebookUniqueID.current = new ID();
   }, []);
 
