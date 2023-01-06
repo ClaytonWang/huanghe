@@ -22,7 +22,6 @@ sys.path.insert(0, SOURCE_PATH.__str__())
 K8S_YAML_CONFIG_PATH = '/etc/juece/config.yaml'
 COMMON_CONFIG_PATH = f'basic.config.{APP_NAME}'
 
-
 try:
     common_module = importlib.import_module(COMMON_CONFIG_PATH)
     for key in common_module.__dict__:

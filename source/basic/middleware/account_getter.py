@@ -90,6 +90,8 @@ async def get_current_user(token: str) -> AccountGetter:
     if MOCK:
         return AccountGetter.parse_obj(MOCK_USER_JSON)
     try:
+        print(f"{USER_SERVICE_URL}{ACCOUNT_PREFIX_URL}")
+
         response = requests.get(f"{USER_SERVICE_URL}{ACCOUNT_PREFIX_URL}",
                                 headers={"Authorization": token})
         print(response)
