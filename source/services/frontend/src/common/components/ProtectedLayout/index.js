@@ -37,7 +37,9 @@ const ProtectedLayout = () => {
         }
         if (!item.permission || permissions.indexOf(item.permission) > -1) {
           const path = item.key.split('.').join('/');
-          item.label = <Link to={path}>{item.label}</Link>;
+          item.label =
+            (!item.children && <Link to={path}>{item.label}</Link>) ||
+            item.label;
           if (item.icon) {
             item.icon = <Icon component={Icons[item.icon]} />;
           }

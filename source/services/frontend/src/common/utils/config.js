@@ -100,19 +100,6 @@ module.exports = {
       ],
     },
     {
-      key: 'settings',
-      label: '设置',
-      icon: 'settings',
-      permission: 'settings',
-      children: [
-        {
-          key: 'settings.users',
-          label: '用户权限',
-          permission: 'settings.users',
-        },
-      ],
-    },
-    {
       key: 'notebooks',
       label: 'Notebook管理',
       icon: 'notebooks',
@@ -135,6 +122,19 @@ module.exports = {
           key: 'storages.list',
           label: '存储管理',
           permission: 'storages.list',
+        },
+      ],
+    },
+    {
+      key: 'settings',
+      label: '设置',
+      icon: 'settings',
+      permission: 'settings',
+      children: [
+        {
+          key: 'settings.users',
+          label: '用户权限',
+          permission: 'settings.users',
         },
       ],
     },

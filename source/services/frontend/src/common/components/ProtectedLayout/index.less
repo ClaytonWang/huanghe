@@ -1,6 +1,19 @@
 @import '../../css/index.less';
 .protected-layout {
-  .anticon.ant-menu-item-icon {
-    color: @primary-color;
+  .ant-menu .ant-menu-submenu {
+    .anticon {
+      color: @dbr-menu-color;
+    }
   }
+  .ant-menu .ant-menu-submenu:hover {
+    .anticon {
+      color: @primary-color;
+    }
+  }
+  .ant-menu .ant-menu-submenu.ant-menu-submenu-selected {
+    .anticon {
+      color: @primary-color;
+    }
+  }
+
 }
