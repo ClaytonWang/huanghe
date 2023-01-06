@@ -21,11 +21,8 @@ ENV_COMMON_URL = "http://121.36.41.231:32767/api/v1"
 # PROJECT_PREFIX_URL = "/user/project"
 # VOLUME_PREFIX_URL = "/storages/volume"
 # CLUSTER_NOTEBOOK_PREFIX_URL = "/cluster/notebook"
-ENV_COMMON_NAMESPCE = "juece"
+ENV_COMMON_NAMESPACE = "juece"
 ENV_COMMON_AFTER = "svc.cluster.local"
-USER_SERVICE_URL = f"user.{ENV_COMMON_NAMESPCE}.{ENV_COMMON_AFTER}"
-CLUSTER_SERVICE_URL = f"cluster.{ENV_COMMON_NAMESPCE}.{ENV_COMMON_AFTER}"
-STORAGE_SERVICE_URL = f"storage.{ENV_COMMON_NAMESPCE}.{ENV_COMMON_AFTER}"
 AUTH_PREFIX_URL = "/v1/auth/login"
 USER_PREFIX_URL = "/user"
 ACCOUNT_PREFIX_URL = "/user/account"
@@ -104,3 +101,7 @@ if os.path.exists(K8S_YAML_CONFIG_PATH):
             locals().update(**data)
     except Exception as e:
         print(f'Loading k8s config error. {e}')
+
+USER_SERVICE_URL = f"user.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
+CLUSTER_SERVICE_URL = f"cluster.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
+STORAGE_SERVICE_URL = f"storage.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
