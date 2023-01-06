@@ -16,8 +16,20 @@ from basic.common.env_variable import get_string_variable
 from pypinyin import lazy_pinyin, Style
 from basic.middleware.account_getter import create_ns, Namespace, create_secret, SecretNamespace
 from project.service_request import get_notebook_list, get_volume_list
+from typing import List
 
 router_project = APIRouter()
+
+
+@router_project.get(
+    '/items',
+    description='项目列表所有项目',
+    response_model=List[ProjectList],
+    response_model_exclude_unset=True
+)
+async def list_project_items():
+    _projects = await Project.objects.select_related('owner').all()
+    return _projects
 
 
 @router_project.get(

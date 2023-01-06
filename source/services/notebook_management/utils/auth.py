@@ -72,6 +72,6 @@ async def operate_auth(request: Request, notebook_id: int):
     if stat != 200:
         return None, '项目不存在'
     owner_id = _project['owner']['id']
-    if int(owner_id) != request.user.role.id:
+    if int(owner_id) != request.user.id:
         return None, '不能编辑非自己负责的Notebook'
     return _notebook, None

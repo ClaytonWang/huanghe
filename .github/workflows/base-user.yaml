@@ -1,18 +1,16 @@
-name: Service:notebook
+name: base-user
 
 on:
   push:
-    branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/notebook", "feature/xinkai"]
+#    branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/jiangshouchen"]
+    branches: [ "feature/xinkai" ]
     paths:
-     - source/basic/**
-     - source/services/notebook_management/**
-     - manifests/service-notebook.yaml
-     - .github/workflows/service-notebook.yaml
+      - dockerfile_base/user/**
     tags: [ '*' ]
 
 env:
   DOCKER_CLI_EXPERIMENTAL: enabled
-  IMAGE_NAME: ${{ github.repository }}.notebook
+  IMAGE_NAME: ${{ github.repository }}.base-user
   DOCKER_TAG: latest
   REGISTRY: containers.git.digitalbrain.cn
   GITHOST: git.digitalbrain.cn
@@ -27,7 +25,7 @@ jobs:
     steps:
       - name: Lowercase image name
         run: |
-          echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}.notebook" >>${GITHUB_ENV}
+          echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}.base-user" >>${GITHUB_ENV}
       - name: Create docker tag
         id: get_docker_tag
         run: |
@@ -58,39 +56,10 @@ jobs:
         uses: docker/build-push-action@v3
         id: build_and_push
         with:
-          file: ./source/services/notebook_management/Dockerfile
-          context: ./source
+          file: ./dockerfile_base/user/Dockerfile_base_user
+          context: ./dockerfile_base
           push: true
           tags: ${{ steps.meta.outputs.tags }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{env.DOCKER_TAG}}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-  deploy_dev:
-    name: 'Deploy Private Image'
-    needs: docker_build_and_push
-    runs-on: ubuntu-latest
-    environment:
-      name: development
-    steps:
-      - name: setup kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: latest
-        id: install
-      - name: set k8s context
-        uses: azure/k8s-set-context@v1
-        with:
-          method: kubeconfig
-          kubeconfig: ${{ secrets.KUBECONFIG }}
-          context: ${{ secrets.KUBECONTEXT }}
-        id: setcontext
-      - name: deploy to k8s
-        uses: Azure/k8s-deploy@v3.1
-        continue-on-error: true
-        with:
-          namespace: ${{ secrets.KUBENAMESPACE }}
-          imagepullsecrets: |
-            db-container
-          manifests: |
-            manifests/service-notebook.yaml
-          images: containers.git.digitalbrain.cn/engineering-group/huanghe.notebook:${{needs.docker_build_and_push.outputs.out_docker_tag}}

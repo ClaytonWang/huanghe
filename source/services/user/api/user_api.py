@@ -199,7 +199,7 @@ async def account(
 @router_user.get(
     '/items',
     description='用户列表指定类型的所有用户，字段只返回ID、用户名和邮箱',
-    response_model=List[UserItem],
+    response_model=List[AdminUserList],
     response_model_exclude_unset=True
 )
 async def list_user(
@@ -221,4 +221,21 @@ async def list_user(
         params_filter = ormar.and_(code_filter, **params_filter)
     if isinstance(params_filter, dict):
         params_filter = ormar.queryset.clause.FilterGroup(**params_filter)
-    return await User.objects.select_related(['role', 'project_user', 'projects']).filter(params_filter).all()
+    result = await User.objects.select_related(['role', 'project_user', 'projects']).filter(params_filter).all()
+    data = []
+    for item in result:
+        item = item.dict()
+        if item.get('role') and item['role'].get('name') == 'admin':
+            item['projects'] = []
+        else:
+            members_projects = item.get('projects', [])
+            projects_list = item.get('project_user', []) + members_projects
+            project_ids = set()
+            res = []
+            for project in projects_list:
+                if project['id'] not in project_ids:
+                    project_ids.add(project['id'])
+                    res.append(project)
+            item['projects'] = res
+        data.append(item)
+    return data
