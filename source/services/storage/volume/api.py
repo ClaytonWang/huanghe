@@ -27,11 +27,11 @@ async def get_volume(volume_id: int = Path(..., ge=1, description="存储ID")
     response_model=Page[VolumeDetailRes],
 )
 async def list_volume(request: Request,
-                      query_params: QueryParameters = Depends(QueryParameters),
-                      isdeleted: bool = False):
+                      query_params: QueryParameters = Depends(QueryParameters)):
     user: AccountGetter = request.user
     volumes = await Volume.undeleted_volumes() if user.role.name == ADMIN else await Volume.undeleted_self_project_volumes([project.id for project in user.projects])
-    if isdeleted:
+    if query_params.filter_.get("isdeleted", False):
+        query_params.filter_.pop("isdeleted")
         query_params.filter_["deleted_at"] = None
         query_params.filter_["owner_by_id"] = user.id
     p = await paginate(volumes.filter(
