@@ -31,7 +31,7 @@ module.exports = {
     // settings
     settingsUsersList: 'get|/user/settings/user',
     settingsUsersCreate: 'post|/user/settings/user',
-    settingsUsersUpdate: 'post|/user/settings/user',
+    settingsUsersUpdate: 'put|/user/settings/user/:pk',
     settingsUsersDelete: 'delete|/user/settings/user/:pk',
 
     // todo, remove settings prefix
