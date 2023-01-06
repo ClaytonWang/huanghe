@@ -29,7 +29,8 @@ from models import startup_event, shutdown_event
 
 # oauth2_scheme = OFOAuth2PasswordBearer(token_url="/v1/auth/login")
 # oauth2_scheme = OFOAuth2PasswordBearer(token_url=USER_SERVICE_PATH + "/v1/auth/login")
-oauth2_scheme = OFOAuth2PasswordBearer(token_url=ENV_COMMON_URL + AUTH_PREFIX_URL)
+# oauth2_scheme = OFOAuth2PasswordBearer(token_url=ENV_COMMON_URL + AUTH_PREFIX_URL)
+oauth2_scheme = OFOAuth2PasswordBearer(token_url=f"http://{USER_SERVICE_URL}{AUTH_PREFIX_URL}")
 configure_logging('logging.config.dictConfig', LOGGING)
 app = FastAPI(
     title='notebook管理',

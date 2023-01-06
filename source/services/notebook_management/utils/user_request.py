@@ -66,7 +66,8 @@ class ProjectInfo(BaseModel):
 async def get_current_user_aio(token):
     async with aiohttp.ClientSession() as session:
         # url = USER_SERVICE_PATH + "/user/account"
-        url = ENV_COMMON_URL + ACCOUNT_PREFIX_URL
+        # url = ENV_COMMON_URL + ACCOUNT_PREFIX_URL
+        url = f"http://{USER_SERVICE_URL}{ACCOUNT_PREFIX_URL}"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
@@ -89,7 +90,8 @@ async def get_current_user_aio(token):
 async def get_user_list(token):
     async with aiohttp.ClientSession() as session:
         # url = USER_SERVICE_PATH + f"/user?pagesize=100&pageno={page_no}"
-        url = f"{ENV_COMMON_URL}{USER_PREFIX_URL}/items"
+        # url = f"{ENV_COMMON_URL}{USER_PREFIX_URL}/items"
+        url = f"http://{USER_SERVICE_URL}{USER_PREFIX_URL}/items"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
@@ -109,7 +111,8 @@ async def get_user_list(token):
 async def get_project_list(token):
     async with aiohttp.ClientSession() as session:
         # url = USER_SERVICE_PATH + f"/project?pagesize=100&pageno={page_no}"
-        url = f"{ENV_COMMON_URL}{PROJECT_PREFIX_URL}/items"
+        # url = f"{ENV_COMMON_URL}{PROJECT_PREFIX_URL}/items"
+        url = f"http://{USER_SERVICE_URL}{PROJECT_PREFIX_URL}/items"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
@@ -128,7 +131,8 @@ async def get_project_list(token):
 async def get_project(token, proj_id):
     async with aiohttp.ClientSession() as session:
         # url = USER_SERVICE_PATH + f"/project/{proj_id}"
-        url = f"{ENV_COMMON_URL}{PROJECT_PREFIX_URL}/{proj_id}"
+        # url = f"{ENV_COMMON_URL}{PROJECT_PREFIX_URL}/{proj_id}"
+        url = f"http://{USER_SERVICE_URL}{PROJECT_PREFIX_URL}/{proj_id}"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
