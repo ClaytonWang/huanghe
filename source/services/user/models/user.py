@@ -25,7 +25,7 @@ class Role(DateModel):
     value = ormar.String(max_length=30, default='', nullable=True, comment='说明')
 
     def __repr__(self):
-        return f'{self.name}_{self.vlaue}'
+        return f'{self.name}_{self.value}'
 
 
 class User(DateAuditModel):

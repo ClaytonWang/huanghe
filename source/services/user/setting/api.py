@@ -83,6 +83,37 @@ async def project_set_user(
         await project.member.add(user)
 
 
+@router_setting.put(
+    '/user/{pms_id}',
+    description='项目编辑普通用户&设置权限',
+    response_model={},
+)
+async def project_set_user(
+        body: ProjectSetUser,
+        pms_id: int = Path(..., ge=1, description='pms ID')
+):
+    project = await Project.objects.select_related('member').get(id=body.project)
+    user = await User.objects.get(id=body.user)
+    add_pms = await Permissions.objects.filter(id__in=body.permissions).all()
+
+    # TODO 失败回滚
+    # 删除指定用户和项目的所有权限
+    pms = await OperationPms.objects.select_related(['user', 'project', 'project__member']).get_or_none(pk=pms_id)
+    await pms.permissions.clear()
+    old_project = pms.project
+    if user in old_project.member:
+        await old_project.member.remove(user)
+    await OperationPms.objects.filter(pk=pms_id).update(project=project.id, user=user.id)
+
+    # 重新添加权限
+    for _item in add_pms:
+        await pms.permissions.add(_item)
+
+    # 添加项目普通用户关联
+    if user not in project.member:
+        await project.member.add(user)
+
+
 @router_setting.delete(
     '/user/{pk}',
     description='删除【设置&用户项目权限】',
