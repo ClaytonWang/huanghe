@@ -112,7 +112,7 @@ def get_project(token: str, project_id) -> ProjectGetter:
 
 def create_secret(sn: SecretNamespace, ignore_exist=False):
     try:
-        response = requests.post(f"{ENV_COMMON_URL}{CLUSTER_SECRET_PREFIX_URL}", json=sn.dict()).json()
+        response = requests.post(f"http://{CLUSTER_SERVICE_URL}{CLUSTER_SECRET_PREFIX_URL}", json=sn.dict()).json()
         if ignore_exist and response["success"] is not True and response["message"] == "AlreadyExists":
             return True
         assert response['success'] is True
@@ -122,7 +122,7 @@ def create_secret(sn: SecretNamespace, ignore_exist=False):
     return True
 def create_pvc(pvc: PVCCreateReq, ignore_exist=False):
     try:
-        response = requests.post(f"{ENV_COMMON_URL}{CLUSTER_PVC_PREFIX_URL}", json=pvc.dict()).json()
+        response = requests.post(f"http://{CLUSTER_SERVICE_URL}{CLUSTER_PVC_PREFIX_URL}", json=pvc.dict()).json()
         if ignore_exist and response["success"] is not True and response["message"] == "AlreadyExists":
             return True
         assert response['success'] is True
@@ -133,7 +133,7 @@ def create_pvc(pvc: PVCCreateReq, ignore_exist=False):
 
 def delete_pvc(pvc: PVCDeleteReq):
     try:
-        response = requests.delete(f"{ENV_COMMON_URL}{CLUSTER_PVC_PREFIX_URL}", json=pvc.dict()).json()
+        response = requests.delete(f"http://{CLUSTER_SERVICE_URL}{CLUSTER_PVC_PREFIX_URL}", json=pvc.dict()).json()
         assert response['success'] is True
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='删除pvc失败, 请确认是否存在namespace， 或者pvc是否不存在')
@@ -141,7 +141,7 @@ def delete_pvc(pvc: PVCDeleteReq):
 
 def create_ns(ns: Namespace):
     try:
-        response = requests.post(f"{ENV_COMMON_URL}{CLUSTER_NAMESPACE_PREFIX_URL}", json=ns.dict()).json()
+        response = requests.post(f"http://{CLUSTER_SERVICE_URL}{CLUSTER_NAMESPACE_PREFIX_URL}", json=ns.dict()).json()
         assert response['success'] is True
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='创建namespace失败')
@@ -151,13 +151,14 @@ def create_ns(ns: Namespace):
 def delete_ns(ns: Namespace):
     try:
 
-        response = requests.delete(f"{ENV_COMMON_URL}{CLUSTER_NAMESPACE_PREFIX_URL}", json=ns.dict()).json()
+        response = requests.delete(f"http://{CLUSTER_SERVICE_URL}{CLUSTER_NAMESPACE_PREFIX_URL}", json=ns.dict()).json()
         assert response['success'] is True
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='删除namespace失败')
     return True
 
 def query_notebook_volume(token: str, volume_id) -> List[Dict]:
+    # http://{USER_SERVICE_URL}{PROJECT_PREFIX_URL}/{project_id}
     try:
         response = requests.get(f"{ENV_COMMON_URL}{NOTEBOOK_VOLUME_PREFIX_URL}/{volume_id}", headers={"Authorization": token}).json()
         assert response['success'] is True
