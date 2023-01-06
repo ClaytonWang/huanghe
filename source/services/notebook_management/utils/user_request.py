@@ -97,7 +97,7 @@ async def get_user_list(token):
         async with session.get(url, headers=headers) as response:
             print("status:{}".format(response.status))
             text = await response.json()
-            user_data = text['result']['data']
+            user_data = text['result']
             res = []
             for user in user_data:
                 projects = user.pop('projects')
@@ -118,7 +118,7 @@ async def get_project_list(token):
             print("status:{}".format(response.status))
             text = await response.json()
             # print(text)
-            proj_data = text['result']['data']
+            proj_data = text['result']
             res = []
             for proj in proj_data:
                 res.append(ProjectInfo.parse_obj(proj))
