@@ -44,7 +44,10 @@ class Source(DateModel):
     desc: str = ormar.String(max_length=80, default='', comnet='备注')
 
     def get_str(self):
-        return f"{self.gpu}*{self.type} {self.cpu}C {self.memory}G"
+        if self.gpu:
+            return f"GPU {self.gpu}*{self.type} {self.cpu}C {self.memory}G"
+        else:
+            return f"CPU {self.cpu}C {self.memory}G"
 
     def get_info(self):
         return {
