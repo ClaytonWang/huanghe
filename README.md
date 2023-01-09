@@ -9,6 +9,7 @@
 | user     | 用户管理 | 用户、认证、鉴权服务 |
 | cluster  | 集群管理 | k8s对接 |
 | storages | 存储管理 | 持久化存储管理  |
+| notebook | notebook管理 | 管理notebook生命周期  |
 
 **微服务间调用**
 ```bash
