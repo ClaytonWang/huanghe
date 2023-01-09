@@ -140,8 +140,9 @@ async def delete_user(
         user_id: int = Path(..., ge=1, description='用户ID')
 ):
     user = await User.objects.get(id=user_id)
+    owner_proj = await Project.objects.filter(owner=user).all()
     # TODO 判断用户管理资源
-    if await user.projects.count():
+    if await user.projects.count() or owner_proj:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联项目资源不能删除')
 
     await user.delete()
