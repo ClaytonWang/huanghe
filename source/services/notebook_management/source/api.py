@@ -32,5 +32,8 @@ async def list_source(query_params: QueryParameters = Depends(QueryParameters),)
     # print(result)
     data = result['data']
     for item in data:
-        item['name'] = f"{item.pop('gpu')}*{item.pop('type')} {item.pop('cpu')}C {item.pop('memory')}G"
+        if item.get('gpu'):
+            item['name'] = f"GPU {item.pop('gpu')}*{item.pop('type')} {item.pop('cpu')}C {item.pop('memory')}G"
+        else:
+            item['name'] = f"CPU {item.pop('cpu')}C {item.pop('memory')}G"
     return result
