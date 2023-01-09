@@ -12,6 +12,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import api from '@/common/api';
 import { useLocalStorage } from './useLocalStorage';
+import { message } from 'antd';
 
 const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
@@ -30,12 +31,19 @@ export const AuthProvider = ({ children }) => {
   const updateUser = useCallback((user) => {
     setUser(user);
   }, []);
-  const loadAccount = useCallback(async () => {
+  const requestAccount = useCallback(async () => {
     try {
       const data = await api.settingsAccount();
       updateUser(data.result);
+      return Promise.resolve();
     } catch (error) {
       console.log(error);
+      if (error === 401) {
+        // token过期
+        setToken(null);
+        message.error('用户登录失效，请重新登录！');
+      }
+      return Promise.reject(error);
     }
   }, [updateUser]);
 
@@ -66,9 +74,9 @@ export const AuthProvider = ({ children }) => {
       user,
       login,
       logout,
-      loadAccount,
+      requestAccount,
     }),
-    [token, user, login, logout, loadAccount]
+    [token, user, login, logout, requestAccount]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

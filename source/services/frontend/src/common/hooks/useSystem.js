@@ -16,12 +16,24 @@ import { useAuth } from './useAuth';
 
 const SystemContext = createContext();
 export const SystemProvider = ({ children }) => {
-  const { token, loadAccount, user } = useAuth();
+  const { token, requestAccount } = useAuth();
   const [organizations, setOrganizations] = useState([]);
+  const [renderChildren, setRenderChildren] = useState(false);
 
+  const loadAccount = async () => {
+    try {
+      await requestAccount();
+      setRenderChildren(true);
+    } catch (error) {
+      console.log(error);
+      setRenderChildren(false);
+    }
+  };
+
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     loadAccount();
-  }, [token, loadAccount]);
+  }, [token]);
 
   // 获取组织列表
   const loadOrganizations = useCallback(async () => {
@@ -54,7 +66,7 @@ export const SystemProvider = ({ children }) => {
 
   return (
     <SystemContext.Provider value={value}>
-      {(user && organizations && children) || renderLoading()}
+      {(renderChildren && children) || renderLoading()}
     </SystemContext.Provider>
   );
 };

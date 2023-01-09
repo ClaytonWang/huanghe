@@ -2,7 +2,7 @@
  * @description 请求发送器
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
-import { message, Modal } from 'antd';
+import { message } from 'antd';
 import axios from 'axios';
 import { isString, isEmpty, cloneDeep } from 'lodash';
 import qs from 'qs';
@@ -83,14 +83,10 @@ function requestFailureHandler(error) {
         (!(response.data instanceof Blob) && response.data) ||
         getGlobalError(codeMessage[_status]);
     } else if (_status === 401) {
-      Modal.warning({
-        title: '系统提示',
-        content: '用户登录失效，请重新登录！',
-      });
       // clear localstorage token
       window.localStorage.clear();
       history.push('/login');
-      return Promise.reject(codeMessage[_status]);
+      return Promise.reject(_status);
     } else if (error.message) {
       errorType = getGlobalError(error.message);
     } else {
