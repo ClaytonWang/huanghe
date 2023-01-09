@@ -105,11 +105,15 @@ const NotebooksTable = ({
                 }}
                 condition={[
                   () => ['running'].indexOf(statusName) > -1,
-                  (user) =>
-                    (user.role.name === USER &&
-                      get(record, 'creator.username') ===
-                        get(user, 'username')) ||
-                    true,
+                  (user) => {
+                    if (user.role.name === USER) {
+                      return (
+                        get(record, 'creator.username') ===
+                        get(user, 'username')
+                      );
+                    }
+                    return true;
+                  },
                 ]}
               >
                 打开
@@ -122,11 +126,15 @@ const NotebooksTable = ({
                     handleStartClicked(record);
                   }}
                   condition={[
-                    (user) =>
-                      (user.role.name === USER &&
-                        get(record, 'creator.username') ===
-                          get(user, 'username')) ||
-                      true,
+                    (user) => {
+                      if (user.role.name === USER) {
+                        return (
+                          get(record, 'creator.username') ===
+                          get(user, 'username')
+                        );
+                      }
+                      return true;
+                    },
                   ]}
                 >
                   启动
@@ -141,11 +149,15 @@ const NotebooksTable = ({
                   }}
                   condition={[
                     () => ['error', 'stop'].indexOf(statusName) < 0,
-                    (user) =>
-                      (user.role.name === USER &&
-                        get(record, 'creator.username') ===
-                          get(user, 'username')) ||
-                      true,
+                    (user) => {
+                      if (user.role.name === USER) {
+                        return (
+                          get(record, 'creator.username') ===
+                          get(user, 'username')
+                        );
+                      }
+                      return true;
+                    },
                   ]}
                 >
                   停止
@@ -173,11 +185,15 @@ const NotebooksTable = ({
                 }}
                 condition={[
                   () => ['stopped', 'error'].indexOf(statusName) > -1,
-                  (user) =>
-                    (user.role.name === USER &&
-                      get(record, 'creator.username') ===
-                        get(user, 'username')) ||
-                    true,
+                  (user) => {
+                    if (user.role.name === USER) {
+                      return (
+                        get(record, 'creator.username') ===
+                        get(user, 'username')
+                      );
+                    }
+                    return true;
+                  },
                 ]}
               >
                 删除

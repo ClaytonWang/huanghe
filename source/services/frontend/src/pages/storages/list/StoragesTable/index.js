@@ -1,7 +1,10 @@
 import { useSearchParams } from 'react-router-dom';
 import { Table, Button } from 'antd';
 import qs from 'qs';
+import { get } from 'lodash';
 import { transformDate } from '@/common/utils/helper';
+import { AuthButton } from '@/common/components';
+import { USER } from '@/common/constants';
 
 const StoragesTable = ({
   tableData = {},
@@ -81,14 +84,24 @@ const StoragesTable = ({
         }
         return (
           <span className="dbr-table-actions">
-            <Button
+            <AuthButton
               type="link"
               onClick={() => {
                 handleEditClicked(record);
               }}
+              condition={[
+                (user) => {
+                  if (user.role.name === USER) {
+                    return (
+                      get(record, 'owner.username') === get(user, 'username')
+                    );
+                  }
+                  return true;
+                },
+              ]}
             >
               编辑
-            </Button>
+            </AuthButton>
             <Button
               type="link"
               onClick={() => {
