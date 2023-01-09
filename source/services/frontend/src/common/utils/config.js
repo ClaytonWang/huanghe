@@ -82,24 +82,6 @@ module.exports = {
       ],
     },
     {
-      key: 'bam',
-      label: '后台管理',
-      icon: 'bam',
-      permission: 'bam',
-      children: [
-        {
-          key: 'bam.projects',
-          label: '项目管理',
-          permission: 'bam.projects',
-        },
-        {
-          key: 'bam.users',
-          label: '用户管理',
-          permission: 'bam.users',
-        },
-      ],
-    },
-    {
       key: 'notebooks',
       label: 'Notebook管理',
       icon: 'notebooks',
@@ -122,6 +104,24 @@ module.exports = {
           key: 'storages.list',
           label: '存储管理',
           permission: 'storages.list',
+        },
+      ],
+    },
+    {
+      key: 'bam',
+      label: '后台管理',
+      icon: 'bam',
+      permission: 'bam',
+      children: [
+        {
+          key: 'bam.projects',
+          label: '项目管理',
+          permission: 'bam.projects',
+        },
+        {
+          key: 'bam.users',
+          label: '用户管理',
+          permission: 'bam.users',
         },
       ],
     },
