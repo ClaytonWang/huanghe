@@ -12,6 +12,7 @@ import json
 from typing import Optional, List, Dict, Set
 # from config import USER_SERVICE_PATH
 from collections import defaultdict
+from datetime import datetime
 from pydantic import BaseModel, Field
 from basic.config.user import *
 
@@ -37,6 +38,7 @@ class VolumeInfo(BaseModel):
     id: int = Field(..., alias='volume_id')
     name: str = Field(..., alias='volume_name')
     project_id: int
+    deleted_at: Optional[datetime] = None
 
     class Config:
         orm_mode = True
@@ -47,6 +49,7 @@ class VolumeInfo(BaseModel):
             'id': self.id,
             'name': self.name,
             'project_id': self.project_id,
+            'deleted_at': self.deleted_at,
         }
 
 

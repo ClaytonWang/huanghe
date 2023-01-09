@@ -121,7 +121,7 @@ async def delete_project(
     if notebook_list:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联notebook，不能删除')
     volume_list = await get_volume_list(authorization)
-    volume_filter = list(filter(lambda x: x['project_id'] == project_id, volume_list))
+    volume_filter = list(filter(lambda x: x['project_id'] == project_id and x['deleted_at'] is None, volume_list))
     if volume_filter:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联存储，不能删除')
 
