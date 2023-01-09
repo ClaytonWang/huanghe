@@ -139,9 +139,11 @@ def delete_pvc(pvc: PVCDeleteReq):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='删除pvc失败, 请确认是否存在namespace， 或者pvc是否不存在')
     return True
 
-def create_ns(ns: Namespace):
+def create_ns(ns: Namespace, ignore_exist=False):
     try:
         response = requests.post(f"http://{CLUSTER_SERVICE_URL}{CLUSTER_NAMESPACE_PREFIX_URL}", json=ns.dict()).json()
+        if ignore_exist and response["success"] is not True and response["message"] == "AlreadyExists":
+            return True
         assert response['success'] is True
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='创建namespace失败')

@@ -112,7 +112,7 @@ class Volume(GenericDateModel):
         return v
 
     @classmethod
-    async def cancel_deleted(cls, _id) -> Volume:
-        v = await cls.get_by_id(_id)
+    async def cancel_deleted(cls, _id, owner_id) -> Volume:
+        v = await cls.get_by_self_id(_id, owner_id)
         await v.update(**{"deleted_at": None})
         return v
