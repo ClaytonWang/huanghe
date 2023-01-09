@@ -51,7 +51,7 @@ async def create_project(project: ProjectCreate):
     init_data = project.dict()
     en_name = ''.join(lazy_pinyin(init_data['name'] + init_data['code'], style=Style.FIRST_LETTER))
     init_data['en_name'] = f"{get_string_variable('ENV', 'DEV')}-{en_name}".lower()
-    create_ns(Namespace(name=init_data['en_name']))
+    create_ns(Namespace(name=init_data['en_name']), ignore_exist=True)
     create_secret(SecretNamespace(namespace=init_data['en_name']), ignore_exist=True)
     return await Project.objects.create(**init_data)
 
