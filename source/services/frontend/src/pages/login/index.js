@@ -40,7 +40,7 @@ const LoginForm = () => {
           ]}
         >
           <Input
-            prefix={<UserOutlined className="site-form-item-icon" />}
+            prefix={<UserOutlined className="login-form-item-icon" />}
             placeholder="邮箱"
           />
         </Form.Item>
@@ -53,9 +53,8 @@ const LoginForm = () => {
             },
           ]}
         >
-          <Input
-            prefix={<LockOutlined className="site-form-item-icon" />}
-            type="password"
+          <Input.Password
+            prefix={<LockOutlined className="login-form-item-icon" />}
             placeholder="密码"
           />
         </Form.Item>
