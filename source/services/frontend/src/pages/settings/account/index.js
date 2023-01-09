@@ -15,7 +15,7 @@ const Account = () => {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [infoValues, setInfoValues] = useState(null);
-  const { user, logout, loadAccount } = useAuth();
+  const { user, logout, requestAccount } = useAuth();
 
   useEffect(() => {}, []);
 
@@ -79,7 +79,7 @@ const Account = () => {
       await api.settingsAccountUpdate({ ...values });
       message.success('用户名修改成功！');
       closeModal();
-      loadAccount();
+      requestAccount();
     } catch (error) {
       console.log(error);
     }
