@@ -1,4 +1,4 @@
-@import url('../../common/css/variables.less');
+@import url('../../common/css/index.less');
 .login {
   display: flex;
   width: 100%;
@@ -27,6 +27,7 @@
       background-clip: text;
       color: #000;
       font-weight: 600;
+      white-space: pre;
     }
   }
   .ant-tabs.ant-tabs-top {
@@ -49,6 +50,9 @@
     margin-right: 20%;
     border: 1px solid #f3f4f6f5;
     box-shadow: 10px 10px 10px 0px #f3f4f6f5;
+    .login-form-item-icon {
+      color: @context-grey;
+    }
   }
   .login-form-forgot {
     float: right;

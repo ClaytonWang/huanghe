@@ -5,7 +5,7 @@
 const APIV1 = '/api/v1';
 // const DEV = '';
 module.exports = {
-  name: '决策智能开发平台',
+  name: `决策智能开放平台\n决策中台`,
   footerText: 'Shanghai Digital Brain.Lmt.',
   logo: 'static/logo.svg',
   CORS: [],
