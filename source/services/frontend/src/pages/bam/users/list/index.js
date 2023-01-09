@@ -27,7 +27,6 @@ const UsersList = () => {
       filter: {
         username: '',
         role__name: 'all',
-        projects__code: 'all',
       },
     }),
     []

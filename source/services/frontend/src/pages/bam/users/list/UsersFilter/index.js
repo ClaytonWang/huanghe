@@ -15,7 +15,6 @@ const UsersFilter = ({
   initialValues = {},
   defaultFilters = {},
   reload = () => {},
-  projectsDataSource = [],
 }) => {
   const [form] = Form.useForm();
   const initialFormValues = useMemo(
@@ -54,18 +53,6 @@ const UsersFilter = ({
           {parseKVToKeyValue(USER_ROLE, 'k', 'v').map(({ k, v }) => (
             <Option key={k} value={k}>
               {v}
-            </Option>
-          ))}
-        </Select>
-      </Form.Item>
-      <Form.Item label="所属项目" name="projects__code">
-        <Select style={{ width: 150 }} dropdownMatchSelectWidth={false}>
-          <Option key="all" value="all">
-            全部
-          </Option>
-          {projectsDataSource.map(({ id, code, name }) => (
-            <Option key={id} value={code}>
-              {name}
             </Option>
           ))}
         </Select>
