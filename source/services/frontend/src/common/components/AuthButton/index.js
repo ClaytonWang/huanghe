@@ -13,7 +13,7 @@ const AuthButton = ({ required, children, condition, ...rest }) => {
   const { user } = useAuth();
   const permissions = get(user, 'permissions', []);
   let props = { ...rest };
-  if (permissions.indexOf(required) < 0) {
+  if (required && permissions.indexOf(required) < 0) {
     props = { ...props, disabled: true };
   }
   if (condition && condition.length > 0) {
