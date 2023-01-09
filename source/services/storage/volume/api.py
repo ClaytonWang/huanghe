@@ -72,6 +72,9 @@ async def update_volume(request: Request,
     d = {}
     if ver.project.id and v.project_by_id != ver.project.id:
         project: ProjectGetter = get_project(request.headers.get('authorization'), ver.project.id)
+        if await Volume.objects.filter(name=v.name, project_by_id=project.id, created_by_id=user.id).exists():
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail=f'同一个项目下，同一个用户，不能创建相同名称的盘')
         size = ver.config.size if ver.config.size and ver.config.size > v.size else v.size
         # create new project pvc
         create_pvc(PVCCreateReq(name=f"{v.create_en_by}-{v.name}", namespace=project.en_name, size=size),
