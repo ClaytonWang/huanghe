@@ -3,11 +3,12 @@ from k8s.api.notebook_mixin import NotebookMixin
 from k8s.api.pod_mixin import PodMixin
 from k8s.api.persistent_volume_claim_mixin import PersistentVolumeClaimMixin
 from k8s.api.secret_mixin import SecretMixin
+from k8s.api.volcano_job_mixin import VolcanoJobMixin
 from k8s.api import c
 
 
 class ClusterClient(NamespaceMixin, NotebookMixin, PodMixin, PersistentVolumeClaimMixin,
-                    SecretMixin):
+                    SecretMixin, VolcanoJobMixin):
 
     def __init__(self):
         super(ClusterClient, self).__init__(c=c)

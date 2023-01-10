@@ -158,6 +158,17 @@ class V1PodSpec(GenericMixin):
         spec = cls.new([c])
         spec.add_pvc_volume_and_volume_mount(volumes).add_tolerations(tolerations).add_dshm().add_image_pull_secrets([SECRET_NAME_DOCKER_CONFIG])
         return spec
+
+
+    @classmethod
+    def vcjob(cls, name: str, image: str, resource: Dict[str, str], envs: Dict[str, str], volumes,
+                 tolerations: List[str]):
+        c = V1Container.default(name=name, image=image)
+        c.set_envs(envs).set_resources(resource).set_image_pull_policy(IMAGE_PULL_POLICY_IF_NOT_PRESENT)
+        spec = cls.new([c])
+        spec.add_pvc_volume_and_volume_mount(volumes).add_tolerations(tolerations).add_dshm().add_image_pull_secrets([SECRET_NAME_DOCKER_CONFIG])
+        return spec
+
     @staticmethod
     def new(containers: List[V1Container], volumes: Optional[List[V1Volume]] = None):
         return V1PodSpec(containers=containers, volumes=volumes)
