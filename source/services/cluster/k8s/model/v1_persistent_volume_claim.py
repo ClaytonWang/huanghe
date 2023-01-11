@@ -38,11 +38,11 @@ class V1PersistentVolumeClaim(BaseModel):
 
 
     @classmethod
-    def default(cls, name: str, namespace: str, size: str, env: str, platform: str):
+    def default(cls, name: str, namespace: str, size: str, env: str, platform: str, sc: str):
         return cls.new(api_version=API_VERSION_V1, kind=PERSISTENT_VOLUME_CLAIM_KIND,
                        metadata=V1ObjectMeta.default(name=name, namespace=namespace, labels={"env": env,
                                                                                              "platform": platform}),
-                       spec=V1PersistentVolumeClaimSpec.default(size=size))
+                       spec=V1PersistentVolumeClaimSpec.default(size=size, sc=sc))
 
     @staticmethod
     def new(api_version: str, kind: str, metadata: V1ObjectMeta, spec: V1PersistentVolumeClaimSpec):

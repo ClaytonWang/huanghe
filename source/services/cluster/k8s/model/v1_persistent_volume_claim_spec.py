@@ -43,14 +43,18 @@ class V1PersistentVolumeClaimSpec(GenericMixin):
         'volume_name': 'volumeName'
     }
 
+    def set_storage_class(self, sc):
+        self.storage_class_name = sc
+        return self
+
     @classmethod
-    def default(cls, size):
+    def default(cls, size, sc=VOLUME_STORAGE_CLASS_JUICEFS):
         return cls.new(access_modes=[VOLUME_ACCESS_MODE_READ_WRITE_MANY],
                        resources=V1ResourceRequirements.only_requests_storage(size=size),
-                       storage_class_name=VOLUME_STORAGE_CLASS_JUICEFS)
+                       storage_class_name=sc)
 
     @staticmethod
-    def new(access_modes: List[str], resources: V1ResourceRequirements, storage_class_name: str):
+    def new(access_modes: List[str], resources: V1ResourceRequirements, storage_class_name: str = VOLUME_STORAGE_CLASS_JUICEFS):
         return V1PersistentVolumeClaimSpec(access_modes=access_modes, resources=resources,
                                            storage_class_name=storage_class_name)
 
