@@ -41,7 +41,7 @@ spec:
         app: cluster
         version: v1
     spec:
-      serviceAccountName: juece-cluster
+      serviceAccountName: huanghe-admin
       containers:
       - name: cluster
         image: containers.git.digitalbrain.cn/engineering-group/huanghe.cluster:2022-11-24.12

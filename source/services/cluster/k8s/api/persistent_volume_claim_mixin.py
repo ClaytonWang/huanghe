@@ -4,6 +4,7 @@ from k8s.api.core_v1_api import CoreV1Api
 from k8s.model.v1_persistent_volume_claim import V1PersistentVolumeClaim
 from k8s.model.v1_status import V1Status
 from pvc.serializers import PVCCreateReq, PVCDeleteReq
+from basic.config.cluster import VOLUME_STORAGE_CLASS_JUICEFS
 
 class PersistentVolumeClaimMixin(CoreV1Api):
     def __init__(self, c: Core):
@@ -15,7 +16,8 @@ class PersistentVolumeClaimMixin(CoreV1Api):
                                                                                                                namespace=pvc.namespace,
                                                                                                                size=pvc.size,
                                                                                                                env=pvc.env,
-                                                                                                               platform=pvc.platform,))
+                                                                                                               platform=pvc.platform,
+                                                                                                               sc=VOLUME_STORAGE_CLASS_JUICEFS))
 
     def delete_namespaced_persistent_volume_claim(self, pdr: PVCDeleteReq) -> V1Status:
         return self.core_v1_api.delete_namespaced_persistent_volume_claim(name=pdr.name,
