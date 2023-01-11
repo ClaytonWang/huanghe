@@ -13,6 +13,15 @@ FROM mirekphd/python3.11-ubuntu22.04
 ARG APP_PATH=services/cluster
 WORKDIR /source/services/cluster
 
+RUN sed -i s@/archive.ubuntu.com//@/mirrors.aliyun.com/@g /etc/apt/sources.list \
+    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
+    && apt-get clean
+
+RUN set -eux \
+    && apt-get update \
+    && apt-get install --no-install-recommends --no-install-suggests -y \
+        build-essential postgresql-client gcc libpq-dev python3.8 python3-pip python3.8-dev \
+        libxml2-dev libxslt-dev zlib1g-dev
 
 # python dependence
 COPY ${APP_PATH}/requirements.txt .
