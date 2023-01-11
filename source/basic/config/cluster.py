@@ -14,6 +14,8 @@ SECRET_KEY = "dc393487a84ddf9da61fe0180ef295cf0642ecbc5d678a1589ef2e26b35fce9c"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 8
 KUBEFLOW_NOTEBOOK_URL = "https://kubeflow.digitalbrain.cn:31443/notebook"
+VOLUME_STORAGE_CLASS_JUICEFS = "juicefs-mvp"
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
