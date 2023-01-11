@@ -8,7 +8,7 @@
 #CMD ["uvicorn", "main:app", "--host=0.0.0.0", "--port=80"]
 
 
-FROM wookingwoo/python3.11-on-ubuntu22.04
+FROM mmirekphd/python3.11-ubuntu22.04
 
 ARG APP_PATH=services/cluster
 WORKDIR /source/services/cluster
