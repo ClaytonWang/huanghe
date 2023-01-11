@@ -8,7 +8,7 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Divider, Form, Input, message, Select, Tooltip } from 'antd';
-import { uniqueId, get, map } from 'lodash';
+import { uniqueId, get, map, drop } from 'lodash';
 import {
   DeleteFilled,
   InfoCircleOutlined,
@@ -175,11 +175,19 @@ const NotebooksUpdate = () => {
     const type = get(location, 'state.type');
     if (type === UPDATE) {
       requestNotebook({ id });
+    } else {
+      form.setFieldsValue({
+        hooks: [
+          {
+            path: '/home/jovyan',
+          },
+        ],
+      });
     }
     setType(type);
   }, [location]);
 
-  const HooksItem = ({ name, remove, selectedStorages }) => {
+  const HooksItem = ({ name, remove, selectedStorages, disabledItems }) => {
     const currStorage = form.getFieldValue(['hooks', name, 'storage']);
     const filteredStorageOptions = useMemo(() => {
       const result = storagesDatasource.filter(
@@ -229,12 +237,17 @@ const NotebooksUpdate = () => {
               label="目录"
               rules={[{ required: true, message: '请输入存储目录' }]}
             >
-              <Input placeholder="请输入目录" />
+              <Input
+                placeholder="请输入目录"
+                disabled={disabledItems && disabledItems.includes('path')}
+              />
             </Form.Item>
           </span>
-          <span className="action">
-            <DeleteFilled onClick={() => remove(name)} />
-          </span>
+          {remove && (
+            <span className="action">
+              <DeleteFilled onClick={() => remove(name)} />
+            </span>
+          )}
         </div>
         <Divider />
       </>
@@ -332,10 +345,18 @@ const NotebooksUpdate = () => {
             },
           ]}
         >
-          {(fields, { add, remove }, { errors }) => (
+          {(fields = [], { add, remove }, { errors }) => (
             <>
               <Form.Item label="存储挂载" wrapperCol={{ push: 2, xs: 22 }}>
-                {fields.map((field) => (
+                {
+                  <HooksItem
+                    key={uniqueId('hook-')}
+                    {...fields[0]}
+                    selectedStorages={selectedStorages}
+                    disabledItems={['path']}
+                  />
+                }
+                {drop([...fields], 1).map((field) => (
                   <HooksItem
                     key={uniqueId('hook-')}
                     {...field}
