@@ -16,7 +16,7 @@
 #        libxml2-dev libxslt-dev zlib1g-dev
 
 #python3.11
-FROM ubuntu:22.04
+FROM ubuntu22.04
 
 #ENV TZ=Asia/Shanghai
 
