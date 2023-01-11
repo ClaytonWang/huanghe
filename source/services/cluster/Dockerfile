@@ -20,7 +20,7 @@ RUN sed -i s@/archive.ubuntu.com//@/mirrors.aliyun.com/@g /etc/apt/sources.list 
 RUN set -eux \
     && apt-get update \
     && apt-get install --no-install-recommends --no-install-suggests -y \
-        build-essential postgresql-client gcc libpq-dev libxml2-dev libxslt-dev zlib1g-dev
+        build-essential postgresql-client gcc libpq-dev libxml2-dev libxslt-dev zlib1g-dev libsqlite3-dev python3-dev
 
 # python dependence
 COPY ${APP_PATH}/requirements.txt .
