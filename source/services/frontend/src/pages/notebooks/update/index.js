@@ -197,7 +197,7 @@ const NotebooksUpdate = () => {
               rules={[{ required: true, message: '请选择存储盘' }]}
             >
               <Select
-                placeholder="请选择资源规格"
+                placeholder="请选择存储盘"
                 showSearch
                 filterOption={(input, option) =>
                   (option?.children ?? '').includes(input)
