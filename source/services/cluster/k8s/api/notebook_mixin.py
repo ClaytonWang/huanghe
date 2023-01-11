@@ -7,6 +7,7 @@ from k8s.const.crd_kubeflow_const import KUBEFLOW_NOTEBOOK_GROUP, KUBEFLOW_V1_VE
 from k8s.model.v1_notebook import V1Notebook
 from typing import Optional, Dict
 from notebook.serializers import NoteBook, NoteBookListReq, NoteBookDeleteReq
+from basic.config.cluster import KUBEFLOW_NOTEBOOK_URL
 
 NOTEBOOK_STATUS_RUNNING = "RUNNING"
 NOTEBOOK_STATUS_PENDING = "PENDING"
@@ -61,7 +62,7 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                               "namespace": namespace,
                               "status": status,
                               "reason": reason,
-                              "url": f"https://kubeflow.digitalbrain.cn:31443/notebook/{namespace}/{notebook_name}/lab"})
+                              "url": f"{KUBEFLOW_NOTEBOOK_URL}/{namespace}/{notebook_name}/lab"})
         return notebooks
 
     def watch_notebook(self):
