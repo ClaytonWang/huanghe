@@ -14,7 +14,7 @@ from basic.middleware.exception import validation_pydantic_exception_handler
 from basic.middleware.rsp import add_common_response_data
 from pydantic.error_wrappers import ValidationError
 from kubernetes.client import ApiException
-
+from source.services.cluster.volcanojob.api import  router_vcjob
 app = FastAPI()
 
 
@@ -32,20 +32,20 @@ app.include_router(router_namespace, prefix="/namespace")
 app.include_router(router_pvc, prefix="/pvc")
 app.include_router(router_notebook, prefix="/notebook")
 app.include_router(router_secret, prefix='/secret')
-
+app.include_router(router_vcjob, prefix='/vcjob')
 
 app.add_middleware(BaseHTTPMiddleware, dispatch=add_common_response_data)
 
 # 异常处理
-app.add_exception_handler(ValidationError, validation_pydantic_exception_handler)
-app.add_exception_handler(ApiException, k8s_exception_handler)
+# app.add_exception_handler(ValidationError, validation_pydantic_exception_handler)
+# app.add_exception_handler(ApiException, k8s_exception_handler)
 
 
 def start():
-    service_port = int(os.getenv('CLUSTER_SERVICE_PORT', 80))
+    service_port = int(os.getenv('CLUSTER_SERVICE_PORT', 8005))
     uvicorn.run(
-        'main:app', host="0.0.0.0", port=service_port,
-        reload=False,
+        'main:app',  port=service_port,
+        reload=True,
         # debug=DEBUG,
         workers=2
     )
