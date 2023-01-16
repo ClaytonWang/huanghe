@@ -19,6 +19,7 @@ from basic.common.query_filter_params import QueryParameters
 from permissions.services import role_pms
 from api.services import update_user_of_project
 from auth.services import verify_password
+from project.service_request import get_volume_list
 
 
 router_user = APIRouter()
@@ -137,13 +138,19 @@ async def update_user(
     status_code=status.HTTP_200_OK,
 )
 async def delete_user(
+        request: Request,
         user_id: int = Path(..., ge=1, description='用户ID')
 ):
+    authorization: str = request.headers.get('authorization')
     user = await User.objects.get(id=user_id)
     owner_proj = await Project.objects.filter(owner=user).all()
-    # TODO 判断用户管理资源
     if await user.projects.count() or owner_proj:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联项目资源不能删除')
+    # 判断用户管理资源, 存储与项目解绑后需要清空关联存储
+    volume_list = await get_volume_list(authorization)
+    volume_filter = list(filter(lambda x: x['owner_id'] == user_id and x['deleted_at'] is None, volume_list))
+    if volume_filter:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联存储不能删除')
 
     await user.delete()
 

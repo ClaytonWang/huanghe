@@ -11,6 +11,7 @@ from api.serializers import OwnerUserList
 from setting.serializers import ProjectSetUser
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
+from project.service_request import get_notebook_list
 
 
 router_setting = APIRouter()
@@ -120,13 +121,17 @@ async def project_set_user(
     response_model={},
 )
 async def project_set_user(
+        request: Request,
         pk: int = Path(..., ge=1, description='权限模块ID')
 ):
-
-    pms = await OperationPms.objects.select_related(['project', 'project__member']).get(id=pk)
+    authorization: str = request.headers.get('authorization')
+    pms = await OperationPms.objects.select_related(['user', 'project', 'project__member']).get(id=pk)
     # 从项目的普通成员中删除该用户
     _user = pms.user
     _project = pms.project
+    notebook_list = await get_notebook_list(authorization, _project.code, _user.username)
+    if notebook_list:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联notebook，不能删除')
     if _user in _project.member:
         await _project.member.remove(_user)
     await pms.permissions.clear()
