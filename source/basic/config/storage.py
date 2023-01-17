@@ -16,6 +16,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 8
 ENV_COMMON_NAMESPACE = "juece"
 ENV_COMMON_AFTER = "svc.cluster.local"
 ACCOUNT_PREFIX_URL = "/user/account"
+USER_ITEMS_URL = "/user/items"
 PROJECT_PREFIX_URL = "/project"
 CLUSTER_PVC_PREFIX_URL = "/pvc"
 CLUSTER_NAMESPACE_PREFIX_URL = "/namespace"
