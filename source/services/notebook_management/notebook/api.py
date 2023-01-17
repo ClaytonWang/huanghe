@@ -229,7 +229,8 @@ async def create_notebook(request: Request,
     init_data['custom'] = nc.image.custom
 
     # 存储检查
-    storages, volumes_k8s = await volume_check(authorization, nc.hooks, extra_info)
+    hooks = init_data.pop('hooks')
+    storages, volumes_k8s = await volume_check(authorization, hooks, extra_info)
     path_set = {x['path'] for x in storages}
     if len(path_set) != len(storages):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
