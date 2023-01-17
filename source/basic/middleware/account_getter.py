@@ -6,6 +6,8 @@
     >Time    : 2022/11/23 13:17
 """
 from __future__ import annotations
+
+import pydantic
 from fastapi import Request, Response, status
 from fastapi import HTTPException
 from typing import Optional, List, Dict
@@ -109,6 +111,18 @@ def get_project(token: str, project_id) -> ProjectGetter:
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='获取项目失败')
     return pg
+
+def list_user_by_project(token: str, projects: List) -> List[AccountGetter]:
+    projects = ",".join(projects)
+    try:
+        response = requests.get(f"http://{USER_SERVICE_URL}{USER_ITEMS_URL}?project_id={projects}",
+                                headers={"Authorization": token})
+        json = response.json()
+        arr = pydantic.parse_obj_as(json['result'], List[AccountGetter])
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='获取用户失败，请检查token')
+    return arr
+
 
 def create_secret(sn: SecretNamespace, ignore_exist=False):
     try:
