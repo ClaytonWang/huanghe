@@ -42,7 +42,7 @@ app.add_middleware(BaseHTTPMiddleware, dispatch=add_common_response_data)
 
 
 def start():
-    service_port = int(os.getenv('CLUSTER_SERVICE_PORT', 8005))
+    service_port = int(os.getenv('CLUSTER_SERVICE_PORT', 80))
     uvicorn.run(
         'main:app',  port=service_port,
         reload=True,

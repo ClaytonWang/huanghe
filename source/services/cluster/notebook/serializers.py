@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError, validator
 from typing import Optional, Dict, List
 
 
@@ -24,6 +24,12 @@ class NoteBookCreateReq(BaseModel):
     gpu: int = 0
     volumes: List[Volume] = []
     tolerations: List[str] = []
+
+    # @validator('name')
+    # def name_must_start_with_alphabet(cls, v):
+    #     if not v[0].isalpha():
+    #         raise ValueError('must start with alphabets')
+    #     return v.title()
     def gen_notebook_dict(self):
         return {
             "name": self.name,
@@ -54,3 +60,8 @@ class NoteBook(BaseModel):
     envs: Dict = {}
     volumes: List[Volume] = []
     tolerations: List[str] = []
+
+try:
+    NoteBookCreateReq(name='7aaa',namespace='auth')
+except ValidationError as e:
+    print(e)

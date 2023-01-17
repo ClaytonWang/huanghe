@@ -9,7 +9,7 @@ router_vcjob = APIRouter()
 
 
 @router_vcjob.post(
-    '/create',
+    '',
     description='创建vcjob',
 )
 def create_vcjob(vjcr: VolcanoJobCreateReq):
@@ -21,9 +21,8 @@ def create_vcjob(vjcr: VolcanoJobCreateReq):
     '/batch',
     description='批量查询vcjob',
 )
-def list_notebook(vjlr: VolcanoJobListReq):
+def list_volcanojob(vjlr: VolcanoJobListReq):
     res=cc.list_volcanojob(vjlr)
-    print(res)
     return res
 
 @router_vcjob.delete(

@@ -5,7 +5,7 @@ from k8s.api.custom_object_api import CustomerObjectApi
 from k8s.api.core_v1_api import CoreV1Api
 from k8s.const.crd_kubeflow_const import VOLCANO_JOB_GROUP, VOLCANO_JOB_PLURAL, VOLCANO_V1_ALPHA1_VERSION
 from k8s.model.v1_alpha1_volcano_job import V1Alpha1VolcanoJob
-from volcanojob.serializers import VolcanoJob, VolcanoJobDeleteReq
+from volcanojob.serializers import VolcanoJob, VolcanoJobDeleteReq,VolcanoJobListReq
 from typing import Optional, Dict
 
 
@@ -39,17 +39,21 @@ class VolcanoJobMixin(CustomerObjectApi, CoreV1Api):
                                                                       name=vjdr.name)
 
 
-    def list_volcanojob(self, vjdr: VolcanoJobDeleteReq):
-        volcanojob = []
-
-        for volcanojob in self.custom_object_api.list_cluster_custom_object(group=VOLCANO_JOB_GROUP,
-                                                                            version=VOLCANO_V1_ALPHA1_VERSION,
-                                                                            plural=VOLCANO_JOB_PLURAL,
-                                                                            label_selector=f"env={vjdr.env}"
-                                                                            )['items']:
-            volcanojob_name = volcanojob["metadata"]["name"]
-            volcanojob.append(volcanojob_name)
-
-        return volcanojob
+    def list_volcanojob(self, vjdr: VolcanoJobListReq):
+        # volcanojobs = []
+        #
+        # for volcanojob in self.custom_object_api.list_cluster_custom_object(group=VOLCANO_JOB_GROUP,
+        #                                                                     version=VOLCANO_V1_ALPHA1_VERSION,
+        #                                                                     plural=VOLCANO_JOB_PLURAL,
+        #                                                                     label_selector=f"env={vjdr.env}"
+        #                                                                     )['items']:
+        #     volcanojob_name = volcanojob["metadata"]["name"]
+        #     namespace = volcanojob["metadata"]['namespace']
+        #     volcanojobs.append({"name":volcanojob_name,
+        #                         "namespace":namespace,
+        #                         })
+        #
+        # return volcanojobs
+        pass
 
 
