@@ -105,3 +105,21 @@ class GenericDateModel(ormar.Model):
     created_at: datetime = ormar.DateTime(server_default=func.now(), comment='创建日期')
     updated_at: datetime = ormar.DateTime(server_default=func.now(), onupdate=func.now(), comment='更新日期')
     deleted_at: datetime = ormar.DateTime(comment="删除日期", nullable=True)
+
+class GenericNoProjectModel(ormar.Model):
+    class Meta:
+        alias_generator = to_camel
+        abstract = True
+
+    id: int = ormar.Integer(primary_key=True)
+    created_by_id: int = ormar.Integer(comment='创建者id', nullable=True)
+    updated_by_id: int = ormar.Integer(comment='更新者id', nullable=True)
+
+    created_by: str = ormar.String(max_length=12, nullable=True, comment="创建者")
+    updated_by: str = ormar.String(max_length=12, nullable=True, comment="更新者")
+
+    create_en_by: str = ormar.String(max_length=20, nullable=True, comment="创建者英文名")
+
+    created_at: datetime = ormar.DateTime(server_default=func.now(), comment='创建日期')
+    updated_at: datetime = ormar.DateTime(server_default=func.now(), onupdate=func.now(), comment='更新日期')
+    deleted_at: datetime = ormar.DateTime(comment="删除日期", nullable=True)

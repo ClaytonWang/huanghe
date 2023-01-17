@@ -63,16 +63,13 @@ class Volume(GenericDateModel):
         }
 
     @staticmethod
-    def gen_create_dict(ag: AccountGetter, pg: ProjectGetter, vcr: VolumeCreateReq):
+    def gen_create_dict(ag: AccountGetter, vcr: VolumeCreateReq):
         return {
             "created_by_id": ag.id,
             "updated_by_id": ag.id,
-            "project_by_id": pg.id,
             "create_en_by": ag.en_name,
-            "project_en_by": pg.en_name,
             "created_by": ag.username,
             "updated_by": ag.username,
-            "project_by": pg.name,
             "name": vcr.name,
             "owner_by": vcr.owner.username,
             "owner_by_id": vcr.owner.id,
@@ -86,9 +83,15 @@ class Volume(GenericDateModel):
             (cls.deleted_at == None) | (cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7)))
 
     @classmethod
-    async def undeleted_self_project_volumes(cls, project_ids):
+    async def undeleted_self_volumes(cls, owner_id):
         return cls.objects.filter(
-            (cls.project_by_id << project_ids) & ((cls.deleted_at == None) | (
+            ((cls.deleted_at == None) | (cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7))) & (cls.owner_by == owner_id))
+
+
+    @classmethod
+    async def undeleted_self_project_volumes(cls, owner_ids):
+        return cls.objects.filter(
+            (cls.owner_by_id << owner_ids) & ((cls.deleted_at == None) | (
                         cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7)))
         )
 
@@ -106,13 +109,25 @@ class Volume(GenericDateModel):
         return v
 
     @classmethod
-    async def set_deleted(cls, _id, owner_id) -> Volume:
+    async def set_deleted(cls, _id) -> Volume:
+        v = await cls.get_by_id(_id)
+        await v.update(**{"deleted_at": datetime.datetime.now()})
+        return v
+
+    @classmethod
+    async def set_self_deleted(cls, _id, owner_id) -> Volume:
         v = await cls.get_by_self_id(_id, owner_id)
         await v.update(**{"deleted_at": datetime.datetime.now()})
         return v
 
     @classmethod
-    async def cancel_deleted(cls, _id, owner_id) -> Volume:
+    async def cancel_deleted(cls, _id) -> Volume:
+        v = await cls.get_by_id(_id)
+        await v.update(**{"deleted_at": None})
+        return v
+
+    @classmethod
+    async def cancel_self_deleted(cls, _id, owner_id) -> Volume:
         v = await cls.get_by_self_id(_id, owner_id)
         await v.update(**{"deleted_at": None})
         return v
