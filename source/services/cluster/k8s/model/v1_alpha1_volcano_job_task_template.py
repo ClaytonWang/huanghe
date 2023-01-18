@@ -1,6 +1,7 @@
 from __future__ import annotations
 from k8s.model.generic_mixin import GenericMixin
 from k8s.model.v1_pod_spec import V1PodSpec
+from k8s.model.v1_object_meta import V1ObjectMeta
 
 
 class V1Alpha1VolcanoJobTaskTemplate(GenericMixin):
@@ -18,21 +19,26 @@ class V1Alpha1VolcanoJobTaskTemplate(GenericMixin):
                             and the value is json key in definition.
     """
     spec: V1PodSpec
+    metadata: V1ObjectMeta
     openapi_types = {
         'spec': 'V1PodSpec',
+        "metadata": "V1ObjectMeta"
     }
 
     attribute_map = {
         'spec': 'spec',
+        'metadata': 'metadata',
     }
 
     @classmethod
-    def default(cls, name, image, resource, envs, volumes, tolerations):
-        return cls.new(spec=V1PodSpec.notebook(name=name, image=image, resource=resource, envs=envs, volumes=volumes, tolerations=tolerations))
+    def default(cls, name, image, resource, envs, volumes, tolerations, command, working_dir):
+        return cls.new(spec=V1PodSpec.vcjob(name=name, image=image, resource=resource, envs=envs, volumes=volumes,
+                                            tolerations=tolerations, command=command, working_dir=working_dir),
+                       metadata=V1ObjectMeta.without_istio_injection(name=name))
 
     @staticmethod
-    def new(spec: V1PodSpec) -> V1Alpha1VolcanoJobTaskTemplate:
-        return V1Alpha1VolcanoJobTaskTemplate(spec=spec)
+    def new(spec: V1PodSpec, metadata: V1ObjectMeta) -> V1Alpha1VolcanoJobTaskTemplate:
+        return V1Alpha1VolcanoJobTaskTemplate(spec=spec, metadata=metadata)
 
 
 

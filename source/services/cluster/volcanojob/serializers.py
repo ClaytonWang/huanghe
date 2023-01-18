@@ -24,6 +24,9 @@ class VolcanoJobCreateReq(BaseModel):
     gpu: int = 0
     volumes: List[Volume] = []
     tolerations: List[str] = []
+    command: List[str] = []
+    working_dir: Optional[str] = None
+
 
     def gen_vcjob_dict(self):
         return {
@@ -36,7 +39,9 @@ class VolcanoJobCreateReq(BaseModel):
                 "memory": f"{self.memory}Gi",
                 "nvidia.com/gpu": self.gpu,
             },
-            "volumes": [v.dict() for v in self.volumes]
+            "volumes": [v.dict() for v in self.volumes],
+            "command": self.command,
+            "working_dir": self.working_dir,
         }
 
 class VolcanoJobDeleteReq(BaseModel):
@@ -56,3 +61,5 @@ class VolcanoJob(BaseModel):
     envs: Dict = {}
     volumes: List[Volume] = []
     tolerations: List[str] = []
+    command: List[str] = []
+    working_dir: Optional[str] = None

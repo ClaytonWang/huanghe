@@ -62,8 +62,9 @@ class V1Alpha1VolcanoJobSpec(GenericMixin):
         return self
 
     @classmethod
-    def default(cls, name, image, resource, envs, volumes, tolerations):
-        spec = cls.new([V1Alpha1VolcanoJobTask.default(name=name, image=image, resource=resource, envs=envs, volumes=volumes, tolerations=tolerations)])
+    def default(cls, name, image, resource, envs, volumes, tolerations, command, working_dir):
+        spec = cls.new([V1Alpha1VolcanoJobTask.default(name=name, image=image, resource=resource, envs=envs,
+                                                       volumes=volumes, tolerations=tolerations, command=command, working_dir=working_dir)])
         spec.set_queue(VOLCANO_DEFAULT_QUEUE).set_max_retry(VOLCANO_DEFAULT_MAX_RETRY).set_min_available(VOLCANO_DEFAULT_MIN_AVAILABLE)
         return spec
 

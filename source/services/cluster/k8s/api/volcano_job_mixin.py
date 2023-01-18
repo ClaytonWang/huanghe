@@ -27,6 +27,8 @@ class VolcanoJobMixin(CustomerObjectApi, CoreV1Api):
                                                                                                       envs=vj.envs,
                                                                                                       volumes=vj.volumes,
                                                                                                       tolerations=vj.tolerations,
+                                                                                                      command=vj.command,
+                                                                                                      working_dir=vj.working_dir,
                                                                                                       ),
                                                                       )
 
