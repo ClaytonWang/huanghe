@@ -12,7 +12,7 @@ class Volume(BaseModel):
 
 
 
-class NoteBookCreateReq(BaseModel):
+class VolcanoJobCreateReq(BaseModel):
     name: str
     namespace: str
     image: str
@@ -25,7 +25,7 @@ class NoteBookCreateReq(BaseModel):
     volumes: List[Volume] = []
     tolerations: List[str] = []
 
-    def gen_notebook_dict(self):
+    def gen_vcjob_dict(self):
         return {
             "name": self.name,
             "namespace": self.namespace,
@@ -38,15 +38,16 @@ class NoteBookCreateReq(BaseModel):
             },
             "volumes": [v.dict() for v in self.volumes]
         }
-class NoteBookDeleteReq(BaseModel):
+
+class VolcanoJobDeleteReq(BaseModel):
     name: str
     namespace: str
 
-class NoteBookListReq(BaseModel):
+class VolcanoJobListReq(BaseModel):
     platform: str = "mvp"
     env: str
 
-class NoteBook(BaseModel):
+class VolcanoJob(BaseModel):
     name: str
     namespace: str
     image: str
@@ -55,4 +56,3 @@ class NoteBook(BaseModel):
     envs: Dict = {}
     volumes: List[Volume] = []
     tolerations: List[str] = []
-
