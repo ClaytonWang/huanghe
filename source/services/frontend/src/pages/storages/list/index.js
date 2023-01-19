@@ -5,9 +5,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Form, Input, InputNumber, message, Modal, Select } from 'antd';
-import { PlusOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { find, map } from 'lodash';
 import qs from 'qs';
+import { PlusOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useAuth } from '@/common/hooks/useAuth';
 import { ADMIN, CREATE, EDIT, OWNER, USER } from '@/common/constants';
 import { AuthButton, FormModal } from '@/common/components';
@@ -29,7 +29,6 @@ const StoragesList = () => {
     []
   );
   const [tableData, setTableData] = useState();
-  const [projectsDataSource, setProjectsDataSource] = useState([]);
   const [usersDatasource, setUsersDatasource] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -58,19 +57,6 @@ const StoragesList = () => {
     },
     [getFilters]
   );
-  const requestProjects = async () => {
-    try {
-      if (user.role.name === ADMIN) {
-        const { result } = await api.bamProjectsList();
-        setProjectsDataSource(result.data);
-      } else {
-        // 项目负责任项目列表返回自己所属项目
-        setProjectsDataSource(user?.projects ?? []);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
   const requestUserListItems = async () => {
     try {
       let data = [];
@@ -103,7 +89,6 @@ const StoragesList = () => {
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     requestList();
-    requestProjects();
     requestUserListItems();
     const filters = getFilters();
     setSearchParams(qs.stringify(filters));
@@ -281,19 +266,6 @@ const StoragesList = () => {
           }}
         >
           <Input placeholder="请输入存储名称" disabled={isNameDisabled()} />
-        </Form.Item>
-        <Form.Item
-          label="所属项目"
-          name={['project', 'id']}
-          rules={[{ required: true, message: '请选择所属项目' }]}
-        >
-          <Select placeholder="请选择所属项目">
-            {projectsDataSource.map(({ id, name }) => (
-              <Option key={id} value={id}>
-                {name}
-              </Option>
-            ))}
-          </Select>
         </Form.Item>
         <Form.Item label="存储配置">
           <Form.Item
