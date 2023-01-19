@@ -69,7 +69,7 @@ alter table public.bam_user
 
 
 --4.初始化admin
-insert into public.bam_user values (1, null, null, current_timestamp, current_timestamp, 'admin', 'admin@digitalbrain.cn',
+insert into public.bam_user values (default, null, null, current_timestamp, current_timestamp, 'admin', 'admin@digitalbrain.cn',
                                     '$2b$12$fq0W0vI3wlZk0MnWSKt1o.Tlpu1sb6Wdpf9144aNaDf1ubAsUG3yG', null, null, null,
                                     false, 1, 'admin'
 )
@@ -309,3 +309,23 @@ comment on column public.bam_pms_operation.updated_at is '更新日期';
 
 alter table public.bam_pms_operation
     owner to root;
+
+
+--功能权限表many to many
+create table public.operationpmss_permissionss
+(
+    id           serial
+        primary key,
+    permissions  integer
+        constraint fk_operationpmss_permissionss_bam_permissions_permissions_id
+            references public.bam_permissions
+            on update cascade on delete cascade,
+    operationpms integer
+        constraint fk_operationpmss_permissionss_bam_pms_operation_operationpms_id
+            references public.bam_pms_operation
+            on update cascade on delete cascade
+);
+
+alter table public.operationpmss_permissionss
+    owner to root;
+
