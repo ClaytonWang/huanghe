@@ -118,7 +118,8 @@ def list_user_by_project(token: str, projects: List) -> List[AccountGetter]:
         response = requests.get(f"http://{USER_SERVICE_URL}{USER_ITEMS_URL}?project_id={projects}",
                                 headers={"Authorization": token})
         json = response.json()
-        arr = pydantic.parse_obj_as(json['result'], List[AccountGetter])
+        arr = json['result']
+        arr = [AccountGetter.parse_obj(ele) for ele in arr]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='获取用户失败，请检查token')
     return arr

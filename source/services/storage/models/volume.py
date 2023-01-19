@@ -10,13 +10,13 @@ from __future__ import annotations
 import datetime
 from fastapi import HTTPException, status
 import ormar
-from basic.common.base_model import GenericDateModel
+from basic.common.base_model import GenericNoProjectModel
 from models import DB, META
 from volume.serializers import VolumeCreateReq, VolumeEditReq
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, ADMIN
 
 
-class Volume(GenericDateModel):
+class Volume(GenericNoProjectModel):
     class Meta(ormar.ModelMeta):
         tablename: str = "bam_volume"
         metadata = META
@@ -44,10 +44,6 @@ class Volume(GenericDateModel):
                 "value": self.value,
                 "size": self.size,
                 "max": self.max,
-            },
-            "project": {
-                "id": self.project_by_id,
-                "name": self.project_by,
             },
             "owner": {
                 "id": self.owner_by_id,
@@ -85,7 +81,7 @@ class Volume(GenericDateModel):
     @classmethod
     async def undeleted_self_volumes(cls, owner_id):
         return cls.objects.filter(
-            ((cls.deleted_at == None) | (cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7))) & (cls.owner_by == owner_id))
+            ((cls.deleted_at == None) | (cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7))) & (cls.owner_by_id == owner_id))
 
 
     @classmethod
