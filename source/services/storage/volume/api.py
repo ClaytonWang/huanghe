@@ -30,7 +30,7 @@ async def get_volume(volume_id: int = Path(..., ge=1, description="存储ID")
 async def list_volume(request: Request,
                       query_params: QueryParameters = Depends(QueryParameters)):
     user: AccountGetter = request.user
-    user_array: List[AccountGetter]= list_user_by_project(request.headers.get('authorization'), [str(project.id) for project in user.projects])
+    user_array: List[AccountGetter] = list_user_by_project(request.headers.get('authorization'), [str(project.id) for project in user.projects])
 
     if user.role.name == ADMIN:
         volumes = await Volume.undeleted_volumes()
