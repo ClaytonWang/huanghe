@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webkubectl-v1
+  namespace: juece
+  labels:
+    app: webkubectl
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webkubectl
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: webkubectl
+        version: v1
+    spec:
+      containers:
+        - name: webkubectl
+          image: swr.cn-north-4.myhuaweicloud.com/digitalbrain/webkubectl:v1
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          env:
+            - name: PYTHONPATH
+              value: /source
+          command:
+            - "sh"
+            - "-c"
+            - "gotty --port 80 --permit-arguments kubectl exec -it"
+          imagePullPolicy: IfNotPresent
+      serviceAccountName: huanghe-admin
+      serviceAccount: huanghe-admin
+      securityContext: {}
+      imagePullSecrets:
+        - name: huaweicloud-bj-registry
+      schedulerName: default-scheduler

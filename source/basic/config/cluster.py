@@ -13,21 +13,9 @@ from pathlib import Path
 SECRET_KEY = "dc393487a84ddf9da61fe0180ef295cf0642ecbc5d678a1589ef2e26b35fce9c"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 8
-ENV_COMMON_NAMESPACE = "juece"
-ENV_COMMON_AFTER = "svc.cluster.local"
-ACCOUNT_PREFIX_URL = "/user/account"
-USER_ITEMS_URL = "/user/items"
-PROJECT_PREFIX_URL = "/project"
-CLUSTER_PVC_PREFIX_URL = "/pvc"
-CLUSTER_NAMESPACE_PREFIX_URL = "/namespace"
-CLUSTER_SECRET_PREFIX_URL = "/secret"
-NOTEBOOK_VOLUME_PREFIX_URL = "/notebooks/volume"
-MOCK = os.getenv("MOCK_ACCOUNT_GETTER", False)
-MOCK_USER_JSON = {"id": 60, 'username': "shouchen"}
-MOCK_PROJECT_JSON = {"id": 1, "name": "决策平台"}
-USER = "user"
-ADMIN = "admin"
-OWNER = "owner"
+KUBEFLOW_NOTEBOOK_URL = "https://kubeflow.digitalbrain.cn:31443/notebook"
+VOLUME_STORAGE_CLASS_JUICEFS = "juicefs-mvp"
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -93,7 +81,3 @@ if os.path.exists(K8S_YAML_CONFIG_PATH):
             locals().update(**data)
     except Exception as e:
         print(f'Loading k8s config error. {e}')
-
-USER_SERVICE_URL = f"user.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
-CLUSTER_SERVICE_URL = f"cluster.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
-NOTEBOOK_SERVICE_URL = f"notebook.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
