@@ -28,13 +28,6 @@ const StoragesTable = ({
       },
     },
     {
-      title: '所属项目',
-      dataIndex: 'project',
-      render(project = {}) {
-        return project.name || '-';
-      },
-    },
-    {
       title: '所有人',
       dataIndex: 'owner',
       render(owner = {}) {
