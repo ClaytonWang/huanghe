@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import annotations as anno
 from k8s.model.generic_mixin import GenericMixin
+from k8s.const.crd_kubeflow_const import ISTIO_DISABLE_INJECT_ANNOTATION
 from typing import Optional, List, Dict
 from datetime import datetime
 
@@ -127,9 +128,29 @@ class V1ObjectMeta(GenericMixin):
         'uid': 'uid'
     }
 
+    def set_annotations(self, annotations=None):
+        if not annotations:
+            annotations = []
+        self.annotations = annotations
+        return self
+
+    def extend_annotations(self, annotations=None):
+        if not self.annotations:
+            self.annotations = {}
+        if not annotations:
+            annotations = {}
+        self.annotations.update(annotations)
+        return self
+
     @classmethod
     def default(cls, name, namespace=None, annotations=None, labels=None):
         return cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
+
+    @classmethod
+    def without_istio_injection(cls, name, namespace=None, annotations=None, labels=None):
+        meta = cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
+        meta.extend_annotations(ISTIO_DISABLE_INJECT_ANNOTATION)
+        return meta
 
     @staticmethod
     def new(name: str, namespace: str, annotations: Dict[str, str], labels: Dict[str, str]):

@@ -22,6 +22,7 @@ class V1Container(GenericMixin):
     ports: Optional[List[V1ContainerPort]]
     resources: Optional[V1ResourceRequirements]
     volume_mounts: Optional[List[V1VolumeMount]]
+    working_dir: Optional[str]
 
     openapi_types = {
         'args': 'list[str]',
@@ -45,7 +46,7 @@ class V1Container(GenericMixin):
         # 'tty': 'bool',
         # 'volume_devices': 'list[V1VolumeDevice]',
         'volume_mounts': 'list[V1VolumeMount]',
-        # 'working_dir': 'str'
+        'working_dir': 'str'
     }
 
     attribute_map = {
@@ -107,9 +108,9 @@ class V1Container(GenericMixin):
         return self
 
     @classmethod
-    def default(cls, name: str, image: str):
-        return cls.new(name=name, image=image, resources=None, command=None)
+    def default(cls, name: str, image: str, command: List[str] = None, working_dir: Optional[str] = None):
+        return cls.new(name=name, image=image, resources=None, command=command, working_dir=working_dir)
 
     @staticmethod
-    def new(name: str, image: str, resources: Optional[V1ResourceRequirements], command: Optional[List[str]]):
-        return V1Container(name=name, image=image, resources=resources, command=command)
+    def new(name: str, image: str, resources: Optional[V1ResourceRequirements], command: Optional[List[str]], working_dir: Optional[str]):
+        return V1Container(name=name, image=image, resources=resources, command=command, working_dir=working_dir)

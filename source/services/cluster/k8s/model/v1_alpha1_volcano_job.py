@@ -37,11 +37,12 @@ class V1Alpha1VolcanoJob(BaseModel):
     }
 
     @classmethod
-    def default(cls, name, namespace, image, labels, resource, envs, volumes, tolerations):
+    def default(cls, name, namespace, image, labels, resource, envs, volumes, tolerations, command, working_dir):
         return cls.new(api_version=VOLCANO_V1_ALPHA1_API_VERSION,
                        kind=VOLCANO_JOB_KIND,
-                       metadata=V1ObjectMeta.default(name=name, namespace=namespace, labels=labels),
-                       spec=V1Alpha1VolcanoJobSpec.default(name=name, image=image, resource=resource, envs=envs, volumes=volumes, tolerations=tolerations),
+                       metadata=V1ObjectMeta.without_istio_injection(name=name, namespace=namespace, labels=labels),
+                       spec=V1Alpha1VolcanoJobSpec.default(name=name, image=image, resource=resource, envs=envs,
+                                                           volumes=volumes, tolerations=tolerations, command=command, working_dir=working_dir),
                        status=None)
 
     @staticmethod
