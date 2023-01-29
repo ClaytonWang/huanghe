@@ -1,0 +1,67 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: monitor
+  namespace: juece
+  labels:
+    app: monitor
+    service: monitor
+spec:
+  ports:
+  - port: 80
+    name: http
+  selector:
+    app: monitor
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: juece-monitor
+  labels:
+    account: monitor
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monitor-v1
+  namespace: juece
+  labels:
+    app: monitor
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: monitor
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: monitor
+        version: v1
+    spec:
+      serviceAccountName: juece-monitor
+      containers:
+      - name: monitor
+        image: containers.git.digitalbrain.cn/engineering-group/huanghe.monitor:2022-12-07.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: service-config
+          mountPath: /etc/juece/config.yaml
+          subPath: monitor
+        env:
+        - name: PYTHONPATH
+          value: /source
+      volumes:
+      - name: service-config
+        configMap:
+          name: service-config
+          items:
+          - key: monitor
+            path: monitor
+      imagePullSecrets:
+      - name: db-container
+---
