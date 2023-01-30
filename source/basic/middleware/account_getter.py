@@ -142,7 +142,10 @@ def create_pvc(pvc: PVCCreateReq, ignore_exist=False):
             return True
         assert response['success'] is True
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='创建pvc失败, 请确认是否存在namespace， 或者pvc是否已经存在')
+        if isinstance(response["message"],list) and response["message"][0].get("msg") is not None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response["message"][0]["msg"])
+        else:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='创建pvc失败, 请确认是否存在namespace， 或者pvc是否已经存在')
 
     return True
 
