@@ -52,6 +52,12 @@ class VolcanoJobListReq(BaseModel):
     platform: str = "mvp"
     env: str
 
+class VolcanoStatusPostReq(BaseModel):
+    name: str
+    status: str
+
+
+
 class VolcanoJob(BaseModelValidatorName):
     namespace: str
     image: str
