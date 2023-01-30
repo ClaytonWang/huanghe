@@ -201,7 +201,7 @@ async def create_notebook(request: Request,
 
     # 存储检查
     hooks = init_data.pop('hooks')
-    storages, volumes_k8s = await volume_check(authorization, hooks)
+    storages, volumes_k8s = await volume_check(authorization, hooks, extra_info)
     path_set = {x['path'] for x in storages}
     if len(path_set) != len(storages):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
@@ -279,7 +279,7 @@ async def update_notebook(request: Request,
     k8s_info['image'] = _image.name
 
     hooks = update_data.pop('hooks')
-    storages, volumes_k8s = await volume_check(authorization, hooks)
+    storages, volumes_k8s = await volume_check(authorization, hooks, extra_info)
     path_set = {x['path'] for x in storages}
     if len(path_set) != len(storages):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')

@@ -15,7 +15,7 @@ from basic.common.query_filter_params import QueryParameters
 from basic.common.env_variable import get_string_variable
 from pypinyin import lazy_pinyin, Style
 from basic.middleware.account_getter import create_ns, Namespace, create_secret, SecretNamespace
-from project.service_request import get_notebook_list, get_volume_list
+from project.service_request import get_notebook_list
 from typing import List
 
 router_project = APIRouter()
@@ -120,9 +120,5 @@ async def delete_project(
     notebook_list = await get_notebook_list(authorization, project.code)
     if notebook_list:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联notebook，不能删除')
-    volume_list = await get_volume_list(authorization)
-    volume_filter = list(filter(lambda x: x['project_id'] == project_id and x['deleted_at'] is None, volume_list))
-    if volume_filter:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联存储，不能删除')
 
     await project.delete()

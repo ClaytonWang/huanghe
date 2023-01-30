@@ -37,7 +37,7 @@ class NotebookInfo(BaseModel):
 class VolumeInfo(BaseModel):
     id: int = Field(..., alias='volume_id')
     name: str = Field(..., alias='volume_name')
-    project_id: int
+    owner_id: int
     deleted_at: Optional[datetime] = None
 
     class Config:
@@ -48,16 +48,18 @@ class VolumeInfo(BaseModel):
         return {
             'id': self.id,
             'name': self.name,
-            'project_id': self.project_id,
+            'owner_id': self.owner_id,
             'deleted_at': self.deleted_at,
         }
 
 
-async def get_notebook_list(token, project_code):
+async def get_notebook_list(token, project_code, username=None):
     res = []
     async with aiohttp.ClientSession() as session:
         # url = f"{ENV_COMMON_URL}{NOTEBOOK_PREFIX_URL}?filter[project__code]={project_code}"
         url = f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_PREFIX_URL}?filter[project__code]={project_code}"
+        if username:
+            url += f"&filter[username]={username}"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
@@ -87,7 +89,7 @@ async def get_volume_list(token):
             # print(text)
             volume_data = text['result']['data']
             for vol in volume_data:
-                vol['project_id'] = vol['project']['id']
+                vol['owner_id'] = vol['owner']['id']
                 res.append(VolumeInfo.parse_obj(vol))
     return [x.get_dict() for x in res]
 

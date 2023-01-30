@@ -28,6 +28,7 @@ USER_PREFIX_URL = "/user"
 ACCOUNT_PREFIX_URL = "/user/account"
 PROJECT_PREFIX_URL = "/project"
 VOLUME_PREFIX_URL = "/volume"
+CLUSTER_PVC_PREFIX_URL = "/pvc"
 CLUSTER_NOTEBOOK_PREFIX_URL = "/notebook"
 ENV = "uat"
 MOCK = os.getenv("MOCK_ACCOUNT_GETTER", False)

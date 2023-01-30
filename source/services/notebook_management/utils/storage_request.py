@@ -14,6 +14,7 @@ from typing import List, Dict
 from collections import defaultdict
 from pydantic import BaseModel, Field
 from basic.config.notebook_management import *
+from utils.k8s_request import create_pvc, PVCCreateReq
 
 
 class VolumeConfigInfo(BaseModel):
@@ -67,7 +68,7 @@ async def get_volume_list(token, page_no=1):
     return [x.get_dict() for x in res]
 
 
-async def volume_check(authorization: str, hooks: List[Dict]):
+async def volume_check(authorization: str, hooks: List[Dict], namespace: str):
     volume_list = await get_volume_list(authorization)
     volume_map = {x['id']: x for x in volume_list}
     storages = []
@@ -77,6 +78,10 @@ async def volume_check(authorization: str, hooks: List[Dict]):
         volume_id = hook['storage']
         path = hook['path']
         volume_info = volume_map.get(volume_id)
-        volumes_k8s.append({'name': f"{volume_info['creator_en_name']}-{volume_info['name']}", 'mount_path': path})
+        volume_k8s_name = f"{volume_info['creator_en_name']}-{volume_info['name']}"
+        volumes_k8s.append({'name': volume_k8s_name, 'mount_path': path})
         storages.append({'storage': volume_info, 'path': path})
+        # 校验创建pvc
+        await create_pvc(PVCCreateReq(name=volume_k8s_name, namespace=namespace, size=volume_info['config']['size']),
+                         ignore_exist=True)
     return storages, volumes_k8s
