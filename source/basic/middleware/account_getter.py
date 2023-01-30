@@ -7,7 +7,6 @@
 """
 from __future__ import annotations
 
-import pydantic
 from fastapi import Request, Response, status
 from fastapi import HTTPException
 from typing import Optional, List, Dict
@@ -17,13 +16,14 @@ from fastapi.security.utils import get_authorization_scheme_param
 from jose.jwt import JWTError
 from pydantic import BaseModel, Field, validator
 import requests
-import os
 from basic.config.storage import *
+
 
 class ProjectGetter(BaseModel):
     id: int = Field(..., alias='project_id')
     name: str = Field(..., alias='project_by')
     en_name: str
+
     class Config:
         allow_population_by_field_name = True
 
@@ -37,8 +37,10 @@ class ProjectGetter(BaseModel):
                 ans.append(ch.lower())
         return ''.join(ans)
 
+
 class SecretNamespace(BaseModel):
     namespace: str
+
 
 class PVCCreateReq(BaseModel):
     name: str
@@ -52,6 +54,7 @@ class PVCDeleteReq(BaseModel):
     name: str
     namespace: str
 
+
 class Namespace(BaseModel):
     name: str
 
@@ -64,6 +67,7 @@ class Namespace(BaseModel):
             if ch.isalpha() or ch.isdigit():
                 ans.append(ch.lower())
         return ''.join(ans)
+
 
 class Role(BaseModel):
     name: str
@@ -79,6 +83,7 @@ class AccountGetter(BaseModel):
     class Config:
         orm_mode = True
         allow_population_by_field_name = True
+
     @validator("en_name")
     def name_match(cls, en_name: str):
         ans = []
@@ -112,6 +117,7 @@ def get_project(token: str, project_id) -> ProjectGetter:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='获取项目失败')
     return pg
 
+
 def list_user_by_project(token: str, projects: List) -> List[AccountGetter]:
     projects = ",".join(projects)
     try:
@@ -132,9 +138,12 @@ def create_secret(sn: SecretNamespace, ignore_exist=False):
             return True
         assert response['success'] is True
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='创建secret失败, 请确认是否存在namespace， 或者secret是否已经存在')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail='创建secret失败, 请确认是否存在namespace， 或者secret是否已经存在')
 
     return True
+
+
 def create_pvc(pvc: PVCCreateReq, ignore_exist=False):
     try:
         response = requests.post(f"http://{CLUSTER_SERVICE_URL}{CLUSTER_PVC_PREFIX_URL}", json=pvc.dict()).json()
@@ -142,12 +151,14 @@ def create_pvc(pvc: PVCCreateReq, ignore_exist=False):
             return True
         assert response['success'] is True
     except Exception as e:
-        if isinstance(response["message"],list) and response["message"][0].get("msg") is not None:
+        if isinstance(response["message"], list) and response["message"][0].get("msg") is not None:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response["message"][0]["msg"])
         else:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='创建pvc失败, 请确认是否存在namespace， 或者pvc是否已经存在')
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail='创建pvc失败, 请确认是否存在namespace， 或者pvc是否已经存在')
 
     return True
+
 
 def delete_pvc(pvc: PVCDeleteReq):
     try:
@@ -157,13 +168,16 @@ def delete_pvc(pvc: PVCDeleteReq):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='删除pvc失败, 请确认是否存在namespace， 或者pvc是否不存在')
     return True
 
+
 def create_ns(ns: Namespace, ignore_exist=False):
     try:
-        response = requests.post(f"http://{CLUSTER_SERVICE_URL}{CLUSTER_NAMESPACE_PREFIX_URL}", json=ns.dict()).json()
+        response = requests.post(f"http://{CLUSTER_SERVICE_URL}{CLUSTER_NAMESPACE_PREFIX_URL}", json=ns.dict())
+        print(response.raw)
         if ignore_exist and response["success"] is not True and response["message"] == "AlreadyExists":
             return True
         assert response['success'] is True
     except Exception as e:
+        raise e
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='创建namespace失败')
     return True
 
@@ -177,15 +191,16 @@ def delete_ns(ns: Namespace):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='删除namespace失败')
     return True
 
+
 def query_notebook_volume(token: str, volume_id) -> List[Dict]:
     # http://{USER_SERVICE_URL}{PROJECT_PREFIX_URL}/{project_id}
     try:
-        response = requests.get(f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_VOLUME_PREFIX_URL}/{volume_id}", headers={"Authorization": token}).json()
+        response = requests.get(f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_VOLUME_PREFIX_URL}/{volume_id}",
+                                headers={"Authorization": token}).json()
         assert response['success'] is True
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='查询notebook存储盘失败')
     return response['result']
-
 
 
 async def verify_token(request: Request, call_next):
@@ -244,5 +259,3 @@ class OFOAuth2PasswordBearer(OAuth2PasswordBearer):
             else:
                 return None
         return param
-
-
