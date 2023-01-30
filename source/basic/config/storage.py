@@ -10,9 +10,7 @@ import sys
 import yaml
 import importlib
 from pathlib import Path
-SECRET_KEY = "dc393487a84ddf9da61fe0180ef295cf0642ecbc5d678a1589ef2e26b35fce9c"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 8
+
 ENV_COMMON_NAMESPACE = "juece"
 ENV_COMMON_AFTER = "svc.cluster.local"
 ACCOUNT_PREFIX_URL = "/user/account"
@@ -51,9 +49,9 @@ LOGGING = {
             'level': 'INFO',
         },
         'sqlalchemy.engine': {
-             'handlers': ['console'],
-             'propagate': True,
-             'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG',
         },
         'databases': {
             'handlers': ['console'],
@@ -84,8 +82,6 @@ try:
 except ModuleNotFoundError:
     pass
 
-
-
 if os.path.exists(K8S_YAML_CONFIG_PATH):
     try:
         with open(K8S_YAML_CONFIG_PATH) as f:
@@ -95,5 +91,5 @@ if os.path.exists(K8S_YAML_CONFIG_PATH):
         print(f'Loading k8s config error. {e}')
 
 USER_SERVICE_URL = f"user.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
-CLUSTER_SERVICE_URL = f"cluster.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
+CLUSTER_SERVICE_URL = f"http://121.36.41.231:32767/api/v1/cluster"
 NOTEBOOK_SERVICE_URL = f"notebook.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
