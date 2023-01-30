@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from pydantic import BaseModel, validator
+from  basic.common.validator_name import  BaseModelValidatorName
 
 
 
 
 
-class PVCCreateReq(BaseModel):
-    name: str
+class PVCCreateReq(BaseModelValidatorName):
     namespace: str
     size: str
     # 对应环境
