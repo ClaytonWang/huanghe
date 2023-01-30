@@ -1,7 +1,7 @@
 from pydantic import BaseModel, validator
 import re
 
-class BaseModel_ValidatorName(BaseModel):
+class BaseModelValidatorName(BaseModel):
  name: str
 
  @validator('name')

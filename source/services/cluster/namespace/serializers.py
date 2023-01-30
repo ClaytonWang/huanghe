@@ -2,8 +2,8 @@
 
 from pydantic import BaseModel
 from typing import Dict, Optional
-from  basic.common.validator_name import  BaseModel_ValidatorName
+from  basic.common.validator_name import  BaseModelValidatorName
 
-class Namespace(BaseModel_ValidatorName):
+class Namespace(BaseModelValidatorName):
 
     labels: Optional[Dict] = {"istio-injection": "enabled"}

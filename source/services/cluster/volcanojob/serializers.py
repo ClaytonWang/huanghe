@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel
 from typing import Optional, Dict, List
-from  basic.common.validator_name import  BaseModel_ValidatorName
+from  basic.common.validator_name import  BaseModelValidatorName
 
 
 
@@ -13,7 +13,7 @@ class Volume(BaseModel):
 
 
 
-class VolcanoJobCreateReq(BaseModel_ValidatorName):
+class VolcanoJobCreateReq(BaseModelValidatorName):
     namespace: str
     image: str
     # 对应环境
@@ -52,7 +52,7 @@ class VolcanoJobListReq(BaseModel):
     platform: str = "mvp"
     env: str
 
-class VolcanoJob(BaseModel_ValidatorName):
+class VolcanoJob(BaseModelValidatorName):
     namespace: str
     image: str
     labels: Dict

@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel
 from typing import Optional, Dict, List
-from  basic.common.validator_name import  BaseModel_ValidatorName
+from  basic.common.validator_name import  BaseModelValidatorName
 
 
 class Volume(BaseModel):
@@ -12,7 +12,7 @@ class Volume(BaseModel):
 
 
 
-class NoteBookCreateReq(BaseModel_ValidatorName):
+class NoteBookCreateReq(BaseModelValidatorName):
     namespace: str
     image: str
     # 对应环境
@@ -45,7 +45,7 @@ class NoteBookListReq(BaseModel):
     platform: str = "mvp"
     env: str
 
-class NoteBook(BaseModel_ValidatorName):
+class NoteBook(BaseModelValidatorName):
     namespace: str
     image: str
     labels: Dict
