@@ -9,42 +9,31 @@ import json
 from typing import List, Dict
 from fastapi import APIRouter, Depends, Request, HTTPException, status, Path
 from fastapi.responses import JSONResponse
-from models import Notebook, Status, Image
-from notebook.serializers import NotebookList, NotebookCreate, NotebookEdit, NotebookOp, NotebookDetail, EventItem
+from models import Notebook, Status, Image, Source
+from notebook.serializers import NotebookList, NotebookCreate, NotebookEdit, NotebookOp, NotebookDetail
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
-from basic.common.common_model import Event
 from basic.common.env_variable import get_string_variable
-from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project
 from utils.user_request import get_user_list, get_project_list, project_check
 from utils.storage_request import volume_check
 from utils.k8s_request import create_notebook_k8s, delete_notebook_k8s
 from utils.auth import operate_auth
 from collections import defaultdict
 
+
 router_notebook = APIRouter()
 
-COMMON = "https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
 
-
-def format_notebook_detail(nb: Notebook):
-    result = nb.dict()
-    result['source'] = nb.get_str()
-    result['project'] = {"id": nb.project_by_id,
-                         "name": nb.project_by, }
-
-    result['image'] = {"desc": "",
-                       "name": nb.image,
-                       "custom": nb.custom, }
-    result['creator'] = {"id": nb.created_by_id,
-                         "username": nb.created_by, }
-    result['hooks'] = result['storage']
-    result['grafana'] = {
-        "cpu": nb.cpu_url(COMMON),
-        "ram": nb.ram_url(COMMON),
-        "gpu": nb.gpu_url(COMMON),
-        "vram": nb.vram_url(COMMON),
-    }
+def format_notebook_detail(notebook: Notebook):
+    result = notebook.dict()
+    result['source'] = notebook.source.id
+    result['creator'] = result.pop('creator_id')
+    result['project'] = result.pop('project_id')
+    result['image'] = result.pop('image_id')
+    storages = result.pop('storage')
+    for item in storages:
+        item['storage'] = item.pop('storage')['id']
+    result['hooks'] = storages
     return result
 
 
@@ -74,7 +63,7 @@ async def get_volume_notebook(volume_id: int = Path(..., ge=1, description='需�
     response_model_exclude_unset=True
 )
 async def get_notebook(notebook_id: int = Path(..., ge=1, description='需要查询的notebook ID')):
-    _notebook = await Notebook.objects.select_related(['status']).get(pk=notebook_id)
+    _notebook = await Notebook.objects.select_related(['status', 'source']).get(pk=notebook_id)
     return format_notebook_detail(_notebook)
 
 
@@ -102,6 +91,7 @@ async def list_notebook(request: Request,
     # print("user_list")
     # print(user_list)
     # 建立映射表
+    res_user_map = {x['id']: {'id': x['id'], 'username': x['username']} for x in user_list}
     id_proj_map = {x['id']: x['project_ids'] for x in user_list}
     name_userid_map = defaultdict(list)
     role_userid_map = defaultdict(list)
@@ -113,32 +103,39 @@ async def list_notebook(request: Request,
     project_list = await get_project_list(authorization)
     # print("project_list")
     # print(project_list)
-    # code_id_map = {x['code']: x['id'] for x in project_list}
-    res_proj_map = {x['id']: {'name': x['name']} for x in project_list}
+    code_id_map = {x['code']: x['id'] for x in project_list}
+    res_proj_map = {x['id']: {'id': x['id'], 'name': x['name']} for x in project_list}
+
+    # todo 临时方案,存储image表
+    images = await Image.objects.all()
+    image_map = {x.id: x.get_dict() for x in images}
+
+    sources = await Source.objects.all()
+    source_map = {x.id: x.get_info() for x in sources}
 
     # 用户可见项目
     if role_name != 'admin':
         viewable_project_ids = id_proj_map.get(request.user.id)
-        params_filter['project_by_id__in'] = viewable_project_ids
-        params_filter['created_by_id'] = request.user.id
+        params_filter['project_id__in'] = viewable_project_ids
+        params_filter['creator_id'] = request.user.id
 
     if params_filter:
         name_filter, role_filter, need_filter = {}, {}, False
         if 'username' in params_filter:
             name = params_filter.pop('username')
-            # name_filter = set(name_userid_map.get(name, []))
-            # need_filter = True
+            name_filter = set(name_userid_map.get(name, []))
+            need_filter = True
         if 'project__code' in params_filter:
             project_code = params_filter.pop('project__code')
-            # params_filter['project_id'] = code_id_map.get(project_code)
+            params_filter['project_id'] = code_id_map.get(project_code)
         if 'role__name' in params_filter:
             role__name = params_filter.pop('role__name')
-            # role_filter = set(role_userid_map.get(role__name, []))
-            # need_filter = True
-        # if name_filter and role_filter:
-        #     params_filter['creator_id__in'] = list(name_filter.intersection(role_filter))
-        # elif need_filter:
-        #     params_filter['creator_id__in'] = list(name_filter or role_filter)
+            role_filter = set(role_userid_map.get(role__name, []))
+            need_filter = True
+        if name_filter and role_filter:
+            params_filter['creator_id__in'] = list(name_filter.intersection(role_filter))
+        elif need_filter:
+            params_filter['creator_id__in'] = list(name_filter or role_filter)
     # todo 要修改合理的params_filter，不然会报错
     # print("show filter")
     # print(params_filter)
@@ -150,28 +147,20 @@ async def list_notebook(request: Request,
     data = result['data']
 
     for item in data:
-        cpu = item["cpu"]
-        memory = item["memory"]
-        if item['type'] != "CPU":
-            gpu = item['gpu']
-            machine_type = item['type']
-            item['source'] = f"GPU {gpu}*{machine_type} {cpu}C {memory}G"
-        else:
-            item['source'] = f"CPU {cpu}C {memory}G"
-        item['creator'] = {
-            "id": int(item["created_by_id"]),
-            "username": item["created_by"],
-        }
-        item['image'] = {
-            'name': item['image'],
-            'desc': "",
-            # "custom": item['custom'],
-        }
+        source_id = item.pop('source')['id']
+        item['source'] = source_map.get(source_id)
 
-        project_id = item.pop('project_by_id')
+        creator_id = item.pop('creator_id')
+        creator_info = res_user_map.get(creator_id)
+        item['creator'] = creator_info
+
+        project_id = item.pop('project_id')
         project_info = res_proj_map.get(project_id)
         item['project'] = project_info
 
+        image_id = item.pop('image_id')
+        image_info = image_map.get(image_id)
+        item['image'] = image_info
     return result
 
 
@@ -181,52 +170,35 @@ async def list_notebook(request: Request,
     response_model=NotebookDetail,
 )
 async def create_notebook(request: Request,
-                          nc: NotebookCreate):
+                          notebook: NotebookCreate):
     authorization: str = request.headers.get('authorization')
-    init_data = {"name": nc.name}
-    ag: AccountGetter = request.user
-    init_data['created_by_id'] = ag.id
-    init_data['updated_by_id'] = ag.id
-    init_data['create_en_by'] = ag.en_name
-    init_data['created_by'] = ag.username
-    init_data['updated_by'] = ag.username
+    init_data = notebook.dict()
+    init_data['creator_id'] = request.user.id
+
     stat = await Status.objects.get(name='stopped')
     init_data['status'] = stat.id
 
-    check, extra_info = await project_check(request, nc.project.id)
+    project_id = int(init_data.pop('project'))
+    check, extra_info = await project_check(request, project_id)
     if not check:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
-    pg: ProjectGetter = get_project(request.headers.get('authorization'), nc.project.id)
-    init_data['project_by_id'] = pg.id
-    init_data['project_by'] = pg.name
-    init_data['project_en_by'] = pg.en_name
+    init_data['project_id'] = project_id
 
-    if await Notebook.objects.filter(name=init_data['name'], project_by_id=int(nc.project.id)).count():
+    duplicate_name = await Notebook.objects.filter(name=init_data['name'], project_id=project_id).count()
+    if duplicate_name:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不能重名')
 
-    gpu_count = 0
-    if nc.source.startswith("GPU"):
-        machine_type = "GPU"
-        _, gpu_count, cpu_count, memory = nc.source.split()
-        gpu_count = gpu_count.split("*")[0]
-        cpu_count = cpu_count.split("C")[0]
-        memory = memory.split("G")[0]
-    else:
-        machine_type = "CPU"
-        _, cpu_count, memory = nc.source.split()
-        cpu_count = cpu_count.split("C")[0]
-        memory = memory.split("G")[0]
-    init_data["cpu"] = cpu_count
-    init_data["gpu"] = gpu_count
-    init_data["memory"] = memory
-    init_data["type"] = machine_type
+    source_id = int(init_data.pop('source'))
+    _source = await Source.objects.get_or_none(pk=source_id)
+    if not _source:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='资源配置不存在')
+    init_data['source'] = _source
 
-    # image_id = int(init_data.pop('image'))
-    # image = await Image.objects.get_or_none(pk=image_id)
-    # if not image:
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='镜像不存在')
-    init_data['image'] = nc.image.name
-    init_data['custom'] = nc.image.custom
+    image_id = int(init_data.pop('image'))
+    _image = await Image.objects.get_or_none(pk=image_id)
+    if not _image:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='镜像不存在')
+    init_data['image_id'] = image_id
 
     # 存储检查
     hooks = init_data.pop('hooks')
@@ -239,12 +211,12 @@ async def create_notebook(request: Request,
     k8s_info = {
         'name': f"{request.user.en_name}-{init_data['name']}",
         'namespace': extra_info,
-        'image': nc.image.name,
+        'image': _image.name,
         'env': get_string_variable('ENV', 'DEV').lower(),
-        'cpu': cpu_count,
-        'memory': memory,
-        'gpu': gpu_count,
-        'type': machine_type,
+        'cpu': _source.cpu,
+        'memory': _source.memory,
+        'gpu': _source.gpu,
+        'type': _source.type,
         'volumes': volumes_k8s,
     }
     init_data['k8s_info'] = json.dumps(k8s_info)
@@ -258,12 +230,12 @@ async def create_notebook(request: Request,
     description='编辑Notebook',
 )
 async def update_notebook(request: Request,
-                          ne: NotebookEdit,
+                          notebook: NotebookEdit,
                           notebook_id: int = Path(..., ge=1, description="NotebookID"),
                           ):
     # user: AccountGetter = request.user
     authorization: str = request.headers.get('authorization')
-    update_data = ne.dict(exclude_unset=True)
+    update_data = notebook.dict(exclude_unset=True)
     if not update_data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
 
@@ -275,52 +247,40 @@ async def update_notebook(request: Request,
     if _notebook.status.name != 'stopped':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook未停止')
 
-    project_id = ne.project.id
+    project_id = int(update_data.pop('project'))
     check, extra_info = await project_check(request, project_id)
     if not check:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
-    update_data['project_by_id'] = project_id
-    if 'project' in update_data:
-        update_data.pop('project')
+    update_data['project_id'] = project_id
     k8s_info['namespace'] = extra_info
 
     duplicate_name = await Notebook.objects.filter(
-        name=update_data['name'], project_by_id=int(project_id)).exclude(id=_notebook.id).count()
+        name=update_data['name'], project_id=project_id).exclude(id=_notebook.id).count()
     if duplicate_name:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不能重名')
     k8s_info['name'] = f"{request.user.en_name}-{update_data['name']}"
 
-    if ne.source:
-        gpu_count = 0
-        if ne.source.startswith("GPU"):
-            machine_type = "GPU"
-            _, gpu_count, cpu_count, memory = ne.source.split()
-            gpu_count = gpu_count.split("*")[0]
-            cpu_count = cpu_count.split("C")[0]
-            memory = memory.split("G")[0]
-        else:
-            machine_type = "CPU"
-            _, cpu_count, memory = ne.source.split()
-            cpu_count = cpu_count.split("C")[0]
-            memory = memory.split("G")[0]
-        update_data["cpu"] = cpu_count
-        update_data["gpu"] = gpu_count
-        update_data["memory"] = memory
-        update_data["type"] = machine_type
-        k8s_info.update({
-            'cpu': cpu_count,
-            'memory': memory,
-            'gpu': gpu_count,
-            'type': machine_type,
-        })
-    if 'source' in update_data:
-        update_data.pop('source')
-    update_data['image'] = ne.image.name
-    update_data['custom'] = ne.image.custom
-    k8s_info['image'] = ne.image.name
+    source_id = int(update_data.pop('source'))
+    _source = await Source.objects.get_or_none(pk=source_id)
+    if not _source:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='资源配置不存在')
+    update_data['source'] = _source
+    k8s_info.update({
+        'cpu': _source.cpu,
+        'memory': _source.memory,
+        'gpu': _source.gpu,
+        'type': _source.type,
+    })
 
-    update_data.pop('hooks')
-    storages, volumes_k8s = await volume_check(authorization, ne.hooks, extra_info)
+    image_id = int(update_data.pop('image'))
+    _image = await Image.objects.get_or_none(pk=image_id)
+    if not _image:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='镜像不存在')
+    update_data['image_id'] = image_id
+    k8s_info['image'] = _image.name
+
+    hooks = update_data.pop('hooks')
+    storages, volumes_k8s = await volume_check(authorization, hooks, extra_info)
     path_set = {x['path'] for x in storages}
     if len(path_set) != len(storages):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
@@ -388,7 +348,7 @@ async def delete_notebook(request: Request,
     _notebook, reason = await operate_auth(request, notebook_id)
     if not _notebook:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
-    check, extra_info = await project_check(request, _notebook.project_by_id)
+    check, extra_info = await project_check(request, _notebook.project_id)
     if not check:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
     if _notebook.status.name not in ['stopped', 'error']:
@@ -401,16 +361,3 @@ async def delete_notebook(request: Request,
         # if response.status != 200:
         #     _notebook.status = None
     await _notebook.delete()
-
-
-@router_notebook.get(
-    '/{notebook_id}/events',
-    description='Notebook事件',
-    response_model=Page[EventItem],
-)
-async def list_notebook_event(query_params: QueryParameters = Depends(QueryParameters)):
-    params_filter = query_params.filter_
-    events = await paginate(Event.objects.filter(**params_filter), params=query_params.params)
-    for i, v in enumerate(events.data):
-        events.data[i] = EventItem.parse_obj(v.gen_pagation_event())
-    return events
