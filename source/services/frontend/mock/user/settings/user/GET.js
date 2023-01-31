@@ -6,7 +6,7 @@
  * @Description 项目负责人可见的设置模块-用户里诶博啊
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
-const utils = require('../../utils');
+const utils = require('../../../utils');
 module.exports = function (req, res) {
   utils.list(req, res, {
     data: [
