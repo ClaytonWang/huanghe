@@ -117,6 +117,7 @@ async def list_notebook(request: Request,
     if role_name != 'admin':
         viewable_project_ids = id_proj_map.get(request.user.id)
         params_filter['project_id__in'] = viewable_project_ids
+        params_filter['creator_id'] = request.user.id
 
     if params_filter:
         name_filter, role_filter, need_filter = {}, {}, False
