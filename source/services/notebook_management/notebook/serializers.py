@@ -43,6 +43,9 @@ class ProjectStr(BaseModel):
     # id: int
     name: Optional[str] = None
 
+class Storage(BaseModel):
+    name: Optional[str]
+    id: str
 
 class Storage(BaseModel):
     name: Optional[str]
@@ -73,6 +76,22 @@ class HookItem(BaseModel):
 class NotebookOp(BaseModel):
     action: int
 
+class Creator(BaseModel):
+    id: str
+    username: str
+
+class Project(BaseModel):
+    id: str
+    name: Optional[str]
+
+class Image(BaseModel):
+    name: str
+    desc: Optional[str] = ""
+    custom: Optional[bool] = False
+
+class SourceItem(BaseModel):
+    id: int
+    name: str
 
 class Creator(BaseModel):
     id: int
