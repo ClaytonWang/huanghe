@@ -232,7 +232,12 @@ insert into public.bam_permissions values (15,null,null,current_timestamp,curren
                                           (55,null,null,current_timestamp,current_timestamp,00050001,'list','列表', null),
                                           (56,null,null,current_timestamp,current_timestamp,000500010001,'create','创建', null),
                                           (57,null,null,current_timestamp,current_timestamp,000500010002,'edit','编辑', null),
-                                          (58,null,null,current_timestamp,current_timestamp,000500010003,'delete','删除', null);
+                                          (58,null,null,current_timestamp,current_timestamp,000500010003,'delete','删除', null),
+                                          (59,null,null,current_timestamp,current_timestamp,0006,'jobs','job',null),
+                                          (60,null,null,current_timestamp,current_timestamp,00060001,'list','列表',null),
+                                          (61,null,null,current_timestamp,current_timestamp,000600010001,'create','创建',null),
+                                          (62,null,null,current_timestamp,current_timestamp,000600010002,'edit','编辑',null),
+                                          (63,null,null,current_timestamp,current_timestamp,000600010003,'delete','删除',null);
 
 
 --8.初始化角色权限表
@@ -279,7 +284,22 @@ insert into public.permissionss_roles values (default,1,15),
                                              (default,3,57),
                                              (default,1,58),
                                              (default,2,58),
-                                             (default,3,58);
+                                             (default,3,58),
+                                             (default,1,59),
+                                             (default,2,59),
+                                             (default,3,59),
+                                             (default,1,60),
+                                             (default,2,60),
+                                             (default,3,60),
+                                             (default,1,61),
+                                             (default,2,61),
+                                             (default,3,61),
+                                             (default,1,62),
+                                             (default,2,62),
+                                             (default,3,62),
+                                             (default,1,63),
+                                             (default,2,63),
+                                             (default,3,63);
 
 
 --9.创建功能权限表
