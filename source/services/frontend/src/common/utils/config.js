@@ -65,9 +65,11 @@ module.exports = {
 
     '/storages/list': '存储管理',
 
-    '/notebooks/list': 'Notebook列表',
+    '/notebooks': 'Notebooks',
+    '/notebooks/list': 'Notebooks',
     '/notebooks/list/update': '编辑Notebook',
     '/notebooks/list/create': '创建Notebook',
+    '/notebooks/detail': '',
   },
   menuItemsConfig: [
     {
