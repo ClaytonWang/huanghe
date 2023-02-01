@@ -102,11 +102,11 @@ async def list_notebook(request: Request,
         role_userid_map[x['role_name']].append(x['id'])
     # print(role_userid_map)
 
-    # project_list = await get_project_list(authorization)
+    project_list = await get_project_list(authorization)
     # print("project_list")
     # print(project_list)
     # code_id_map = {x['code']: x['id'] for x in project_list}
-    # res_proj_map = {x['id']: {'id': x['id'], 'name': x['name']} for x in project_list}
+    res_proj_map = {x['id']: {'id': x['id'], 'name': x['name']} for x in project_list}
 
 
     # 用户可见项目
@@ -161,9 +161,9 @@ async def list_notebook(request: Request,
             # "custom": item['custom'],
         }
 
-        # project_id = item.pop('project_id')
-        # project_info = res_proj_map.get(project_id)
-        # item['project'] = project_info
+        project_id = item.pop('project_by_id')
+        project_info = res_proj_map.get(project_id)
+        item['project'] = project_info
 
     return result
 
@@ -379,7 +379,7 @@ async def delete_notebook(request: Request,
     _notebook, reason = await operate_auth(request, notebook_id)
     if not _notebook:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
-    check, extra_info = await project_check(request, _notebook.project_id)
+    check, extra_info = await project_check(request, _notebook.project_by_id)
     if not check:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
     if _notebook.status.name not in ['stopped', 'error']:
