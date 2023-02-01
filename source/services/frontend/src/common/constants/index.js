@@ -1,6 +1,10 @@
 /**
- * @description Global Constants
- * @author liguanlin<guanlin.li@digitalbrain.cn>
+ * @Author: liguanlin<guanlin.li@digitalbrain.cn> junshi clayton.wang@digitalbrain.cn
+ * @Date: 2023-01-31 15:07:28
+ * @LastEditors: junshi clayton.wang@digitalbrain.cn
+ * @LastEditTime: 2023-02-01 10:21:58
+ * @FilePath: /frontend/src/common/constants/index.js
+ * @Description: Global Constants
  */
 // 用户角色
 export const USER_ROLE = {
@@ -50,6 +54,11 @@ export const NOTEBOOK_STATUS = {
 export const START = 'start';
 export const STOP = 'stop';
 export const NOTEBOOK_ACTION = {
+  [START]: 1,
+  [STOP]: 0,
+};
+
+export const JOB_ACTION = {
   [START]: 1,
   [STOP]: 0,
 };
