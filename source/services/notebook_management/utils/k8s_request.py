@@ -69,7 +69,7 @@ async def list_notebook_k8s(nblr: NoteBookListReq):
             'Content-Type': 'application/json'
         }
         async with session.post(url, headers=headers, data=json.dumps(nblr.dict())) as response:
-            print("status:{}".format(response.status))
+            # print("status:{}".format(response.status))
             response = await response.json()
             # print(response)
             return response['result']
@@ -83,7 +83,7 @@ async def create_pvc(pvc: PVCCreateReq, ignore_exist=False):
         }
         try:
             async with session.post(url, headers=headers, data=json.dumps(pvc.dict())) as response:
-                print("status:{}".format(response.status))
+                # print("status:{}".format(response.status))
                 response = await response.json()
                 # print(response)
                 if ignore_exist and response["success"] is not True and response["message"] == "AlreadyExists":
