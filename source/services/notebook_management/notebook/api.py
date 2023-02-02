@@ -9,10 +9,11 @@ import json
 from typing import List, Dict
 from fastapi import APIRouter, Depends, Request, HTTPException, status, Path
 from fastapi.responses import JSONResponse
-from models import Notebook, Status, Image, Source
-from notebook.serializers import NotebookList, NotebookCreate, NotebookEdit, NotebookOp, NotebookDetail
+from models import Notebook, Status, Image
+from notebook.serializers import NotebookList, NotebookCreate, NotebookEdit, NotebookOp, NotebookDetail, EventItem
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
+from basic.common.common_model import Event
 from basic.common.env_variable import get_string_variable
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project
 from utils.user_request import get_user_list, get_project_list, project_check
@@ -392,3 +393,17 @@ async def delete_notebook(request: Request,
         # if response.status != 200:
         #     _notebook.status = None
     await _notebook.delete()
+
+
+
+@router_notebook.get(
+    '/{notebook_id}/events',
+    description='Notebook事件',
+    response_model=Page[EventItem],
+)
+async def list_notebook_event(query_params: QueryParameters = Depends(QueryParameters)):
+    params_filter = query_params.filter_
+    events = await paginate(Event.objects.filter(**params_filter), params=query_params.params)
+    for i, v in enumerate(events.data):
+        events.data[i] = EventItem.parse_obj(v.gen_pagation_event())
+    return events
