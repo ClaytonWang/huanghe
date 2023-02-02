@@ -113,11 +113,11 @@ export const parseKeyValueToKV = (arr) => {
  * @param {number|string} value
  * @return {string} YYYY/MM/DD HH:mm:ss
  */
-export const transformTime = (value) => {
+export const transformTime = (value, format = 'YYYY/MM/DD HH:mm:ss') => {
   if (!value) {
     return '';
   }
-  return moment(value).format('YYYY/MM/DD HH:mm:ss');
+  return moment(value).format(format);
 };
 
 /**
@@ -126,11 +126,11 @@ export const transformTime = (value) => {
  * @param {number|string} value
  * @return {string} YYYY-MM-DD
  */
-export const transformDate = (value) => {
+export const transformDate = (value, format = 'YYYY-MM-DD') => {
   if (!value) {
     return '';
   }
-  return moment(value).format('YYYY-MM-DD');
+  return moment(value).format(format);
 };
 /**
  * promise顺序执行task
