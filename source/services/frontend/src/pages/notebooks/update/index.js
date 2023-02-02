@@ -80,7 +80,10 @@ const NotebooksUpdate = () => {
 
   const projectDefaultValue = useMemo(() => {
     if (projectsDatasource && projectsDatasource.length > 0) {
-      return projectsDatasource[0]?.id;
+      return {
+        name: projectsDatasource[0]?.name,
+        id: projectsDatasource[0]?.id,
+      };
     }
   }, [projectsDatasource]);
 
@@ -95,7 +98,11 @@ const NotebooksUpdate = () => {
 
   const imageDefaultValue = useMemo(() => {
     if (imagesDatasource && imagesDatasource.length > 0) {
-      return imagesDatasource[0]?.id;
+      return {
+        custom: false,
+        id: imagesDatasource[0]?.id,
+        name: imagesDatasource[0]?.name,
+      };
     }
   }, [imagesDatasource]);
 
@@ -166,6 +173,7 @@ const NotebooksUpdate = () => {
   const handleSubmit = () => {
     const values = form.getFieldsValue();
     const { id = null } = get(location, 'state.params', {});
+    console.log(values);
     if (type === CREATE) {
       saveNotebook(values);
     } else {
@@ -194,24 +202,14 @@ const NotebooksUpdate = () => {
   }, []);
 
   useEffect(() => {
-    form.setFieldsValue({
-      project: {
-        id: projectDefaultValue,
-      },
-      image: {
-        custom: false,
-        name: imageDefaultValue,
-      },
-    });
-  }, [form, projectDefaultValue, imageDefaultValue]);
-
-  useEffect(() => {
     const { id = null } = get(location, 'state.params', {});
     const type = get(location, 'state.type');
     if (type === UPDATE) {
       requestNotebook({ id });
     } else {
       form.setFieldsValue({
+        project: projectDefaultValue,
+        image: imageDefaultValue,
         hooks: [
           {
             path: '/home/jovyan',
@@ -220,7 +218,7 @@ const NotebooksUpdate = () => {
       });
     }
     setType(type);
-  }, [location]);
+  }, [location, form, projectDefaultValue, imageDefaultValue]);
 
   const HooksItem = ({ name, remove, selectedStorages, disabledItems }) => {
     const currStorage = form.getFieldValue(['hooks', name, 'storage']);
@@ -331,7 +329,7 @@ const NotebooksUpdate = () => {
             onChange={onSelectChange}
           >
             {imagesDatasource.map(({ id, name }) => (
-              <Option key={id} value={id}>
+              <Option key={id} value={name}>
                 <Tooltip title={name}>{name}</Tooltip>
               </Option>
             ))}
@@ -340,6 +338,9 @@ const NotebooksUpdate = () => {
 
         <Checkbox checked={custom} onChange={onCheckChange}>
           自定义镜像
+          <Tooltip title="请填写公共镜像仓库，如：tensorflow:1.13">
+            <InfoCircleOutlined style={{ marginLeft: 5, cursor: 'help' }} />
+          </Tooltip>
         </Checkbox>
       </>
     );
@@ -351,7 +352,10 @@ const NotebooksUpdate = () => {
     return (
       <Select
         placeholder="请选择项目"
-        defaultValue={value?.id}
+        defaultValue={{
+          value: value?.id,
+          label: value?.name,
+        }}
         onChange={onSelectChange}
       >
         {projectsDatasource.map(({ id, name = '-' }) => (
