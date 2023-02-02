@@ -8,7 +8,7 @@
 
 from __future__ import annotations
 import ormar
-from basic.common.base_model import DateModel
+from basic.common.base_model import DateModel, GenericDateModel
 from models import DB, META
 
 NOTEBOOK_STATUS_RUNNING = "RUNNING"
@@ -56,28 +56,33 @@ class Source(DateModel):
         }
 
 
-class Notebook(DateModel):
+class Notebook(GenericDateModel):
     class Meta(ormar.ModelMeta):
         tablename: str = "bam_notebook"
         metadata = META
         database = DB
         orders_by = ['-id']
 
-    id: int = ormar.Integer(primary_key=True)
     name: str = ormar.String(max_length=20, comnet='名称')
     url: str = ormar.String(max_length=160, comnet='url地址', nullable=True)
     status: Status = ormar.ForeignKey(Status, related_name='notebook_status')
-    source: Source = ormar.ForeignKey(Source, related_name='notebook_source')
-
-    creator_id: int = ormar.Integer(comment='创建者id')
-    project_id: int = ormar.Integer(comment='项目id')
-    image_id: int = ormar.Integer(comment='镜像id')
-
+    cpu: int = ormar.Integer(comment='CPU数量')
+    memory: int = ormar.Integer(comment='存储容量G')
+    gpu: int = ormar.Integer(comment='GPU数量')
+    type: str = ormar.String(max_length=40, default='', comnet='CPU/GPU类型')
+    image: str = ormar.String(max_length=150, comment='镜像名称')
+    custom: bool = ormar.Boolean(default=False)
     storage: str = ormar.JSON(comment='存储信息')
     k8s_info: str = ormar.JSON(comment='集群信息')
 
     # def __repr__(self):
     #     return f'{self.name}_{self.value}'
+
+    def get_str(self):
+        if self.gpu:
+            return f"GPU {self.gpu}*{self.type} {self.cpu}C {self.memory}G"
+        else:
+            return f"CPU {self.cpu}C {self.memory}G"
 
     @classmethod
     def compare_status_and_update(cls, nb: Notebook, status: str, status_dic):

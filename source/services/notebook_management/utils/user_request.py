@@ -73,7 +73,7 @@ async def get_current_user_aio(token):
             'Content-Type': 'application/json'
         }
         async with session.get(url, headers=headers) as response:
-            print("status:{}".format(response.status))
+            # print("status:{}".format(response.status))
             # 把401传递出去
             if response.status != 200:
                 return None
@@ -97,7 +97,7 @@ async def get_user_list(token):
             'Content-Type': 'application/json'
         }
         async with session.get(url, headers=headers) as response:
-            print("status:{}".format(response.status))
+            # print("status:{}".format(response.status))
             text = await response.json()
             user_data = text['result']
             res = []
@@ -118,7 +118,7 @@ async def get_project_list(token):
             'Content-Type': 'application/json'
         }
         async with session.get(url, headers=headers) as response:
-            print("status:{}".format(response.status))
+            # print("status:{}".format(response.status))
             text = await response.json()
             # print(text)
             proj_data = text['result']
@@ -138,7 +138,7 @@ async def get_project(token, proj_id):
             'Content-Type': 'application/json'
         }
         async with session.get(url, headers=headers) as response:
-            print("status:{}".format(response.status))
+            # print("status:{}".format(response.status))
             text = await response.json()
             # print(text)
             return text['status'], text['result']
