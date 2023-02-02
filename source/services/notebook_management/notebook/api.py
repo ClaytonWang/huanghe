@@ -220,6 +220,7 @@ async def create_notebook(request: Request,
     # if not image:
     #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='镜像不存在')
     init_data['image'] = nc.image.name
+    init_data['custom'] = nc.image.custom
 
     # 存储检查
     storages, volumes_k8s = await volume_check(authorization, nc.hooks, extra_info)
