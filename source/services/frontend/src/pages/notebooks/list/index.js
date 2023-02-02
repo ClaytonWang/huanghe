@@ -10,7 +10,7 @@ import api from '@/common/api';
 import { AuthButton } from '@/common/components';
 import { purifyDeep } from '@/common/utils/helper';
 import { PlusOutlined } from '@ant-design/icons';
-import NotebooksFilter from './NotebooksFilter';
+// import NotebooksFilter from './NotebooksFilter';
 import NotebooksTable from './NotebooksTable';
 import {
   CREATE,
@@ -28,7 +28,7 @@ const NotebooksList = () => {
     () => ({
       pageno: 1,
       pagesize: 10,
-      sort: 'id:desc',
+      sort: 'update_at:desc',
       filter: {
         username: null,
         role__name: 'all',
@@ -168,12 +168,12 @@ const NotebooksList = () => {
   };
   return (
     <div className="storages-list">
-      <NotebooksFilter
+      {/* <NotebooksFilter
         initialValues={getFilters().filter}
         defaultFilters={defaultFilters.filter}
         reload={reload}
         projectsDatasource={projectsDatasource}
-      />
+      /> */}
       <div className="dbr-table-container">
         <div className="batch-command">
           <AuthButton
@@ -183,7 +183,7 @@ const NotebooksList = () => {
             onClick={handleCreateClicked}
           >
             <PlusOutlined />
-            新建Notebook
+            新建
           </AuthButton>
         </div>
         <NotebooksTable

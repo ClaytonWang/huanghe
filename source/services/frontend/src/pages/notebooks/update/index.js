@@ -7,7 +7,16 @@
  */
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Divider, Form, Input, message, Select, Tooltip } from 'antd';
+import {
+  Button,
+  Divider,
+  Form,
+  Input,
+  message,
+  Select,
+  Tooltip,
+  Checkbox,
+} from 'antd';
 import { uniqueId, get, map, drop } from 'lodash';
 import {
   DeleteFilled,
@@ -68,6 +77,13 @@ const NotebooksUpdate = () => {
       console.log(error);
     }
   };
+
+  const projectDefaultValue = useMemo(() => {
+    if (projectsDatasource && projectsDatasource.length > 0) {
+      return projectsDatasource[0]?.id;
+    }
+  }, [projectsDatasource]);
+
   const requestImages = async () => {
     try {
       const { result } = await api.imagesList();
@@ -76,6 +92,13 @@ const NotebooksUpdate = () => {
       console.log(error);
     }
   };
+
+  const imageDefaultValue = useMemo(() => {
+    if (imagesDatasource && imagesDatasource.length > 0) {
+      return imagesDatasource[0]?.id;
+    }
+  }, [imagesDatasource]);
+
   const requestSource = async () => {
     try {
       const { result } = await api.sourceList();
@@ -171,6 +194,18 @@ const NotebooksUpdate = () => {
   }, []);
 
   useEffect(() => {
+    form.setFieldsValue({
+      project: {
+        id: projectDefaultValue,
+      },
+      image: {
+        custom: false,
+        name: imageDefaultValue,
+      },
+    });
+  }, [form, projectDefaultValue, imageDefaultValue]);
+
+  useEffect(() => {
     const { id = null } = get(location, 'state.params', {});
     const type = get(location, 'state.type');
     if (type === UPDATE) {
@@ -200,7 +235,7 @@ const NotebooksUpdate = () => {
         <div className="notebooks-hooks-item">
           <span className="content">
             <Form.Item
-              name={[name, 'storage']}
+              name={[name, 'storage', 'id']}
               label="存储盘"
               rules={[{ required: true, message: '请选择存储盘' }]}
             >
@@ -253,6 +288,80 @@ const NotebooksUpdate = () => {
       </>
     );
   };
+
+  const checkImage = (_, value) => {
+    if (value?.name) {
+      return Promise.resolve();
+    }
+    return Promise.reject(new Error('请输入镜像！'));
+  };
+
+  const CustomImage = ({ value, onChange }) => {
+    const [custom, setCustom] = useState(value?.custom);
+    const onCheckChange = (e) => {
+      setCustom(e.target.checked);
+      onChange?.({
+        custom: e.target.checked,
+        name: null,
+      });
+    };
+    const onInputChange = (e) => {
+      onChange?.({ custom: true, name: e.target.value });
+    };
+    const onSelectChange = (value) => {
+      onChange?.({ custom: false, name: value });
+    };
+    return (
+      <>
+        {custom ? (
+          <Input
+            addonBefore="harbor.digitalbrain.cn/"
+            placeholder="输入镜像地址"
+            onChange={onInputChange}
+            value={value?.name}
+          />
+        ) : (
+          <Select
+            placeholder="请选择镜像"
+            showSearch
+            filterOption={(input, option) =>
+              (option?.children ?? '').includes(input)
+            }
+            defaultValue={value?.name}
+            onChange={onSelectChange}
+          >
+            {imagesDatasource.map(({ id, name }) => (
+              <Option key={id} value={id}>
+                <Tooltip title={name}>{name}</Tooltip>
+              </Option>
+            ))}
+          </Select>
+        )}
+
+        <Checkbox checked={custom} onChange={onCheckChange}>
+          自定义镜像
+        </Checkbox>
+      </>
+    );
+  };
+  const ProjectSelect = ({ value, onChange }) => {
+    const onSelectChange = (value) => {
+      onChange?.({ id: value });
+    };
+    return (
+      <Select
+        placeholder="请选择项目"
+        defaultValue={value?.id}
+        onChange={onSelectChange}
+      >
+        {projectsDatasource.map(({ id, name = '-' }) => (
+          <Option key={id} value={id}>
+            {name}
+          </Option>
+        ))}
+      </Select>
+    );
+  };
   return (
     <div className="notebooks-update">
       <Form
@@ -283,55 +392,11 @@ const NotebooksUpdate = () => {
           <Input placeholder="请输入Notebook名称" />
         </Form.Item>
         <Form.Item
-          name="image"
-          label="镜像"
-          rules={[{ required: true, message: '请选择镜像' }]}
-        >
-          <Select
-            placeholder="请选择镜像"
-            showSearch
-            filterOption={(input, option) =>
-              (option?.children ?? '').includes(input)
-            }
-          >
-            {imagesDatasource.map(({ id, name }) => (
-              <Option key={id} value={id}>
-                <Tooltip title={name}>{name}</Tooltip>
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item
-          name="source"
-          label="资源规格"
-          rules={[{ required: true, message: '请选择资源规格' }]}
-        >
-          <Select
-            placeholder="请选择资源规格"
-            showSearch
-            filterOption={(input, option) =>
-              (option?.children ?? '').includes(input)
-            }
-          >
-            {sourceDatasource.map(({ id, name }) => (
-              <Option key={id} value={id}>
-                <Tooltip title={name}>{name}</Tooltip>
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item
           name="project"
-          label="所属项目"
+          label="项目"
           rules={[{ required: true, message: '请选择项目' }]}
         >
-          <Select placeholder="请选择项目">
-            {projectsDatasource.map(({ id, name = '-' }) => (
-              <Option key={id} value={id}>
-                {name}
-              </Option>
-            ))}
-          </Select>
+          <ProjectSelect />
         </Form.Item>
         <Form.List
           name="hooks"
@@ -383,6 +448,37 @@ const NotebooksUpdate = () => {
             </>
           )}
         </Form.List>
+        <Form.Item
+          name="image"
+          label="镜像"
+          rules={[
+            { required: true, message: '请选择镜像' },
+            {
+              validator: checkImage,
+            },
+          ]}
+        >
+          <CustomImage />
+        </Form.Item>
+        <Form.Item
+          name="source"
+          label="资源规格"
+          rules={[{ required: true, message: '请选择资源规格' }]}
+        >
+          <Select
+            placeholder="请选择资源规格"
+            showSearch
+            filterOption={(input, option) =>
+              (option?.children ?? '').includes(input)
+            }
+          >
+            {sourceDatasource.map(({ id, name }) => (
+              <Option key={id} value={name}>
+                <Tooltip title={name}>{name}</Tooltip>
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
         <Form.Item>
           <Button onClick={handleCancelClicked}>取消</Button>
           <Button type="primary" htmlType="submit">
