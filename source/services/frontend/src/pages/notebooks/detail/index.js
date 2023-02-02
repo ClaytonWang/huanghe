@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-02 14:24:08
+ * @LastEditTime: 2023-02-02 19:11:39
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
@@ -22,7 +22,19 @@ const NotebookDetail = () => {
   const [loading, setLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const defaultFilters = useMemo(() => ({}), []);
+  const defaultFilters = useMemo(
+    () => ({
+      pageno: 1,
+      pagesize: 10,
+      sort: 'update_at:desc',
+      filter: {
+        // username: null,
+        // role__name: 'all',
+        // project__code: 'all',
+      },
+    }),
+    []
+  );
 
   const getFilters = useCallback(
     () => ({ ...defaultFilters, ...qs.parse(searchParams.toString()) }),
@@ -37,6 +49,23 @@ const NotebookDetail = () => {
         setLoading(loading);
         const { result } = await api.notebooksDetail(params);
         setDetailData(result);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
+    },
+    [getFilters]
+  );
+
+  const requestEvent = useCallback(
+    async (args) => {
+      const { loading = false, ...rest } = args;
+      const params = purifyDeep({ ...getFilters(), ...rest });
+      try {
+        setLoading(loading);
+        const { result } = await api.notebooksDetailEvent(params);
+        setTableData(result);
         setLoading(false);
       } catch (error) {
         console.log(error);
@@ -78,17 +107,7 @@ const NotebookDetail = () => {
     // eslint-disable-next-line default-case
     switch (key) {
       case 'event-monitor':
-        setTableData({
-          total: 1,
-          data: [
-            {
-              id: '1',
-              status: '胡彦斌',
-              time: '2023-01-31T10:58:25.030773',
-              name: '西湖区湖底公园1号',
-            },
-          ],
-        });
+        requestEvent({ loading: true });
         break;
     }
   };

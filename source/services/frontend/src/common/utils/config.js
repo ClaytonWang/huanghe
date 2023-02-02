@@ -52,6 +52,8 @@ module.exports = {
     notebooksListAction: 'post|/notebook/notebooks/:id',
     notebooksListUpdate: 'put|/notebook/notebooks/:id',
     notebooksListDelete: 'delete|/notebook/notebooks/:id',
+    notebooksDetailEvent: 'get|/notebook/notebooks/:id/events',
+
     imagesList: 'get|/notebook/image',
     sourceList: 'get|/notebook/source',
   },
