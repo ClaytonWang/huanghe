@@ -8,7 +8,7 @@ const { merge } = require('webpack-merge');
 const base = require('./webpack.base.config.js');
 const { apiPrefix } = require('../src/common/utils/config');
 
-const mock = true;
+const mock = false;
 
 const proxy = {
   // target: 'http://124.71.133.7/',

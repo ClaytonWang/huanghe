@@ -58,7 +58,7 @@ const NotebooksTable = ({
       dataIndex: 'name',
       width: '10%',
       render(value, _) {
-        return <Link to={`/notebooks/detail/${_.id}`}>{value}</Link>;
+        return <Link to={`/notebooks/detail?id=${_.id}`}>{value}</Link>;
       },
     },
     {
