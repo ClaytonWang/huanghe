@@ -54,7 +54,7 @@ class NotebookOp(BaseModel):
     action: int
 
 class Creator(BaseModel):
-    id: str
+    id: int
     username: str
 
 class Project(BaseModel):
