@@ -93,7 +93,7 @@ class JobList(BaseModel):
 class JobCreate(BaseModel):
     name: str = Field(..., max_length=20)
     project: Project
-    source: int
+    source_id: int
     task_model: int
     start_command: str
     image_type: int
@@ -116,7 +116,7 @@ class JobDetail(BaseModel):
     project: Project
     image_type: int
     image_name: str
-    source: str
+    source: str = None
     hooks: List[HookItem]
     updated_at: Optional[datetime]
     task_model_name: str
