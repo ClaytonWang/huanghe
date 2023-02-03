@@ -2,16 +2,15 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-03 11:42:07
+ * @LastEditTime: 2023-02-03 20:06:23
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Col, Row, Tabs } from 'antd';
+import { Col, Row, Tabs, Space, Button } from 'antd';
 import { ChartMonitor, EventMonitor } from '@/common/components';
-import { purifyDeep } from '@/common/utils/helper';
-import { transformDate } from '@/common/utils/helper';
+import { purifyDeep, transformDate } from '@/common/utils/helper';
 import api from '@/common/api';
 import qs from 'qs';
 import './index.less';
@@ -173,5 +172,16 @@ const NotebookDetail = () => {
     </div>
   );
 };
+
+NotebookDetail.context = ({ onCancel, onSubmit }) => (
+  <Space>
+    <Button onClick={onCancel}>取消</Button>
+    <Button type="primary" onClick={onSubmit}>
+      打开
+    </Button>
+  </Space>
+);
+
+NotebookDetail.path = '/notebooks/list/detail';
 
 export default NotebookDetail;
