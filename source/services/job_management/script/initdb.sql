@@ -19,11 +19,10 @@ CREATE TABLE "public"."bam_job" (
                                     "image_name" varchar(100) COLLATE "pg_catalog"."default",
                                     "status" int4,
                                     "work_dir" varchar(100) COLLATE "pg_catalog"."default",
-                                    "source" int4,
+                                    "source_id" int4,
                                     "project_by" varchar COLLATE "pg_catalog"."default",
                                     "k8s_info" json,
                                     CONSTRAINT "bam_job_pkey" PRIMARY KEY ("id"),
-                                    CONSTRAINT "bam_job_source_fkey" FOREIGN KEY ("source") REFERENCES "public"."bam_source" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
                                     CONSTRAINT "bam_job_status_fkey" FOREIGN KEY ("status") REFERENCES "public"."bam_status" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
 )
 ;
@@ -48,6 +47,8 @@ COMMENT ON COLUMN "public"."bam_job"."image_type" IS '镜像类型，0：官方�
 COMMENT ON COLUMN "public"."bam_job"."image_name" IS '镜像名称';
 
 COMMENT ON COLUMN "public"."bam_job"."work_dir" IS '工作目录';
+
+COMMENT ON COLUMN "public"."bam_job"."source_id" IS 'source表id逻辑关联';
 
 --2.创建bam_job序列
 CREATE SEQUENCE "public"."bam_job_id_seq"

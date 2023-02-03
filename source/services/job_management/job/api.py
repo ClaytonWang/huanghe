@@ -25,9 +25,10 @@ from utils.user_request import get_user_list, get_project_list, project_check
 router_job = APIRouter()
 
 
-def format_job_detail(nb: Job):
+def format_job_detail(nb: Job, source: Source = None):
     result = nb.dict()
-    result['source'] = nb.source.get_str()
+    if source:
+        result['source'] = source.get_str()
     result['project'] = {"id": nb.project_by_id,
                          "name": nb.project_by, }
 
@@ -67,8 +68,9 @@ async def get_volume_job(volume_id: int = Path(..., ge=1, description='需要查
     response_model_exclude_unset=True
 )
 async def get_job(job_id: int = Path(..., ge=1, description='需要查询的job ID')):
-    _job = await Job.objects.select_related(['status',"source"]).get(pk=job_id)
-    return format_job_detail(_job)
+    _job = await Job.objects.select_related(['status']).get(pk=job_id)
+    source = await Source.objects.get(pk=_job.source_id)
+    return format_job_detail(_job, source)
 
 
 @router_job.get(
@@ -78,8 +80,8 @@ async def get_job(job_id: int = Path(..., ge=1, description='需要查询的job 
     response_model_exclude_unset=True
 )
 async def list_job(request: Request,
-                        query_params: QueryParameters = Depends(QueryParameters),
-                        ):
+                   query_params: QueryParameters = Depends(QueryParameters),
+                   ):
     """
     :param request:
     :param query_params:
@@ -137,16 +139,20 @@ async def list_job(request: Request,
     # print(params_filter)
 
     result = await paginate(Job.objects.select_related(
-        ['status','source']
+        ['status']
     ).filter(**params_filter), params=query_params.params)
     result = result.dict()
     data = result['data']
 
+    source_ids = ( item['source_id'] for item in data)
+    source_list = await Source.objects.filter(id__in=source_ids).all()
+    source_list_map = {source.id: source for source in source_list}
     for item in data:
-        gpu = item["source"]["gpu"]
-        type = item["source"]["type"]
-        cpu = item["source"]["cpu"]
-        memory = item["source"]["memory"]
+        source = source_list_map.get(item['source_id'])
+        gpu = source.gpu
+        type = source.type
+        cpu = source.cpu
+        memory = source.memory
         if gpu:
             item['source'] = f"GPU {gpu}*{type} {cpu}C {memory}G"
         else:
@@ -202,7 +208,7 @@ async def create_job(request: Request,
     if await Job.objects.filter(name=init_data['name'], project_by_id=int(nc.project.id)).count():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='job不能重名')
 
-    init_data['source'] = nc.source
+    init_data['source_id'] = nc.source_id
     init_data['task_model'] = nc.task_model
     init_data['start_command'] = nc.start_command
     init_data['image_type'] = nc.image_type
@@ -216,7 +222,7 @@ async def create_job(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
     init_data['storage'] = json.dumps(storages)
 
-    source = await Source.objects.get(pk=nc.source)
+    source = await Source.objects.get(pk=nc.source_id)
     k8s_info = {
         'name': f"{request.user.en_name}-{init_data['name']}",
         'namespace': extra_info,
@@ -239,9 +245,9 @@ async def create_job(request: Request,
 #     description='编辑Job',
 # )
 async def update_job(request: Request,
-                          ne: JobEdit,
-                          job_id: int = Path(..., ge=1, description="JobID"),
-                          ):
+                     ne: JobEdit,
+                     job_id: int = Path(..., ge=1, description="JobID"),
+                     ):
     # user: AccountGetter = request.user
     authorization: str = request.headers.get('authorization')
     update_data = ne.dict(exclude_unset=True)
@@ -320,8 +326,8 @@ async def update_job(request: Request,
 #     description='启动/停止Job',
 # )
 async def operate_job(request: Request,
-                           data: JobOp,
-                           job_id: int = Path(..., ge=1, description="JobID")):
+                      data: JobOp,
+                      job_id: int = Path(..., ge=1, description="JobID")):
     authorization: str = request.headers.get('authorization')
     action = int(data.dict()['action'])
     _job, reason = await operate_auth(request, job_id)
@@ -365,7 +371,7 @@ async def operate_job(request: Request,
     description='删除Job',
 )
 async def delete_job(request: Request,
-                          job_id: int = Path(..., ge=1, description="JobID")):
+                     job_id: int = Path(..., ge=1, description="JobID")):
     _job, reason = await operate_auth(request, job_id)
     if not _job:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)

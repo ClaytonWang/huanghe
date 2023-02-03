@@ -80,7 +80,7 @@ class Job(GenericDateModel):
     image_name: str = ormar.String(max_length=100, comment='镜像名称')
     status: Status = ormar.ForeignKey(Status, related_name='job_status')
     work_dir: str = ormar.String(max_length=100, comment='工作目录')
-    source: Source = ormar.ForeignKey(Source, related_name='job_source')
+    source_id: int = ormar.Integer(comment='source表id逻辑关联')
     k8s_info:str = ormar.JSON(comment="集群信息")
 
     def get_task_model_name(self):
