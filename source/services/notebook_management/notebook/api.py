@@ -9,10 +9,11 @@ import json
 from typing import List, Dict
 from fastapi import APIRouter, Depends, Request, HTTPException, status, Path
 from fastapi.responses import JSONResponse
-from models import Notebook, Status, Image, Source
-from notebook.serializers import NotebookList, NotebookCreate, NotebookEdit, NotebookOp, NotebookDetail
+from models import Notebook, Status, Image
+from notebook.serializers import NotebookList, NotebookCreate, NotebookEdit, NotebookOp, NotebookDetail, EventItem
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
+from basic.common.common_model import Event
 from basic.common.env_variable import get_string_variable
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project
 from utils.user_request import get_user_list, get_project_list, project_check
@@ -106,7 +107,7 @@ async def list_notebook(request: Request,
     # print("project_list")
     # print(project_list)
     # code_id_map = {x['code']: x['id'] for x in project_list}
-    res_proj_map = {x['id']: {'id': x['id'], 'name': x['name']} for x in project_list}
+    res_proj_map = {x['id']: {'name': x['name']} for x in project_list}
 
 
     # 用户可见项目
@@ -152,7 +153,7 @@ async def list_notebook(request: Request,
         else:
             item['source'] = f"CPU {cpu}C {memory}G"
         item['creator'] = {
-            "id": item["created_by_id"],
+            "id": int(item["created_by_id"]),
             "username": item["created_by"],
         }
         item['image'] = {
@@ -219,6 +220,7 @@ async def create_notebook(request: Request,
     # if not image:
     #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='镜像不存在')
     init_data['image'] = nc.image.name
+    init_data['custom'] = nc.image.custom
 
     # 存储检查
     storages, volumes_k8s = await volume_check(authorization, nc.hooks, extra_info)
@@ -307,7 +309,7 @@ async def update_notebook(request: Request,
     if 'source' in update_data:
         update_data.pop('source')
     update_data['image'] = ne.image.name
-
+    update_data['custom'] = ne.image.custom
     k8s_info['image'] = ne.image.name
 
     update_data.pop('hooks')
@@ -392,3 +394,17 @@ async def delete_notebook(request: Request,
         # if response.status != 200:
         #     _notebook.status = None
     await _notebook.delete()
+
+
+
+@router_notebook.get(
+    '/{notebook_id}/events',
+    description='Notebook事件',
+    response_model=Page[EventItem],
+)
+async def list_notebook_event(query_params: QueryParameters = Depends(QueryParameters)):
+    params_filter = query_params.filter_
+    events = await paginate(Event.objects.filter(**params_filter), params=query_params.params)
+    for i, v in enumerate(events.data):
+        events.data[i] = EventItem.parse_obj(v.gen_pagation_event())
+    return events
