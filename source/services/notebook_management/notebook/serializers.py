@@ -58,7 +58,7 @@ class Creator(BaseModel):
     username: str
 
 class Project(BaseModel):
-    id: str
+    id: int
     name: Optional[str]
 
 class Image(BaseModel):
