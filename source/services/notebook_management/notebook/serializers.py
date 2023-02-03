@@ -50,7 +50,7 @@ class ProjectStr(BaseModel):
 
 class Storage(BaseModel):
     name: Optional[str]
-    id: str
+    id: int
 
 class Storage(BaseModel):
     name: Optional[str]
