@@ -107,7 +107,7 @@ async def list_notebook(request: Request,
     # print("project_list")
     # print(project_list)
     # code_id_map = {x['code']: x['id'] for x in project_list}
-    res_proj_map = {x['id']: {'id': x['id'], 'name': x['name']} for x in project_list}
+    res_proj_map = {x['id']: {'name': x['name']} for x in project_list}
 
 
     # 用户可见项目
@@ -153,7 +153,7 @@ async def list_notebook(request: Request,
         else:
             item['source'] = f"CPU {cpu}C {memory}G"
         item['creator'] = {
-            "id": item["created_by_id"],
+            "id": int(item["created_by_id"]),
             "username": item["created_by"],
         }
         item['image'] = {
@@ -309,7 +309,7 @@ async def update_notebook(request: Request,
     if 'source' in update_data:
         update_data.pop('source')
     update_data['image'] = ne.image.name
-
+    update_data['custom'] = ne.image.custom
     k8s_info['image'] = ne.image.name
 
     update_data.pop('hooks')
