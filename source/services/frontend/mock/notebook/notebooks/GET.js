@@ -29,7 +29,7 @@ module.exports = function (req, res) {
         source: '1*A100 8C 32G', // 资源，字符串
         creator: {
           id: '1', // 用户ID，字符串
-          username: '田老师', // 用户名称，字符串
+          username: 'name1', // 用户名称，字符串
         }, // 创建人
         created_at: '2022-09-03', // 创建时间，字符串
       },

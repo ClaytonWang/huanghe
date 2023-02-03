@@ -16,6 +16,7 @@ import {
   Select,
   Tooltip,
   Checkbox,
+  Space,
 } from 'antd';
 import { uniqueId, get, map, drop } from 'lodash';
 import {
@@ -25,6 +26,7 @@ import {
 } from '@ant-design/icons';
 import api from '@/common/api';
 import { CREATE, UPDATE, ADMIN } from '@/common/constants';
+import { useContextProps } from '@/common/hooks/RoutesProvider';
 import { useAuth } from '@/common/hooks/useAuth';
 import { genUniqueIdByPrefix, ID } from '@/common/utils/helper';
 import './index.less';
@@ -37,6 +39,7 @@ const NotebooksUpdate = () => {
   const [sourceDatasource, setSourceDatasource] = useState([]);
   const [storagesDatasource, setStoragesDatasource] = useState([]);
   const [selectedStorages, setSelectedStorages] = useState([]);
+  const setContextProps = useContextProps();
   const [type, setType] = useState(CREATE);
   const notebookUniqueID = useRef();
   const { user } = useAuth();
@@ -199,6 +202,12 @@ const NotebooksUpdate = () => {
     requestSource();
     requestStorages();
     notebookUniqueID.current = new ID();
+    setContextProps({
+      onCancel: handleCancelClicked,
+      onSubmit: () => {
+        form.submit();
+      },
+    });
   }, []);
 
   useEffect(() => {
@@ -352,10 +361,7 @@ const NotebooksUpdate = () => {
     return (
       <Select
         placeholder="请选择项目"
-        defaultValue={{
-          value: value?.id,
-          label: value?.name,
-        }}
+        defaultValue={value?.id}
         onChange={onSelectChange}
       >
         {projectsDatasource.map(({ id, name = '-' }) => (
@@ -483,14 +489,19 @@ const NotebooksUpdate = () => {
             ))}
           </Select>
         </Form.Item>
-        <Form.Item>
-          <Button onClick={handleCancelClicked}>取消</Button>
-          <Button type="primary" htmlType="submit">
-            保存
-          </Button>
-        </Form.Item>
       </Form>
     </div>
   );
 };
+NotebooksUpdate.context = ({ onCancel, onSubmit }) => (
+  <Space>
+    <Button onClick={onCancel}>取消</Button>
+    <Button type="primary" onClick={onSubmit}>
+      保存
+    </Button>
+  </Space>
+);
+
+NotebooksUpdate.path = '/notebooks/list/update';
+
 export default NotebooksUpdate;
