@@ -502,6 +502,6 @@ NotebooksUpdate.context = ({ onCancel, onSubmit }) => (
   </Space>
 );
 
-NotebooksUpdate.path = '/notebooks/list/update';
+NotebooksUpdate.path = ['/notebooks/list/update', 'notebooks/list/create'];
 
 export default NotebooksUpdate;

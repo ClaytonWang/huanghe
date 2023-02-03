@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-03 16:00:40
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-03 19:31:07
+ * @LastEditTime: 2023-02-03 20:05:14
  * @FilePath: /huanghe/source/services/frontend/src/providers/RoutesProvider.js
  * @Description: RoutesProvider
  */
@@ -17,10 +17,20 @@ const findMacthingComponents = (path, routesMap, parentPath = '') => {
   const result = [];
 
   const match = routesMap.find((route) => {
-    const matchingPath = `${parentPath}${route.path}`;
-    const match = matchPath({ path: matchingPath }, path);
+    const _path = route.path;
+    const _match = (v) => {
+      const matchingPath = `${parentPath}${v}`;
+      const match = matchPath({ path: matchingPath }, path);
+      return match;
+    };
 
-    return match;
+    if (typeof _path === 'string') {
+      return _match(_path);
+    }
+    if (Array.isArray(_path)) {
+      return _path.some(_match);
+    }
+    return false;
   });
 
   if (match) {
