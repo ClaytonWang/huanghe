@@ -45,6 +45,23 @@ class Storage(BaseModel):
     name: Optional[str]
     id: int
 
+
+class CpuUrl(BaseModel):
+    url: str
+
+
+class GpuUrl(BaseModel):
+    url: str
+
+
+class MemoryUrl(BaseModel):
+    url: str
+
+
+class GpuDisplayUrl(BaseModel):
+    url: str
+
+
 class HookItem(BaseModel):
     storage: Storage
     path: str
@@ -69,6 +86,14 @@ class Image(BaseModel):
 class SourceItem(BaseModel):
     id: int
     name: str
+
+
+class Grafana(BaseModel):
+    cpu: CpuUrl
+    ram: MemoryUrl
+    gpu: GpuUrl
+    vram: GpuDisplayUrl
+
 
 class NotebookList(BaseModel):
     id: int
@@ -112,7 +137,7 @@ class NotebookDetail(BaseModel):
     source: str
     hooks: List[HookItem]
     updated_at: Optional[datetime]
-
+    grafana: Grafana
 
 class NotebookEdit(BaseModel):
     name: Optional[str]

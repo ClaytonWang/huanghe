@@ -25,6 +25,8 @@ from collections import defaultdict
 
 router_notebook = APIRouter()
 
+COMMON = "https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
+
 
 def format_notebook_detail(nb: Notebook):
     result = nb.dict()
@@ -38,6 +40,12 @@ def format_notebook_detail(nb: Notebook):
     result['creator'] = {"id": nb.created_by_id,
                          "username": nb.created_by,}
     result['hooks'] = result['storage']
+    result['grafana'] = {
+        "cpu": nb.cpu_url(COMMON),
+        "ram": nb.ram_url(COMMON),
+        "gpu": nb.gpu_url(COMMON),
+        "vram": nb.vram_url(COMMON),
+    }
     return result
 
 
@@ -108,7 +116,6 @@ async def list_notebook(request: Request,
     # print(project_list)
     # code_id_map = {x['code']: x['id'] for x in project_list}
     res_proj_map = {x['id']: {'name': x['name']} for x in project_list}
-
 
     # 用户可见项目
     if role_name != 'admin':
@@ -394,7 +401,6 @@ async def delete_notebook(request: Request,
         # if response.status != 200:
         #     _notebook.status = None
     await _notebook.delete()
-
 
 
 @router_notebook.get(
