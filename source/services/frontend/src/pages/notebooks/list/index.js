@@ -18,10 +18,10 @@ import {
   START,
   STOP,
   UPDATE,
-  ADMIN,
+  // ADMIN,
 } from '@/common/constants';
 import './index.less';
-import { useAuth } from '@/common/hooks/useAuth';
+// import { useAuth } from '@/common/hooks/useAuth';
 
 const NotebooksList = () => {
   const defaultFilters = useMemo(
@@ -38,10 +38,10 @@ const NotebooksList = () => {
     []
   );
   const [tableData, setTableData] = useState();
-  const [projectsDatasource, setProjectsDatasource] = useState([]);
+  // const [projectsDatasource, setProjectsDatasource] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const navigate = useNavigate();
 
   const getFilters = useCallback(
@@ -65,19 +65,19 @@ const NotebooksList = () => {
     },
     [getFilters]
   );
-  const requestProjects = async () => {
-    try {
-      if (user.role.name === ADMIN) {
-        const { result } = await api.bamProjectsList();
-        setProjectsDatasource(result.data);
-      } else {
-        // 除超级管理员角色，其他项目列表返回自己所属项目
-        setProjectsDatasource(user?.projects ?? []);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const requestProjects = async () => {
+  //   try {
+  //     if (user.role.name === ADMIN) {
+  //       const { result } = await api.bamProjectsList();
+  //       setProjectsDatasource(result.data);
+  //     } else {
+  //       // 除超级管理员角色，其他项目列表返回自己所属项目
+  //       setProjectsDatasource(user?.projects ?? []);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const reload = (args) => {
     const filters = getFilters();
@@ -89,10 +89,11 @@ const NotebooksList = () => {
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     requestList({ loading: true });
-    requestProjects();
+    // requestProjects();
     const filters = getFilters();
     setSearchParams(qs.stringify(filters));
   }, []);
+
   useEffect(() => {
     const timer = setInterval(() => {
       reload();
