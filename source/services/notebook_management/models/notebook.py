@@ -80,20 +80,20 @@ class Notebook(GenericDateModel):
     # def __repr__(self):
     #     return f'{self.name}_{self.value}'
     def cpu_url(self, common: str):
-        return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&from=now-3h&panelId=4"
+        return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&panelId=4"
 
     def gpu_url(self, common: str):
         if self.gpu > 0:
-            return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&from=now-3h&panelId=8"
+            return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&panelId=8"
         else:
             return ""
 
     def ram_url(self, common: str):
-        return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&from=now-3h&panelId=6"
+        return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&panelId=6"
 
     def vram_url(self, common: str):
         if self.gpu > 0:
-            return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&from=now-3h&panelId=12"
+            return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&panelId=12"
         else:
             return ""
 
