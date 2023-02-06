@@ -2,16 +2,15 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-02 19:11:39
+ * @LastEditTime: 2023-02-03 20:06:23
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Col, Row, Tabs } from 'antd';
+import { Col, Row, Tabs, Space, Button } from 'antd';
 import { ChartMonitor, EventMonitor } from '@/common/components';
-import { purifyDeep } from '@/common/utils/helper';
-import { transformDate } from '@/common/utils/helper';
+import { purifyDeep, transformDate } from '@/common/utils/helper';
 import api from '@/common/api';
 import qs from 'qs';
 import './index.less';
@@ -112,39 +111,34 @@ const NotebookDetail = () => {
     }
   };
 
-  const items = [
-    {
-      key: 'chart-monitor',
-      label: `监控`,
-      children: <ChartMonitor />,
-    },
-    {
-      key: 'event-monitor',
-      label: `事件`,
-      children: (
-        <EventMonitor
-          onPageNoChange={onPageNoChange}
-          tableData={tableData}
-          reload={reload}
-          loading={loading}
-        />
-      ),
-    },
-  ];
   return (
     <div className="detail">
       <div className="detail-section">
         <Row gutter={[16, 24]}>
-          <Col span={6}>名称：{detailData?.name}</Col>
-          <Col span={6}>项目：{detailData?.project?.name}</Col>
-          <Col span={6}>
+          <Col span={6} title={detailData?.name}>
+            名称：{detailData?.name}
+          </Col>
+          <Col span={6} title={detailData?.project?.name}>
+            项目：{detailData?.project?.name}
+          </Col>
+          <Col
+            span={6}
+            title={(() =>
+              detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
+          >
             存储挂载：
             {(() => detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
           </Col>
-          <Col span={6}>镜像：{detailData?.image?.name}</Col>
-          <Col span={6}>资源规格：{detailData?.source}</Col>
-          <Col span={6}>创建人：{detailData?.creator?.username}</Col>
-          <Col span={6}>
+          <Col span={6} title={detailData?.image?.name}>
+            镜像：{detailData?.image?.name}
+          </Col>
+          <Col span={6} title={detailData?.source}>
+            资源规格：{detailData?.source}
+          </Col>
+          <Col span={6} title={detailData?.creator?.username}>
+            创建人：{detailData?.creator?.username}
+          </Col>
+          <Col span={6} title={transformDate(detailData?.createdAt) || '-'}>
             创建时间：{transformDate(detailData?.createdAt) || '-'}
           </Col>
           <Col span={6}></Col>
@@ -153,12 +147,41 @@ const NotebookDetail = () => {
       <div className="dbr-table-container">
         <Tabs
           defaultActiveKey="chart-monitor"
-          items={items}
+          items={[
+            {
+              key: 'chart-monitor',
+              label: `监控`,
+              children: <ChartMonitor />,
+            },
+            {
+              key: 'event-monitor',
+              label: `事件`,
+              children: (
+                <EventMonitor
+                  onPageNoChange={onPageNoChange}
+                  tableData={tableData}
+                  reload={reload}
+                  loading={loading}
+                />
+              ),
+            },
+          ]}
           onChange={onChange}
         />
       </div>
     </div>
   );
 };
+
+NotebookDetail.context = ({ onCancel, onSubmit }) => (
+  <Space>
+    <Button onClick={onCancel}>取消</Button>
+    <Button type="primary" onClick={onSubmit}>
+      打开
+    </Button>
+  </Space>
+);
+
+NotebookDetail.path = '/notebooks/list/detail';
 
 export default NotebookDetail;

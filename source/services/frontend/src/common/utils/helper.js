@@ -2,7 +2,7 @@
  * @description common functions
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
-
+import React from 'react';
 import { uniqueId, cloneDeep } from 'lodash';
 import accounting from 'accounting';
 import moment from 'moment';
@@ -397,4 +397,40 @@ export const genUniqueIdByPrefix = (prefix, instance) => {
     return instance.getValue(prefix);
   }
   return globalID.getValue(prefix);
+};
+
+export const pageSetToRoutes = (pages) => {
+  const pageProcessor = ([name, page]) => {
+    const route = {
+      path: page.path ?? '',
+    };
+
+    route.exact = !!page.exact;
+    route.modal = !!page.modal;
+
+    if (page.title) route.title = page.title;
+    if (page.render) route.render = page.render;
+
+    if (page instanceof React.Component || page instanceof Function) {
+      if (name && /Layout/.test(name)) route.layout = page;
+      else route.component = page;
+    } else {
+      route.component = page.component;
+      route.layout = page.layout;
+    }
+
+    if (route.component?.context) route.context = route.component.context;
+
+    return route;
+  };
+
+  try {
+    if (Array.isArray(pages)) {
+      return pages.map((page) => pageProcessor([null, page]));
+    }
+    return Object.entries(pages).map(pageProcessor);
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
 };
