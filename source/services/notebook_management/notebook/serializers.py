@@ -26,6 +26,14 @@ class EventItem(BaseModel):
     name: Optional[str] = ""
     time: Optional[datetime]
 
+
+class EventItem(BaseModel):
+    id: Optional[int]
+    status: str = ""
+    name: Optional[str] = ""
+    time: Optional[datetime]
+
+
 class StatusItem(BaseModel):
     code: str = None
     name: str = None
@@ -44,6 +52,29 @@ class ProjectStr(BaseModel):
 class Storage(BaseModel):
     name: Optional[str]
     id: int
+
+
+class Storage(BaseModel):
+    name: Optional[str]
+    id: int
+
+
+class CpuUrl(BaseModel):
+    url: str
+
+
+class GpuUrl(BaseModel):
+    url: str
+
+
+class MemoryUrl(BaseModel):
+    url: str
+
+
+class GpuDisplayUrl(BaseModel):
+    url: str
+
+
 
 class HookItem(BaseModel):
     storage: Storage
@@ -69,6 +100,36 @@ class Image(BaseModel):
 class SourceItem(BaseModel):
     id: int
     name: str
+
+
+class Creator(BaseModel):
+    id: int
+    username: str
+
+
+class Project(BaseModel):
+    id: str
+    name: Optional[str]
+
+
+class Image(BaseModel):
+    name: str
+    desc: Optional[str] = ""
+    custom: Optional[bool] = False
+
+
+class SourceItem(BaseModel):
+    id: int
+    name: str
+
+
+class Grafana(BaseModel):
+    cpu: CpuUrl
+    ram: MemoryUrl
+    gpu: GpuUrl
+    vram: GpuDisplayUrl
+
+
 
 class NotebookList(BaseModel):
     id: int
@@ -112,6 +173,7 @@ class NotebookDetail(BaseModel):
     source: str
     hooks: List[HookItem]
     updated_at: Optional[datetime]
+    grafana: Grafana
 
 
 class NotebookEdit(BaseModel):
