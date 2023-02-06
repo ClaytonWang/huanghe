@@ -5,6 +5,7 @@
     >Mail   : xinkai.tao@digitalbrain.cn
     >Time   : 2022/12/15 10:21
 """
+import datetime
 import json
 from collections import defaultdict
 
@@ -144,7 +145,7 @@ async def list_job(request: Request,
     result = result.dict()
     data = result['data']
 
-    source_ids = ( item['source_id'] for item in data)
+    source_ids = (item['source_id'] for item in data)
     source_list = await Source.objects.filter(id__in=source_ids).all()
     source_list_map = {source.id: source for source in source_list}
     for item in data:
@@ -240,10 +241,27 @@ async def create_job(request: Request,
     return format_job_detail(_job)
 
 
-# @router_job.put(
-#     '/{job_id}',
-#     description='编辑Job',
-# )
+@router_job.put(
+    '/{job_id}/{status}',
+    description='状态修改',
+)
+async def update_status(request: Request,
+                        job_id: int = Path(..., ge=1, description="JobID"),
+                        status: int = Path(..., ge=1, description="status_id"),
+                        ):
+    _job, reason = await operate_auth(request, job_id)
+    if not _job:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
+
+    if not await _job.update(status=status):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job不存在')
+    return JSONResponse(dict(id=job_id))
+
+
+@router_job.put(
+    '/{job_id}',
+    description='编辑Job',
+)
 async def update_job(request: Request,
                      ne: JobEdit,
                      job_id: int = Path(..., ge=1, description="JobID"),
@@ -259,7 +277,7 @@ async def update_job(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
     k8s_info = _job.k8s_info
 
-    if _job.status.name != 'stopped':
+    if _job.status.name != 'stop':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job未停止')
 
     project_id = ne.project.id
@@ -271,40 +289,18 @@ async def update_job(request: Request,
         update_data.pop('project')
     k8s_info['namespace'] = extra_info
 
-    duplicate_name = await Job.objects.filter(
-        name=update_data['name'], project_by_id=int(project_id)).exclude(id=_job.id).count()
-    if duplicate_name:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job不能重名')
-    k8s_info['name'] = f"{request.user.en_name}-{update_data['name']}"
+    k8s_info['name'] = f"{request.user.en_name}-{_job.name}"
 
-    if ne.source:
-        gpu_count = 0
-        if ne.source.startswith("GPU"):
-            machine_type = "GPU"
-            _, gpu_count, cpu_count, memory = ne.source.split()
-            gpu_count = gpu_count.split("*")[0]
-            cpu_count = cpu_count.split("C")[0]
-            memory = memory.split("G")[0]
-        else:
-            machine_type = "CPU"
-            _, cpu_count, memory = ne.source.split()
-            cpu_count = cpu_count.split("C")[0]
-            memory = memory.split("G")[0]
-        update_data["cpu"] = cpu_count
-        update_data["gpu"] = gpu_count
-        update_data["memory"] = memory
-        update_data["type"] = machine_type
+    if ne.source_id:
+        source = await Source.objects.get(pk=ne.source_id)
         k8s_info.update({
-            'cpu': cpu_count,
-            'memory': memory,
-            'gpu': gpu_count,
-            'type': machine_type,
+            'cpu': source.cpu,
+            'memory': source.memory,
+            'gpu': source.gpu,
+            'type': source.type,
         })
-    if 'source' in update_data:
-        update_data.pop('source')
-    update_data['image'] = ne.image.name
 
-    k8s_info['image'] = ne.image.name
+    k8s_info['image'] = ne.image_name
 
     update_data.pop('hooks')
     storages, volumes_k8s = await volume_check(authorization, ne.hooks, extra_info)
@@ -315,16 +311,16 @@ async def update_job(request: Request,
     k8s_info['volumes'] = volumes_k8s
 
     update_data['k8s_info'] = json.dumps(k8s_info)
-
+    update_data['updated_at'] = datetime.datetime.now()
     if not await _job.update(**update_data):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job不存在')
     return JSONResponse(dict(id=job_id))
 
 
-# @router_job.post(
-#     '/{job_id}',
-#     description='启动/停止Job',
-# )
+@router_job.post(
+    '/{job_id}',
+    description='启动/停止Job',
+)
 async def operate_job(request: Request,
                       data: JobOp,
                       job_id: int = Path(..., ge=1, description="JobID")):
@@ -341,17 +337,17 @@ async def operate_job(request: Request,
     # todo 状态还需要调整
     update_data = {}
     if action == 0:
-        if _job.status.name not in ['start', 'running', 'pending']:
+        if _job.status.name not in ['pending', 'running', 'stop_fail','on']:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
         stat = await Status.objects.get(name='stop')
         update_data['status'] = stat.id
         response = await delete_job_k8s(authorization, payloads)
         # if response.status != 200:
         #     _job.status = None
-    else:
-        if _job.status.name != 'stopped':
+    elif action==1:
+        if _job.status.name not in ['start_fail','run_fail','stopped']:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
-        stat = await Status.objects.get(name='start')
+        stat = await Status.objects.get(name='pending')
         update_data['status'] = stat.id
         # todo response返回不为200时更新job状态到异常
         response = await create_job_k8s(authorization, payloads)

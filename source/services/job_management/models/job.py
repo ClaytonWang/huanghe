@@ -15,14 +15,14 @@ from models import DB, META
 
 
 # 状态
-# JOB_STATUS_QUEUING = "queuing"  # 排队中
-# JOB_STATUS_RUNNING = "RUNNING"  # 运行中
-# JOB_STATUS_STOPING = "STOPING"  # 停止中
-# JOB_STATUS_START_FAIL = "START_FAIL"  # 启动失败
-# JOB_STATUS_RUN_FAIL = "RUN_FAIL"  # 运行失败
-# JOB_STATUS_STOP_FAIL = "STOP_FAIL"  # 停止失败
-# JOB_STATUS_ON = "ON"  # 已完成
-# JOB_STATUS_STOP = "STOP"  # 已停止
+# JOB_STATUS_PENDING = "pending"  # 排队中
+# JOB_STATUS_RUNNING = "running"  # 已启动(运行中)
+# JOB_STATUS_STOP = "stop"  # 停止中
+# JOB_STATUS_START_FAIL = "start_fail"  # 启动失败
+# JOB_STATUS_RUN_FAIL = "run_fail"  # 运行失败
+# JOB_STATUS_STOP_FAIL = "stop_fail"  # 停止失败
+# JOB_STATUS_ON = "on"  # 已完成
+# JOB_STATUS_STOPPED = "stopped"  # 已停止
 
 
 class Status(ormar.Model):

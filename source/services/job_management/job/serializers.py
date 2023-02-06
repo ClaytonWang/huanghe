@@ -126,12 +126,11 @@ class JobDetail(BaseModel):
         return dt_to_string(dt, '%Y-%m-%d')
 
 class JobEdit(BaseModel):
-    name: Optional[str]
-    source: Optional[str]
-    project: Optional[Project]
-    image: Optional[Image]
-    hooks: Optional[List[HookItem]] = []
-
-    @validator('name')
-    def job_name_validator(cls, name):
-        return k8s_format(name)
+    project: Project
+    task_model: int
+    start_command: str
+    image_type: int
+    image_name: str = Field(..., max_length=100)
+    work_dir: str
+    hooks: List[HookItem] = []
+    source_id: int
