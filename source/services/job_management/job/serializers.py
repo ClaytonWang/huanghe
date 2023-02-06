@@ -120,6 +120,7 @@ class JobDetail(BaseModel):
     hooks: List[HookItem]
     updated_at: Optional[datetime]
     task_model_name: str
+    task_model: int
 
     @validator('created_at', 'updated_at')
     def format_dt(cls, dt):
