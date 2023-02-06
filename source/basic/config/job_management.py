@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    >File   : notebook_management.py
+    >File   : job_management.py
     >Auther : TXK
     >Mail   : xinkai.tao@digitalbrain.cn
     >Time   : 2022/12/16 18:55
@@ -20,7 +20,7 @@ ENV_COMMON_URL = "http://121.36.41.231:32767/api/v1"
 # ACCOUNT_PREFIX_URL = "/user/user/account"
 # PROJECT_PREFIX_URL = "/user/project"
 # VOLUME_PREFIX_URL = "/storages/volume"
-# CLUSTER_NOTEBOOK_PREFIX_URL = "/cluster/notebook"
+# CLUSTER_JOB_PREFIX_URL = "/cluster/job"
 ENV_COMMON_NAMESPACE = "juece"
 ENV_COMMON_AFTER = "svc.cluster.local"
 AUTH_PREFIX_URL = "/v1/auth/login"
@@ -29,7 +29,7 @@ ACCOUNT_PREFIX_URL = "/user/account"
 PROJECT_PREFIX_URL = "/project"
 VOLUME_PREFIX_URL = "/volume"
 CLUSTER_PVC_PREFIX_URL = "/pvc"
-CLUSTER_NOTEBOOK_PREFIX_URL = "/notebook"
+CLUSTER_JOB_PREFIX_URL = "/notebook"
 ENV = "uat"
 MOCK = os.getenv("MOCK_ACCOUNT_GETTER", False)
 MOCK_USER_JSON = {"id": 60, 'username': "shouchen"}
