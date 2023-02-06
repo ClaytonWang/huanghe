@@ -20,6 +20,7 @@ def k8s_format(name):
         raise ValueError("Notebook命名必须为英文数字中划线组合,且首位必须是字母")
     return name.lower()
 
+
 class EventItem(BaseModel):
     id: Optional[int]
     status: str = ""
@@ -49,31 +50,15 @@ class ProjectStr(BaseModel):
     # id: int
     name: Optional[str] = None
 
-class Storage(BaseModel):
-    name: Optional[str]
-    id: int
-
 
 class Storage(BaseModel):
     name: Optional[str]
     id: int
 
 
-class CpuUrl(BaseModel):
-    url: str
-
-
-class GpuUrl(BaseModel):
-    url: str
-
-
-class MemoryUrl(BaseModel):
-    url: str
-
-
-class GpuDisplayUrl(BaseModel):
-    url: str
-
+class Storage(BaseModel):
+    name: Optional[str]
+    id: int
 
 
 class HookItem(BaseModel):
@@ -84,18 +69,22 @@ class HookItem(BaseModel):
 class NotebookOp(BaseModel):
     action: int
 
+
 class Creator(BaseModel):
     id: int
     username: str
+
 
 class Project(BaseModel):
     id: str
     name: Optional[str]
 
+
 class Image(BaseModel):
     name: str
     desc: Optional[str] = ""
     custom: Optional[bool] = False
+
 
 class SourceItem(BaseModel):
     id: int
@@ -124,11 +113,10 @@ class SourceItem(BaseModel):
 
 
 class Grafana(BaseModel):
-    cpu: CpuUrl
-    ram: MemoryUrl
-    gpu: GpuUrl
-    vram: GpuDisplayUrl
-
+    cpu: str
+    ram: str
+    gpu: str
+    vram: str
 
 
 class NotebookList(BaseModel):
