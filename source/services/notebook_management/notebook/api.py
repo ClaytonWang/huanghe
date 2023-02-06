@@ -24,7 +24,7 @@ from collections import defaultdict
 
 
 router_notebook = APIRouter()
-
+COMMON="https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
 
 def format_notebook_detail(nb: Notebook):
     result = nb.dict()
@@ -38,6 +38,12 @@ def format_notebook_detail(nb: Notebook):
     result['creator'] = {"id": nb.created_by_id,
                          "username": nb.created_by,}
     result['hooks'] = result['storage']
+    result['grafana'] = {
+        'cpu' : nb.cpu_url(COMMON),
+        'ram' : nb.ram_url(COMMON),
+        'gpu' : nb.gpu_url(COMMON),
+        'vram' : nb.vram_url(COMMON),
+    }
     return result
 
 
