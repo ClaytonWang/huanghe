@@ -80,7 +80,7 @@ class Notebook(GenericDateModel):
     # def __repr__(self):
     #     return f'{self.name}_{self.value}'
     def cpu_url(self, common: str):
-        return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&from=now-3h&panelId=8"
+        return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&from=now-3h&panelId=4"
 
     def gpu_url(self, common: str):
         if self.gpu > 0:
@@ -89,11 +89,11 @@ class Notebook(GenericDateModel):
             return ""
 
     def ram_url(self, common: str):
-        return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&from=now-3h&panelId=8"
+        return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&from=now-3h&panelId=6"
 
     def vram_url(self, common: str):
         if self.gpu > 0:
-            return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&from=now-3h&panelId=8"
+            return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&from=now-3h&panelId=12"
         else:
             return ""
 
@@ -101,7 +101,7 @@ class Notebook(GenericDateModel):
         return f"{self.k8s_info.get('namespace')}"
 
     def pod_name(self):
-        return f"{self.k8s_info.get('name') - 0}"
+        return f"{self.k8s_info.get('name')}-0"
 
     def get_str(self):
         if self.gpu:
