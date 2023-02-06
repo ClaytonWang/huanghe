@@ -23,6 +23,7 @@ class NoteBookCreateReq(BaseModelValidatorName):
     gpu: int = 0
     volumes: List[Volume] = []
     tolerations: List[str] = []
+    annotations: Dict = {}
 
     def gen_notebook_dict(self):
         return {
@@ -35,6 +36,7 @@ class NoteBookCreateReq(BaseModelValidatorName):
                 "memory": f"{self.memory}Gi",
                 "nvidia.com/gpu": self.gpu,
             },
+            "annotations": self.annotations,
             "volumes": [v.dict() for v in self.volumes]
         }
 class NoteBookDeleteReq(BaseModel):
@@ -53,4 +55,5 @@ class NoteBook(BaseModelValidatorName):
     envs: Dict = {}
     volumes: List[Volume] = []
     tolerations: List[str] = []
+    annotations: Dict = {}
 
