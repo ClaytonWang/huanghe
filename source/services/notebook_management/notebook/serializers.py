@@ -26,6 +26,7 @@ class EventItem(BaseModel):
     name: Optional[str] = ""
     time: Optional[datetime]
 
+
 class EventItem(BaseModel):
     id: Optional[int]
     status: str = ""
@@ -52,6 +53,7 @@ class Storage(BaseModel):
     name: Optional[str]
     id: int
 
+
 class Storage(BaseModel):
     name: Optional[str]
     id: int
@@ -71,6 +73,7 @@ class MemoryUrl(BaseModel):
 
 class GpuDisplayUrl(BaseModel):
     url: str
+
 
 
 class HookItem(BaseModel):
@@ -98,6 +101,7 @@ class SourceItem(BaseModel):
     id: int
     name: str
 
+
 class Creator(BaseModel):
     id: int
     username: str
@@ -124,6 +128,7 @@ class Grafana(BaseModel):
     ram: MemoryUrl
     gpu: GpuUrl
     vram: GpuDisplayUrl
+
 
 
 class NotebookList(BaseModel):

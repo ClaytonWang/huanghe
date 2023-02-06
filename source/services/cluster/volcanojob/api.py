@@ -1,11 +1,10 @@
 from fastapi import APIRouter
-from volcanojob.serializers import VolcanoJobCreateReq,VolcanoJobListReq, VolcanoJobDeleteReq, VolcanoJob
+from volcanojob.serializers import VolcanoJobCreateReq, VolcanoJobDeleteReq, VolcanoJob, VolcanoStatusPostReq
 from k8s.cluster_client import cc
 from basic.middleware.rsp import success_common_response
 
 
 router_vcjob = APIRouter()
-
 
 
 @router_vcjob.post(
@@ -18,17 +17,29 @@ def create_vcjob(vjcr: VolcanoJobCreateReq):
 
 
 @router_vcjob.post(
-    '/batch',
-    description='批量查询vcjob',
+    '/status/test',
+    description='创建vcjob',
 )
-def list_volcanojob(vjlr: VolcanoJobListReq):
-    res=cc.list_volcanojob(vjlr)
-    return res
+def update_status(vspr: VolcanoStatusPostReq):
+    print(vspr.name)
+    print(vspr.status)
+    return success_common_response()
 
+
+
+
+#
+# @router_notebook.post(
+#     '/batch',
+#     description='批量查询notebook',
+# )
+# def list_notebook(nblr: NoteBookListReq):
+#     return cc.list_notebook(nblr)
+#
 @router_vcjob.delete(
     '',
-    description='删除volcanojob'
+    description='删除notebook',
 )
-def delete_volcanojob(vjdr: VolcanoJobDeleteReq):
+def delete_notebook(vjdr: VolcanoJobDeleteReq):
     cc.delete_vcjob(vjdr)
     return success_common_response()
