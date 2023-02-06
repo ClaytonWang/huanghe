@@ -20,11 +20,13 @@ def k8s_format(name):
         raise ValueError("Notebook命名必须为英文数字中划线组合,且首位必须是字母")
     return name.lower()
 
+
 class EventItem(BaseModel):
     id: Optional[int]
     status: str = ""
     name: Optional[str] = ""
     time: Optional[datetime]
+
 
 class StatusItem(BaseModel):
     code: str = None
@@ -40,6 +42,7 @@ class UserStr(BaseModel):
 class ProjectStr(BaseModel):
     # id: int
     name: Optional[str] = None
+
 
 class Storage(BaseModel):
     name: Optional[str]
@@ -70,18 +73,22 @@ class HookItem(BaseModel):
 class NotebookOp(BaseModel):
     action: int
 
+
 class Creator(BaseModel):
     id: int
     username: str
+
 
 class Project(BaseModel):
     id: str
     name: Optional[str]
 
+
 class Image(BaseModel):
     name: str
     desc: Optional[str] = ""
     custom: Optional[bool] = False
+
 
 class SourceItem(BaseModel):
     id: int
@@ -138,6 +145,7 @@ class NotebookDetail(BaseModel):
     hooks: List[HookItem]
     updated_at: Optional[datetime]
     grafana: Grafana
+
 
 class NotebookEdit(BaseModel):
     name: Optional[str]

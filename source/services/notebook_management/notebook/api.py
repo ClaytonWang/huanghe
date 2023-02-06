@@ -22,7 +22,6 @@ from utils.k8s_request import create_notebook_k8s, delete_notebook_k8s
 from utils.auth import operate_auth
 from collections import defaultdict
 
-
 router_notebook = APIRouter()
 
 COMMON = "https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
@@ -32,13 +31,13 @@ def format_notebook_detail(nb: Notebook):
     result = nb.dict()
     result['source'] = nb.get_str()
     result['project'] = {"id": nb.project_by_id,
-                         "name": nb.project_by,}
+                         "name": nb.project_by, }
 
     result['image'] = {"desc": "",
                        "name": nb.image,
-                       "custom": nb.custom,}
+                       "custom": nb.custom, }
     result['creator'] = {"id": nb.created_by_id,
-                         "username": nb.created_by,}
+                         "username": nb.created_by, }
     result['hooks'] = result['storage']
     result['grafana'] = {
         "cpu": nb.cpu_url(COMMON),
