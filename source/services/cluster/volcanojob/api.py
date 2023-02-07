@@ -40,6 +40,6 @@ def update_status(vspr: VolcanoStatusPostReq):
     '',
     description='删除notebook',
 )
-def delete_notebook(vjdr: VolcanoJobDeleteReq):
+def delete_vcjob(vjdr: VolcanoJobDeleteReq):
     cc.delete_vcjob(vjdr)
     return success_common_response()

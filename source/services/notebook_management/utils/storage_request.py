@@ -81,6 +81,7 @@ async def volume_check(authorization: str, hooks: List[HookItem], namespace: str
         volumes_k8s.append({'name': volume_k8s_name, 'mount_path': path})
         storages.append({'storage': volume_info, 'path': path})
         # 校验创建pvc
-        await create_pvc(PVCCreateReq(name=volume_k8s_name, namespace=namespace, size=volume_info['config']['size']),
+        await create_pvc(PVCCreateReq(name=volume_k8s_name, namespace=namespace,
+                                      size=volume_info['config']['size'], env=ENV),
                          ignore_exist=True)
     return storages, volumes_k8s

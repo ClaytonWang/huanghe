@@ -76,7 +76,7 @@ class Creator(BaseModel):
 
 
 class Project(BaseModel):
-    id: str
+    id: int
     name: Optional[str]
 
 
