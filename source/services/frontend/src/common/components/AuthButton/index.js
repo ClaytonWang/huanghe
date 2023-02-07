@@ -21,6 +21,10 @@ const AuthButton = ({ required, children, condition, ...rest }) => {
       props = { ...props, disabled: true };
     }
   }
+  const { type } = props;
+  if (type === 'text') {
+    return <a {...props}>{children}</a>;
+  }
   return <Button {...props}>{children}</Button>;
 };
 export default AuthButton;
