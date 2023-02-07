@@ -36,6 +36,9 @@ class EventItem(BaseModel):
 
 class EventCreate(BaseModel):
     name: str
+    desc: str
+    source_id: int
+    source: Optional[str] = "NOTEBOOK"
 
 
 
