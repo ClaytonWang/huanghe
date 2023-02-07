@@ -2,13 +2,12 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-06 16:14:42
+ * @LastEditTime: 2023-02-07 16:24:07
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-
 import {
   Col,
   Row,
@@ -20,26 +19,55 @@ import {
   Spin,
   message,
   Modal,
+  DatePicker,
 } from 'antd';
 import { useAuth } from '@/common/hooks/useAuth';
 import Icon from '@ant-design/icons';
 import { ChartMonitor, EventMonitor, AuthButton } from '@/common/components';
 import { get } from 'lodash';
+
 import { purifyDeep, transformDate } from '@/common/utils/helper';
 import api from '@/common/api';
 import qs from 'qs';
 import { USER, NOTEBOOK_ACTION, START, STOP, UPDATE } from '@/common/constants';
 import Icons from '@/common/components/Icon';
 import { useContextProps } from '@/common/hooks/RoutesProvider';
+import moment from 'moment';
+
 import './index.less';
+
+const { RangePicker } = DatePicker;
 
 const NotebookDetail = () => {
   const [tableData, setTableData] = useState([]);
   const [detailData, setDetailData] = useState(null);
+  const [dateRange, setDateRange] = useState({
+    from: moment().add(-3, 'h'), // 默认3小时
+    to: moment(),
+  });
   const [loading, setLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const setContextProps = useContextProps();
   const navigate = useNavigate();
+
+  const rangePresets = [
+    {
+      label: 'Last 7 Days',
+      value: [moment().add(-7, 'd'), moment()],
+    },
+    {
+      label: 'Last 14 Days',
+      value: [moment().add(-14, 'd'), moment()],
+    },
+    {
+      label: 'Last 30 Days',
+      value: [moment().add(-30, 'd'), moment()],
+    },
+    {
+      label: 'Last 90 Days',
+      value: [moment().add(-90, 'd'), moment()],
+    },
+  ];
 
   const defaultFilters = useMemo(
     () => ({
@@ -194,6 +222,31 @@ const NotebookDetail = () => {
     }
   };
 
+  const onRangeChange = (dates) => {
+    if (dates) {
+      console.log('From: ', dates[0], ', to: ', dates[1]);
+      setDateRange({ from: dates[0]?.valueOf(), to: dates[1]?.valueOf() });
+    } else {
+      console.log('Clear');
+    }
+  };
+
+  const dateFormat = 'YYYY/MM/DD HH:mm:ss';
+  const operations = (
+    <RangePicker
+      allowClear={false}
+      presets={rangePresets}
+      showTime
+      format={dateFormat}
+      onChange={onRangeChange}
+      placement="bottomRight"
+      defaultValue={[
+        moment(dateRange.from, dateFormat),
+        moment(dateRange.to, dateFormat),
+      ]}
+    />
+  );
+
   return (
     <div className="detail">
       <div className="detail-section">
@@ -237,11 +290,17 @@ const NotebookDetail = () => {
       <div className="dbr-table-container">
         <Tabs
           defaultActiveKey="chart-monitor"
+          tabBarExtraContent={operations}
           items={[
             {
               key: 'chart-monitor',
               label: `监控`,
-              // children: <ChartMonitor />,
+              children: (
+                <ChartMonitor
+                  urls={detailData?.grafana}
+                  dateRange={dateRange}
+                />
+              ),
             },
             {
               key: 'event-monitor',
