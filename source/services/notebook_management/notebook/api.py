@@ -424,5 +424,7 @@ async def list_notebook_event(query_params: QueryParameters = Depends(QueryParam
 )
 async def create_notebook_event(ec: EventCreate,
                                 notebook_id: int = Path(..., ge=1, description="NotebookID")):
-    print(f"this is event creator {ec.name}: notebook id: {notebook_id}")
+
+    print(ec)
+    print(notebook_id)
     return {}
