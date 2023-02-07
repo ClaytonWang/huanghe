@@ -1,0 +1,96 @@
+name: Service:job
+
+on:
+  push:
+    branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/jiangshouchen"]
+    paths:
+     - source/basic/**
+     - source/services/job_management/**
+     - manifests/service-job.yaml
+     - .github/workflows/service-job.yaml
+    tags: [ '*' ]
+
+env:
+  DOCKER_CLI_EXPERIMENTAL: enabled
+  IMAGE_NAME: ${{ github.repository }}.job
+  DOCKER_TAG: latest
+  REGISTRY: containers.git.digitalbrain.cn
+  GITHOST: git.digitalbrain.cn
+
+jobs:
+  docker_build_and_push:
+    name: Build & Push
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    outputs:
+      out_docker_tag: ${{ steps.get_docker_tag.outputs.out_docker_tag }}
+    steps:
+      - name: Lowercase image name
+        run: |
+          echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}.job" >>${GITHUB_ENV}
+      - name: Create docker tag
+        id: get_docker_tag
+        run: |
+          export strDate=$(date +'%Y-%m-%d').${{ github.run_number }}
+          echo "DOCKER_TAG=$strDate" >> $GITHUB_ENV
+          echo "::set-output name=out_docker_tag::$strDate"
+      - name: Override image tag on 'tag'
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          echo "DOCKER_TAG=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Docker Buildx 🏗️
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Build and push 🚀
+        uses: docker/build-push-action@v3
+        id: build_and_push
+        with:
+          file: ./source/services/job_management/Dockerfile
+          context: ./source
+          push: true
+          tags: ${{ steps.meta.outputs.tags }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{env.DOCKER_TAG}}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+  deploy_dev:
+    name: 'Deploy Private Image'
+    needs: docker_build_and_push
+    runs-on: ubuntu-latest
+    environment:
+      name: development
+    steps:
+      - name: setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: latest
+        id: install
+      - name: set k8s context
+        uses: azure/k8s-set-context@v1
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+          context: ${{ secrets.KUBECONTEXT }}
+        id: setcontext
+      - name: deploy to k8s
+        uses: Azure/k8s-deploy@v3.1
+        continue-on-error: true
+        with:
+          namespace: ${{ secrets.KUBENAMESPACE }}
+          imagepullsecrets: |
+            db-container
+          manifests: |
+            manifests/service-job.yaml
+          images: containers.git.digitalbrain.cn/engineering-group/huanghe.job:${{needs.docker_build_and_push.outputs.out_docker_tag}}
