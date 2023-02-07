@@ -33,6 +33,10 @@ class EventItem(BaseModel):
     name: Optional[str] = ""
     time: Optional[datetime]
 
+class EventCreate(BaseModel):
+    name: str
+
+
 
 class StatusItem(BaseModel):
     code: str = None
@@ -173,7 +177,7 @@ class NotebookDetail(BaseModel):
     source: str
     hooks: List[HookItem]
     updated_at: Optional[datetime]
-    grafana: Grafana
+    grafana: Optional[Grafana]
 
 
 class NotebookEdit(BaseModel):
