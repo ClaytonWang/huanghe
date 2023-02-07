@@ -425,6 +425,8 @@ async def list_notebook_event(query_params: QueryParameters = Depends(QueryParam
 async def create_notebook_event(ec: EventCreate,
                                 notebook_id: int = Path(..., ge=1, description="NotebookID")):
 
-    print(ec)
-    print(notebook_id)
+    _notebook = await Notebook.objects.select_related(['status']).get(pk=notebook_id)
+    d = ec.dict()
+    d.update({"status": _notebook.status.name})
+    await Event.objects.create(**d)
     return {}
