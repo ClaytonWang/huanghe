@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-07 20:13:16
+ * @LastEditTime: 2023-02-07 20:21:49
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
@@ -237,9 +237,11 @@ const NotebookDetail = () => {
     }
   };
 
-  const dateFormat = 'YYYY/MM/DD HH:mm:ss';
-  const operations =
-    currTab === 'event-monitor' ? null : (
+  const operations = useMemo(() => {
+    if (currTab === 'event-monitor') return null;
+
+    const dateFormat = 'YYYY/MM/DD HH:mm:ss';
+    return (
       <RangePicker
         allowClear={false}
         presets={rangePresets}
@@ -253,6 +255,7 @@ const NotebookDetail = () => {
         ]}
       />
     );
+  }, [currTab]);
 
   return (
     <div className="detail">
