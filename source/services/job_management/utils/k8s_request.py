@@ -105,6 +105,6 @@ async def create_pvc(pvc: PVCCreateReq, ignore_exist=False):
 #     return response["result"]
 
 
-if __name__ == '__main__':
-    res = list_job_k8s(JobListReq())
-    print(res)
+# if __name__ == '__main__':
+#     res = list_job_k8s(JobListReq())
+#     print(res)

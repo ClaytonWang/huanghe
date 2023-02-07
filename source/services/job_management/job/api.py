@@ -277,7 +277,7 @@ async def update_job(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
     k8s_info = _job.k8s_info
 
-    if _job.status.name != 'stop':
+    if _job.status.name != 'stopped':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job未停止')
 
     project_id = ne.project.id
