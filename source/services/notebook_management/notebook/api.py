@@ -415,8 +415,8 @@ async def list_notebook_event(query_params: QueryParameters = Depends(QueryParam
 @router_notebook.post(
     '/{notebook_id}/events',
     description='Notebook事件创建',
-    response_model=Page[EventItem],
 )
-async def list_notebook_event(ec: EventCreate):
-    pass
+async def create_notebook_event(ec: EventCreate,
+                                notebook_id: int = Path(..., ge=1, description="NotebookID")):
+    print(f"this is event creator {ec.name}: notebook id: {notebook_id}")
     return {}
