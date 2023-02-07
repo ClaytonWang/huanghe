@@ -29,7 +29,11 @@ async def verify_token(request: Request, call_next):
 
     path: str = request.get('path')
     # 登录接口、docs文档依赖的接口，不做token校验
-    if path in DO_NOT_AUTH_URI or path in NO_AUTH_WORDS:
+    for word in NO_AUTH_WORDS:
+        if path in word:
+            return await call_next(request)
+
+    if path in DO_NOT_AUTH_URI:
         return await call_next(request)
     else:
         try:
