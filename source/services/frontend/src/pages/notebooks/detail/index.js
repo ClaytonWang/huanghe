@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-07 16:24:07
+ * @LastEditTime: 2023-02-07 20:21:49
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
@@ -41,8 +41,9 @@ const { RangePicker } = DatePicker;
 const NotebookDetail = () => {
   const [tableData, setTableData] = useState([]);
   const [detailData, setDetailData] = useState(null);
+  const [currTab, setCurrTab] = useState('');
   const [dateRange, setDateRange] = useState({
-    from: moment().add(-3, 'h'), // 默认3小时
+    from: moment().add(-1, 'h'), // 默认1小时
     to: moment(),
   });
   const [loading, setLoading] = useState(false);
@@ -152,7 +153,7 @@ const NotebookDetail = () => {
     }
   };
   const handleEditClicked = (values) => {
-    navigate('update', {
+    navigate('/notebooks/list/update', {
       state: {
         params: values,
         type: UPDATE,
@@ -165,7 +166,7 @@ const NotebookDetail = () => {
     try {
       await api.notebooksListDelete({ id });
       message.success('删除Notebook成功！');
-      reload();
+      navigate('/notebooks/list');
     } catch (error) {
       console.log(error);
     }
@@ -210,10 +211,15 @@ const NotebookDetail = () => {
   }, [detailData]);
 
   const onPageNoChange = (pageno, pagesize) => {
-    reload({ pageno, pagesize });
+    const filters = getFilters();
+    const params = purifyDeep({ ...filters, pageno, pagesize });
+    // 手动同步Url
+    setSearchParams(qs.stringify(params));
+    requestEvent(params);
   };
 
-  const onChange = (key) => {
+  const onTabChange = (key) => {
+    setCurrTab(key);
     // eslint-disable-next-line default-case
     switch (key) {
       case 'event-monitor':
@@ -231,21 +237,25 @@ const NotebookDetail = () => {
     }
   };
 
-  const dateFormat = 'YYYY/MM/DD HH:mm:ss';
-  const operations = (
-    <RangePicker
-      allowClear={false}
-      presets={rangePresets}
-      showTime
-      format={dateFormat}
-      onChange={onRangeChange}
-      placement="bottomRight"
-      defaultValue={[
-        moment(dateRange.from, dateFormat),
-        moment(dateRange.to, dateFormat),
-      ]}
-    />
-  );
+  const operations = useMemo(() => {
+    if (currTab === 'event-monitor') return null;
+
+    const dateFormat = 'YYYY/MM/DD HH:mm:ss';
+    return (
+      <RangePicker
+        allowClear={false}
+        presets={rangePresets}
+        showTime
+        format={dateFormat}
+        onChange={onRangeChange}
+        placement="bottomRight"
+        defaultValue={[
+          moment(dateRange.from, dateFormat),
+          moment(dateRange.to, dateFormat),
+        ]}
+      />
+    );
+  }, [currTab]);
 
   return (
     <div className="detail">
@@ -315,7 +325,7 @@ const NotebookDetail = () => {
               ),
             },
           ]}
-          onChange={onChange}
+          onChange={onTabChange}
         />
       </div>
     </div>
@@ -436,7 +446,11 @@ NotebookDetail.context = (props = {}) => {
           <AuthButton
             required="notebooks.list.edit"
             type="text"
-            style={{ color: '#00000040' }}
+            style={(() => {
+              if (statusName === 'error') {
+                return { color: '#00000040' };
+              }
+            })()}
             onClick={() => {
               const { user } = useAuth();
               if (get(detail, 'creator.username') === get(user, 'username')) {

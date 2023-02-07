@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 18:13:47
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-02 19:26:12
+ * @LastEditTime: 2023-02-07 19:50:18
  * @FilePath: /huanghe/source/services/frontend/src/common/components/EventMonitor/index.js
  * @Description: 事件监控
  */
@@ -55,6 +55,7 @@ const EventMonitor = ({
   return (
     <Table
       className="dbr-table"
+      style={{ marginTop: 20 }}
       rowKey="id"
       size="small"
       columns={columns}
