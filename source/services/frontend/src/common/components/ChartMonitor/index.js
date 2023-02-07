@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 18:03:06
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-07 16:08:23
+ * @LastEditTime: 2023-02-07 20:23:58
  * @FilePath: /huanghe/source/services/frontend/src/common/components/Monitor/index.js
  * @Description: 监控公共组建
  */
@@ -16,7 +16,6 @@ const ChartMonitor = ({ urls = {}, dateRange }) => {
       {Object.keys(urls)?.map((key, index) => {
         const grafana = urls?.[key] ?? ``;
         if (!grafana) return null;
-        console.log(grafana + time);
         return (
           <div key={index} className="detail-chart-list">
             <iframe name="iframe" className="content" src={grafana + time} />
