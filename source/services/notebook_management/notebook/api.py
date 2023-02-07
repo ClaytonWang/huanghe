@@ -10,7 +10,7 @@ from typing import List, Dict
 from fastapi import APIRouter, Depends, Request, HTTPException, status, Path
 from fastapi.responses import JSONResponse
 from models import Notebook, Status, Image
-from notebook.serializers import NotebookList, NotebookCreate, NotebookEdit, NotebookOp, NotebookDetail, EventItem
+from notebook.serializers import NotebookList, NotebookCreate, NotebookEdit, NotebookOp, NotebookDetail, EventItem, EventCreate
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from basic.common.common_model import Event
@@ -249,6 +249,8 @@ async def create_notebook(request: Request,
     init_data['k8s_info'] = json.dumps(k8s_info)
 
     _notebook = await Notebook.objects.create(**init_data)
+    k8s_info['annotations'] = {"id": str(_notebook.id)}
+    await _notebook.update(**{"k8s_info": k8s_info})
     return format_notebook_detail(_notebook)
 
 
@@ -405,7 +407,7 @@ async def delete_notebook(request: Request,
 
 @router_notebook.get(
     '/{notebook_id}/events',
-    description='Notebook事件',
+    description='Notebook事件列表',
     response_model=Page[EventItem],
 )
 async def list_notebook_event(query_params: QueryParameters = Depends(QueryParameters)):
@@ -414,3 +416,13 @@ async def list_notebook_event(query_params: QueryParameters = Depends(QueryParam
     for i, v in enumerate(events.data):
         events.data[i] = EventItem.parse_obj(v.gen_pagation_event())
     return events
+
+
+@router_notebook.post(
+    '/{notebook_id}/events',
+    description='Notebook事件创建',
+    response_model=Page[EventItem],
+)
+async def list_notebook_event(ec: EventCreate):
+    pass
+    return {}
