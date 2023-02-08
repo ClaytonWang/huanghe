@@ -99,13 +99,13 @@ module.exports = {
     },
     {
       key: 'storages',
-      label: '存储',
+      label: '存储管理',
       icon: 'storages',
       permission: 'storages',
       children: [
         {
           key: 'storages.list',
-          label: '存储管理',
+          label: '存储列表',
           permission: 'storages.list',
         },
       ],
