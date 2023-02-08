@@ -22,7 +22,7 @@ const NotebooksTable = ({
     {
       title: '状态',
       dataIndex: 'status',
-      width: '5%',
+      width: '10%',
       ellipsis: true,
       render(value) {
         let icon = (
@@ -82,7 +82,7 @@ const NotebooksTable = ({
       width: '15%',
       dataIndex: 'source',
       render(value) {
-        return get(value, 'name', '-');
+        return value || '-';
       },
     },
     {
@@ -103,7 +103,7 @@ const NotebooksTable = ({
     },
     {
       title: '操作',
-      width: '15%',
+      width: '10%',
       render(_value, record) {
         const statusName = get(record, 'status.name');
         let items = [
