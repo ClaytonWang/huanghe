@@ -7,7 +7,17 @@
  */
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Divider, Form, Input, message, Select, Tooltip } from 'antd';
+import {
+  Button,
+  Divider,
+  Form,
+  Input,
+  message,
+  Select,
+  Tooltip,
+  Checkbox,
+  Space,
+} from 'antd';
 import { uniqueId, get, map, drop } from 'lodash';
 import {
   DeleteFilled,
@@ -16,6 +26,7 @@ import {
 } from '@ant-design/icons';
 import api from '@/common/api';
 import { CREATE, UPDATE, ADMIN } from '@/common/constants';
+import { useContextProps } from '@/common/hooks/RoutesProvider';
 import { useAuth } from '@/common/hooks/useAuth';
 import { genUniqueIdByPrefix, ID } from '@/common/utils/helper';
 import './index.less';
@@ -28,6 +39,7 @@ const NotebooksUpdate = () => {
   const [sourceDatasource, setSourceDatasource] = useState([]);
   const [storagesDatasource, setStoragesDatasource] = useState([]);
   const [selectedStorages, setSelectedStorages] = useState([]);
+  const setContextProps = useContextProps();
   const [type, setType] = useState(CREATE);
   const notebookUniqueID = useRef();
   const { user } = useAuth();
@@ -40,7 +52,7 @@ const NotebooksUpdate = () => {
     if (transform) {
       result = transform(values);
     } else {
-      result = map(get(values, 'hooks', []), 'storage');
+      result = map(get(values, 'hooks', []), 'storage').map(({ id }) => id);
     }
     setSelectedStorages([...result]);
   };
@@ -68,6 +80,16 @@ const NotebooksUpdate = () => {
       console.log(error);
     }
   };
+
+  const projectDefaultValue = useMemo(() => {
+    if (projectsDatasource && projectsDatasource.length > 0) {
+      return {
+        name: projectsDatasource[0]?.name,
+        id: projectsDatasource[0]?.id,
+      };
+    }
+  }, [projectsDatasource]);
+
   const requestImages = async () => {
     try {
       const { result } = await api.imagesList();
@@ -76,6 +98,17 @@ const NotebooksUpdate = () => {
       console.log(error);
     }
   };
+
+  const imageDefaultValue = useMemo(() => {
+    if (imagesDatasource && imagesDatasource.length > 0) {
+      return {
+        custom: false,
+        id: imagesDatasource[0]?.id,
+        name: imagesDatasource[0]?.name,
+      };
+    }
+  }, [imagesDatasource]);
+
   const requestSource = async () => {
     try {
       const { result } = await api.sourceList();
@@ -136,13 +169,16 @@ const NotebooksUpdate = () => {
     } else if (changedHooks) {
       // 删除/新增挂载，通过hooks下的value数组，更新selectedStorage集合
       updateSelectedStorage(get(changedHooks, 'value', []), (values) =>
-        values.map(({ storage }) => storage || false).filter((value) => value)
+        values
+          .map(({ storage }) => storage?.id || false)
+          .filter((value) => value)
       );
     }
   };
   const handleSubmit = () => {
     const values = form.getFieldsValue();
     const { id = null } = get(location, 'state.params', {});
+    console.log(values);
     if (type === CREATE) {
       saveNotebook(values);
     } else {
@@ -168,6 +204,12 @@ const NotebooksUpdate = () => {
     requestSource();
     requestStorages();
     notebookUniqueID.current = new ID();
+    setContextProps({
+      onCancel: handleCancelClicked,
+      onSubmit: () => {
+        form.submit();
+      },
+    });
   }, []);
 
   useEffect(() => {
@@ -177,6 +219,8 @@ const NotebooksUpdate = () => {
       requestNotebook({ id });
     } else {
       form.setFieldsValue({
+        project: projectDefaultValue,
+        image: imageDefaultValue,
         hooks: [
           {
             path: '/home/jovyan',
@@ -185,12 +229,13 @@ const NotebooksUpdate = () => {
       });
     }
     setType(type);
-  }, [location]);
+  }, [location, form, projectDefaultValue, imageDefaultValue]);
 
   const HooksItem = ({ name, remove, selectedStorages, disabledItems }) => {
-    const currStorage = form.getFieldValue(['hooks', name, 'storage']);
+    const currStorage = form.getFieldValue(['hooks', name, 'storage', 'id']);
     const filteredStorageOptions = useMemo(() => {
       const result = storagesDatasource.filter(
+        // 非选中了的存储集合的元素及当前选择的存储元素的集合
         ({ id }) => !(selectedStorages.includes(id) && id !== currStorage)
       );
       return result;
@@ -200,7 +245,7 @@ const NotebooksUpdate = () => {
         <div className="notebooks-hooks-item">
           <span className="content">
             <Form.Item
-              name={[name, 'storage']}
+              name={[name, 'storage', 'id']}
               label="存储盘"
               rules={[{ required: true, message: '请选择存储盘' }]}
             >
@@ -253,6 +298,83 @@ const NotebooksUpdate = () => {
       </>
     );
   };
+
+  const checkImage = (_, value) => {
+    if (value?.name) {
+      return Promise.resolve();
+    }
+    return Promise.reject(new Error('请输入镜像！'));
+  };
+
+  const CustomImage = ({ value, onChange }) => {
+    const [custom, setCustom] = useState(value?.custom);
+    const onCheckChange = (e) => {
+      setCustom(e.target.checked);
+      onChange?.({
+        custom: e.target.checked,
+        name: null,
+      });
+    };
+    const onInputChange = (e) => {
+      onChange?.({ custom: true, name: e.target.value });
+    };
+    const onSelectChange = (value) => {
+      onChange?.({ custom: false, name: value });
+    };
+    return (
+      <>
+        {custom ? (
+          <Input
+            addonBefore="harbor.digitalbrain.cn/"
+            placeholder="输入镜像地址"
+            onChange={onInputChange}
+            value={value?.name}
+          />
+        ) : (
+          <Select
+            placeholder="请选择镜像"
+            showSearch
+            filterOption={(input, option) =>
+              (option?.children ?? '').includes(input)
+            }
+            defaultValue={value?.name}
+            onChange={onSelectChange}
+          >
+            {imagesDatasource.map(({ id, name }) => (
+              <Option key={id} value={name}>
+                <Tooltip title={name}>{name}</Tooltip>
+              </Option>
+            ))}
+          </Select>
+        )}
+
+        <Checkbox checked={custom} onChange={onCheckChange}>
+          自定义镜像
+          <Tooltip title="请填写公共镜像仓库，如：tensorflow:1.13">
+            <InfoCircleOutlined style={{ marginLeft: 5, cursor: 'help' }} />
+          </Tooltip>
+        </Checkbox>
+      </>
+    );
+  };
+  const ProjectSelect = ({ value, onChange }) => {
+    const onSelectChange = (value) => {
+      onChange?.({ id: value });
+    };
+    return (
+      <Select
+        placeholder="请选择项目"
+        defaultValue={value?.id}
+        onChange={onSelectChange}
+      >
+        {projectsDatasource.map(({ id, name = '-' }) => (
+          <Option key={id} value={id}>
+            {name}
+          </Option>
+        ))}
+      </Select>
+    );
+  };
   return (
     <div className="notebooks-update">
       <Form
@@ -283,55 +405,11 @@ const NotebooksUpdate = () => {
           <Input placeholder="请输入Notebook名称" />
         </Form.Item>
         <Form.Item
-          name="image"
-          label="镜像"
-          rules={[{ required: true, message: '请选择镜像' }]}
-        >
-          <Select
-            placeholder="请选择镜像"
-            showSearch
-            filterOption={(input, option) =>
-              (option?.children ?? '').includes(input)
-            }
-          >
-            {imagesDatasource.map(({ id, name }) => (
-              <Option key={id} value={id}>
-                <Tooltip title={name}>{name}</Tooltip>
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item
-          name="source"
-          label="资源规格"
-          rules={[{ required: true, message: '请选择资源规格' }]}
-        >
-          <Select
-            placeholder="请选择资源规格"
-            showSearch
-            filterOption={(input, option) =>
-              (option?.children ?? '').includes(input)
-            }
-          >
-            {sourceDatasource.map(({ id, name }) => (
-              <Option key={id} value={id}>
-                <Tooltip title={name}>{name}</Tooltip>
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item
           name="project"
-          label="所属项目"
+          label="项目"
           rules={[{ required: true, message: '请选择项目' }]}
         >
-          <Select placeholder="请选择项目">
-            {projectsDatasource.map(({ id, name = '-' }) => (
-              <Option key={id} value={id}>
-                {name}
-              </Option>
-            ))}
-          </Select>
+          <ProjectSelect />
         </Form.Item>
         <Form.List
           name="hooks"
@@ -383,14 +461,50 @@ const NotebooksUpdate = () => {
             </>
           )}
         </Form.List>
-        <Form.Item>
-          <Button onClick={handleCancelClicked}>取消</Button>
-          <Button type="primary" htmlType="submit">
-            保存
-          </Button>
+        <Form.Item
+          name="image"
+          label="镜像"
+          rules={[
+            { required: true, message: '请选择镜像' },
+            {
+              validator: checkImage,
+            },
+          ]}
+        >
+          <CustomImage />
+        </Form.Item>
+        <Form.Item
+          name="source"
+          label="资源规格"
+          rules={[{ required: true, message: '请选择资源规格' }]}
+        >
+          <Select
+            placeholder="请选择资源规格"
+            showSearch
+            filterOption={(input, option) =>
+              (option?.children ?? '').includes(input)
+            }
+          >
+            {sourceDatasource.map(({ id, name }) => (
+              <Option key={id} value={name}>
+                <Tooltip title={name}>{name}</Tooltip>
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
       </Form>
     </div>
   );
 };
+NotebooksUpdate.context = ({ onCancel, onSubmit }) => (
+  <Space>
+    <Button onClick={onCancel}>取消</Button>
+    <Button type="primary" onClick={onSubmit}>
+      保存
+    </Button>
+  </Space>
+);
+
+NotebooksUpdate.path = ['/notebooks/list/update', 'notebooks/list/create'];
+
 export default NotebooksUpdate;

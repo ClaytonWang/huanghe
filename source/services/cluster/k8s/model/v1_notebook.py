@@ -37,10 +37,10 @@ class V1Notebook(BaseModel):
     }
 
     @classmethod
-    def default(cls, name, namespace, image, labels, resource, envs, volumes, tolerations):
+    def default(cls, name, namespace, image, annotations, labels, resource, envs, volumes, tolerations):
         return cls.new(api_version=KUBEFLOW_V1_API_VERSION,
                        kind=KUBEFLOW_NOTEBOOK_KIND,
-                       metadata=V1ObjectMeta.default(name=name, namespace=namespace, labels=labels),
+                       metadata=V1ObjectMeta.default(name=name, namespace=namespace, annotations=annotations, labels=labels),
                        spec=V1NotebookSpec.default(name=name, image=image, resource=resource, envs=envs, volumes=volumes, tolerations=tolerations),
                        status=None)
 

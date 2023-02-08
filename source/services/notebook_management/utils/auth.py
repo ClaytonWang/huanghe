@@ -11,7 +11,7 @@ from jose import jwt
 from fastapi import Request, Response, status
 from fastapi import HTTPException
 from typing import Optional
-from config import DO_NOT_AUTH_URI
+from config import DO_NOT_AUTH_URI, NO_AUTH_WORDS
 from starlette.authentication import AuthCredentials, SimpleUser
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
@@ -29,6 +29,10 @@ async def verify_token(request: Request, call_next):
 
     path: str = request.get('path')
     # 登录接口、docs文档依赖的接口，不做token校验
+    for word in NO_AUTH_WORDS:
+        if word in path:
+            return await call_next(request)
+
     if path in DO_NOT_AUTH_URI:
         return await call_next(request)
     else:
@@ -58,7 +62,7 @@ async def operate_auth(request: Request, notebook_id: int):
     if not _notebook:
         return None, 'Notebook不存在'
     # 正确返回notebook
-    if _notebook.creator_id == request.user.id or request.user.role.name == 'admin':
+    if _notebook.created_by_id == request.user.id or request.user.role.name == 'admin':
         return _notebook, None
     # 普通用户
     if request.user.role.name == 'user':

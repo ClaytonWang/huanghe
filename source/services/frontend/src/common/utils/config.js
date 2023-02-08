@@ -74,15 +74,16 @@ module.exports = {
     '/settings/users': '用户列表',
     '/settings/account': '我的账号',
 
-    '/storages/list': '存储管理',
+    '/storages/list': '存储列表',
 
-    '/notebooks/list': 'Notebook列表',
+    '/notebooks/list': 'Notebooks',
     '/notebooks/list/update': '编辑Notebook',
-    '/notebooks/list/create': '创建Notebook',
+    '/notebooks/list/create': '新建Notebook',
+    '/notebooks/list/detail': 'Notebook详情',
 
-    '/jobs/list': 'Job列表',
+    '/jobs/list': 'Jobs',
     '/jobs/list/update': '编辑Job',
-    '/jobs/list/create': '创建Job',
+    '/jobs/list/create': '新建Job',
   },
   menuItemsConfig: [
     {
@@ -124,13 +125,13 @@ module.exports = {
     },
     {
       key: 'storages',
-      label: '存储',
+      label: '存储管理',
       icon: 'storages',
       permission: 'storages',
       children: [
         {
           key: 'storages.list',
-          label: '存储管理',
+          label: '存储列表',
           permission: 'storages.list',
         },
       ],

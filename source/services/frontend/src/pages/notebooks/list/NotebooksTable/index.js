@@ -1,8 +1,8 @@
-import { useSearchParams } from 'react-router-dom';
-import { Modal, Spin, Table, Tooltip } from 'antd';
+import { useSearchParams, Link } from 'react-router-dom';
+import { Modal, Spin, Table, Tooltip, Dropdown } from 'antd';
 import qs from 'qs';
 import { get } from 'lodash';
-import Icon from '@ant-design/icons';
+import Icon, { EllipsisOutlined } from '@ant-design/icons';
 import { transformDate } from '@/common/utils/helper';
 import { AuthButton, Auth } from '@/common/components';
 import Icons from '@/common/components/Icon';
@@ -22,17 +22,21 @@ const NotebooksTable = ({
     {
       title: '状态',
       dataIndex: 'status',
-      width: '5%',
+      width: '10%',
+      ellipsis: true,
       render(value) {
         let icon = (
-          <Icon style={{ fontSize: 24 }} component={Icons[value.name]} />
+          <Icon
+            style={{ fontSize: 18, marginRight: 5 }}
+            component={Icons[value.name]}
+          />
         );
         if (/^(stop|start|pending)$/.test(value.name)) {
           icon = (
             <Spin
               indicator={
                 <Icon
-                  style={{ fontSize: 24 }}
+                  style={{ fontSize: 16, marginRight: 5 }}
                   component={Icons[value.name]}
                   spin
                   rotate={(/pending/.test(value.name) && 180) || 0}
@@ -41,13 +45,21 @@ const NotebooksTable = ({
             />
           );
         }
-        return <Tooltip title={value.desc}>{icon}</Tooltip>;
+        return (
+          <label>
+            <Tooltip title={value.desc}>{icon}</Tooltip>
+            {value.desc}
+          </label>
+        );
       },
     },
     {
       title: '名称',
       dataIndex: 'name',
       width: '10%',
+      render(value, _) {
+        return <Link to={`/notebooks/list/detail?id=${_.id}`}>{value}</Link>;
+      },
     },
     {
       title: '项目',
@@ -70,7 +82,7 @@ const NotebooksTable = ({
       width: '15%',
       dataIndex: 'source',
       render(value) {
-        return get(value, 'name', '-');
+        return value || '-';
       },
     },
     {
@@ -91,9 +103,56 @@ const NotebooksTable = ({
     },
     {
       title: '操作',
-      width: '15%',
+      width: '10%',
       render(_value, record) {
         const statusName = get(record, 'status.name');
+        let items = [
+          {
+            key: '1',
+            label: (
+              <AuthButton
+                required="notebooks.list.edit"
+                type="link"
+                onClick={() => {
+                  handleEditClicked(record);
+                }}
+                condition={[
+                  () => ['stopped'].indexOf(statusName) > -1,
+                  (user) =>
+                    get(record, 'creator.username') === get(user, 'username'),
+                ]}
+              >
+                编辑
+              </AuthButton>
+            ),
+          },
+          {
+            key: '2',
+            label: (
+              <AuthButton
+                required="notebooks.list.edit"
+                type="link"
+                onClick={() => {
+                  handleDeleteClicked(record);
+                }}
+                condition={[
+                  () => ['stopped', 'error'].indexOf(statusName) > -1,
+                  (user) => {
+                    if (user.role.name === USER) {
+                      return (
+                        get(record, 'creator.username') ===
+                        get(user, 'username')
+                      );
+                    }
+                    return true;
+                  },
+                ]}
+              >
+                删除
+              </AuthButton>
+            ),
+          },
+        ];
         return (
           <Auth required="notebooks.list.edit">
             <span className="dbr-table-actions">
@@ -163,41 +222,11 @@ const NotebooksTable = ({
                   停止
                 </AuthButton>
               )}
-              <AuthButton
-                required="notebooks.list.edit"
-                type="link"
-                onClick={() => {
-                  handleEditClicked(record);
-                }}
-                condition={[
-                  () => ['stopped'].indexOf(statusName) > -1,
-                  (user) =>
-                    get(record, 'creator.username') === get(user, 'username'),
-                ]}
-              >
-                编辑
-              </AuthButton>
-              <AuthButton
-                required="notebooks.list.edit"
-                type="link"
-                onClick={() => {
-                  handleDeleteClicked(record);
-                }}
-                condition={[
-                  () => ['stopped', 'error'].indexOf(statusName) > -1,
-                  (user) => {
-                    if (user.role.name === USER) {
-                      return (
-                        get(record, 'creator.username') ===
-                        get(user, 'username')
-                      );
-                    }
-                    return true;
-                  },
-                ]}
-              >
-                删除
-              </AuthButton>
+              <Dropdown menu={{ items }}>
+                <a>
+                  <EllipsisOutlined />
+                </a>
+              </Dropdown>
             </span>
           </Auth>
         );

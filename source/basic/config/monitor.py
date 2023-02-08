@@ -34,9 +34,9 @@ LOGGING = {
             'level': 'INFO',
         },
         'sqlalchemy.engine': {
-             'handlers': ['console'],
-             'propagate': True,
-             'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG',
         },
         'databases': {
             'handlers': ['console'],
@@ -66,8 +66,6 @@ try:
         locals().__setitem__(key, val)
 except ModuleNotFoundError:
     pass
-
-
 
 if os.path.exists(K8S_YAML_CONFIG_PATH):
     try:

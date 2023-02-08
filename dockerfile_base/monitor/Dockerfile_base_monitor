@@ -3,7 +3,7 @@
 #python3.11
 ARG BASE_IMG=containers.git.digitalbrain.cn/engineering-group/huanghe.backend-base:2023-01-11.9
 FROM $BASE_IMG
-WORKDIR /source/services/storage
+WORKDIR /source/services/monitor
 
 # python dependence
 COPY ./storage/requirements.txt .

@@ -21,9 +21,15 @@ def k8s_format(name):
     return name.lower()
 
 
+
+
+
 class StatusItem(BaseModel):
-    code: str = None
-    name: str = None
+    code: Optional[str] = None
+    name: Optional[str] = None
+    desc: str = None
+
+class StatusItemOnlyDesc(BaseModel):
     desc: str = None
 
 
@@ -33,12 +39,22 @@ class UserStr(BaseModel):
 
 
 class ProjectStr(BaseModel):
-    id: int
+    # id: int
     name: Optional[str] = None
 
 
+class Storage(BaseModel):
+    name: Optional[str]
+    id: int
+
+
+class Storage(BaseModel):
+    name: Optional[str]
+    id: int
+
+
 class HookItem(BaseModel):
-    storage: int
+    storage: Storage
     path: str
 
 
@@ -46,14 +62,63 @@ class NotebookOp(BaseModel):
     action: int
 
 
+class Creator(BaseModel):
+    id: int
+    username: str
+
+
+class Project(BaseModel):
+    id: int
+    name: Optional[str]
+
+
+class Image(BaseModel):
+    name: str
+    desc: Optional[str] = ""
+    custom: Optional[bool] = False
+
+
+class SourceItem(BaseModel):
+    id: int
+    name: str
+
+
+class Creator(BaseModel):
+    id: int
+    username: str
+
+
+class Project(BaseModel):
+    id: int
+    name: Optional[str]
+
+
+class Image(BaseModel):
+    name: str
+    desc: Optional[str] = ""
+    custom: Optional[bool] = False
+
+
+class SourceItem(BaseModel):
+    id: int
+    name: str
+
+
+class Grafana(BaseModel):
+    cpu: str
+    ram: str
+    gpu: str
+    vram: str
+
+
 class NotebookList(BaseModel):
     id: int
     status: StatusItem
     name: str
-    source: Optional[SourceList]
+    source: Optional[str]
     creator: Optional[UserStr]
     project: Optional[ProjectStr]
-    image: ImageItem
+    image: Image
     url: Optional[str]
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
@@ -66,8 +131,9 @@ class NotebookList(BaseModel):
 class NotebookCreate(BaseModel):
     name: str = Field(..., max_length=20)
     source: str
-    project: str
-    image: str
+    project: Project
+    image: Image
+    custom: Optional[bool] = False
     hooks: List[HookItem] = []
 
     @validator('name')
@@ -77,25 +143,40 @@ class NotebookCreate(BaseModel):
 
 class NotebookDetail(BaseModel):
     id: int
-    status: StatusItem
     name: str
-    source: int
-    creator: int
-    project: int
-    image: int
-    hooks: List[HookItem]
-    url: Optional[str]
+    creator: Creator
     created_at: Optional[datetime]
+    status: StatusItem
+    url: Optional[str]
+    project: Project
+    image: Image
+    source: str
+    hooks: List[HookItem]
     updated_at: Optional[datetime]
+    grafana: Optional[Grafana]
 
 
 class NotebookEdit(BaseModel):
-    name: str = Field(..., max_length=20)
+    name: Optional[str]
     source: Optional[str]
-    project: Optional[str]
-    image: Optional[str]
+    project: Optional[Project]
+    image: Optional[Image]
     hooks: Optional[List[HookItem]] = []
 
     @validator('name')
     def notebook_name_validator(cls, name):
         return k8s_format(name)
+
+
+class EventItem(BaseModel):
+    id: Optional[int]
+    status: StatusItemOnlyDesc
+    name: Optional[str] = ""
+    time: Optional[datetime]
+
+
+class EventCreate(BaseModel):
+    name: str
+    desc: str
+    source_id: int
+    source: Optional[str] = "NOTEBOOK"

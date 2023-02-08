@@ -33,6 +33,7 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                                                                                               envs=nb.envs,
                                                                                               volumes=nb.volumes,
                                                                                               tolerations=nb.tolerations,
+                                                                                              annotations=nb.annotations,
                                                                                               ),
                                                                       )
 

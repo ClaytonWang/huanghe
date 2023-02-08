@@ -15,7 +15,7 @@ from collections import defaultdict
 from pydantic import BaseModel, Field
 from basic.config.notebook_management import *
 from utils.k8s_request import create_pvc, PVCCreateReq
-
+from notebook.serializers import HookItem
 
 class VolumeConfigInfo(BaseModel):
     value: int
@@ -58,7 +58,7 @@ async def get_volume_list(token, page_no=1):
             'Content-Type': 'application/json'
         }
         async with session.get(url, headers=headers) as response:
-            print("status:{}".format(response.status))
+            # print("status:{}".format(response.status))
             text = await response.json()
             # print(text)
             volume_data = text['result']['data']
@@ -68,20 +68,20 @@ async def get_volume_list(token, page_no=1):
     return [x.get_dict() for x in res]
 
 
-async def volume_check(authorization: str, hooks: List[Dict], namespace: str):
+async def volume_check(authorization: str, hooks: List[HookItem], namespace: str):
     volume_list = await get_volume_list(authorization)
-    volume_map = {x['id']: x for x in volume_list}
+    volume_map = {int(x['id']): x for x in volume_list}
     storages = []
     volumes_k8s = []
 
     for hook in hooks:
-        volume_id = hook['storage']
-        path = hook['path']
-        volume_info = volume_map.get(volume_id)
+        path = hook.path
+        volume_info = volume_map.get(int(hook.storage.id))
         volume_k8s_name = f"{volume_info['creator_en_name']}-{volume_info['name']}"
         volumes_k8s.append({'name': volume_k8s_name, 'mount_path': path})
         storages.append({'storage': volume_info, 'path': path})
         # 校验创建pvc
-        await create_pvc(PVCCreateReq(name=volume_k8s_name, namespace=namespace, size=volume_info['config']['size']),
+        await create_pvc(PVCCreateReq(name=volume_k8s_name, namespace=namespace,
+                                      size=volume_info['config']['size'], env=ENV),
                          ignore_exist=True)
     return storages, volumes_k8s
