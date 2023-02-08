@@ -65,7 +65,7 @@ module.exports = {
 
     '/settings/account': '我的账号',
 
-    '/storages/list': '存储管理',
+    '/storages/list': '存储列表',
 
     '/notebooks/list': 'Notebooks',
     '/notebooks/list/update': '编辑Notebook',
@@ -99,13 +99,13 @@ module.exports = {
     },
     {
       key: 'storages',
-      label: '存储',
+      label: '存储管理',
       icon: 'storages',
       permission: 'storages',
       children: [
         {
           key: 'storages.list',
-          label: '存储管理',
+          label: '存储列表',
           permission: 'storages.list',
         },
       ],
