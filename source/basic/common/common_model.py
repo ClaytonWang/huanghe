@@ -19,7 +19,6 @@ class Event(DateModel):
     source: str = ormar.String(max_length=30, default="", comment="事件来源")
     source_id: int = ormar.Integer()
 
-
     def gen_pagation_event(self):
         return {
             "id": self.id,
@@ -27,3 +26,7 @@ class Event(DateModel):
             "name": self.desc,
             "time": self.created_at,
         }
+
+    @classmethod
+    async def find_notebook_events(cls, _id):
+        return cls.objects.filter((cls.source_id == _id) & (cls.source == "NOTEBOOK"))
