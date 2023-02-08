@@ -65,7 +65,7 @@ module.exports = {
 
     '/settings/account': '我的账号',
 
-    '/storages/list': '存储管理',
+    '/storages/list': '存储列表',
 
     '/notebooks/list': 'Notebooks',
     '/notebooks/list/update': '编辑Notebook',
