@@ -52,7 +52,7 @@ const NotebooksUpdate = () => {
     if (transform) {
       result = transform(values);
     } else {
-      result = map(get(values, 'hooks', []), 'storage');
+      result = map(get(values, 'hooks', []), 'storage').map(({ id }) => id);
     }
     setSelectedStorages([...result]);
   };
@@ -169,7 +169,9 @@ const NotebooksUpdate = () => {
     } else if (changedHooks) {
       // 删除/新增挂载，通过hooks下的value数组，更新selectedStorage集合
       updateSelectedStorage(get(changedHooks, 'value', []), (values) =>
-        values.map(({ storage }) => storage || false).filter((value) => value)
+        values
+          .map(({ storage }) => storage?.id || false)
+          .filter((value) => value)
       );
     }
   };
@@ -230,9 +232,10 @@ const NotebooksUpdate = () => {
   }, [location, form, projectDefaultValue, imageDefaultValue]);
 
   const HooksItem = ({ name, remove, selectedStorages, disabledItems }) => {
-    const currStorage = form.getFieldValue(['hooks', name, 'storage']);
+    const currStorage = form.getFieldValue(['hooks', name, 'storage', 'id']);
     const filteredStorageOptions = useMemo(() => {
       const result = storagesDatasource.filter(
+        // 非选中了的存储集合的元素及当前选择的存储元素的集合
         ({ id }) => !(selectedStorages.includes(id) && id !== currStorage)
       );
       return result;
