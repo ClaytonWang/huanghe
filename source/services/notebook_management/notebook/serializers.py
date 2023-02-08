@@ -21,23 +21,15 @@ def k8s_format(name):
     return name.lower()
 
 
-class EventItem(BaseModel):
-    id: Optional[int]
-    status: str = ""
-    name: Optional[str] = ""
-    time: Optional[datetime]
 
-
-class EventItem(BaseModel):
-    id: Optional[int]
-    status: str = ""
-    name: Optional[str] = ""
-    time: Optional[datetime]
 
 
 class StatusItem(BaseModel):
-    code: str = None
-    name: str = None
+    code: Optional[str] = None
+    name: Optional[str] = None
+    desc: str = None
+
+class StatusItemOnlyDesc(BaseModel):
     desc: str = None
 
 
@@ -97,7 +89,7 @@ class Creator(BaseModel):
 
 
 class Project(BaseModel):
-    id: str
+    id: int
     name: Optional[str]
 
 
@@ -161,7 +153,7 @@ class NotebookDetail(BaseModel):
     source: str
     hooks: List[HookItem]
     updated_at: Optional[datetime]
-    grafana: Grafana
+    grafana: Optional[Grafana]
 
 
 class NotebookEdit(BaseModel):
@@ -174,3 +166,17 @@ class NotebookEdit(BaseModel):
     @validator('name')
     def notebook_name_validator(cls, name):
         return k8s_format(name)
+
+
+class EventItem(BaseModel):
+    id: Optional[int]
+    status: StatusItemOnlyDesc
+    name: Optional[str] = ""
+    time: Optional[datetime]
+
+
+class EventCreate(BaseModel):
+    name: str
+    desc: str
+    source_id: int
+    source: Optional[str] = "NOTEBOOK"

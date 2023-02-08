@@ -3,8 +3,8 @@
 #python3.11
 ARG BASE_IMG=containers.git.digitalbrain.cn/engineering-group/huanghe.backend-base:2023-01-11.9
 FROM $BASE_IMG
-WORKDIR /source/services/monitor
+WORKDIR /source/services/job_management
 
 # python dependence
-COPY ./storage/requirements.txt .
+COPY ./job/requirements.txt .
 RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
