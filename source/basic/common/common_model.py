@@ -23,7 +23,7 @@ class Event(DateModel):
     def gen_pagation_event(self):
         return {
             "id": self.id,
-            "status": self.status,
-            "name": self.name,
+            "status": {"desc": self.status},
+            "name": self.desc,
             "time": self.created_at,
         }
