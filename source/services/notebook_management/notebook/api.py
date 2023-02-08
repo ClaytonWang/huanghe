@@ -427,6 +427,6 @@ async def create_notebook_event(ec: EventCreate,
 
     _notebook = await Notebook.objects.select_related(['status']).get(pk=notebook_id)
     d = ec.dict()
-    d.update({"status": _notebook.status.name})
+    d.update({"status": _notebook.status.desc})
     await Event.objects.create(**d)
     return {}
