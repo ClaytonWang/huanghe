@@ -1,8 +1,8 @@
-import { useSearchParams } from 'react-router-dom';
-import { Modal, Spin, Table, Tooltip } from 'antd';
+import { useSearchParams, Link } from 'react-router-dom';
+import { Modal, Spin, Table, Tooltip, Dropdown } from 'antd';
 import qs from 'qs';
 import { get } from 'lodash';
-import Icon from '@ant-design/icons';
+import Icon, { EllipsisOutlined } from '@ant-design/icons';
 import { transformDate } from '@/common/utils/helper';
 import { AuthButton, Auth } from '@/common/components';
 import Icons from '@/common/components/Icon';
@@ -22,17 +22,20 @@ const JobsTable = ({
     {
       title: '状态',
       dataIndex: 'status',
-      width: '5%',
+      width: '10%',
       render(value) {
         let icon = (
-          <Icon style={{ fontSize: 24 }} component={Icons[value.name]} />
+          <Icon
+            style={{ fontSize: 18, marginRight: 5 }}
+            component={Icons[value.name]}
+          />
         );
         if (/^(stop|start|pending)$/.test(value.name)) {
           icon = (
             <Spin
               indicator={
                 <Icon
-                  style={{ fontSize: 24 }}
+                  style={{ fontSize: 16, marginRight: 5 }}
                   component={Icons[value.name]}
                   spin
                   rotate={(/pending/.test(value.name) && 180) || 0}
@@ -41,13 +44,21 @@ const JobsTable = ({
             />
           );
         }
-        return <Tooltip title={value.desc}>{icon}</Tooltip>;
+        return (
+          <label>
+            <Tooltip title={value.desc}>{icon}</Tooltip>
+            {value.desc}
+          </label>
+        );
       },
     },
     {
       title: '名称',
       dataIndex: 'name',
       width: '10%',
+      render(value, _) {
+        return <Link to={`/jobs/list/detail?id=${_.id}`}>{value}</Link>;
+      },
     },
     {
       title: '项目',
@@ -70,7 +81,7 @@ const JobsTable = ({
       width: '15%',
       dataIndex: 'source',
       render(value) {
-        return get(value, 'name', '-');
+        return value || '-';
       },
     },
     {
@@ -91,113 +102,173 @@ const JobsTable = ({
     },
     {
       title: '操作',
-      width: '15%',
+      width: '10%',
       render(_value, record) {
         const statusName = get(record, 'status.name');
+        const taskModelName = get(record, 'taskModel_name');
+
+        const StartStopBtn = () => {
+          if (statusName === 'stopped') {
+            return (
+              <AuthButton
+                required="jobs.list.edit"
+                type="link"
+                onClick={() => {
+                  handleStartClicked(record);
+                }}
+                condition={[
+                  (user) => {
+                    if (user.role.name === USER) {
+                      return (
+                        get(record, 'creator.username') ===
+                        get(user, 'username')
+                      );
+                    }
+                    return true;
+                  },
+                ]}
+              >
+                启动
+              </AuthButton>
+            );
+          }
+          if (statusName !== 'stopped') {
+            return (
+              <AuthButton
+                required="jobs.list.edit"
+                type="link"
+                onClick={() => {
+                  handleStopClicked(record);
+                }}
+                condition={[
+                  () => ['error', 'stop'].indexOf(statusName) < 0,
+                  (user) => {
+                    if (user.role.name === USER) {
+                      return (
+                        get(record, 'creator.username') ===
+                        get(user, 'username')
+                      );
+                    }
+                    return true;
+                  },
+                ]}
+              >
+                停止
+              </AuthButton>
+            );
+          }
+        };
+
+        const DebugBtn = () =>
+          taskModelName === '调试' && (
+            <AuthButton
+              required="jobs.list"
+              type="link"
+              onClick={() => {
+                handleOpenClicked(record);
+              }}
+              condition={[
+                () => ['running'].indexOf(statusName) > -1,
+                (user) => {
+                  if (user.role.name === USER) {
+                    return (
+                      get(record, 'creator.username') === get(user, 'username')
+                    );
+                  }
+                  return true;
+                },
+              ]}
+            >
+              {taskModelName}
+            </AuthButton>
+          );
+
+        const CopyBtn = () =>
+          statusName === 'stopped' && (
+            <AuthButton
+              required="jobs.list.edit"
+              type="link"
+              onClick={() => {
+                handleStartClicked(record);
+              }}
+              condition={[
+                (user) => {
+                  if (user.role.name === USER) {
+                    return (
+                      get(record, 'creator.username') === get(user, 'username')
+                    );
+                  }
+                  return true;
+                },
+              ]}
+            >
+              复制
+            </AuthButton>
+          );
+
+        const EditBtn = () => (
+          <AuthButton
+            required="jobs.list.edit"
+            type="link"
+            onClick={() => {
+              handleEditClicked(record);
+            }}
+            condition={[
+              () => ['stopped'].indexOf(statusName) > -1,
+              (user) =>
+                get(record, 'creator.username') === get(user, 'username'),
+            ]}
+          >
+            编辑
+          </AuthButton>
+        );
+
+        const DeleteBtn = () => (
+          <AuthButton
+            required="jobs.list.edit"
+            type="link"
+            onClick={() => {
+              handleDeleteClicked(record);
+            }}
+            condition={[
+              () => ['stopped', 'error'].indexOf(statusName) > -1,
+              (user) => {
+                if (user.role.name === USER) {
+                  return (
+                    get(record, 'creator.username') === get(user, 'username')
+                  );
+                }
+                return true;
+              },
+            ]}
+          >
+            删除
+          </AuthButton>
+        );
+        let items = [
+          {
+            key: 'edit',
+            label: <EditBtn />,
+          },
+          {
+            key: 'copy',
+            label: <CopyBtn />,
+          },
+          {
+            key: 'delete',
+            label: <DeleteBtn />,
+          },
+        ];
         return (
-          <Auth required="notebooks.list.edit">
+          <Auth required="jobs.list.edit">
             <span className="dbr-table-actions">
-              <AuthButton
-                required="notebooks.list"
-                type="link"
-                onClick={() => {
-                  handleOpenClicked(record);
-                }}
-                condition={[
-                  () => ['running'].indexOf(statusName) > -1,
-                  (user) => {
-                    if (user.role.name === USER) {
-                      return (
-                        get(record, 'creator.username') ===
-                        get(user, 'username')
-                      );
-                    }
-                    return true;
-                  },
-                ]}
-              >
-                打开
-              </AuthButton>
-              {statusName === 'stopped' && (
-                <AuthButton
-                  required="notebooks.list.edit"
-                  type="link"
-                  onClick={() => {
-                    handleStartClicked(record);
-                  }}
-                  condition={[
-                    (user) => {
-                      if (user.role.name === USER) {
-                        return (
-                          get(record, 'creator.username') ===
-                          get(user, 'username')
-                        );
-                      }
-                      return true;
-                    },
-                  ]}
-                >
-                  启动
-                </AuthButton>
-              )}
-              {statusName !== 'stopped' && (
-                <AuthButton
-                  required="notebooks.list.edit"
-                  type="link"
-                  onClick={() => {
-                    handleStopClicked(record);
-                  }}
-                  condition={[
-                    () => ['error', 'stop'].indexOf(statusName) < 0,
-                    (user) => {
-                      if (user.role.name === USER) {
-                        return (
-                          get(record, 'creator.username') ===
-                          get(user, 'username')
-                        );
-                      }
-                      return true;
-                    },
-                  ]}
-                >
-                  停止
-                </AuthButton>
-              )}
-              <AuthButton
-                required="notebooks.list.edit"
-                type="link"
-                onClick={() => {
-                  handleEditClicked(record);
-                }}
-                condition={[
-                  () => ['stopped'].indexOf(statusName) > -1,
-                  (user) =>
-                    get(record, 'creator.username') === get(user, 'username'),
-                ]}
-              >
-                编辑
-              </AuthButton>
-              <AuthButton
-                required="notebooks.list.edit"
-                type="link"
-                onClick={() => {
-                  handleDeleteClicked(record);
-                }}
-                condition={[
-                  () => ['stopped', 'error'].indexOf(statusName) > -1,
-                  (user) => {
-                    if (user.role.name === USER) {
-                      return (
-                        get(record, 'creator.username') ===
-                        get(user, 'username')
-                      );
-                    }
-                    return true;
-                  },
-                ]}
-              >
-                删除
-              </AuthButton>
+              <StartStopBtn />
+              <DebugBtn />
+              <Dropdown menu={{ items }}>
+                <a>
+                  <EllipsisOutlined />
+                </a>
+              </Dropdown>
             </span>
           </Auth>
         );
@@ -225,7 +296,7 @@ const JobsTable = ({
   };
   const handleStopClicked = (record) => {
     Modal.confirm({
-      title: '可能会导致数据丢失，是否要停止该notebook服务？',
+      title: '可能会导致数据丢失，是否要停止该Job服务？',
       okText: '停止',
       cancelText: '取消',
       onOk: () => {
