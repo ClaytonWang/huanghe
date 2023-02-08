@@ -29,6 +29,9 @@ class StatusItem(BaseModel):
     name: Optional[str] = None
     desc: str = None
 
+class StatusItemOnlyDesc(BaseModel):
+    desc: str = None
+
 
 class UserStr(BaseModel):
     id: int
@@ -167,7 +170,7 @@ class NotebookEdit(BaseModel):
 
 class EventItem(BaseModel):
     id: Optional[int]
-    status: StatusItem
+    status: StatusItemOnlyDesc
     name: Optional[str] = ""
     time: Optional[datetime]
 
