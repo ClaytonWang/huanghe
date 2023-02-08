@@ -20,7 +20,7 @@ const StoragesTable = ({
       dataIndex: 'name',
     },
     {
-      title: '配置',
+      title: '存储配置',
       dataIndex: 'config',
       render(config = {}) {
         const { size = 0 } = config;
