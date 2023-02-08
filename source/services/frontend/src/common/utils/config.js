@@ -84,6 +84,7 @@ module.exports = {
     '/jobs/list': 'Jobs',
     '/jobs/list/update': '编辑Job',
     '/jobs/list/create': '新建Job',
+    '/jobs/list/detail': 'Job详情',
   },
   menuItemsConfig: [
     {
