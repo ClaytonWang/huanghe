@@ -230,7 +230,7 @@ const NotebooksUpdate = () => {
   }, [location, form, projectDefaultValue, imageDefaultValue]);
 
   const HooksItem = ({ name, remove, selectedStorages, disabledItems }) => {
-    const currStorage = form.getFieldValue(['hooks', name, 'storage']);
+    const currStorage = form.getFieldValue(['hooks', name, 'storage', 'id']);
     const filteredStorageOptions = useMemo(() => {
       const result = storagesDatasource.filter(
         ({ id }) => !(selectedStorages.includes(id) && id !== currStorage)
