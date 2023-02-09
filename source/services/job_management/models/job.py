@@ -16,7 +16,7 @@ from models import DB, META
 
 # 状态
 # JOB_STATUS_PENDING = "pending"  # 排队中     3
-# JOB_STATUS_RUNNING = "running"  # 已启动(运行中)    4
+# JOB_STATUS_RUN = "run"  # 运行中    11
 # JOB_STATUS_STOP = "stop"  # 停止中       2
 # JOB_STATUS_START_FAIL = "start_fail"  # 启动失败  7
 # JOB_STATUS_RUN_FAIL = "run_fail"  # 运行失败  8
