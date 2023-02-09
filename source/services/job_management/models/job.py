@@ -21,7 +21,7 @@ from models import DB, META
 # JOB_STATUS_START_FAIL = "start_fail"  # 启动失败  7
 # JOB_STATUS_RUN_FAIL = "run_fail"  # 运行失败  8
 # JOB_STATUS_STOP_FAIL = "stop_fail"  # 停止失败    9
-# JOB_STATUS_ON = "completed"  # 已完成       10
+# JOB_STATUS_COMPLETED = "completed"  # 已完成       10
 # JOB_STATUS_STOPPED = "stopped"  # 已停止 5
 
 
