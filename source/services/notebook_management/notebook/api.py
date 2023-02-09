@@ -114,7 +114,7 @@ async def list_notebook(request: Request,
     # print("project_list")
     # print(project_list)
     code_id_map = {x['code']: x['id'] for x in project_list}
-    res_proj_map = {x['id']: {'name': x['name'], "id": "id"} for x in project_list}
+    res_proj_map = {x['id']: {'name': x['name'], "id": x['id']} for x in project_list}
 
     # 用户可见项目
     if role_name != 'admin':
