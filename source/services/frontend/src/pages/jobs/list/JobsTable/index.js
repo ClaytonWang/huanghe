@@ -1,5 +1,5 @@
 import { useSearchParams, Link } from 'react-router-dom';
-import { Modal, Spin, Table, Tooltip, Dropdown } from 'antd';
+import { Modal, Spin, Table, Tooltip, Dropdown, Space } from 'antd';
 import qs from 'qs';
 import { get } from 'lodash';
 import Icon, { EllipsisOutlined } from '@ant-design/icons';
@@ -10,6 +10,21 @@ import { USER } from '@/common/constants';
 
 const DEBUG = '调试';
 
+const getStatusName = (value) => {
+  let status = value;
+  // eslint-disable-next-line default-case
+  switch (status) {
+    case 'stop_fail':
+    case 'run_fail':
+    case 'start_fail':
+      status = 'error';
+      break;
+    case 'run':
+      status = 'running';
+      break;
+  }
+  return status;
+};
 const JobsTable = ({
   tableData = {},
   loading = false,
@@ -17,6 +32,7 @@ const JobsTable = ({
   onStart = () => {},
   onStop = () => {},
   onEdit = () => {},
+  onCopy = () => {},
   onDelete = () => {},
   onPageNoChange = () => {},
 }) => {
@@ -26,21 +42,22 @@ const JobsTable = ({
       dataIndex: 'status',
       width: '10%',
       render(value) {
+        const status = getStatusName(value.name);
         let icon = (
           <Icon
             style={{ fontSize: 18, marginRight: 5 }}
-            component={Icons[value.name]}
+            component={Icons[status]}
           />
         );
-        if (/^(stop|start|pending)$/.test(value.name)) {
+        if (/^(stop|start|pending|running)$/.test(status)) {
           icon = (
             <Spin
               indicator={
                 <Icon
                   style={{ fontSize: 16, marginRight: 5 }}
-                  component={Icons[value.name]}
+                  component={Icons[status]}
                   spin
-                  rotate={(/pending/.test(value.name) && 180) || 0}
+                  rotate={(/pending/.test(status) && 180) || 0}
                 />
               }
             />
@@ -105,17 +122,24 @@ const JobsTable = ({
     {
       title: '操作',
       width: '10%',
+      shouldCellUpdate: (record, prevRecord) =>
+        record?.status?.desc !== prevRecord?.status?.desc,
       render(_value, record) {
         return <OperationBtnGroup record={record} />;
       },
     },
   ];
   const OperationBtnGroup = ({ record }) => {
-    const statusName = get(record, 'status.name');
+    const _sname = get(record, 'status.name');
+    const statusName = getStatusName(_sname);
     const taskModel = get(record, 'taskModel_name');
 
     const StartStopBtn = () => {
-      if (statusName === 'stopped') {
+      if (
+        statusName === 'stopped' ||
+        _sname === 'run_fail' ||
+        _sname === 'start_fail'
+      ) {
         return (
           <AuthButton
             required="jobs.list.edit"
@@ -147,7 +171,7 @@ const JobsTable = ({
               handleStopClicked(record);
             }}
             condition={[
-              () => ['error', 'stop'].indexOf(statusName) < 0,
+              () => ['stop_fail', 'stop', 'completed'].indexOf(statusName) < 0,
               (user) => {
                 if (user.role.name === USER) {
                   return (
@@ -185,28 +209,27 @@ const JobsTable = ({
       </AuthButton>
     );
 
-    const CopyBtn = () =>
-      statusName === 'stopped' && (
-        <AuthButton
-          required="jobs.list.edit"
-          type="link"
-          onClick={() => {
-            handleStartClicked(record);
-          }}
-          condition={[
-            (user) => {
-              if (user.role.name === USER) {
-                return (
-                  get(record, 'creator.username') === get(user, 'username')
-                );
-              }
-              return true;
-            },
-          ]}
-        >
-          复制
-        </AuthButton>
-      );
+    const CopyBtn = () => (
+      <AuthButton
+        required="jobs.list.edit"
+        type="link"
+        onClick={() => {
+          handleCopyClicked(record);
+        }}
+        condition={[
+          () => ['error', 'stopped', 'completed'].indexOf(statusName) > -1,
+          () => ['stop_fail'].indexOf(_sname) < 0,
+          (user) => {
+            if (user.role.name === USER) {
+              return get(record, 'creator.username') === get(user, 'username');
+            }
+            return true;
+          },
+        ]}
+      >
+        复制
+      </AuthButton>
+    );
 
     const EditBtn = () => (
       <AuthButton
@@ -216,7 +239,7 @@ const JobsTable = ({
           handleEditClicked(record);
         }}
         condition={[
-          () => ['stopped'].indexOf(statusName) > -1,
+          () => ['stopped', 'completed'].indexOf(statusName) > -1,
           (user) => get(record, 'creator.username') === get(user, 'username'),
         ]}
       >
@@ -232,7 +255,8 @@ const JobsTable = ({
           handleDeleteClicked(record);
         }}
         condition={[
-          () => ['stopped', 'error'].indexOf(statusName) > -1,
+          () => ['stopped', 'error', 'completed'].indexOf(statusName) > -1,
+          () => ['stop_fail'].indexOf(_sname) < 0,
           (user) => {
             if (user.role.name === USER) {
               return get(record, 'creator.username') === get(user, 'username');
@@ -254,26 +278,31 @@ const JobsTable = ({
         label: <DeleteBtn />,
       },
     ];
+
     if (taskModel === DEBUG) {
       items.unshift({
         key: 'edit',
         label: <EditBtn />,
       });
     }
+
     return (
       <Auth required="jobs.list.edit">
         <span className="dbr-table-actions">
-          <StartStopBtn />
-          {taskModel === DEBUG ? <DebugBtn /> : <EditBtn />}
-          <Dropdown menu={{ items }}>
-            <a>
-              <EllipsisOutlined />
-            </a>
-          </Dropdown>
+          <Space>
+            <StartStopBtn />
+            {taskModel === DEBUG ? <DebugBtn /> : <EditBtn />}
+            <Dropdown menu={{ items }} placement="bottomRight">
+              <a>
+                <EllipsisOutlined style={{ fontSize: 24 }} />
+              </a>
+            </Dropdown>
+          </Space>
         </span>
       </Auth>
     );
   };
+
   const [searchParams] = useSearchParams();
   const { pageno = 1, pagesize = 10 } = {
     ...qs.parse(searchParams.toString()),
@@ -306,10 +335,12 @@ const JobsTable = ({
   const handleEditClicked = (record) => {
     onEdit(record);
   };
+  const handleCopyClicked = (record) => {
+    onCopy(record);
+  };
   const handleDeleteClicked = (record) => {
     onDelete(record);
   };
-  const genTableData = (data) => data;
 
   return (
     <Table
@@ -318,7 +349,7 @@ const JobsTable = ({
       size="small"
       columns={columns}
       loading={loading}
-      dataSource={genTableData(data)}
+      dataSource={data}
       pagination={pagination}
     />
   );
