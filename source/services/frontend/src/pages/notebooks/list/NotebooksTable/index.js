@@ -104,6 +104,8 @@ const NotebooksTable = ({
     {
       title: '操作',
       width: '10%',
+      shouldCellUpdate: (record, prevRecord) =>
+        record?.status?.desc !== prevRecord?.status?.desc,
       render(_value, record) {
         const statusName = get(record, 'status.name');
         let items = [
@@ -224,7 +226,7 @@ const NotebooksTable = ({
               )}
               <Dropdown menu={{ items }}>
                 <a>
-                  <EllipsisOutlined />
+                  <EllipsisOutlined style={{ fontSize: 24 }} />
                 </a>
               </Dropdown>
             </span>

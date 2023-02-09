@@ -93,6 +93,7 @@ const JobList = () => {
     const filters = getFilters();
     setSearchParams(qs.stringify(filters));
   }, []);
+
   useEffect(() => {
     const timer = setInterval(() => {
       reload();
@@ -109,15 +110,15 @@ const JobList = () => {
   const deleteNotebook = async (record) => {
     const { id } = record;
     try {
-      await api.notebooksListDelete({ id });
-      message.success('删除Job成功！');
+      await api.jobListDelete({ id });
+      message.success('删除Job服务成功！');
       reload();
     } catch (error) {
       console.log(error);
     }
   };
   const handleCreateClicked = () => {
-    navigate('create', {
+    navigate(CREATE, {
       state: {
         type: CREATE,
       },
@@ -131,7 +132,7 @@ const JobList = () => {
   const handleStartClicked = async (record) => {
     try {
       const { id } = record;
-      await api.notebooksListAction({ id, action: JOB_ACTION[START] });
+      await api.jobListAction({ id, action: JOB_ACTION[START] });
       message.success('已触发启动！');
     } catch (error) {
       console.log(error);
@@ -140,23 +141,31 @@ const JobList = () => {
   const handleStopClicked = async (record) => {
     try {
       const { id } = record;
-      await api.notebooksListAction({ id, action: JOB_ACTION[STOP] });
+      await api.jobListAction({ id, action: JOB_ACTION[STOP] });
       message.success('已触发停止！');
     } catch (error) {
       console.log(error);
     }
   };
   const handleEditClicked = (values) => {
-    navigate('update', {
+    navigate(UPDATE, {
       state: {
         params: values,
         type: UPDATE,
       },
     });
   };
+  const handleCopyClicked = (values) => {
+    navigate(CREATE, {
+      state: {
+        params: values,
+        type: CREATE,
+      },
+    });
+  };
   const handleDelete = (record) => {
     Modal.confirm({
-      title: '确定要删除该Job吗？',
+      title: '确定要删除该Job服务吗？',
       okText: '删除',
       okType: 'danger',
       cancelText: '取消',
@@ -193,6 +202,7 @@ const JobList = () => {
           onStart={handleStartClicked}
           onStop={handleStopClicked}
           onEdit={handleEditClicked}
+          onCopy={handleCopyClicked}
           onDelete={handleDelete}
           onPageNoChange={onPageNoChange}
         />
