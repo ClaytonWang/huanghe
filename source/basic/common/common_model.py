@@ -14,7 +14,7 @@ class Event(DateModel):
 
     id: int = ormar.Integer(primary_key=True)
     name: str = ormar.String(max_length=100, comnet='事件名称')
-    desc: str = ormar.String(max_length=200, default='', comment='事件描述')
+    desc: str = ormar.String(max_length=400, default='', comment='事件描述')
     status: str = ormar.String(max_length=30, default="", comment="状态")
     source: str = ormar.String(max_length=30, default="", comment="事件来源")
     source_id: int = ormar.Integer()

@@ -113,7 +113,7 @@ async def list_notebook(request: Request,
     project_list = await get_project_list(authorization)
     # print("project_list")
     # print(project_list)
-    # code_id_map = {x['code']: x['id'] for x in project_list}
+    code_id_map = {x['code']: x['id'] for x in project_list}
     res_proj_map = {x['id']: {'name': x['name']} for x in project_list}
 
     # 用户可见项目
@@ -130,7 +130,7 @@ async def list_notebook(request: Request,
             # need_filter = True
         if 'project__code' in params_filter:
             project_code = params_filter.pop('project__code')
-            # params_filter['project_id'] = code_id_map.get(project_code)
+            params_filter['project_by_id'] = code_id_map.get(project_code)
         if 'role__name' in params_filter:
             role__name = params_filter.pop('role__name')
             # role_filter = set(role_userid_map.get(role__name, []))
