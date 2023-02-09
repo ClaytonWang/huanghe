@@ -39,7 +39,7 @@ class UserStr(BaseModel):
 
 
 class ProjectStr(BaseModel):
-    # id: int
+    id: int
     name: Optional[str] = None
 
 
