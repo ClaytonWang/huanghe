@@ -402,7 +402,7 @@ const NotebooksUpdate = () => {
             icon: <InfoCircleOutlined />,
           }}
         >
-          <Input placeholder="请输入Notebook名称" />
+          <Input placeholder="请输入Notebook名称" disabled={type === UPDATE} />
         </Form.Item>
         <Form.Item
           name="project"
