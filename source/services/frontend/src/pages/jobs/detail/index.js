@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-10 14:51:49
+ * @LastEditTime: 2023-02-10 15:01:29
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -137,7 +137,7 @@ const JobDetail = () => {
   const handleStartClicked = async (record) => {
     try {
       const { id } = record;
-      await api.notebooksListAction({ id, action: JOB_ACTION[START] });
+      await api.jobListAction({ id, action: JOB_ACTION[START] });
       message.success('已触发启动！');
     } catch (error) {
       console.log(error);
@@ -146,14 +146,14 @@ const JobDetail = () => {
   const handleStopClicked = async (record) => {
     try {
       const { id } = record;
-      await api.notebooksListAction({ id, action: JOB_ACTION[STOP] });
+      await api.jobListAction({ id, action: JOB_ACTION[STOP] });
       message.success('已触发停止！');
     } catch (error) {
       console.log(error);
     }
   };
   const handleEditClicked = (values) => {
-    navigate('/notebooks/list/update', {
+    navigate('/jobs/list/update', {
       state: {
         params: values,
         type: UPDATE,
@@ -161,12 +161,12 @@ const JobDetail = () => {
     });
   };
 
-  const deleteNotebook = async (record) => {
+  const deleteJob = async (record) => {
     const { id } = record;
     try {
-      await api.notebooksListDelete({ id });
-      message.success('删除Notebook成功！');
-      navigate('/notebooks/list');
+      await api.jobListDelete({ id });
+      message.success('删除Job服务成功！');
+      navigate('/jobs/list');
     } catch (error) {
       console.log(error);
     }
@@ -174,12 +174,12 @@ const JobDetail = () => {
 
   const handleDelete = (record) => {
     Modal.confirm({
-      title: '确定要删除该Notebook吗？',
+      title: '确定要删除该Job服务吗？',
       okText: '删除',
       okType: 'danger',
       cancelText: '取消',
       onOk: () => {
-        deleteNotebook(record);
+        deleteJob(record);
       },
     });
   };
@@ -347,7 +347,7 @@ JobDetail.context = (props = {}) => {
       {
         label: (
           <AuthButton
-            required="notebooks.list.edit"
+            required="jobs.list.edit"
             type="link"
             onClick={() => {
               handleEditClicked(detail);
@@ -366,7 +366,7 @@ JobDetail.context = (props = {}) => {
       {
         label: (
           <AuthButton
-            required="notebooks.list.edit"
+            required="jobs.list.edit"
             type="link"
             onClick={() => {
               handleDelete(detail);
@@ -423,7 +423,7 @@ JobDetail.context = (props = {}) => {
       <Dropdown.Button menu={menuProps}>
         {statusName === 'stopped' && (
           <AuthButton
-            required="notebooks.list.edit"
+            required="jobs.list.edit"
             type="text"
             onClick={() => {
               handleStartClicked(detail);
@@ -444,7 +444,7 @@ JobDetail.context = (props = {}) => {
         )}
         {statusName !== 'stopped' && (
           <AuthButton
-            required="notebooks.list.edit"
+            required="jobs.list.edit"
             type="text"
             style={(() => {
               if (statusName === 'error') {
@@ -474,7 +474,7 @@ JobDetail.context = (props = {}) => {
         )}
       </Dropdown.Button>
       <AuthButton
-        required="notebooks.list"
+        required="jobs.list"
         type="primary"
         onClick={() => {
           const { url } = detail;
@@ -496,6 +496,6 @@ JobDetail.context = (props = {}) => {
   );
 };
 
-JobDetail.path = '/notebooks/list/detail';
+JobDetail.path = '/jobs/list/detail';
 
 export default JobDetail;
