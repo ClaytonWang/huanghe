@@ -20,3 +20,5 @@ const JobRoutes = () => (
   </Routes>
 );
 export default JobRoutes;
+
+export const JobsPages = [JobList, JobUpdate, JobUpdate];
