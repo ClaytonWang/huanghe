@@ -134,13 +134,12 @@ class JobDetail(BaseModel):
 
 class JobEdit(BaseModel):
     project: Project
-    task_model: int
+    mode: str
     start_command: str
-    image_type: int
-    image_name: str = Field(..., max_length=100)
+    image: Image
     work_dir: str
     hooks: List[HookItem] = []
-    source_id: int
+    source: str
 
 class StatusItemOnlyDesc(BaseModel):
     desc: str = None
