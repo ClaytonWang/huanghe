@@ -7,7 +7,6 @@
 """
 import datetime
 import json
-from collections import defaultdict
 
 from fastapi import APIRouter, Depends, Request, HTTPException, status, Path
 from fastapi.responses import JSONResponse
@@ -21,7 +20,7 @@ from models import Job, Status, Source
 from utils.auth import operate_auth
 from utils.k8s_request import create_job_k8s, delete_job_k8s
 from utils.storage_request import volume_check
-from utils.user_request import get_user_list, get_project_list, project_check
+from utils.user_request import get_user_list, get_project_list, project_check, project_check_obj
 from basic.middleware.account_getter import ADMIN, USER, OWNER
 from basic.common.common_model import Event
 
@@ -189,12 +188,14 @@ async def create_job(request: Request,
     description='编辑Job',
 )
 async def update_job(request: Request,
-                     ne: JobEdit,
+                     je: JobEdit,
                      job_id: int = Path(..., ge=1, description="JobID"),
                      ):
     # user: AccountGetter = request.user
     authorization: str = request.headers.get('authorization')
-    update_data = ne.dict(exclude_unset=True)
+    update_data = {"mode": je.mode,
+                   "work_dir": je.work_dir,
+                   "start_command": je.start_command,}
     if not update_data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
 
@@ -203,33 +204,45 @@ async def update_job(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
     k8s_info = _job.k8s_info
 
+    # TODO(jiangshouchen): add more status
     if _job.status.name != 'stopped':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job未停止')
 
-    project_id = ne.project.id
-    check, extra_info = await project_check(request, project_id)
+    project_id = je.project.id
+    check, extra_info = await project_check_obj(request, project_id)
     if not check:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
-    update_data['project_by_id'] = project_id
-    if 'project' in update_data:
-        update_data.pop('project')
-    k8s_info['namespace'] = extra_info
+    update_data.update({"project_by_id": project_id,
+                        "project_by": extra_info['name']})
+
+    k8s_info['namespace'] = extra_info['en_name']
 
     k8s_info['name'] = f"{request.user.en_name}-{_job.name}"
 
-    if ne.source_id:
-        source = await Source.objects.get(pk=ne.source_id)
-        k8s_info.update({
-            'cpu': source.cpu,
-            'memory': source.memory,
-            'gpu': source.gpu,
-            'type': source.type,
-        })
+    if je.source:
+        gpu_count = 0
+        if je.source.startswith("GPU"):
+            machine_type = "GPU"
+            _, gpu_count, cpu_count, memory = je.source.split()
+            gpu_count = gpu_count.split("*")[0]
+            cpu_count = cpu_count.split("C")[0]
+            memory = memory.split("G")[0]
+        else:
+            machine_type = "CPU"
+            _, cpu_count, memory = je.source.split()
+            cpu_count = cpu_count.split("C")[0]
+            memory = memory.split("G")[0]
+        source_dic = {'cpu': cpu_count,
+            'memory': memory,
+            'gpu': gpu_count,
+            'type': machine_type,}
+        k8s_info.update(source_dic)
+        update_data.update(source_dic)
 
-    k8s_info['image'] = ne.image_name
-
-    update_data.pop('hooks')
-    storages, volumes_k8s = await volume_check(authorization, ne.hooks, extra_info)
+    k8s_info['image'] = je.image.name
+    update_data.update({"image": je.image.name,
+                        "custom": je.image.custom,})
+    storages, volumes_k8s = await volume_check(authorization, je.hooks, extra_info['en_name'])
     path_set = {x['path'] for x in storages}
     if len(path_set) != len(storages):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
