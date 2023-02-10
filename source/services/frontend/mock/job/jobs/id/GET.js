@@ -6,23 +6,45 @@
  * @Description Notebook详情
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
-const utils = require('../../utils');
+const utils = require('../../../utils');
 module.exports = function (req, res) {
   utils.ok(req, res, {
-    id: '1', // notebookId，字符串
-    name: 'hb-test-01', // 名称，字符串，仅支持英文名称
-    project: 'ENG106', // projectId, string
-    image: '1', // imageId, string
-    source: '1', // 资源Id，字符串
-    hooks: [
-      {
-        storage: '1', // 存储盘Id, 字符串
-        path: '/home/jovyan/vol-1', // 目录，字符串，前端校验需符合文件路径格式
+    success: true,
+    message: '',
+    status: 200,
+    result: {
+      id: 1,
+      name: 'a7',
+      creator: {
+        id: '1',
+        username: 'name1',
       },
-      {
-        storage: '2', // 存储盘Id, 字符串
-        path: '/home/jovyan/vol-2', // 目录，字符串，前端校验需符合文件路径格式
+      created_at: '2023-02-03',
+      status: {
+        code: '05',
+        name: 'stopped',
+        desc: '已停止',
       },
-    ],
+      project: {
+        id: '87',
+        name: 'shouchen',
+      },
+      image: {
+        name: 'testname',
+        custom: false,
+      },
+      source: 'CPU 12C 24G',
+      hooks: [
+        {
+          storage: {
+            name: 'shouchen',
+            id: 27,
+          },
+          path: '/home/jovyan',
+        },
+      ],
+      updated_at: '2023-02-03',
+      mode: '调试',
+    },
   });
 };

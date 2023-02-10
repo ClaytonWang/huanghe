@@ -72,14 +72,22 @@ const NotebooksTable = ({
     {
       title: '镜像',
       dataIndex: 'image',
-      width: '15%',
+      width: '20%',
+      ellipsis: {
+        showTitle: false,
+      },
       render(value) {
-        return get(value, 'name', '-');
+        const _value = get(value, 'name', '-');
+        return (
+          <Tooltip placement="topLeft" title={_value}>
+            {_value}
+          </Tooltip>
+        );
       },
     },
     {
       title: '资源',
-      width: '15%',
+      width: '10%',
       dataIndex: 'source',
       render(value) {
         return value || '-';
@@ -224,7 +232,7 @@ const NotebooksTable = ({
                   停止
                 </AuthButton>
               )}
-              <Dropdown menu={{ items }}>
+              <Dropdown menu={{ items }} placement="bottomCenter">
                 <a>
                   <EllipsisOutlined style={{ fontSize: 24 }} />
                 </a>

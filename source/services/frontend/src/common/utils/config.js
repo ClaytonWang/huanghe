@@ -53,6 +53,7 @@ module.exports = {
     notebooksListAction: 'post|/notebook/notebooks/:id',
     notebooksListUpdate: 'put|/notebook/notebooks/:id',
     notebooksListDelete: 'delete|/notebook/notebooks/:id',
+    notebooksDetailEvent: 'get|/notebook/notebooks/:id/events',
 
     // jobs
     jobList: 'get|/job/jobs',
@@ -61,6 +62,7 @@ module.exports = {
     jobListAction: 'post|/job/jobs/:id',
     jobListUpdate: 'put|/job/jobs/:id',
     jobListDelete: 'delete|/job/jobs/:id',
+    jobDetailEvent: 'get|/job/jobs/:id/events',
 
     imagesList: 'get|/notebook/image',
     sourceList: 'get|/notebook/source',
