@@ -112,5 +112,5 @@ async def delete_volume(request: Request,
 async def recover_volume(request: Request,
                          volume_id: int = Path(..., ge=1, description="存储ID")):
     user: AccountGetter = request.user
-    Volume.cancel_self_deleted(volume_id, user.id)
+    await Volume.cancel_self_deleted(volume_id, user.id)
     return success_common_response()
