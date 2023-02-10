@@ -1,5 +1,5 @@
 import { useSearchParams, Link } from 'react-router-dom';
-import { Modal, Spin, Table, Tooltip, Dropdown } from 'antd';
+import { Modal, Spin, Table, Tooltip, Dropdown, Space } from 'antd';
 import qs from 'qs';
 import { get } from 'lodash';
 import Icon, { EllipsisOutlined } from '@ant-design/icons';
@@ -165,7 +165,7 @@ const NotebooksTable = ({
         ];
         return (
           <Auth required="notebooks.list.edit">
-            <span className="dbr-table-actions">
+            <Space className="dbr-table-actions">
               <AuthButton
                 required="notebooks.list"
                 type="link"
@@ -232,12 +232,12 @@ const NotebooksTable = ({
                   停止
                 </AuthButton>
               )}
-              <Dropdown menu={{ items }} placement="bottomCenter">
+              <Dropdown menu={{ items }} placement="bottom">
                 <a>
                   <EllipsisOutlined style={{ fontSize: 24 }} />
                 </a>
               </Dropdown>
-            </span>
+            </Space>
           </Auth>
         );
       },

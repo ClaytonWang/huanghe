@@ -18,9 +18,10 @@ const JobRoutes = () => (
     <Route path="list" element={<JobList />} />
     <Route path="list/create" element={<JobUpdate />} />
     <Route path="list/update" element={<JobUpdate />} />
+    <Route path="list/copy" element={<JobUpdate />} />
     <Route path="list/detail" element={<JobDetail />} />
   </Routes>
 );
 export default JobRoutes;
 
-export const JobsPages = [JobList, JobUpdate, JobUpdate, JobDetail];
+export const JobsPages = [JobList, JobUpdate, JobDetail];

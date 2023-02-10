@@ -41,6 +41,7 @@ export const PASSWORD = 'password';
 export const CREATE = 'create';
 export const EDIT = 'edit';
 export const UPDATE = 'update';
+export const COPY = 'copy';
 
 // notebooks
 export const NOTEBOOK_STATUS = {

@@ -25,7 +25,7 @@ import {
   PlusOutlined,
 } from '@ant-design/icons';
 import api from '@/common/api';
-import { CREATE, UPDATE, ADMIN } from '@/common/constants';
+import { CREATE, UPDATE, COPY, ADMIN } from '@/common/constants';
 import { useContextProps } from '@/common/hooks/RoutesProvider';
 import { useAuth } from '@/common/hooks/useAuth';
 import { genUniqueIdByPrefix, ID } from '@/common/utils/helper';
@@ -34,7 +34,7 @@ import './index.less';
 const { Option } = Select;
 const { TextArea } = Input;
 
-const taskModels = [
+const taskModes = [
   { id: 0, name: '调试' },
   { id: 1, name: '非调试' },
 ];
@@ -45,7 +45,7 @@ const JobsUpdate = () => {
   const [sourceDatasource, setSourceDatasource] = useState([]);
   const [storagesDatasource, setStoragesDatasource] = useState([]);
   const [selectedStorages, setSelectedStorages] = useState([]);
-  const [taskModel, setTaskModel] = useState(0);
+  const [taskMode, setTaskMode] = useState(taskModes[0].name);
   const setContextProps = useContextProps();
   const [type, setType] = useState(CREATE);
   const uniqueID = useRef();
@@ -67,11 +67,20 @@ const JobsUpdate = () => {
   const requestJob = async (params) => {
     try {
       const { result } = await api.jobDetail({ ...params });
-      form.setFieldsValue(result);
-      updateSelectedStorage(result);
+      populateDetail(result);
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const populateDetail = (detail) => {
+    const _detail = {
+      ...detail,
+      id: type === COPY ? null : detail?.id,
+      name: type === COPY ? `${detail?.name}-1` : detail?.name,
+    };
+    form.setFieldsValue(_detail);
+    updateSelectedStorage(_detail);
   };
 
   const requestProjects = async () => {
@@ -222,13 +231,13 @@ const JobsUpdate = () => {
   useEffect(() => {
     const { id = null } = get(location, 'state.params', {});
     const type = get(location, 'state.type');
-    if (type === UPDATE) {
+    if (type === UPDATE || type === COPY) {
       requestJob({ id });
     } else {
       form.setFieldsValue({
         project: projectDefaultValue,
         image: imageDefaultValue,
-        task_model: taskModel,
+        mode: taskMode,
       });
     }
     setType(type);
@@ -382,16 +391,16 @@ const JobsUpdate = () => {
   const JobModel = ({ value, onChange }) => {
     const onSelectChange = (value) => {
       onChange?.(value);
-      setTaskModel(value);
+      setTaskMode(value);
     };
     return (
       <Select
         placeholder="请选择任务模式"
-        defaultValue={value || 0}
+        defaultValue={value || taskModes[0].name}
         onChange={onSelectChange}
       >
-        {taskModels.map(({ id, name = '-' }) => (
-          <Option key={id} value={id}>
+        {taskModes.map(({ id, name = '-' }) => (
+          <Option key={id} value={name}>
             {name}
           </Option>
         ))}
@@ -425,7 +434,7 @@ const JobsUpdate = () => {
             icon: <InfoCircleOutlined />,
           }}
         >
-          <Input placeholder="请输入Job名称" />
+          <Input placeholder="请输入Job名称" disabled={type === UPDATE} />
         </Form.Item>
         <Form.Item
           name="project"
@@ -438,14 +447,24 @@ const JobsUpdate = () => {
           {(fields = [], { add, remove }, { errors }) => (
             <>
               <Form.Item label="存储挂载" wrapperCol={{ push: 2, xs: 22 }}>
-                {drop([...fields], 1).map((field) => (
+                {selectedStorages.length > 0 && (
                   <HooksItem
                     key={uniqueId('hook-')}
-                    {...field}
-                    remove={remove}
+                    {...fields[0]}
                     selectedStorages={selectedStorages}
+                    disabledItems={['path']}
                   />
-                ))}
+                )}
+                {drop([...fields], selectedStorages.length > 0 ? 1 : 0).map(
+                  (field) => (
+                    <HooksItem
+                      key={uniqueId('hook-')}
+                      {...field}
+                      remove={remove}
+                      selectedStorages={selectedStorages}
+                    />
+                  )
+                )}
                 <Button
                   style={{ width: '100%' }}
                   onClick={() =>
@@ -466,13 +485,13 @@ const JobsUpdate = () => {
           )}
         </Form.List>
         <Form.Item
-          name="task_model"
+          name="mode"
           label="模式"
           rules={[{ required: true, message: '请选择模式' }]}
         >
           <JobModel />
         </Form.Item>
-        {taskModel === 1 && (
+        {taskMode !== taskModes[0].name && (
           <Form.Item
             name="start_command"
             label="启动命令"
@@ -541,6 +560,6 @@ JobsUpdate.context = ({ onCancel, onSubmit }) => (
   </Space>
 );
 
-JobsUpdate.path = ['/jobs/list/update', '/jobs/list/create'];
+JobsUpdate.path = ['/jobs/list/update', '/jobs/list/create', '/jobs/list/copy'];
 
 export default JobsUpdate;

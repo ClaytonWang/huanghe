@@ -305,7 +305,7 @@ const JobsTable = ({
           <Space>
             <StartStopBtn />
             {taskModel === DEBUG ? <DebugBtn /> : <EditBtn />}
-            <Dropdown menu={{ items }} placement="bottomCenter">
+            <Dropdown menu={{ items }} placement="bottom">
               <a>
                 <EllipsisOutlined style={{ fontSize: 24 }} />
               </a>
