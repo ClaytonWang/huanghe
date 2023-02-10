@@ -22,6 +22,7 @@ from utils.storage_request import volume_check
 from utils.k8s_request import create_notebook_k8s, delete_notebook_k8s
 from utils.auth import operate_auth
 from collections import defaultdict
+import datetime
 
 router_notebook = APIRouter()
 COMMON = "https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
@@ -329,6 +330,7 @@ async def update_notebook(request: Request,
     k8s_info['volumes'] = volumes_k8s
 
     update_data['k8s_info'] = json.dumps(k8s_info)
+    update_data['updated_at'] = datetime.datetime.now()
 
     if not await _notebook.update(**update_data):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不存在')
