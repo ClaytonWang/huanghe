@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-10 15:01:29
+ * @LastEditTime: 2023-02-10 18:19:24
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -20,10 +20,16 @@ import {
   message,
   Modal,
   DatePicker,
+  Button,
 } from 'antd';
 import { useAuth } from '@/common/hooks/useAuth';
 import Icon from '@ant-design/icons';
-import { ChartMonitor, EventMonitor, AuthButton } from '@/common/components';
+import {
+  ChartMonitor,
+  EventMonitor,
+  AuthButton,
+  LogMonitor,
+} from '@/common/components';
 import { get } from 'lodash';
 
 import { purifyDeep, transformDate } from '@/common/utils/helper';
@@ -238,23 +244,28 @@ const JobDetail = () => {
   };
 
   const operations = useMemo(() => {
-    if (currTab === 'event-monitor') return null;
+    if (currTab === 'chart-monitor') {
+      const dateFormat = 'YYYY/MM/DD HH:mm:ss';
+      return (
+        <RangePicker
+          allowClear={false}
+          presets={rangePresets}
+          showTime
+          format={dateFormat}
+          onChange={onRangeChange}
+          placement="bottomRight"
+          defaultValue={[
+            moment(dateRange.from, dateFormat),
+            moment(dateRange.to, dateFormat),
+          ]}
+        />
+      );
+    }
 
-    const dateFormat = 'YYYY/MM/DD HH:mm:ss';
-    return (
-      <RangePicker
-        allowClear={false}
-        presets={rangePresets}
-        showTime
-        format={dateFormat}
-        onChange={onRangeChange}
-        placement="bottomRight"
-        defaultValue={[
-          moment(dateRange.from, dateFormat),
-          moment(dateRange.to, dateFormat),
-        ]}
-      />
-    );
+    if (currTab === 'log-monitor') {
+      return <Button>下载</Button>;
+    }
+    return null;
   }, [currTab]);
 
   return (
@@ -280,8 +291,14 @@ const JobDetail = () => {
                 {(() =>
                   detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
               </Col>
+              <Col span={6} title={detailData?.mode}>
+                项目：{detailData?.mode}
+              </Col>
               <Col span={6} title={detailData?.image?.name}>
-                镜像：{detailData?.image?.name}
+                镜像：
+                <Tooltip title={detailData?.image?.name}>
+                  {detailData?.image?.name}
+                </Tooltip>
               </Col>
               <Col span={6} title={detailData?.source}>
                 资源规格：{detailData?.source}
@@ -323,6 +340,11 @@ const JobDetail = () => {
                   loading={loading}
                 />
               ),
+            },
+            {
+              key: 'log-monitor',
+              label: `日志`,
+              children: <LogMonitor />,
             },
           ]}
           onChange={onTabChange}
@@ -393,6 +415,7 @@ JobDetail.context = (props = {}) => {
   return (
     <Space>
       {(() => {
+        if (!statusName) return null;
         let icon = (
           <Icon
             style={{ fontSize: 18, marginRight: 5 }}

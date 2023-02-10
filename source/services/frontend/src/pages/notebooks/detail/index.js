@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-07 20:21:49
+ * @LastEditTime: 2023-02-10 17:59:15
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
@@ -281,7 +281,10 @@ const NotebookDetail = () => {
                   detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
               </Col>
               <Col span={6} title={detailData?.image?.name}>
-                镜像：{detailData?.image?.name}
+                镜像：
+                <Tooltip title={detailData?.image?.name}>
+                  {detailData?.image?.name}
+                </Tooltip>
               </Col>
               <Col span={6} title={detailData?.source}>
                 资源规格：{detailData?.source}
@@ -393,6 +396,7 @@ NotebookDetail.context = (props = {}) => {
   return (
     <Space>
       {(() => {
+        if (!statusName) return null;
         let icon = (
           <Icon
             style={{ fontSize: 18, marginRight: 5 }}
