@@ -10,6 +10,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import JobList from './list';
 import JobUpdate from './update';
+import JobDetail from './detail';
 
 const JobRoutes = () => (
   <Routes>
@@ -17,8 +18,9 @@ const JobRoutes = () => (
     <Route path="list" element={<JobList />} />
     <Route path="list/create" element={<JobUpdate />} />
     <Route path="list/update" element={<JobUpdate />} />
+    <Route path="list/detail" element={<JobDetail />} />
   </Routes>
 );
 export default JobRoutes;
 
-export const JobsPages = [JobList, JobUpdate, JobUpdate];
+export const JobsPages = [JobList, JobUpdate, JobUpdate, JobDetail];

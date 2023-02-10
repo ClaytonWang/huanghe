@@ -43,6 +43,12 @@ const owner = [
   'notebooks.list.create',
   'notebooks.list.edit',
   'notebooks.list.delete',
+
+  'jobs',
+  'jobs.list',
+  'jobs.list.create',
+  'jobs.list.edit',
+  'jobs.list.delete',
 ];
 // const user = [];
 const account = {
