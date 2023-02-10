@@ -10,7 +10,8 @@ from typing import List, Dict
 from fastapi import APIRouter, Depends, Request, HTTPException, status, Path
 from fastapi.responses import JSONResponse
 from models import Notebook, Status, Image
-from notebook.serializers import NotebookList, NotebookCreate, NotebookEdit, NotebookOp, NotebookDetail, EventItem, EventCreate
+from notebook.serializers import NotebookList, NotebookCreate, NotebookEdit, NotebookOp, NotebookDetail, EventItem, \
+    EventCreate
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from basic.common.common_model import Event
@@ -22,27 +23,27 @@ from utils.k8s_request import create_notebook_k8s, delete_notebook_k8s
 from utils.auth import operate_auth
 from collections import defaultdict
 
-
 router_notebook = APIRouter()
-COMMON="https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
+COMMON = "https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
+
 
 def format_notebook_detail(nb: Notebook):
     result = nb.dict()
     result['source'] = nb.get_str()
     result['project'] = {"id": nb.project_by_id,
-                         "name": nb.project_by,}
+                         "name": nb.project_by, }
 
     result['image'] = {"desc": "",
                        "name": nb.image,
-                       "custom": nb.custom,}
+                       "custom": nb.custom, }
     result['creator'] = {"id": nb.created_by_id,
-                         "username": nb.created_by,}
+                         "username": nb.created_by, }
     result['hooks'] = result['storage']
     result['grafana'] = {
-        'cpu' : nb.cpu_url(COMMON),
-        'ram' : nb.ram_url(COMMON),
-        'gpu' : nb.gpu_url(COMMON),
-        'vram' : nb.vram_url(COMMON),
+        'cpu': nb.cpu_url(COMMON),
+        'ram': nb.ram_url(COMMON),
+        'gpu': nb.gpu_url(COMMON),
+        'vram': nb.vram_url(COMMON),
     }
     return result
 
@@ -112,9 +113,8 @@ async def list_notebook(request: Request,
     project_list = await get_project_list(authorization)
     # print("project_list")
     # print(project_list)
-    # code_id_map = {x['code']: x['id'] for x in project_list}
-    res_proj_map = {x['id']: {'name': x['name']} for x in project_list}
-
+    code_id_map = {x['code']: x['id'] for x in project_list}
+    res_proj_map = {x['id']: {'name': x['name'], "id": x['id']} for x in project_list}
 
     # 用户可见项目
     if role_name != 'admin':
@@ -130,7 +130,7 @@ async def list_notebook(request: Request,
             # need_filter = True
         if 'project__code' in params_filter:
             project_code = params_filter.pop('project__code')
-            # params_filter['project_id'] = code_id_map.get(project_code)
+            params_filter['project_by_id'] = code_id_map.get(project_code)
         if 'role__name' in params_filter:
             role__name = params_filter.pop('role__name')
             # role_filter = set(role_userid_map.get(role__name, []))
@@ -404,15 +404,16 @@ async def delete_notebook(request: Request,
     await _notebook.delete()
 
 
-
 @router_notebook.get(
     '/{notebook_id}/events',
     description='Notebook事件列表',
     response_model=Page[EventItem],
 )
-async def list_notebook_event(query_params: QueryParameters = Depends(QueryParameters)):
+async def list_notebook_event(query_params: QueryParameters = Depends(QueryParameters),
+                              notebook_id: int = Path(..., ge=1, description="NotebookID")):
     params_filter = query_params.filter_
-    events = await paginate(Event.objects.filter(**params_filter), params=query_params.params)
+    events = await Event.find_notebook_events(notebook_id)
+    events = await paginate(events.filter(**params_filter), params=query_params.params)
     for i, v in enumerate(events.data):
         events.data[i] = EventItem.parse_obj(v.gen_pagation_event())
     return events
@@ -424,7 +425,6 @@ async def list_notebook_event(query_params: QueryParameters = Depends(QueryParam
 )
 async def create_notebook_event(ec: EventCreate,
                                 notebook_id: int = Path(..., ge=1, description="NotebookID")):
-
     _notebook = await Notebook.objects.select_related(['status']).get(pk=notebook_id)
     d = ec.dict()
     d.update({"status": _notebook.status.desc})

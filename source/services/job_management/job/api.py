@@ -337,7 +337,7 @@ async def operate_job(request: Request,
     # todo 状态还需要调整
     update_data = {}
     if action == 0:
-        if _job.status.name not in ['pending', 'running', 'stop_fail','on']:
+        if _job.status.name not in ['pending', 'run', 'stop_fail','completed']:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
         stat = await Status.objects.get(name='stop')
         update_data['status'] = stat.id
