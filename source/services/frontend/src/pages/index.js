@@ -11,6 +11,7 @@ import Bam from '@/pages/bam';
 import Settings from '@/pages/settings';
 import Storages from '@/pages/storages';
 import Notebooks from '@/pages/notebooks';
+import Jobs from '@/pages/jobs';
 import Overview from '@/pages/overview';
 import './index.less';
 
@@ -22,6 +23,7 @@ const Pages = () => (
       <Route path="settings/*" element={<Settings />} />
       <Route path="storages/*" element={<Storages />} />
       <Route path="notebooks/*" element={<Notebooks />} />
+      <Route path="jobs/*" element={<Jobs />} />
     </Route>
   </Routes>
 );

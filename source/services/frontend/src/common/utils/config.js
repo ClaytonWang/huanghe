@@ -46,31 +46,45 @@ module.exports = {
     storagesListDelete: 'delete|/storages/volume/:id',
     storagesListReset: 'post|/storages/volume/:id/reset',
 
+    // notebooks
     notebooksList: 'get|/notebook/notebooks',
     notebooksDetail: 'get|/notebook/notebooks/:id',
     notebooksListCreate: 'post|/notebook/notebooks',
     notebooksListAction: 'post|/notebook/notebooks/:id',
     notebooksListUpdate: 'put|/notebook/notebooks/:id',
     notebooksListDelete: 'delete|/notebook/notebooks/:id',
-    notebooksDetailEvent: 'get|/notebook/notebooks/:id/events',
+
+    // jobs
+    jobList: 'get|/job/jobs',
+    jobDetail: 'get|/job/jobs/:id',
+    jobListCreate: 'post|/job/jobs',
+    jobListAction: 'post|/job/jobs/:id',
+    jobListUpdate: 'put|/job/jobs/:id',
+    jobListDelete: 'delete|/job/jobs/:id',
 
     imagesList: 'get|/notebook/image',
     sourceList: 'get|/notebook/source',
   },
   breadcrumbConfig: {
     '/overview/list': '总览',
+
     '/bam/projects': '项目管理',
     '/bam/users': '用户管理',
-    '/settings/users': '用户列表',
 
+    '/settings/users': '用户列表',
     '/settings/account': '我的账号',
 
     '/storages/list': '存储列表',
 
     '/notebooks/list': 'Notebooks',
     '/notebooks/list/update': '编辑Notebook',
-    '/notebooks/list/create': '创建Notebook',
+    '/notebooks/list/create': '新建Notebook',
     '/notebooks/list/detail': 'Notebook详情',
+
+    '/jobs/list': 'Jobs',
+    '/jobs/list/update': '编辑Job',
+    '/jobs/list/create': '新建Job',
+    '/jobs/list/detail': 'Job详情',
   },
   menuItemsConfig: [
     {
@@ -94,6 +108,19 @@ module.exports = {
           key: 'notebooks.list',
           label: 'Notebook列表',
           permission: 'notebooks.list',
+        },
+      ],
+    },
+    {
+      key: 'jobs',
+      label: 'Job管理',
+      icon: 'jobs',
+      permission: 'jobs',
+      children: [
+        {
+          key: 'jobs.list',
+          label: 'Job列表',
+          permission: 'jobs.list',
         },
       ],
     },

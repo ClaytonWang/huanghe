@@ -3,7 +3,7 @@
  * @Date 2022-12-22 10:48:26
  * @LastEditors guanlin.li guanlin.li@digitalbrain.cn
  * @LastEditTime 2022-12-23 09:40:59
- * @Description Notebook新建/编辑页
+ * @Description Job 新建/编辑页
  */
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -32,16 +32,23 @@ import { genUniqueIdByPrefix, ID } from '@/common/utils/helper';
 import './index.less';
 
 const { Option } = Select;
+const { TextArea } = Input;
 
-const NotebooksUpdate = () => {
+const taskModels = [
+  { id: 0, name: '调试' },
+  { id: 1, name: '非调试' },
+];
+
+const JobsUpdate = () => {
   const [projectsDatasource, setProjectsDatasource] = useState([]);
   const [imagesDatasource, setImagesDatasource] = useState([]);
   const [sourceDatasource, setSourceDatasource] = useState([]);
   const [storagesDatasource, setStoragesDatasource] = useState([]);
   const [selectedStorages, setSelectedStorages] = useState([]);
+  const [taskModel, setTaskModel] = useState(0);
   const setContextProps = useContextProps();
   const [type, setType] = useState(CREATE);
-  const notebookUniqueID = useRef();
+  const uniqueID = useRef();
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -57,9 +64,9 @@ const NotebooksUpdate = () => {
     setSelectedStorages([...result]);
   };
 
-  const requestNotebook = async (params) => {
+  const requestJob = async (params) => {
     try {
-      const { result } = await api.notebooksDetail({ ...params });
+      const { result } = await api.jobDetail({ ...params });
       form.setFieldsValue(result);
       updateSelectedStorage(result);
     } catch (error) {
@@ -129,18 +136,18 @@ const NotebooksUpdate = () => {
       console.log(error);
     }
   };
-  const saveNotebook = async (values) => {
+  const saveJob = async (values) => {
     try {
-      await api.notebooksListCreate(values);
+      await api.jobListCreate(values);
       message.success('创建成功！');
       backToList();
     } catch (error) {
       console.log(error);
     }
   };
-  const updateNotebook = async (values) => {
+  const updateJob = async (values) => {
     try {
-      await api.notebooksListUpdate(values);
+      await api.jobListUpdate(values);
       message.success('保存成功!');
       backToList();
     } catch (error) {
@@ -149,7 +156,7 @@ const NotebooksUpdate = () => {
   };
 
   const backToList = () => {
-    navigate('/notebooks/list', { state: null });
+    navigate('/jobs/list', { state: null });
   };
   const updateStorage = (changedFields, allFields) => {
     const changedStorage = changedFields.find((field) =>
@@ -180,9 +187,9 @@ const NotebooksUpdate = () => {
     const { id = null } = get(location, 'state.params', {});
     console.log(values);
     if (type === CREATE) {
-      saveNotebook(values);
+      saveJob(values);
     } else {
-      updateNotebook({ id, ...values });
+      updateJob({ id, ...values });
     }
   };
   const handleSubmitFailed = ({ errorFields }) => {
@@ -203,7 +210,7 @@ const NotebooksUpdate = () => {
     requestImages();
     requestSource();
     requestStorages();
-    notebookUniqueID.current = new ID();
+    uniqueID.current = new ID();
     setContextProps({
       onCancel: handleCancelClicked,
       onSubmit: () => {
@@ -216,16 +223,12 @@ const NotebooksUpdate = () => {
     const { id = null } = get(location, 'state.params', {});
     const type = get(location, 'state.type');
     if (type === UPDATE) {
-      requestNotebook({ id });
+      requestJob({ id });
     } else {
       form.setFieldsValue({
         project: projectDefaultValue,
         image: imageDefaultValue,
-        hooks: [
-          {
-            path: '/home/jovyan',
-          },
-        ],
+        task_model: taskModel,
       });
     }
     setType(type);
@@ -375,6 +378,26 @@ const NotebooksUpdate = () => {
       </Select>
     );
   };
+
+  const JobModel = ({ value, onChange }) => {
+    const onSelectChange = (value) => {
+      onChange?.(value);
+      setTaskModel(value);
+    };
+    return (
+      <Select
+        placeholder="请选择任务模式"
+        defaultValue={value || 0}
+        onChange={onSelectChange}
+      >
+        {taskModels.map(({ id, name = '-' }) => (
+          <Option key={id} value={id}>
+            {name}
+          </Option>
+        ))}
+      </Select>
+    );
+  };
   return (
     <div className="notebooks-update">
       <Form
@@ -390,7 +413,7 @@ const NotebooksUpdate = () => {
           name="name"
           label="名称"
           rules={[
-            { required: true, message: '请输入Notebook名称' },
+            { required: true, message: '请输入Job名称' },
             {
               pattern: /^[a-zA-z][0-9a-zA-Z-]*$/,
               message: '字母开头，可以是字母、数字、中划线组合',
@@ -402,7 +425,7 @@ const NotebooksUpdate = () => {
             icon: <InfoCircleOutlined />,
           }}
         >
-          <Input placeholder="请输入Notebook名称" />
+          <Input placeholder="请输入Job名称" />
         </Form.Item>
         <Form.Item
           name="project"
@@ -411,29 +434,10 @@ const NotebooksUpdate = () => {
         >
           <ProjectSelect />
         </Form.Item>
-        <Form.List
-          name="hooks"
-          rules={[
-            {
-              validator: async (_, hooks) => {
-                if (!hooks || hooks.length < 1) {
-                  return Promise.reject(new Error('至少一个挂载'));
-                }
-              },
-            },
-          ]}
-        >
+        <Form.List name="hooks">
           {(fields = [], { add, remove }, { errors }) => (
             <>
               <Form.Item label="存储挂载" wrapperCol={{ push: 2, xs: 22 }}>
-                {
-                  <HooksItem
-                    key={uniqueId('hook-')}
-                    {...fields[0]}
-                    selectedStorages={selectedStorages}
-                    disabledItems={['path']}
-                  />
-                }
                 {drop([...fields], 1).map((field) => (
                   <HooksItem
                     key={uniqueId('hook-')}
@@ -448,7 +452,7 @@ const NotebooksUpdate = () => {
                     add({
                       path: `/home/jovyan/${genUniqueIdByPrefix(
                         'vol-',
-                        notebookUniqueID.current
+                        uniqueID.current
                       )}`,
                     })
                   }
@@ -462,6 +466,27 @@ const NotebooksUpdate = () => {
           )}
         </Form.List>
         <Form.Item
+          name="task_model"
+          label="模式"
+          rules={[{ required: true, message: '请选择模式' }]}
+        >
+          <JobModel />
+        </Form.Item>
+        {taskModel === 1 && (
+          <Form.Item
+            name="start_command"
+            label="启动命令"
+            tooltip={{
+              title: '...',
+              icon: <InfoCircleOutlined />,
+            }}
+            rules={[{ required: true, message: '请输入启动命令' }]}
+          >
+            <TextArea rows={4} placeholder="输入..." />
+          </Form.Item>
+        )}
+
+        <Form.Item
           name="image"
           label="镜像"
           rules={[
@@ -472,6 +497,17 @@ const NotebooksUpdate = () => {
           ]}
         >
           <CustomImage />
+        </Form.Item>
+        <Form.Item
+          name="work_dir"
+          label="工作路径"
+          tooltip={{
+            title: '输入容器的工作目录',
+            icon: <InfoCircleOutlined />,
+          }}
+          rules={[{ required: false }]}
+        >
+          <Input placeholder="输入容器的工作目录" />
         </Form.Item>
         <Form.Item
           name="source"
@@ -496,7 +532,7 @@ const NotebooksUpdate = () => {
     </div>
   );
 };
-NotebooksUpdate.context = ({ onCancel, onSubmit }) => (
+JobsUpdate.context = ({ onCancel, onSubmit }) => (
   <Space>
     <Button onClick={onCancel}>取消</Button>
     <Button type="primary" onClick={onSubmit}>
@@ -505,6 +541,6 @@ NotebooksUpdate.context = ({ onCancel, onSubmit }) => (
   </Space>
 );
 
-NotebooksUpdate.path = ['/notebooks/list/update', '/notebooks/list/create'];
+JobsUpdate.path = ['/jobs/list/update', '/jobs/list/create'];
 
-export default NotebooksUpdate;
+export default JobsUpdate;

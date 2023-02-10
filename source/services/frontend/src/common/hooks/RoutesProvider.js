@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-03 16:00:40
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-03 20:05:14
+ * @LastEditTime: 2023-02-09 19:07:20
  * @FilePath: /huanghe/source/services/frontend/src/providers/RoutesProvider.js
  * @Description: RoutesProvider
  */
@@ -10,6 +10,7 @@ import { createContext, useContext, useMemo, useState, useEffect } from 'react';
 import { matchPath, useLocation } from 'react-router';
 import { pageSetToRoutes } from '@/common/utils/helper';
 import { NotebooksPages } from '@/pages/notebooks/routes';
+import { JobsPages } from '@/pages/jobs/routes';
 
 export const RoutesContext = createContext();
 
@@ -68,7 +69,7 @@ export const RoutesProvider = ({ children }) => {
   const [currentContextProps, setCurrentContextProps] = useState(null);
 
   const routesMap = useMemo(() => {
-    const pages = [...NotebooksPages];
+    const pages = [...NotebooksPages, ...JobsPages];
     return pageSetToRoutes(pages);
   }, []);
 

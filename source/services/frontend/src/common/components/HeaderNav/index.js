@@ -100,7 +100,7 @@ const HeaderNav = () => {
         </div>
         <div className="user-info">
           <Icon component={Icons.account} />
-          <Dropdown overlay={menu}>
+          <Dropdown menu={menu}>
             <a onClick={(e) => e.preventDefault()}>
               <Space>
                 {user.username || null}
