@@ -7,7 +7,7 @@
 """
 import re
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from pydantic import BaseModel, Field
 from pydantic import validator
@@ -31,6 +31,11 @@ class UserStr(BaseModel):
     id: int
     username: str = None
 
+class Grafana(BaseModel):
+    cpu: str
+    ram: str
+    gpu: str
+    vram: str
 
 class ProjectStr(BaseModel):
     id: int
@@ -57,7 +62,7 @@ class Creator(BaseModel):
 
 
 class Project(BaseModel):
-    id: str
+    id: int
     name: Optional[str]
 
 
@@ -81,25 +86,25 @@ class JobList(BaseModel):
     project: Optional[ProjectStr]
     image: Image
     url: Optional[str]
-    created_at: Optional[datetime]
-    updated_at: Optional[datetime]
-    task_model_name: str
+    created_at: Union[datetime, str, None]
+    updated_at: Union[datetime, str, None]
+    mode: str
 
     @validator('created_at', 'updated_at')
     def format_dt(cls, dt):
+        if isinstance(dt, str):
+            return dt
         return dt_to_string(dt, '%Y-%m-%d')
 
 
 class JobCreate(BaseModel):
     name: str = Field(..., max_length=20)
     project: Project
-    source_id: int
-    task_model: int
+    source: str
     start_command: str
-    image_type: int
-    image_name: str = Field(..., max_length=100)
+    mode: str
+    image: Image
     work_dir: str
-
     hooks: List[HookItem] = []
 
     @validator('name')
@@ -111,19 +116,20 @@ class JobDetail(BaseModel):
     id: int
     name: str
     creator: Creator
-    created_at: Optional[datetime]
+    created_at: Union[datetime, str, None]
     status: StatusItem
     project: Project
-    image_type: int
-    image_name: str
+    image: Image
     source: str = None
     hooks: List[HookItem]
-    updated_at: Optional[datetime]
-    task_model_name: str
-    task_model: int
+    updated_at: Union[datetime, str, None]
+    mode: str
+    grafana: Optional[Grafana]
 
     @validator('created_at', 'updated_at')
     def format_dt(cls, dt):
+        if isinstance(dt, str):
+            return dt
         return dt_to_string(dt, '%Y-%m-%d')
 
 class JobEdit(BaseModel):

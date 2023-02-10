@@ -22,7 +22,7 @@ from basic.middleware.rsp import add_common_response_data
 from basic.utils.log import configure_logging
 from models import startup_event, shutdown_event
 from job.api import router_job
-from utils.auth import verify_token
+from basic.middleware.account_getter import verify_token
 
 # oauth2_scheme = OFOAuth2PasswordBearer(token_url="/v1/auth/login")
 # oauth2_scheme = OFOAuth2PasswordBearer(token_url=USER_SERVICE_PATH + "/v1/auth/login")
