@@ -16,13 +16,14 @@ from basic.common.env_variable import get_string_variable
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project
-from job.serializers import JobCreate, JobDetail, JobList, JobEdit, JobOp
+from job.serializers import JobCreate, JobDetail, JobList, JobEdit, JobOp, EventItem
 from models import Job, Status, Source
 from utils.auth import operate_auth
 from utils.k8s_request import create_job_k8s, delete_job_k8s
 from utils.storage_request import volume_check
 from utils.user_request import get_user_list, get_project_list, project_check
 from basic.middleware.account_getter import ADMIN, USER, OWNER
+from basic.common.common_model import Event
 
 router_job = APIRouter()
 
@@ -310,3 +311,18 @@ async def delete_job(request: Request,
     # if response.status != 200:
     #     _job.status = None
     await _job.delete()
+
+
+@router_job.get(
+    '/{job_id}/events',
+    description='Job事件列表',
+    response_model=Page[EventItem],
+)
+async def list_job_event(query_params: QueryParameters = Depends(QueryParameters),
+                              job_id: int = Path(..., ge=1, description="JobID")):
+    params_filter = query_params.filter_
+    # events = await Event.find_notebook_events(notebook_id)
+    events = await paginate(Event.objects.filter(**params_filter), params=query_params.params)
+    for i, v in enumerate(events.data):
+        events.data[i] = EventItem.parse_obj(v.gen_pagation_event())
+    return events
