@@ -1,5 +1,5 @@
 import { useSearchParams, Link } from 'react-router-dom';
-import { Modal, Spin, Table, Tooltip, Dropdown } from 'antd';
+import { Modal, Spin, Table, Tooltip, Dropdown, Space } from 'antd';
 import qs from 'qs';
 import { get } from 'lodash';
 import Icon, { EllipsisOutlined } from '@ant-design/icons';
@@ -72,14 +72,22 @@ const NotebooksTable = ({
     {
       title: '镜像',
       dataIndex: 'image',
-      width: '15%',
+      width: '20%',
+      ellipsis: {
+        showTitle: false,
+      },
       render(value) {
-        return get(value, 'name', '-');
+        const _value = get(value, 'name', '-');
+        return (
+          <Tooltip placement="topLeft" title={_value}>
+            {_value}
+          </Tooltip>
+        );
       },
     },
     {
       title: '资源',
-      width: '15%',
+      width: '10%',
       dataIndex: 'source',
       render(value) {
         return value || '-';
@@ -157,7 +165,7 @@ const NotebooksTable = ({
         ];
         return (
           <Auth required="notebooks.list.edit">
-            <span className="dbr-table-actions">
+            <Space className="dbr-table-actions">
               <AuthButton
                 required="notebooks.list"
                 type="link"
@@ -224,12 +232,12 @@ const NotebooksTable = ({
                   停止
                 </AuthButton>
               )}
-              <Dropdown menu={{ items }}>
+              <Dropdown menu={{ items }} placement="bottom">
                 <a>
                   <EllipsisOutlined style={{ fontSize: 24 }} />
                 </a>
               </Dropdown>
-            </span>
+            </Space>
           </Auth>
         );
       },

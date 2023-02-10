@@ -6,7 +6,7 @@
  * @Description Notebook详情
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
-const utils = require('../../utils');
+const utils = require('../../../utils');
 module.exports = function (req, res) {
   utils.ok(req, res, {
     id: '1', // notebookId，字符串

@@ -88,16 +88,29 @@ const JobsTable = ({
       },
     },
     {
+      title: '任务模式',
+      dataIndex: 'mode',
+      width: '10%',
+    },
+    {
       title: '镜像',
       dataIndex: 'image',
-      width: '15%',
+      width: '20%',
+      ellipsis: {
+        showTitle: false,
+      },
       render(value) {
-        return get(value, 'name', '-');
+        const _value = get(value, 'name', '-');
+        return (
+          <Tooltip placement="topLeft" title={_value}>
+            {_value}
+          </Tooltip>
+        );
       },
     },
     {
       title: '资源',
-      width: '15%',
+      width: '10%',
       dataIndex: 'source',
       render(value) {
         return value || '-';
@@ -292,7 +305,7 @@ const JobsTable = ({
           <Space>
             <StartStopBtn />
             {taskModel === DEBUG ? <DebugBtn /> : <EditBtn />}
-            <Dropdown menu={{ items }} placement="bottomRight">
+            <Dropdown menu={{ items }} placement="bottom">
               <a>
                 <EllipsisOutlined style={{ fontSize: 24 }} />
               </a>

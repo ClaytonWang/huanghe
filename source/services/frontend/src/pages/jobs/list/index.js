@@ -14,6 +14,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import JobsTable from './JobsTable';
 import {
   CREATE,
+  COPY,
   JOB_ACTION,
   START,
   STOP,
@@ -156,10 +157,10 @@ const JobList = () => {
     });
   };
   const handleCopyClicked = (values) => {
-    navigate(CREATE, {
+    navigate(COPY, {
       state: {
         params: values,
-        type: CREATE,
+        type: COPY,
       },
     });
   };
