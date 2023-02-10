@@ -141,3 +141,12 @@ class JobEdit(BaseModel):
     work_dir: str
     hooks: List[HookItem] = []
     source_id: int
+
+class StatusItemOnlyDesc(BaseModel):
+    desc: str = None
+
+class EventItem(BaseModel):
+    id: Optional[int]
+    status: StatusItemOnlyDesc
+    name: Optional[str] = ""
+    time: Optional[datetime]
