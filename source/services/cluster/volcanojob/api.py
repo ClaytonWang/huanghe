@@ -38,7 +38,7 @@ def update_status(vspr: VolcanoStatusPostReq):
 #
 @router_vcjob.delete(
     '',
-    description='删除notebook',
+    description='删除vcjob',
 )
 def delete_vcjob(vjdr: VolcanoJobDeleteReq):
     cc.delete_vcjob(vjdr)
