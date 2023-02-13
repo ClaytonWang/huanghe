@@ -146,7 +146,7 @@ async def list_notebook(request: Request,
 
     result = await paginate(Notebook.objects.select_related(
         'status'
-    ).filter(**params_filter), params=query_params.params)
+    ).order_by(Notebook.updated_at.desc()).filter(**params_filter), params=query_params.params)
     result = result.dict()
     data = result['data']
 
