@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-10 18:19:24
+ * @LastEditTime: 2023-02-13 16:38:57
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -22,20 +22,30 @@ import {
   DatePicker,
   Button,
 } from 'antd';
-import { useAuth } from '@/common/hooks/useAuth';
 import Icon from '@ant-design/icons';
 import {
   ChartMonitor,
   EventMonitor,
   AuthButton,
   LogMonitor,
+  Auth,
 } from '@/common/components';
 import { get } from 'lodash';
-
-import { purifyDeep, transformDate } from '@/common/utils/helper';
+import {
+  purifyDeep,
+  transformDate,
+  getStatusName,
+} from '@/common/utils/helper';
 import api from '@/common/api';
 import qs from 'qs';
-import { USER, JOB_ACTION, START, STOP, UPDATE } from '@/common/constants';
+import {
+  JOB_ACTION,
+  START,
+  STOP,
+  UPDATE,
+  DEBUG,
+  COPY,
+} from '@/common/constants';
 import Icons from '@/common/components/Icon';
 import { useContextProps } from '@/common/hooks/RoutesProvider';
 import moment from 'moment';
@@ -149,7 +159,7 @@ const JobDetail = () => {
       console.log(error);
     }
   };
-  const handleStopClicked = async (record) => {
+  const onStop = async (record) => {
     try {
       const { id } = record;
       await api.jobListAction({ id, action: JOB_ACTION[STOP] });
@@ -158,7 +168,19 @@ const JobDetail = () => {
       console.log(error);
     }
   };
-  const handleEditClicked = (values) => {
+
+  const handleStopClicked = (record) => {
+    Modal.confirm({
+      title: '可能会导致数据丢失，是否要停止该Job服务？',
+      okText: '停止',
+      cancelText: '取消',
+      onOk: () => {
+        onStop(record);
+      },
+    });
+  };
+
+  const onEdit = (values) => {
     navigate('/jobs/list/update', {
       state: {
         params: values,
@@ -167,7 +189,23 @@ const JobDetail = () => {
     });
   };
 
-  const deleteJob = async (record) => {
+  const handleEditClicked = (record) => {
+    onEdit(record);
+  };
+
+  const onCopy = (values) => {
+    navigate(`/jobs/list/copy`, {
+      state: {
+        params: values,
+        type: COPY,
+      },
+    });
+  };
+  const handleCopyClicked = (record) => {
+    onCopy(record);
+  };
+
+  const onDelete = async (record) => {
     const { id } = record;
     try {
       await api.jobListDelete({ id });
@@ -178,14 +216,14 @@ const JobDetail = () => {
     }
   };
 
-  const handleDelete = (record) => {
+  const handleDeleteClicked = (record) => {
     Modal.confirm({
       title: '确定要删除该Job服务吗？',
       okText: '删除',
       okType: 'danger',
       cancelText: '取消',
       onOk: () => {
-        deleteJob(record);
+        onDelete(record);
       },
     });
   };
@@ -211,7 +249,8 @@ const JobDetail = () => {
       handleStartClicked,
       handleStopClicked,
       handleEditClicked,
-      handleDelete,
+      handleCopyClicked,
+      handleDeleteClicked,
       detail: detailData,
     });
   }, [detailData]);
@@ -359,163 +398,189 @@ JobDetail.context = (props = {}) => {
     handleStartClicked,
     handleStopClicked,
     handleEditClicked,
-    handleDelete,
+    handleOpenClicked,
+    handleCopyClicked,
+    handleDeleteClicked,
     detail,
   } = props;
-  const statusName = get(detail, 'status.name');
+
   const statusDesc = get(detail, 'status.desc');
+  const _sname = get(detail, 'status.name');
+  const statusName = getStatusName(_sname);
+  const taskModel = get(detail, 'mode');
+
+  const StartStopBtn = (props = {}) => {
+    if (
+      statusName === 'stopped' ||
+      _sname === 'run_fail' ||
+      _sname === 'start_fail'
+    ) {
+      return (
+        <AuthButton
+          required="jobs.list.edit"
+          onClick={() => {
+            handleStartClicked(detail);
+          }}
+          condition={[
+            (user) => get(detail, 'creator.username') === get(user, 'username'),
+          ]}
+          {...props}
+        >
+          启动
+        </AuthButton>
+      );
+    }
+    if (statusName !== 'stopped') {
+      return (
+        <AuthButton
+          required="jobs.list.edit"
+          onClick={() => {
+            handleStopClicked(detail);
+          }}
+          condition={[
+            () => ['stop_fail', 'stop', 'completed'].indexOf(statusName) < 0,
+            (user) => get(detail, 'creator.username') === get(user, 'username'),
+          ]}
+          {...props}
+        >
+          停止
+        </AuthButton>
+      );
+    }
+  };
+
+  const DebugBtn = (props = {}) => (
+    <AuthButton
+      required="jobs.list"
+      type="link"
+      {...props}
+      onClick={() => {
+        handleOpenClicked(detail);
+      }}
+      condition={[
+        () => ['running'].indexOf(statusName) > -1,
+        (user) => get(detail, 'creator.username') === get(user, 'username'),
+      ]}
+    >
+      {taskModel}
+    </AuthButton>
+  );
+
+  const CopyBtn = (props = {}) => (
+    <AuthButton
+      required="jobs.list.edit"
+      type="link"
+      {...props}
+      onClick={() => {
+        handleCopyClicked(detail);
+      }}
+      condition={[
+        () => ['error', 'stopped', 'completed'].indexOf(statusName) > -1,
+        () => ['stop_fail'].indexOf(_sname) < 0,
+        (user) => get(detail, 'creator.username') === get(user, 'username'),
+      ]}
+    >
+      复制
+    </AuthButton>
+  );
+
+  const EditBtn = (props = {}) => (
+    <AuthButton
+      required="jobs.list.edit"
+      type="link"
+      {...props}
+      onClick={() => {
+        handleEditClicked(detail);
+      }}
+      condition={[
+        () => ['error', 'stopped', 'completed'].indexOf(statusName) > -1,
+        () => ['stop_fail'].indexOf(_sname) < 0,
+        (user) => get(detail, 'creator.username') === get(user, 'username'),
+      ]}
+    >
+      编辑
+    </AuthButton>
+  );
+
+  const DeleteBtn = () => (
+    <AuthButton
+      required="jobs.list.edit"
+      type="link"
+      onClick={() => {
+        handleDeleteClicked(detail);
+      }}
+      condition={[
+        () => ['stopped', 'error', 'completed'].indexOf(statusName) > -1,
+        () => ['stop_fail'].indexOf(_sname) < 0,
+        (user) => get(detail, 'creator.username') === get(user, 'username'),
+      ]}
+    >
+      删除
+    </AuthButton>
+  );
+  let items = [
+    {
+      key: 'copy',
+      label: <CopyBtn />,
+    },
+    {
+      key: 'delete',
+      label: <DeleteBtn />,
+    },
+  ];
+
+  if (taskModel === DEBUG) {
+    items.unshift({
+      key: 'edit',
+      label: <EditBtn />,
+    });
+  }
+
   const menuProps = {
-    items: [
-      {
-        label: (
-          <AuthButton
-            required="jobs.list.edit"
-            type="link"
-            onClick={() => {
-              handleEditClicked(detail);
-            }}
-            condition={[
-              () => ['stopped'].indexOf(statusName) > -1,
-              (user) =>
-                get(detail, 'creator.username') === get(user, 'username'),
-            ]}
-          >
-            编辑
-          </AuthButton>
-        ),
-        key: 'edit',
-      },
-      {
-        label: (
-          <AuthButton
-            required="jobs.list.edit"
-            type="link"
-            onClick={() => {
-              handleDelete(detail);
-            }}
-            condition={[
-              () => ['stopped', 'error'].indexOf(statusName) > -1,
-              (user) => {
-                if (user.role.name === USER) {
-                  return (
-                    get(detail, 'creator.username') === get(user, 'username')
-                  );
-                }
-                return true;
-              },
-            ]}
-          >
-            删除
-          </AuthButton>
-        ),
-        key: 'delete',
-      },
-    ],
+    items,
   };
   return (
-    <Space>
-      {(() => {
-        if (!statusName) return null;
-        let icon = (
-          <Icon
-            style={{ fontSize: 18, marginRight: 5 }}
-            component={Icons[statusName]}
-          />
-        );
-        if (/^(stop|start|pending)$/.test(statusName)) {
-          icon = (
-            <Spin
-              indicator={
-                <Icon
-                  style={{ fontSize: 16, marginRight: 5 }}
-                  component={Icons[statusName]}
-                  spin
-                  rotate={(/pending/.test(statusName) && 180) || 0}
-                />
-              }
+    <Auth required="jobs.list.edit">
+      <Space>
+        {(() => {
+          if (!statusName) return null;
+          let icon = (
+            <Icon
+              style={{ fontSize: 18, marginRight: 5 }}
+              component={Icons[statusName]}
             />
           );
-        }
-        return (
-          <label>
-            <Tooltip title={statusDesc}>{icon}</Tooltip>
-            {statusDesc}
-          </label>
-        );
-      })()}
-      <Dropdown.Button menu={menuProps}>
-        {statusName === 'stopped' && (
-          <AuthButton
-            required="jobs.list.edit"
-            type="text"
-            onClick={() => {
-              handleStartClicked(detail);
-            }}
-            condition={[
-              (user) => {
-                if (user.role.name === USER) {
-                  return (
-                    get(detail, 'creator.username') === get(user, 'username')
-                  );
+          if (/^(stop|start|pending)$/.test(statusName)) {
+            icon = (
+              <Spin
+                indicator={
+                  <Icon
+                    style={{ fontSize: 16, marginRight: 5 }}
+                    component={Icons[statusName]}
+                    spin
+                    rotate={(/pending/.test(statusName) && 180) || 0}
+                  />
                 }
-                return true;
-              },
-            ]}
-          >
-            启动
-          </AuthButton>
-        )}
-        {statusName !== 'stopped' && (
-          <AuthButton
-            required="jobs.list.edit"
-            type="text"
-            style={(() => {
-              if (statusName === 'error') {
-                return { color: '#00000040' };
-              }
-            })()}
-            onClick={() => {
-              const { user } = useAuth();
-              if (get(detail, 'creator.username') === get(user, 'username')) {
-                handleStopClicked(detail);
-              }
-            }}
-            condition={[
-              () => ['error', 'stop'].indexOf(statusName) < 0,
-              (user) => {
-                if (user.role.name === USER) {
-                  return (
-                    get(detail, 'creator.username') === get(user, 'username')
-                  );
-                }
-                return true;
-              },
-            ]}
-          >
-            停止
-          </AuthButton>
-        )}
-      </Dropdown.Button>
-      <AuthButton
-        required="jobs.list"
-        type="primary"
-        onClick={() => {
-          const { url } = detail;
-          window.open(url);
-        }}
-        condition={[
-          () => ['running'].indexOf(statusName) > -1,
-          (user) => {
-            if (user.role.name === USER) {
-              return get(detail, 'creator.username') === get(user, 'username');
-            }
-            return true;
-          },
-        ]}
-      >
-        打开
-      </AuthButton>
-    </Space>
+              />
+            );
+          }
+          return (
+            <label>
+              <Tooltip title={statusDesc}>{icon}</Tooltip>
+              {statusDesc}
+            </label>
+          );
+        })()}
+        <Dropdown.Button menu={menuProps}>
+          {taskModel === DEBUG ? (
+            <DebugBtn type="text" />
+          ) : (
+            <EditBtn type="text" />
+          )}
+        </Dropdown.Button>
+        <StartStopBtn type="primary" />
+      </Space>
+    </Auth>
   );
 };
 

@@ -9,21 +9,22 @@
 from __future__ import annotations
 
 import ormar
+from basic.utils.dt_format import dt_to_string
 
 from basic.common.base_model import DateModel, GenericDateModel
 from models import DB, META
-
+from typing import List
 
 # 状态
-# JOB_STATUS_PENDING = "pending"  # 排队中     3
-# JOB_STATUS_RUN = "run"  # 运行中    11
-# JOB_STATUS_STOP = "stop"  # 停止中       2
-# JOB_STATUS_START_FAIL = "start_fail"  # 启动失败  7
-# JOB_STATUS_RUN_FAIL = "run_fail"  # 运行失败  8
-# JOB_STATUS_STOP_FAIL = "stop_fail"  # 停止失败    9
-# JOB_STATUS_COMPLETED = "completed"  # 已完成       10
-# JOB_STATUS_STOPPED = "stopped"  # 已停止 5
-
+# JOB_STATUS_PENDING = "pending"  # 排队中
+# JOB_STATUS_RUNNING = "running"  # 已启动(运行中)
+# JOB_STATUS_STOP = "stop"  # 停止中
+# JOB_STATUS_START_FAIL = "start_fail"  # 启动失败
+# JOB_STATUS_RUN_FAIL = "run_fail"  # 运行失败
+# JOB_STATUS_STOP_FAIL = "stop_fail"  # 停止失败
+# JOB_STATUS_ON = "on"  # 已完成
+# JOB_STATUS_STOPPED = "stopped"  # 已停止
+COMMON = "https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
 
 class Status(ormar.Model):
     class Meta(ormar.ModelMeta):
@@ -72,21 +73,112 @@ class Job(GenericDateModel):
         database = DB
         orders_by = ['-id']
 
-    name: str = ormar.String(max_length=20, comnet='名称')
+    name: str = ormar.String(max_length=20, comment='名称')
     storage: str = ormar.JSON(comment='存储信息')
-    task_model: int = ormar.Integer(default=0, comment='任务模式，0：调试，1：非调试')
+    mode: str = ormar.String(max_length=40)
     start_command: str = ormar.Text(comment='启动命令')
-    image_type: int = ormar.Integer(default=0, comment='镜像类型，0：官方镜像，1：自定义镜像')
-    image_name: str = ormar.String(max_length=100, comment='镜像名称')
+
+    custom: bool = ormar.Boolean(default=False)
+    image: str = ormar.String(max_length=150, comment='镜像名称')
+
     status: Status = ormar.ForeignKey(Status, related_name='job_status')
     work_dir: str = ormar.String(max_length=100, comment='工作目录')
-    source_id: int = ormar.Integer(comment='source表id逻辑关联')
-    k8s_info:str = ormar.JSON(comment="集群信息")
+    k8s_info: str = ormar.JSON(comment="集群信息")
 
-    def get_task_model_name(self):
-        if self.task_model == 0:
-            return "调试"
-        if self.task_model == 1:
-            return "非调试"
-        return self.task_model
+    cpu: int = ormar.Integer(comment='CPU数量')
+    memory: int = ormar.Integer(comment='存储容量G')
+    gpu: int = ormar.Integer(comment='GPU数量')
+    type: str = ormar.String(max_length=40, default='', comment='CPU/GPU类型')
+    url: str = ormar.String(max_length=160, comment='url地址', nullable=True)
 
+
+    @classmethod
+    async def all_jobs(cls):
+        return cls.objects.filter()
+
+    @classmethod
+    async def self_projects(cls, project_ids: List[int]):
+        return cls.objects.filter((cls.project_by_id << project_ids))
+
+    @property
+    def namespace_name(self):
+        return f"{self.k8s_info.get('namespace')}"
+
+    @property
+    def pod_name(self):
+        return f"{self.k8s_info.get('name')}-0"
+
+    @property
+    def cpu_url(self):
+        return f"{COMMON}orgId=1&var-namespace={self.namespace_name}&var-cluster=&var-job={self.pod_name}&panelId=4"
+
+    @property
+    def gpu_url(self):
+        if self.gpu > 0:
+            return f"{COMMON}orgId=1&var-namespace={self.namespace_name}&var-cluster=&var-job={self.pod_name}&panelId=8"
+        else:
+            return ""
+
+    @property
+    def ram_url(self):
+        return f"{COMMON}orgId=1&var-namespace={self.namespace_name}&var-cluster=&var-job={self.pod_name}&panelId=6"
+
+    @property
+    def vram_url(self):
+        if self.gpu > 0:
+            return f"{COMMON}orgId=1&var-namespace={self.namespace_name}&var-cluster=&var-job={self.pod_name}&panelId=12"
+        else:
+            return ""
+
+
+
+    @property
+    def source(self):
+        if self.gpu:
+            return f"GPU {self.gpu}*{self.type} {self.cpu}C {self.memory}G"
+        else:
+            return f"CPU {self.cpu}C {self.memory}G"
+
+    def gen_job_pagation_response(self):
+        return {
+            "id": self.id,
+            "status": {"code": self.status.code,
+                       "name": self.status.name,
+                       "desc": self.status.desc,},
+            "name": self.name,
+            "source": self.source,
+            "creator": {"id": self.created_by_id,
+                        "username": self.created_by,},
+            "project": {"id": self.project_by_id,
+                        "name": self.project_by,},
+            "image": {"name": self.image,
+                      "custom": self.custom,},
+            "url": self.url,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "mode": self.mode,
+        }
+
+    def gen_job_detail_response(self):
+        return {
+            "id": self.id,
+            "status": {"code": self.status.code,
+                       "name": self.status.name,
+                       "desc": self.status.desc, },
+            "name": self.name,
+            "creator": {"id": self.created_by_id,
+                        "username": self.created_by,},
+            "project": {"id": self.project_by_id,
+                        "name": self.project_by,},
+            "image": {"name": self.image,
+                      "custom": self.custom,},
+            "source": self.source,
+            "mode": self.mode,
+            "updated_at": self.updated_at,
+            "created_at": self.created_at,
+            "hooks": self.storage,
+            "grafana": {"cpu": self.cpu_url,
+                        "gpu": self.gpu_url,
+                        "ram": self.ram_url,
+                        "vram": self.vram_url,},
+        }

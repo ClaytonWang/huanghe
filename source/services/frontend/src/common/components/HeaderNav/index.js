@@ -7,7 +7,6 @@ import {
   Layout,
   Dropdown,
   Space,
-  Menu,
   Modal,
   Select,
   Input,
@@ -85,12 +84,16 @@ const HeaderNav = () => {
   const handleAccountCancel = () => {
     closeAccountModal();
   };
-  const menu = (
-    <Menu onClick={handleDropdownClicked}>
-      <Menu.Item key="account">个人信息</Menu.Item>
-      <Menu.Item key="logout">退出登陆</Menu.Item>
-    </Menu>
-  );
+  const items = [
+    {
+      key: 'account',
+      label: '个人信息',
+    },
+    {
+      key: 'logout',
+      label: '退出登陆',
+    },
+  ];
   return (
     <>
       <Header className="dbr-header">
@@ -100,7 +103,7 @@ const HeaderNav = () => {
         </div>
         <div className="user-info">
           <Icon component={Icons.account} />
-          <Dropdown menu={menu}>
+          <Dropdown menu={{ items, onClick: handleDropdownClicked }}>
             <a onClick={(e) => e.preventDefault()}>
               <Space>
                 {user.username || null}

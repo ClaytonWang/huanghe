@@ -3,28 +3,11 @@ import { Modal, Spin, Table, Tooltip, Dropdown, Space } from 'antd';
 import qs from 'qs';
 import { get } from 'lodash';
 import Icon, { EllipsisOutlined } from '@ant-design/icons';
-import { transformDate } from '@/common/utils/helper';
+import { transformDate, getStatusName } from '@/common/utils/helper';
 import { AuthButton, Auth } from '@/common/components';
 import Icons from '@/common/components/Icon';
-import { USER } from '@/common/constants';
+import { DEBUG } from '@/common/constants';
 
-const DEBUG = '调试';
-
-const getStatusName = (value) => {
-  let status = value;
-  // eslint-disable-next-line default-case
-  switch (status) {
-    case 'stop_fail':
-    case 'run_fail':
-    case 'start_fail':
-      status = 'error';
-      break;
-    case 'run':
-      status = 'running';
-      break;
-  }
-  return status;
-};
 const JobsTable = ({
   tableData = {},
   loading = false,
@@ -145,7 +128,7 @@ const JobsTable = ({
   const OperationBtnGroup = ({ record }) => {
     const _sname = get(record, 'status.name');
     const statusName = getStatusName(_sname);
-    const taskModel = get(record, 'taskModel_name');
+    const taskModel = get(record, 'mode');
 
     const StartStopBtn = () => {
       if (
@@ -161,14 +144,8 @@ const JobsTable = ({
               handleStartClicked(record);
             }}
             condition={[
-              (user) => {
-                if (user.role.name === USER) {
-                  return (
-                    get(record, 'creator.username') === get(user, 'username')
-                  );
-                }
-                return true;
-              },
+              (user) =>
+                get(record, 'creator.username') === get(user, 'username'),
             ]}
           >
             启动
@@ -185,14 +162,8 @@ const JobsTable = ({
             }}
             condition={[
               () => ['stop_fail', 'stop', 'completed'].indexOf(statusName) < 0,
-              (user) => {
-                if (user.role.name === USER) {
-                  return (
-                    get(record, 'creator.username') === get(user, 'username')
-                  );
-                }
-                return true;
-              },
+              (user) =>
+                get(record, 'creator.username') === get(user, 'username'),
             ]}
           >
             停止
@@ -210,12 +181,7 @@ const JobsTable = ({
         }}
         condition={[
           () => ['running'].indexOf(statusName) > -1,
-          (user) => {
-            if (user.role.name === USER) {
-              return get(record, 'creator.username') === get(user, 'username');
-            }
-            return true;
-          },
+          (user) => get(record, 'creator.username') === get(user, 'username'),
         ]}
       >
         {taskModel}
@@ -232,12 +198,7 @@ const JobsTable = ({
         condition={[
           () => ['error', 'stopped', 'completed'].indexOf(statusName) > -1,
           () => ['stop_fail'].indexOf(_sname) < 0,
-          (user) => {
-            if (user.role.name === USER) {
-              return get(record, 'creator.username') === get(user, 'username');
-            }
-            return true;
-          },
+          (user) => get(record, 'creator.username') === get(user, 'username'),
         ]}
       >
         复制
@@ -252,7 +213,8 @@ const JobsTable = ({
           handleEditClicked(record);
         }}
         condition={[
-          () => ['stopped', 'completed'].indexOf(statusName) > -1,
+          () => ['error', 'stopped', 'completed'].indexOf(statusName) > -1,
+          () => ['stop_fail'].indexOf(_sname) < 0,
           (user) => get(record, 'creator.username') === get(user, 'username'),
         ]}
       >
@@ -270,12 +232,7 @@ const JobsTable = ({
         condition={[
           () => ['stopped', 'error', 'completed'].indexOf(statusName) > -1,
           () => ['stop_fail'].indexOf(_sname) < 0,
-          (user) => {
-            if (user.role.name === USER) {
-              return get(record, 'creator.username') === get(user, 'username');
-            }
-            return true;
-          },
+          (user) => get(record, 'creator.username') === get(user, 'username'),
         ]}
       >
         删除

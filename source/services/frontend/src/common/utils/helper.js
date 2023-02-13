@@ -434,3 +434,19 @@ export const pageSetToRoutes = (pages) => {
     return [];
   }
 };
+
+export const getStatusName = (value) => {
+  let status = value;
+  // eslint-disable-next-line default-case
+  switch (status) {
+    case 'stop_fail':
+    case 'run_fail':
+    case 'start_fail':
+      status = 'error';
+      break;
+    case 'run':
+      status = 'running';
+      break;
+  }
+  return status;
+};
