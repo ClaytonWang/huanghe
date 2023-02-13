@@ -17,11 +17,12 @@ from basic.common.query_filter_params import QueryParameters
 from basic.common.common_model import Event
 from basic.common.env_variable import get_string_variable
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project
-from utils.user_request import get_user_list, get_project_list, project_check
+from utils.user_request import get_user_list, get_project_list, project_check, project_check_obj
 from utils.storage_request import volume_check
 from utils.k8s_request import create_notebook_k8s, delete_notebook_k8s
 from utils.auth import operate_auth
 from collections import defaultdict
+import datetime
 
 router_notebook = APIRouter()
 COMMON = "https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
@@ -145,7 +146,7 @@ async def list_notebook(request: Request,
 
     result = await paginate(Notebook.objects.select_related(
         'status'
-    ).filter(**params_filter), params=query_params.params)
+    ).order_by(Notebook.updated_at.desc()).filter(**params_filter), params=query_params.params)
     result = result.dict()
     data = result['data']
 
@@ -201,8 +202,8 @@ async def create_notebook(request: Request,
     init_data['project_by'] = pg.name
     init_data['project_en_by'] = pg.en_name
 
-    if await Notebook.objects.filter(name=init_data['name'], project_by_id=int(nc.project.id)).count():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不能重名')
+    if await Notebook.objects.filter(name=init_data['name'], project_by_id=int(nc.project.id), created_by_id=ag.id).count():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户，Notebook不能重名')
 
     gpu_count = 0
     if nc.source.startswith("GPU"):
@@ -232,7 +233,7 @@ async def create_notebook(request: Request,
     storages, volumes_k8s = await volume_check(authorization, nc.hooks, extra_info)
     path_set = {x['path'] for x in storages}
     if len(path_set) != len(storages):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个NoteBook中挂载的目录不能重复')
     init_data['storage'] = json.dumps(storages)
 
     k8s_info = {
@@ -264,6 +265,7 @@ async def update_notebook(request: Request,
                           ):
     # user: AccountGetter = request.user
     authorization: str = request.headers.get('authorization')
+    ag: AccountGetter = request.user
     update_data = ne.dict(exclude_unset=True)
     if not update_data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
@@ -277,19 +279,21 @@ async def update_notebook(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook未停止')
 
     project_id = ne.project.id
-    check, extra_info = await project_check(request, project_id)
+    check, extra_info = await project_check_obj(request, project_id)
     if not check:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
-    update_data['project_by_id'] = project_id
+    update_data.update({"project_by_id": project_id,
+                       "project_by": extra_info['name'],
+                       "project_en_by": extra_info['en_name']})
     if 'project' in update_data:
         update_data.pop('project')
-    k8s_info['namespace'] = extra_info
+    k8s_info['namespace'] = extra_info['en_name']
 
     duplicate_name = await Notebook.objects.filter(
-        name=update_data['name'], project_by_id=int(project_id)).exclude(id=_notebook.id).count()
+        name=update_data['name'], project_by_id=int(project_id), created_by_id=ag.id).exclude(id=_notebook.id).count()
     if duplicate_name:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不能重名')
-    k8s_info['name'] = f"{request.user.en_name}-{update_data['name']}"
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户，Notebook不能重名')
+    k8s_info['name'] = f"{ag.en_name}-{update_data['name']}"
 
     if ne.source:
         gpu_count = 0
@@ -321,7 +325,7 @@ async def update_notebook(request: Request,
     k8s_info['image'] = ne.image.name
 
     update_data.pop('hooks')
-    storages, volumes_k8s = await volume_check(authorization, ne.hooks, extra_info)
+    storages, volumes_k8s = await volume_check(authorization, ne.hooks, extra_info['en_name'])
     path_set = {x['path'] for x in storages}
     if len(path_set) != len(storages):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
@@ -329,6 +333,7 @@ async def update_notebook(request: Request,
     k8s_info['volumes'] = volumes_k8s
 
     update_data['k8s_info'] = json.dumps(k8s_info)
+    update_data['updated_at'] = datetime.datetime.now()
 
     if not await _notebook.update(**update_data):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Notebook不存在')
