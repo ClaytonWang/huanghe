@@ -2,6 +2,7 @@ from __future__ import annotations
 from k8s.api.core import Core
 from k8s.api.core_v1_api import CoreV1Api
 from k8s.model.v1_pod import V1Pod
+from pod.serializers import Pod
 
 class PodMixin(CoreV1Api):
     def __init__(self, c: Core):
@@ -15,5 +16,7 @@ class PodMixin(CoreV1Api):
                                                                                       namespace=namespace,
                                                                                       image=image))
 
+    def read_namespaced_pod_log(self, p: Pod):
+        return self.core_v1_api.read_namespaced_pod_log(name=p.name, namespace=p.namespace)
 
 
