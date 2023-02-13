@@ -161,14 +161,8 @@ const JobsTable = ({
               handleStartClicked(record);
             }}
             condition={[
-              (user) => {
-                if (user.role.name === USER) {
-                  return (
-                    get(record, 'creator.username') === get(user, 'username')
-                  );
-                }
-                return true;
-              },
+              (user) =>
+                get(record, 'creator.username') === get(user, 'username'),
             ]}
           >
             启动
@@ -185,14 +179,8 @@ const JobsTable = ({
             }}
             condition={[
               () => ['stop_fail', 'stop', 'completed'].indexOf(statusName) < 0,
-              (user) => {
-                if (user.role.name === USER) {
-                  return (
-                    get(record, 'creator.username') === get(user, 'username')
-                  );
-                }
-                return true;
-              },
+              (user) =>
+                get(record, 'creator.username') === get(user, 'username'),
             ]}
           >
             停止
@@ -210,12 +198,7 @@ const JobsTable = ({
         }}
         condition={[
           () => ['running'].indexOf(statusName) > -1,
-          (user) => {
-            if (user.role.name === USER) {
-              return get(record, 'creator.username') === get(user, 'username');
-            }
-            return true;
-          },
+          (user) => get(record, 'creator.username') === get(user, 'username'),
         ]}
       >
         {taskModel}
@@ -232,12 +215,7 @@ const JobsTable = ({
         condition={[
           () => ['error', 'stopped', 'completed'].indexOf(statusName) > -1,
           () => ['stop_fail'].indexOf(_sname) < 0,
-          (user) => {
-            if (user.role.name === USER) {
-              return get(record, 'creator.username') === get(user, 'username');
-            }
-            return true;
-          },
+          (user) => get(record, 'creator.username') === get(user, 'username'),
         ]}
       >
         复制
@@ -270,12 +248,7 @@ const JobsTable = ({
         condition={[
           () => ['stopped', 'error', 'completed'].indexOf(statusName) > -1,
           () => ['stop_fail'].indexOf(_sname) < 0,
-          (user) => {
-            if (user.role.name === USER) {
-              return get(record, 'creator.username') === get(user, 'username');
-            }
-            return true;
-          },
+          (user) => get(record, 'creator.username') === get(user, 'username'),
         ]}
       >
         删除
