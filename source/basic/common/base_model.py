@@ -123,3 +123,10 @@ class GenericNoProjectModel(ormar.Model):
     created_at: datetime = ormar.DateTime(server_default=func.now(), comment='创建日期')
     updated_at: datetime = ormar.DateTime(server_default=func.now(), onupdate=func.now(), comment='更新日期')
     deleted_at: datetime = ormar.DateTime(comment="删除日期", nullable=True)
+
+class OnlyPrimaryKeyModel(ormar.Model):
+    class Meta:
+        alias_generator = to_camel
+        abstract = True
+
+    id: int = ormar.Integer(primary_key=True)
