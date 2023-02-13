@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-13 15:21:07
+ * @LastEditTime: 2023-02-13 16:12:42
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
@@ -295,7 +295,10 @@ const NotebookDetail = () => {
                   detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
               </Col>
               <Col span={6} title={detailData?.image?.name}>
-                镜像：{detailData?.image?.name}
+                镜像：
+                <Tooltip title={detailData?.image?.name}>
+                  {detailData?.image?.name}
+                </Tooltip>
               </Col>
               <Col span={6} title={detailData?.source}>
                 资源规格：{detailData?.source}
@@ -449,11 +452,6 @@ NotebookDetail.context = (props = {}) => {
           <AuthButton
             required="notebooks.list.edit"
             type="text"
-            style={(() => {
-              if (statusName === 'error') {
-                return { color: '#00000040' };
-              }
-            })()}
             onClick={() => {
               handleStopClicked(detail);
             }}
