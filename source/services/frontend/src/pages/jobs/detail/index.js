@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-10 15:01:29
+ * @LastEditTime: 2023-02-13 15:21:34
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -29,7 +29,7 @@ import { get } from 'lodash';
 import { purifyDeep, transformDate } from '@/common/utils/helper';
 import api from '@/common/api';
 import qs from 'qs';
-import { USER, JOB_ACTION, START, STOP, UPDATE } from '@/common/constants';
+import { JOB_ACTION, START, STOP, UPDATE } from '@/common/constants';
 import Icons from '@/common/components/Icon';
 import { useContextProps } from '@/common/hooks/RoutesProvider';
 import moment from 'moment';
@@ -143,7 +143,7 @@ const JobDetail = () => {
       console.log(error);
     }
   };
-  const handleStopClicked = async (record) => {
+  const onStop = async (record) => {
     try {
       const { id } = record;
       await api.jobListAction({ id, action: JOB_ACTION[STOP] });
@@ -152,6 +152,18 @@ const JobDetail = () => {
       console.log(error);
     }
   };
+
+  const handleStopClicked = (record) => {
+    Modal.confirm({
+      title: '可能会导致数据丢失，是否要停止该Job服务？',
+      okText: '停止',
+      cancelText: '取消',
+      onOk: () => {
+        onStop(record);
+      },
+    });
+  };
+
   const handleEditClicked = (values) => {
     navigate('/jobs/list/update', {
       state: {
@@ -373,14 +385,8 @@ JobDetail.context = (props = {}) => {
             }}
             condition={[
               () => ['stopped', 'error'].indexOf(statusName) > -1,
-              (user) => {
-                if (user.role.name === USER) {
-                  return (
-                    get(detail, 'creator.username') === get(user, 'username')
-                  );
-                }
-                return true;
-              },
+              (user) =>
+                get(detail, 'creator.username') === get(user, 'username'),
             ]}
           >
             删除
@@ -393,6 +399,7 @@ JobDetail.context = (props = {}) => {
   return (
     <Space>
       {(() => {
+        if (!statusName) return null;
         let icon = (
           <Icon
             style={{ fontSize: 18, marginRight: 5 }}
@@ -429,14 +436,8 @@ JobDetail.context = (props = {}) => {
               handleStartClicked(detail);
             }}
             condition={[
-              (user) => {
-                if (user.role.name === USER) {
-                  return (
-                    get(detail, 'creator.username') === get(user, 'username')
-                  );
-                }
-                return true;
-              },
+              (user) =>
+                get(detail, 'creator.username') === get(user, 'username'),
             ]}
           >
             启动
@@ -446,27 +447,13 @@ JobDetail.context = (props = {}) => {
           <AuthButton
             required="jobs.list.edit"
             type="text"
-            style={(() => {
-              if (statusName === 'error') {
-                return { color: '#00000040' };
-              }
-            })()}
             onClick={() => {
-              const { user } = useAuth();
-              if (get(detail, 'creator.username') === get(user, 'username')) {
-                handleStopClicked(detail);
-              }
+              handleStopClicked(detail);
             }}
             condition={[
               () => ['error', 'stop'].indexOf(statusName) < 0,
-              (user) => {
-                if (user.role.name === USER) {
-                  return (
-                    get(detail, 'creator.username') === get(user, 'username')
-                  );
-                }
-                return true;
-              },
+              (user) =>
+                get(detail, 'creator.username') === get(user, 'username'),
             ]}
           >
             停止
@@ -482,12 +469,7 @@ JobDetail.context = (props = {}) => {
         }}
         condition={[
           () => ['running'].indexOf(statusName) > -1,
-          (user) => {
-            if (user.role.name === USER) {
-              return get(detail, 'creator.username') === get(user, 'username');
-            }
-            return true;
-          },
+          (user) => get(detail, 'creator.username') === get(user, 'username'),
         ]}
       >
         打开

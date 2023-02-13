@@ -6,7 +6,6 @@ import Icon, { EllipsisOutlined } from '@ant-design/icons';
 import { transformDate } from '@/common/utils/helper';
 import { AuthButton, Auth } from '@/common/components';
 import Icons from '@/common/components/Icon';
-import { USER } from '@/common/constants';
 
 const NotebooksTable = ({
   tableData = {},
@@ -31,7 +30,7 @@ const NotebooksTable = ({
             component={Icons[value.name]}
           />
         );
-        if (/^(stop|start|pending)$/.test(value.name)) {
+        if (/^(stop|start|pending|running)$/.test(value.name)) {
           icon = (
             <Spin
               indicator={
