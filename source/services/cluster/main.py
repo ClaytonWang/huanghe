@@ -48,7 +48,7 @@ def start():
     service_port = int(os.getenv('CLUSTER_SERVICE_PORT', 80))
     uvicorn.run(
         'main:app', host="0.0.0.0", port=service_port,
-        reload=False,
+        reload=True,
         # debug=DEBUG,
         workers=2
     )
