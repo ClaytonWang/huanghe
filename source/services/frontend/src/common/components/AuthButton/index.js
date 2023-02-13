@@ -18,7 +18,12 @@ const AuthButton = ({ required, children, condition, ...rest }) => {
   }
   if (condition && condition.length > 0) {
     if (some(condition, (fn) => !fn(user))) {
-      props = { ...props, disabled: true };
+      props = {
+        ...props,
+        disabled: true,
+        style: { color: '#00000040' },
+        onClick: null,
+      };
     }
   }
   const { type } = props;
