@@ -325,7 +325,7 @@ async def update_notebook(request: Request,
     k8s_info['image'] = ne.image.name
 
     update_data.pop('hooks')
-    storages, volumes_k8s = await volume_check(authorization, ne.hooks, extra_info)
+    storages, volumes_k8s = await volume_check(authorization, ne.hooks, extra_info['en_name'])
     path_set = {x['path'] for x in storages}
     if len(path_set) != len(storages):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
