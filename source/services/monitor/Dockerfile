@@ -5,4 +5,6 @@ FROM $BASE_IMG
 COPY services/monitor .
 COPY basic /source/basic/
 
-ENTRYPOINT python3 main.py
+RUN chmod a+x start_service.sh
+
+CMD ["./start_service.sh"]
