@@ -42,7 +42,6 @@ export const CREATE = 'create';
 export const EDIT = 'edit';
 export const UPDATE = 'update';
 export const COPY = 'copy';
-export const DEBUG = '调试';
 
 // notebooks
 export const NOTEBOOK_STATUS = {
