@@ -147,15 +147,8 @@ const NotebooksTable = ({
                 }}
                 condition={[
                   () => ['stopped', 'error'].indexOf(statusName) > -1,
-                  (user) => {
-                    if (user.role.name === USER) {
-                      return (
-                        get(record, 'creator.username') ===
-                        get(user, 'username')
-                      );
-                    }
-                    return true;
-                  },
+                  (user) =>
+                    get(record, 'creator.username') === get(user, 'username'),
                 ]}
               >
                 删除
@@ -174,15 +167,8 @@ const NotebooksTable = ({
                 }}
                 condition={[
                   () => ['running'].indexOf(statusName) > -1,
-                  (user) => {
-                    if (user.role.name === USER) {
-                      return (
-                        get(record, 'creator.username') ===
-                        get(user, 'username')
-                      );
-                    }
-                    return true;
-                  },
+                  (user) =>
+                    get(record, 'creator.username') === get(user, 'username'),
                 ]}
               >
                 打开
@@ -195,15 +181,8 @@ const NotebooksTable = ({
                     handleStartClicked(record);
                   }}
                   condition={[
-                    (user) => {
-                      if (user.role.name === USER) {
-                        return (
-                          get(record, 'creator.username') ===
-                          get(user, 'username')
-                        );
-                      }
-                      return true;
-                    },
+                    (user) =>
+                      get(record, 'creator.username') === get(user, 'username'),
                   ]}
                 >
                   启动
@@ -218,15 +197,8 @@ const NotebooksTable = ({
                   }}
                   condition={[
                     () => ['error', 'stop'].indexOf(statusName) < 0,
-                    (user) => {
-                      if (user.role.name === USER) {
-                        return (
-                          get(record, 'creator.username') ===
-                          get(user, 'username')
-                        );
-                      }
-                      return true;
-                    },
+                    (user) =>
+                      get(record, 'creator.username') === get(user, 'username'),
                   ]}
                 >
                   停止
