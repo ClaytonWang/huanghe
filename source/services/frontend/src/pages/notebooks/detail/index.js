@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-13 15:21:07
+ * @LastEditTime: 2023-02-14 12:59:25
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
@@ -21,15 +21,14 @@ import {
   Modal,
   DatePicker,
 } from 'antd';
-import { useAuth } from '@/common/hooks/useAuth';
-import Icon from '@ant-design/icons';
+import Icon, { InfoCircleOutlined } from '@ant-design/icons';
 import { ChartMonitor, EventMonitor, AuthButton } from '@/common/components';
 import { get } from 'lodash';
 
 import { purifyDeep, transformDate } from '@/common/utils/helper';
 import api from '@/common/api';
 import qs from 'qs';
-import { USER, NOTEBOOK_ACTION, START, STOP, UPDATE } from '@/common/constants';
+import { NOTEBOOK_ACTION, START, STOP, UPDATE } from '@/common/constants';
 import Icons from '@/common/components/Icon';
 import { useContextProps } from '@/common/hooks/RoutesProvider';
 import moment from 'moment';
@@ -299,6 +298,13 @@ const NotebookDetail = () => {
               </Col>
               <Col span={6} title={detailData?.source}>
                 资源规格：{detailData?.source}
+              </Col>
+              <Col span={6} title="SSH远程开发">
+                SSH远程开发
+                <Tooltip title="prompt text">
+                  <InfoCircleOutlined />
+                </Tooltip>
+                :<a style={{ marginLeft: 5 }}>查看配置信息</a>
               </Col>
               <Col span={6} title={detailData?.creator?.username}>
                 创建人：{detailData?.creator?.username}
