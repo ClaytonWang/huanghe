@@ -112,6 +112,7 @@ class VolcanoJobCreateReq(BaseModelValidatorName):
     tolerations: List[str] = []
     command: List[str] = []
     working_dir: Optional[str] = None
+    annotations: Dict = {}
 
 
 class VolcanoJobDeleteReq(BaseModel):
