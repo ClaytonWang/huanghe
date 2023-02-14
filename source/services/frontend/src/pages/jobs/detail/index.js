@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-13 16:38:57
+ * @LastEditTime: 2023-02-14 11:26:53
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -22,7 +22,7 @@ import {
   DatePicker,
   Button,
 } from 'antd';
-import Icon from '@ant-design/icons';
+import Icon, { InfoCircleOutlined } from '@ant-design/icons';
 import {
   ChartMonitor,
   EventMonitor,
@@ -342,6 +342,13 @@ const JobDetail = () => {
               <Col span={6} title={detailData?.source}>
                 资源规格：{detailData?.source}
               </Col>
+              <Col span={6} title="SSH远程开发">
+                SSH远程开发
+                <Tooltip title="prompt text">
+                  <InfoCircleOutlined />
+                </Tooltip>
+                :<a style={{ marginLeft: 5 }}>查看配置信息</a>
+              </Col>
               <Col span={6} title={detailData?.creator?.username}>
                 创建人：{detailData?.creator?.username}
               </Col>
@@ -398,7 +405,6 @@ JobDetail.context = (props = {}) => {
     handleStartClicked,
     handleStopClicked,
     handleEditClicked,
-    handleOpenClicked,
     handleCopyClicked,
     handleDeleteClicked,
     detail,
@@ -455,14 +461,15 @@ JobDetail.context = (props = {}) => {
       type="link"
       {...props}
       onClick={() => {
-        handleOpenClicked(detail);
+        const { url } = detail;
+        window.open(url);
       }}
       condition={[
         () => ['running'].indexOf(statusName) > -1,
         (user) => get(detail, 'creator.username') === get(user, 'username'),
       ]}
     >
-      {taskModel}
+      调试
     </AuthButton>
   );
 
@@ -550,7 +557,7 @@ JobDetail.context = (props = {}) => {
               component={Icons[statusName]}
             />
           );
-          if (/^(stop|start|pending)$/.test(statusName)) {
+          if (/^(stop|start|pending|running)$/.test(statusName)) {
             icon = (
               <Spin
                 indicator={
