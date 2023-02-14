@@ -26,6 +26,7 @@ class VolcanoJobCreateReq(BaseModelValidatorName):
     tolerations: List[str] = []
     command: List[str] = []
     working_dir: Optional[str] = None
+    annotations: Dict = {}
 
 
     def gen_vcjob_dict(self):
@@ -42,6 +43,7 @@ class VolcanoJobCreateReq(BaseModelValidatorName):
             "volumes": [v.dict() for v in self.volumes],
             "command": self.command,
             "working_dir": self.working_dir,
+            "annotations": self.annotations,
         }
 
 class VolcanoJobDeleteReq(BaseModel):
@@ -68,3 +70,4 @@ class VolcanoJob(BaseModelValidatorName):
     tolerations: List[str] = []
     command: List[str] = []
     working_dir: Optional[str] = None
+    annotations: Dict = {}
