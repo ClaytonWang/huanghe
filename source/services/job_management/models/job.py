@@ -142,7 +142,7 @@ class Job(GenericDateModel):
 
     @property
     def webkubectl(self):
-        return "http://121.36.41.231:31767/?arg=-nkubeflow&arg=jupyter-web-app-deployment-65685cc86d-lt85h&arg=bash"
+        return f"http://121.36.41.231:31767/?arg=-n{self.project_en_by}&arg={self.name}-tfjob-0&arg=bash"
 
     def gen_job_pagation_response(self):
         return {
