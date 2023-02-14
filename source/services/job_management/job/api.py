@@ -198,6 +198,8 @@ async def create_job(request: Request,
     init_data['k8s_info'] = json.dumps(k8s_info)
 
     _job = await Job.objects.create(**init_data)
+    k8s_info['annotations'] = {"id": str(_job.id)}
+    await _job.update(**{"k8s_info": k8s_info})
     return _job.gen_job_detail_response()
 
 
@@ -369,8 +371,8 @@ async def delete_job(request: Request,
 async def list_job_event(query_params: QueryParameters = Depends(QueryParameters),
                               job_id: int = Path(..., ge=1, description="JobID")):
     params_filter = query_params.filter_
-    # events = await Event.find_notebook_events(notebook_id)
-    events = await paginate(Event.objects.filter(**params_filter), params=query_params.params)
+    events = await Event.find_vcjob_events(job_id)
+    events = await paginate(events.filter(**params_filter), params=query_params.params)
     for i, v in enumerate(events.data):
         events.data[i] = EventItem.parse_obj(v.gen_pagation_event())
     return events
