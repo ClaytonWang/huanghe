@@ -124,6 +124,7 @@ class JobDetail(BaseModel):
     hooks: List[HookItem]
     updated_at: Union[datetime, str, None]
     mode: str
+    url: Optional[str]
     grafana: Optional[Grafana]
 
     @validator('created_at', 'updated_at')
@@ -149,3 +150,9 @@ class EventItem(BaseModel):
     status: StatusItemOnlyDesc
     name: Optional[str] = ""
     time: Optional[datetime]
+
+class EventCreate(BaseModel):
+    name: str
+    desc: str
+    source_id: int
+    source: Optional[str] = "VCJOB"

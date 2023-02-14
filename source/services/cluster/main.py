@@ -6,6 +6,7 @@ import uvicorn
 from fastapi import FastAPI, status as st
 from fastapi.responses import JSONResponse
 from namespace.api import router_namespace
+from pod.api import router_pod
 from pvc.api import router_pvc
 from notebook.api import router_notebook
 from secret.api import router_secret
@@ -34,6 +35,7 @@ app.include_router(router_pvc, prefix="/pvc")
 app.include_router(router_notebook, prefix="/notebook")
 app.include_router(router_secret, prefix='/secret')
 app.include_router(router_vcjob, prefix='/job')
+app.include_router(router_pod, prefix='/pod')
 
 app.add_middleware(BaseHTTPMiddleware, dispatch=add_common_response_data)
 
@@ -46,7 +48,7 @@ def start():
     service_port = int(os.getenv('CLUSTER_SERVICE_PORT', 80))
     uvicorn.run(
         'main:app', host="0.0.0.0", port=service_port,
-        reload=False,
+        reload=True,
         # debug=DEBUG,
         workers=2
     )

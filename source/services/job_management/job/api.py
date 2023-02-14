@@ -14,11 +14,11 @@ from fastapi.responses import JSONResponse
 from basic.common.env_variable import get_string_variable
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
-from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project
-from job.serializers import JobCreate, JobDetail, JobList, JobEdit, JobOp, EventItem
+from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project, create_vcjob,\
+    delete_vcjob, VolcanoJobCreateReq, VolcanoJobDeleteReq
+from job.serializers import JobCreate, JobDetail, JobList, JobEdit, JobOp, EventItem, EventCreate
 from models import Job, Status, Source
 from utils.auth import operate_auth
-from utils.k8s_request import create_job_k8s, delete_job_k8s
 from utils.storage_request import volume_check
 from utils.user_request import get_user_list, get_project_list, project_check, project_check_obj
 from basic.middleware.account_getter import ADMIN, USER, OWNER
@@ -82,7 +82,7 @@ async def list_job(request: Request,
         jobs = await Job.self_projects(projects)
     p = await paginate(jobs.select_related(
         'status'
-    ).filter(
+    ).order_by(Job.updated_at.desc()).filter(
         **query_params.filter_
     ), params=query_params.params)
     for i, j in enumerate(p.data):
@@ -149,17 +149,16 @@ async def create_job(request: Request,
                       "memory": memory,
                       "type": machine_type})
 
-    k8s_info = {
-        'name': f"{request.user.en_name}-{init_data['name']}",
-        'namespace': extra_info,
-        'image': jc.image.name,
-        'env': get_string_variable('ENV', 'DEV').lower(),
-        'cpu': cpu_count,
-        'memory': memory,
-        'gpu': gpu_count,
-        'type': machine_type,
-        'volumes': volumes_k8s,
-    }
+    k8s_info = VolcanoJobCreateReq(name=f"{request.user.en_name}-{init_data['name']}",
+                                   namespace=extra_info,
+                                   image=jc.image.name,
+                                   env=get_string_variable('ENV', 'DEV').lower(),
+                                   cpu=cpu_count,
+                                   memory=memory,
+                                   gpu=gpu_count,
+                                   volumes=volumes_k8s,
+                                   command=[jc.start_command],
+                                   working_dir=jc.work_dir,).dict()
     init_data['k8s_info'] = json.dumps(k8s_info)
 
     _job = await Job.objects.create(**init_data)
@@ -280,7 +279,7 @@ async def operate_job(request: Request,
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
         stat = await Status.objects.get(name='stop')
         update_data['status'] = stat.id
-        response = await delete_job_k8s(authorization, payloads)
+        delete_vcjob(vjd=VolcanoJobDeleteReq.parse_raw(payloads))
         # if response.status != 200:
         #     _job.status = None
     elif action == 1:
@@ -289,7 +288,7 @@ async def operate_job(request: Request,
         stat = await Status.objects.get(name='pending')
         update_data['status'] = stat.id
         # todo response返回不为200时更新job状态到异常
-        response = await create_job_k8s(authorization, payloads)
+        create_vcjob(vjc=VolcanoJobCreateReq.parse_raw(payloads))
         # if response.status != 200:
         #     _job.status = None
     # print(response)
@@ -339,3 +338,18 @@ async def list_job_event(query_params: QueryParameters = Depends(QueryParameters
     for i, v in enumerate(events.data):
         events.data[i] = EventItem.parse_obj(v.gen_pagation_event())
     return events
+
+
+
+
+@router_job.post(
+    '/{job_id}/events',
+    description='Job事件创建',
+)
+async def create_notebook_event(ec: EventCreate,
+                                job_id: int = Path(..., ge=1, description="JobID")):
+    j = await Job.objects.select_related(['status']).get(pk=job_id)
+    d = ec.dict()
+    d.update({"status": j.status.desc})
+    await Event.objects.create(**d)
+    return {}
