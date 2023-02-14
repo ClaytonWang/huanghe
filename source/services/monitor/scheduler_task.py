@@ -14,9 +14,10 @@ from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 from models.initdb import startup_event
 from k8s.cluster_client import cc
 
+
 async def job_func(job_id):
     await startup_event()
-    ncr=NodeCreate()
+    ncr = NodeCreate()
     await  cc.get_node_list(ncr)
     print(f"job {job_id} run in {datetime.now()}")
 
@@ -28,12 +29,12 @@ def job_listener(event):
         print("work worked!")
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     logging.basicConfig()
     logging.getLogger('apscheduler').setLevel(logging.DEBUG)
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(job_func,trigger='interval',args=[1],id='1', name='a test job',max_instances=10,
-                      jobstore='default',executor='default',seconds=5)
+    scheduler.add_job(job_func, trigger='interval', args=[1], id='1', name='a test job', max_instances=10,
+                      jobstore='default', executor='default', seconds=5)
     scheduler.add_listener(job_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
     print("apscheduler start")
     scheduler.start()
