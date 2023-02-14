@@ -150,3 +150,9 @@ class EventItem(BaseModel):
     status: StatusItemOnlyDesc
     name: Optional[str] = ""
     time: Optional[datetime]
+
+class EventCreate(BaseModel):
+    name: str
+    desc: str
+    source_id: int
+    source: Optional[str] = "VCJOB"
