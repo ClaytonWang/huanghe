@@ -120,7 +120,7 @@ async def create_job(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='job不能重名')
 
     init_data.update({"mode": jc.mode,
-                      "start_command": jc.start_command,
+                      "start_command": "sleep 14400" if jc.mode == "调试" else jc.start_command,
                       "custom": jc.image.custom,
                       "image": jc.image.name,
                       "work_dir": jc.work_dir})
