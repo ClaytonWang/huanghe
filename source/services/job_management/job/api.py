@@ -232,7 +232,7 @@ async def update_job(request: Request,
     authorization: str = request.headers.get('authorization')
     update_data = {"mode": je.mode,
                    "work_dir": je.work_dir,
-                   "start_command": je.start_command,}
+                   "start_command": "sleep 14400" if je.mode == "调试" else je.start_command,}
     if not update_data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
 
@@ -321,8 +321,8 @@ async def operate_job(request: Request,
         # if response.status != 200:
         #     _job.status = None
     elif action == 1:
-        if _job.status.name not in ['start_fail', 'run_fail', 'stopped']:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
+        # if _job.status.name not in ['start_fail', 'run_fail', 'stopped']:
+        #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
         stat = await Status.objects.get(name='pending')
         update_data['status'] = stat.id
         # todo response返回不为200时更新job状态到异常
