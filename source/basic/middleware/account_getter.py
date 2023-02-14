@@ -17,6 +17,7 @@ from jose.jwt import JWTError
 from pydantic import BaseModel, Field, validator
 import requests
 from basic.config.storage import *
+from basic.common.validator_name import BaseModelValidatorName
 
 
 class ProjectGetter(BaseModel):
@@ -93,6 +94,30 @@ class AccountGetter(BaseModel):
         return ''.join(ans)
 
 
+class Volume(BaseModel):
+    name: str
+    mount_path: str
+    mount_propagation: Optional[str] = "HostToContainer"
+
+class VolcanoJobCreateReq(BaseModelValidatorName):
+    namespace: str
+    image: str
+    # 对应环境
+    env: str = "dev"
+    platform: str = "mvp"
+    cpu: int = 0
+    memory: int = 0
+    gpu: int = 0
+    volumes: List[Volume] = []
+    tolerations: List[str] = []
+    command: List[str] = []
+    working_dir: Optional[str] = None
+
+
+class VolcanoJobDeleteReq(BaseModel):
+    name: str
+    namespace: str
+
 async def get_current_user(token: str) -> AccountGetter:
     if MOCK:
         return AccountGetter.parse_obj(MOCK_USER_JSON)
@@ -151,10 +176,7 @@ def create_pvc(pvc: PVCCreateReq, ignore_exist=False):
             return True
         assert response['success'] is True
     except Exception as e:
-        if isinstance(response["message"], list) and response["message"][0].get("msg") is not None:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response["message"][0]["msg"])
-        else:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail='创建pvc失败, 请确认是否存在namespace， 或者pvc是否已经存在')
 
     return True
@@ -189,6 +211,24 @@ def delete_ns(ns: Namespace):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='删除namespace失败')
     return True
 
+def create_vcjob(vjc: VolcanoJobCreateReq, ignore_exist=False):
+    try:
+        # response = requests.post(f"http://127.0.0.1:8003/job", json=vjc.dict()).json()
+        response = requests.post(f"http://{CLUSTER_SERVICE_URL}{CLUSTER_VCJOB_PREFIX_URL}", json=vjc.dict()).json()
+        if ignore_exist and response["success"] is not True and response["message"] == "AlreadyExists":
+            return True
+        assert response['success'] is True
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='创建vcjob失败')
+    return True
+
+def delete_vcjob(vjd: VolcanoJobDeleteReq):
+    try:
+        response = requests.delete(f"http://{CLUSTER_SERVICE_URL}{CLUSTER_VCJOB_PREFIX_URL}", json=vjd.dict()).json()
+        assert response['success'] is True
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='删除vcjob失败')
+    return True
 
 def query_notebook_volume(token: str, volume_id) -> List[Dict]:
     # http://{USER_SERVICE_URL}{PROJECT_PREFIX_URL}/{project_id}
