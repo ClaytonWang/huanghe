@@ -16,7 +16,7 @@ from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project, create_vcjob,\
     delete_vcjob, VolcanoJobCreateReq, VolcanoJobDeleteReq
-from job.serializers import JobCreate, JobDetail, JobList, JobEdit, JobOp, EventItem
+from job.serializers import JobCreate, JobDetail, JobList, JobEdit, JobOp, EventItem, EventCreate
 from models import Job, Status, Source
 from utils.auth import operate_auth
 from utils.storage_request import volume_check
@@ -338,3 +338,18 @@ async def list_job_event(query_params: QueryParameters = Depends(QueryParameters
     for i, v in enumerate(events.data):
         events.data[i] = EventItem.parse_obj(v.gen_pagation_event())
     return events
+
+
+
+
+@router_job.post(
+    '/{job_id}/events',
+    description='Job事件创建',
+)
+async def create_notebook_event(ec: EventCreate,
+                                job_id: int = Path(..., ge=1, description="JobID")):
+    j = await Job.objects.select_related(['status']).get(pk=job_id)
+    d = ec.dict()
+    d.update({"status": j.status.desc})
+    await Event.objects.create(**d)
+    return {}

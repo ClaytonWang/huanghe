@@ -10,7 +10,7 @@ from __future__ import annotations
 from fastapi import Request, Response, status
 from fastapi import HTTPException
 from typing import Optional, List, Dict
-from config import DO_NOT_AUTH_URI
+from config import DO_NOT_AUTH_URI, NO_AUTH_WORDS
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
 from jose.jwt import JWTError
@@ -250,6 +250,10 @@ async def verify_token(request: Request, call_next):
 
     path: str = request.get('path')
     # 登录接口、docs文档依赖的接口，不做token校验
+    for word in NO_AUTH_WORDS:
+        if word in path:
+            return await call_next(request)
+
     if path in DO_NOT_AUTH_URI:
         return await call_next(request)
     else:
