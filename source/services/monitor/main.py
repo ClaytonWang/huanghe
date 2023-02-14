@@ -14,8 +14,8 @@ from pydantic.error_wrappers import ValidationError
 from config import *
 from fastapi.exceptions import RequestValidationError
 from basic.middleware.rsp import add_common_response_data
-from source.services.monitor.node.api import router_node
-# from source.services.monitor.statistics.api import router_statistic
+from node.api import router_node
+# from statistics.api import router_statistic
 
 app = FastAPI()
 
