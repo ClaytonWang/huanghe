@@ -30,3 +30,7 @@ class Event(DateModel):
     @classmethod
     async def find_notebook_events(cls, _id):
         return cls.objects.filter((cls.source_id == _id) & (cls.source == "NOTEBOOK"))
+
+    @classmethod
+    async def find_vcjob_events(cls, _id):
+        return cls.objects.filter((cls.source_id == _id) & (cls.source == "VCJOB"))
