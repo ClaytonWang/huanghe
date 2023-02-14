@@ -14,6 +14,8 @@ from pydantic.error_wrappers import ValidationError
 from config import *
 from fastapi.exceptions import RequestValidationError
 from basic.middleware.rsp import add_common_response_data
+from source.services.monitor.node.api import router_node
+# from source.services.monitor.statistics.api import router_statistic
 
 app = FastAPI()
 
@@ -22,7 +24,8 @@ app = FastAPI()
 def status():
     return {"status": "ok"}
 
-
+app.include_router(router_node,prefix="/node")
+# app.include_router(router_statistic,prefix="/statistic")
 
 # 配置中间件
 app.add_middleware(BaseHTTPMiddleware, dispatch=verify_token)
