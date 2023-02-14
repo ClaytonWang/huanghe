@@ -3,11 +3,28 @@ import { Modal, Spin, Table, Tooltip, Dropdown, Space } from 'antd';
 import qs from 'qs';
 import { get } from 'lodash';
 import Icon, { EllipsisOutlined } from '@ant-design/icons';
-import { transformDate, getStatusName } from '@/common/utils/helper';
+import { transformDate } from '@/common/utils/helper';
 import { AuthButton, Auth } from '@/common/components';
 import Icons from '@/common/components/Icon';
-import { DEBUG } from '@/common/constants';
+import { USER } from '@/common/constants';
 
+const DEBUG = '调试';
+
+const getStatusName = (value) => {
+  let status = value;
+  // eslint-disable-next-line default-case
+  switch (status) {
+    case 'stop_fail':
+    case 'run_fail':
+    case 'start_fail':
+      status = 'error';
+      break;
+    case 'run':
+      status = 'running';
+      break;
+  }
+  return status;
+};
 const JobsTable = ({
   tableData = {},
   loading = false,
@@ -128,7 +145,7 @@ const JobsTable = ({
   const OperationBtnGroup = ({ record }) => {
     const _sname = get(record, 'status.name');
     const statusName = getStatusName(_sname);
-    const taskModel = get(record, 'mode');
+    const taskModel = get(record, 'taskModel_name');
 
     const StartStopBtn = () => {
       if (
@@ -213,8 +230,7 @@ const JobsTable = ({
           handleEditClicked(record);
         }}
         condition={[
-          () => ['error', 'stopped', 'completed'].indexOf(statusName) > -1,
-          () => ['stop_fail'].indexOf(_sname) < 0,
+          () => ['stopped', 'completed'].indexOf(statusName) > -1,
           (user) => get(record, 'creator.username') === get(user, 'username'),
         ]}
       >

@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-14 11:26:53
+ * @LastEditTime: 2023-02-14 12:56:04
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -31,6 +31,7 @@ import {
   Auth,
 } from '@/common/components';
 import { get } from 'lodash';
+
 import {
   purifyDeep,
   transformDate,
@@ -38,14 +39,7 @@ import {
 } from '@/common/utils/helper';
 import api from '@/common/api';
 import qs from 'qs';
-import {
-  JOB_ACTION,
-  START,
-  STOP,
-  UPDATE,
-  DEBUG,
-  COPY,
-} from '@/common/constants';
+import { JOB_ACTION, START, STOP, UPDATE, DEBUG } from '@/common/constants';
 import Icons from '@/common/components/Icon';
 import { useContextProps } from '@/common/hooks/RoutesProvider';
 import moment from 'moment';
@@ -180,7 +174,7 @@ const JobDetail = () => {
     });
   };
 
-  const onEdit = (values) => {
+  const handleEditClicked = (values) => {
     navigate('/jobs/list/update', {
       state: {
         params: values,
@@ -189,23 +183,7 @@ const JobDetail = () => {
     });
   };
 
-  const handleEditClicked = (record) => {
-    onEdit(record);
-  };
-
-  const onCopy = (values) => {
-    navigate(`/jobs/list/copy`, {
-      state: {
-        params: values,
-        type: COPY,
-      },
-    });
-  };
-  const handleCopyClicked = (record) => {
-    onCopy(record);
-  };
-
-  const onDelete = async (record) => {
+  const deleteJob = async (record) => {
     const { id } = record;
     try {
       await api.jobListDelete({ id });
@@ -216,14 +194,14 @@ const JobDetail = () => {
     }
   };
 
-  const handleDeleteClicked = (record) => {
+  const handleDelete = (record) => {
     Modal.confirm({
       title: '确定要删除该Job服务吗？',
       okText: '删除',
       okType: 'danger',
       cancelText: '取消',
       onOk: () => {
-        onDelete(record);
+        deleteJob(record);
       },
     });
   };
@@ -249,8 +227,7 @@ const JobDetail = () => {
       handleStartClicked,
       handleStopClicked,
       handleEditClicked,
-      handleCopyClicked,
-      handleDeleteClicked,
+      handleDelete,
       detail: detailData,
     });
   }, [detailData]);
@@ -330,14 +307,8 @@ const JobDetail = () => {
                 {(() =>
                   detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
               </Col>
-              <Col span={6} title={detailData?.mode}>
-                项目：{detailData?.mode}
-              </Col>
               <Col span={6} title={detailData?.image?.name}>
-                镜像：
-                <Tooltip title={detailData?.image?.name}>
-                  {detailData?.image?.name}
-                </Tooltip>
+                镜像：{detailData?.image?.name}
               </Col>
               <Col span={6} title={detailData?.source}>
                 资源规格：{detailData?.source}
@@ -409,7 +380,6 @@ JobDetail.context = (props = {}) => {
     handleDeleteClicked,
     detail,
   } = props;
-
   const statusDesc = get(detail, 'status.desc');
   const _sname = get(detail, 'status.name');
   const statusName = getStatusName(_sname);
@@ -542,7 +512,6 @@ JobDetail.context = (props = {}) => {
       label: <EditBtn />,
     });
   }
-
   const menuProps = {
     items,
   };
