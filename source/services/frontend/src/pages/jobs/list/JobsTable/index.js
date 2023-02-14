@@ -3,28 +3,11 @@ import { Modal, Spin, Table, Tooltip, Dropdown, Space } from 'antd';
 import qs from 'qs';
 import { get } from 'lodash';
 import Icon, { EllipsisOutlined } from '@ant-design/icons';
-import { transformDate } from '@/common/utils/helper';
+import { transformDate, getStatusName } from '@/common/utils/helper';
 import { AuthButton, Auth } from '@/common/components';
 import Icons from '@/common/components/Icon';
-import { USER } from '@/common/constants';
+import { DEBUG } from '@/common/constants';
 
-const DEBUG = '调试';
-
-const getStatusName = (value) => {
-  let status = value;
-  // eslint-disable-next-line default-case
-  switch (status) {
-    case 'stop_fail':
-    case 'run_fail':
-    case 'start_fail':
-      status = 'error';
-      break;
-    case 'run':
-      status = 'running';
-      break;
-  }
-  return status;
-};
 const JobsTable = ({
   tableData = {},
   loading = false,

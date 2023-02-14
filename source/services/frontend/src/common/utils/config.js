@@ -66,9 +66,11 @@ module.exports = {
 
     imagesList: 'get|/notebook/image',
     sourceList: 'get|/notebook/source',
+    serverList: 'get|/servers',
   },
   breadcrumbConfig: {
     '/overview/list': '总览',
+    '/overview/serverlist': '服务器列表',
 
     '/bam/projects': '项目管理',
     '/bam/users': '用户管理',
@@ -97,6 +99,10 @@ module.exports = {
         {
           key: 'overview.list',
           label: '总览',
+        },
+        {
+          key: 'overview.serverlist',
+          label: '服务器列表',
         },
       ],
     },

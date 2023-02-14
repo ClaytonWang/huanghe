@@ -7,11 +7,13 @@
  */
 import { Navigate, Route, Routes } from 'react-router-dom';
 import OverviewList from './list';
+import ServerList from './serverlist';
 
 const OverviewRoutes = () => (
   <Routes>
     <Route path="" element={<Navigate to="list" />} />
     <Route path="list" element={<OverviewList />} />
+    <Route path="serverlist" element={<ServerList />} />
   </Routes>
 );
 export default OverviewRoutes;
