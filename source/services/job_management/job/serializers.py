@@ -124,6 +124,7 @@ class JobDetail(BaseModel):
     hooks: List[HookItem]
     updated_at: Union[datetime, str, None]
     mode: str
+    url: Optional[str]
     grafana: Optional[Grafana]
 
     @validator('created_at', 'updated_at')
