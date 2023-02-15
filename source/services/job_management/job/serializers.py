@@ -118,10 +118,10 @@ class JobCreate(BaseModel):
     name: str = Field(..., max_length=20)
     project: Project
     source: str
-    start_command: str
+    start_command: Optional[str]
     mode: str
     image: Image
-    work_dir: str
+    work_dir: Optional[str]
     hooks: List[HookItem] = []
 
     @validator('name')
