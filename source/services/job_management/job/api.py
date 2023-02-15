@@ -159,7 +159,7 @@ async def create_job(request: Request,
     if jc.mode == "调试":
         jc.start_command = "sleep 14400"
     init_data.update({"mode": jc.mode,
-                      "start_command": "sleep 14400" if jc.mode == "调试" else jc.start_command,
+                      "start_command": jc.start_command,
                       "custom": jc.image.custom,
                       "image": jc.image.name,
                       "work_dir": jc.work_dir})
