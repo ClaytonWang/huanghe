@@ -16,7 +16,6 @@ from models import DB, META
 from typing import List
 
 # 状态
-# JOB_STATUS_PENDING = "pending"  # 排队中
 # JOB_STATUS_RUNNING = "running"  # 已启动(运行中)
 # JOB_STATUS_STOP = "stop"  # 停止中
 # JOB_STATUS_START_FAIL = "start_fail"  # 启动失败
@@ -24,6 +23,17 @@ from typing import List
 # JOB_STATUS_STOP_FAIL = "stop_fail"  # 停止失败
 # JOB_STATUS_ON = "on"  # 已完成
 # JOB_STATUS_STOPPED = "stopped"  # 已停止
+
+JOB_STATUS_PENDING = "Pending"
+JOB_STATUS_COMPLETING = "Completing"
+JOB_STATUS_COMPLETED = "Completed"
+JOB_STATUS_TERMINATING = "Terminating"
+JOB_STATUS_TERMINATED = "Terminated"
+JOB_STATUS_FAILED = "Failed"
+JOB_STATUS_RESTARTING = "Restarting"
+JOB_STATUS_ABORTED = "Aborted"
+JOB_STATUS_ABORTING = "Aborting"
+
 COMMON = "https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
 
 class Status(ormar.Model):
@@ -188,3 +198,16 @@ class Job(GenericDateModel):
                         "vram": self.vram_url,},
             "url": self.webkubectl,
         }
+
+    @classmethod
+    def compare_status_and_update(cls, j: Job, status: str, status_dic):
+        if status == JOB_STATUS_PENDING:
+            j.status = status_dic['pending']
+        elif status == JOB_STATUS_FAILED:
+            j.status = status_dic['run_fail']
+        elif status in {JOB_STATUS_COMPLETED, JOB_STATUS_COMPLETING}:
+            j.status = status_dic['completed']
+        elif status in {JOB_STATUS_TERMINATING, JOB_STATUS_TERMINATED, JOB_STATUS_ABORTED, JOB_STATUS_ABORTING}:
+            j.status = status_dic['error']
+        else:
+            print(f"unknow status: {status}")
