@@ -145,6 +145,10 @@ class JobEdit(BaseModel):
 class StatusItemOnlyDesc(BaseModel):
     desc: str = None
 
+class JobStatusUpdate(BaseModel):
+    status: str
+
+
 class EventItem(BaseModel):
     id: Optional[int]
     status: StatusItemOnlyDesc
