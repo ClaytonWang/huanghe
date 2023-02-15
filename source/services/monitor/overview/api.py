@@ -9,10 +9,10 @@
 from fastapi import APIRouter, Request
 from overview.serializers import ProjectReq
 
-router_statistic = APIRouter()
+router_overview = APIRouter()
 
 
-@router_statistic.post(
+@router_overview.post(
     '/task',
     description='开发统计',
     response_model_exclude_unset=True
@@ -29,7 +29,7 @@ async def task_statistic(request: Request, projects: ProjectReq):
     }]
 
 
-@router_statistic.post(
+@router_overview.post(
     '/sources',
     description='资源统计',
     response_model_exclude_unset=True
