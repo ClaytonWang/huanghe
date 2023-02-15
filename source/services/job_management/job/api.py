@@ -16,7 +16,8 @@ from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project, create_vcjob,\
     delete_vcjob, VolcanoJobCreateReq, VolcanoJobDeleteReq
-from job.serializers import JobCreate, JobDetail, JobList, JobEdit, JobOp, EventItem, EventCreate
+from job.serializers import JobCreate, JobDetail, JobList, JobEdit,\
+    JobOp, EventItem, EventCreate, JobStatusUpdate
 from models import Job, Status, Source
 from utils.auth import operate_auth
 from utils.storage_request import volume_check
@@ -167,21 +168,19 @@ async def create_job(request: Request,
     return _job.gen_job_detail_response()
 
 
-# @router_job.put(
-#     '/{job_id}/{status}',
-#     description='状态修改',
-# )
-# async def update_status(request: Request,
-#                         job_id: int = Path(..., ge=1, description="JobID"),
-#                         status: int = Path(..., ge=1, description="status_id"),
-#                         ):
-#     _job, reason = await operate_auth(request, job_id)
-#     if not _job:
-#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
-#
-#     if not await _job.update(status=status):
-#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job不存在')
-#     return JSONResponse(dict(id=job_id))
+@router_job.put(
+    '/{job_id}/status_update',
+    description='状态更新',
+)
+async def update_status(jsu: JobStatusUpdate,
+                        job_id: int = Path(..., ge=1, description="JobID")):
+    j = await Job.objects.select_related(['status']).get(pk=job_id)
+    if not j:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Job不存在")
+    print(jsu.status)
+    # if not await _job.update(status=status):
+    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job不存在')
+    return JSONResponse(dict(id=job_id))
 
 
 @router_job.put(
@@ -277,8 +276,8 @@ async def operate_job(request: Request,
     # todo 状态还需要调整
     update_data = {}
     if action == 0:
-        if _job.status.name not in ['pending', 'running', 'stop_fail', 'on']:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
+        # if _job.status.name not in ['pending', 'running', 'stop_fail', 'on']:
+        #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
         stat = await Status.objects.get(name='stop')
         update_data['status'] = stat.id
         delete_vcjob(vjd=VolcanoJobDeleteReq.parse_raw(payloads))
