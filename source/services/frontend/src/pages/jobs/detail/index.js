@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-15 16:27:34
+ * @LastEditTime: 2023-02-15 16:33:08
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -261,7 +261,7 @@ const JobDetail = () => {
   };
 
   const operations = useMemo(() => {
-    if (currTab === 'chart-monitor') {
+    if (currTab === 'chart') {
       const dateFormat = 'YYYY/MM/DD HH:mm:ss';
       return (
         <RangePicker
@@ -279,7 +279,7 @@ const JobDetail = () => {
       );
     }
 
-    if (currTab === 'log-monitor') {
+    if (currTab === 'log') {
       return <Button>下载</Button>;
     }
     return null;
