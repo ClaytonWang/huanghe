@@ -250,7 +250,8 @@ async def update_job(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
     update_data.update({"project_by_id": project_id,
                         "project_by": extra_info['name']})
-
+    if je.mode == "调试":
+        k8s_info['command'] = ["sleep 14400"]
     k8s_info['namespace'] = extra_info['en_name']
 
     k8s_info['name'] = f"{request.user.en_name}-{_job.name}"
@@ -314,7 +315,7 @@ async def operate_job(request: Request,
     if action == 0:
         # if _job.status.name not in ['pending', 'running', 'stop_fail', 'on']:
         #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
-        stat = await Status.objects.get(name='stop')
+        stat = await Status.objects.get(name='stopped')
         update_data['status'] = stat.id
         delete_vcjob(vjd=VolcanoJobDeleteReq.parse_raw(payloads))
         # if response.status != 200:
