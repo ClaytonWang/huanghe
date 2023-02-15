@@ -92,7 +92,7 @@ class Job(GenericDateModel):
     image: str = ormar.String(max_length=150, comment='镜像名称')
 
     status: Status = ormar.ForeignKey(Status, related_name='job_status')
-    work_dir: str = ormar.String(max_length=100, comment='工作目录')
+    work_dir: str = ormar.String(max_length=100, comment='工作目录', nullable=True)
     k8s_info: str = ormar.JSON(comment="集群信息")
 
     cpu: int = ormar.Integer(comment='CPU数量')
