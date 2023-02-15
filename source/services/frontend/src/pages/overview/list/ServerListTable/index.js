@@ -2,14 +2,13 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-14 13:53:37
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-14 14:04:13
+ * @LastEditTime: 2023-02-14 17:45:52
  * @FilePath: /huanghe/source/services/frontend/src/pages/overview/serverlist/ServerListTable/index.js
  * @Description: Server List Table
  */
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Table, Tooltip } from 'antd';
 import qs from 'qs';
-import { get } from 'lodash';
 
 const ServerListTable = ({
   tableData = {},
@@ -22,7 +21,7 @@ const ServerListTable = ({
       dataIndex: 'status',
       width: '10%',
       render(value) {
-        return get(value, 'status', '-');
+        return value || '-';
       },
     },
     {
@@ -30,15 +29,15 @@ const ServerListTable = ({
       dataIndex: 'server',
       width: '20%',
       render(value, _) {
-        return get(value, 'server', '-');
+        return value || '-';
       },
     },
     {
       title: '占用率',
-      dataIndex: 'occupied_rate',
+      dataIndex: 'occupiedRate',
       width: '20%',
       render(value) {
-        return get(value, 'occupied_rate', '-');
+        return value || '-';
       },
     },
     {
@@ -48,12 +47,12 @@ const ServerListTable = ({
     },
     {
       title: '占用人',
-      dataIndex: 'occupied_by',
+      dataIndex: 'occupiedBy',
       ellipsis: {
         showTitle: false,
       },
       render(value) {
-        const _value = get(value, 'occupied_by', '-');
+        const _value = value?.map((v) => v.username).join(',');
         return (
           <Tooltip placement="topLeft" title={_value}>
             {_value}

@@ -6,8 +6,8 @@
  * @Description 总览
  */
 import { Navigate, Route, Routes } from 'react-router-dom';
-import OverviewList from './list';
-import ServerList from './serverlist';
+import OverviewList from './summary';
+import ServerList from './list';
 
 const OverviewRoutes = () => (
   <Routes>

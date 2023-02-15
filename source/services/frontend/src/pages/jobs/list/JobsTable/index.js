@@ -48,7 +48,7 @@ const JobsTable = ({
         }
         return (
           <label>
-            <Tooltip title={value.desc}>{icon}</Tooltip>
+            {icon}
             {value.desc}
           </label>
         );
