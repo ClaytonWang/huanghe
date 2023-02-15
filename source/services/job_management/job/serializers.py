@@ -136,9 +136,9 @@ class JobDetail(BaseModel):
 class JobEdit(BaseModel):
     project: Project
     mode: str
-    start_command: str
+    start_command: Optional[str]
     image: Image
-    work_dir: str
+    work_dir: Optional[str]
     hooks: List[HookItem] = []
     source: str
 

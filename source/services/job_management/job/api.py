@@ -217,7 +217,6 @@ async def update_job(request: Request,
     if je.mode == "调试":
         k8s_info['command'] = ["sleep 14400"]
     k8s_info['namespace'] = extra_info['en_name']
-
     k8s_info['name'] = f"{request.user.en_name}-{_job.name}"
 
     if je.source:
@@ -242,7 +241,8 @@ async def update_job(request: Request,
 
     k8s_info['image'] = je.image.name
     update_data.update({"image": je.image.name,
-                        "custom": je.image.custom,})
+                        "custom": je.image.custom,
+                        "working_dir": je.work_dir,})
     storages, volumes_k8s = await volume_check(authorization, je.hooks, extra_info['en_name'])
     path_set = {x['path'] for x in storages}
     if len(path_set) != len(storages):
