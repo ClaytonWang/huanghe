@@ -7,7 +7,7 @@
 """
 
 from fastapi import APIRouter, Request
-from serializers import  ProjectReq
+from ..overview.serializers import ProjectReq
 
 router_statistic = APIRouter()
 
