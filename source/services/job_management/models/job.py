@@ -33,6 +33,7 @@ JOB_STATUS_FAILED = "Failed"
 JOB_STATUS_RESTARTING = "Restarting"
 JOB_STATUS_ABORTED = "Aborted"
 JOB_STATUS_ABORTING = "Aborting"
+JOB_STATUS_RUNNING = "Running"
 
 COMMON = "https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
 
@@ -217,10 +218,12 @@ class Job(GenericDateModel):
     def compare_status_and_update(cls, status: str, status_dic):
         if status == JOB_STATUS_PENDING:
             return status_dic['pending']
+        elif status == JOB_STATUS_RUNNING:
+            return status_dic['run']
         elif status == JOB_STATUS_FAILED:
             return status_dic['run_fail']
         elif status in {JOB_STATUS_COMPLETED, JOB_STATUS_COMPLETING}:
             return status_dic['completed']
         elif status in {JOB_STATUS_TERMINATING, JOB_STATUS_TERMINATED, JOB_STATUS_ABORTED, JOB_STATUS_ABORTING}:
             return status_dic['error']
-        return "unknown"
+        return 1
