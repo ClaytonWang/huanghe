@@ -215,13 +215,7 @@ async def update_status(jsu: JobStatusUpdate,
     j = await Job.objects.select_related(['status']).get(pk=job_id)
     if not j:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Job不存在")
-    status_dic = {}
-    status_objs = await Status.objects.all()
-    for status_obj in status_objs:
-        status_dic[status_obj.name] = status_obj.id
-    st = Job.compare_status_and_update(jsu.status, status_dic)
-    update_data = {"status": st}
-    await j.update(**update_data)
+    print(jsu.status)
     # if not await _job.update(status=status):
     #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job不存在')
     return JSONResponse(dict(id=job_id))
