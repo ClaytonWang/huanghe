@@ -214,14 +214,13 @@ class Job(GenericDateModel):
         }
 
     @classmethod
-    def compare_status_and_update(cls, j: Job, status: str, status_dic):
+    def compare_status_and_update(cls, status: str, status_dic):
         if status == JOB_STATUS_PENDING:
-            j.status = status_dic['pending']
+            return status_dic['pending']
         elif status == JOB_STATUS_FAILED:
-            j.status = status_dic['run_fail']
+            return status_dic['run_fail']
         elif status in {JOB_STATUS_COMPLETED, JOB_STATUS_COMPLETING}:
-            j.status = status_dic['completed']
+            return status_dic['completed']
         elif status in {JOB_STATUS_TERMINATING, JOB_STATUS_TERMINATED, JOB_STATUS_ABORTED, JOB_STATUS_ABORTING}:
-            j.status = status_dic['error']
-        else:
-            print(f"unknow status: {status}")
+            return status_dic['error']
+        return "unknown"
