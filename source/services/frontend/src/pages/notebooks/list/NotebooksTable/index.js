@@ -128,7 +128,7 @@ const NotebooksTable = ({
             label: (
               <AuthButton
                 required="notebooks.list.edit"
-                type="link"
+                type="text"
                 onClick={() => {
                   handleEditClicked(record);
                 }}
@@ -147,7 +147,7 @@ const NotebooksTable = ({
             label: (
               <AuthButton
                 required="notebooks.list.edit"
-                type="link"
+                type="text"
                 onClick={() => {
                   handleDeleteClicked(record);
                 }}

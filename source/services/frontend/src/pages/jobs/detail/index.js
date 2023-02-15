@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-15 15:50:32
+ * @LastEditTime: 2023-02-15 16:27:34
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -348,6 +348,7 @@ const JobDetail = () => {
       <div className="monitor-container">
         <Card
           activeTabKey={currTab}
+          tabBarExtraContent={operations}
           tabList={[
             {
               key: 'chart',
@@ -428,7 +429,7 @@ JobDetail.context = (props = {}) => {
   const DebugBtn = (props = {}) => (
     <AuthButton
       required="jobs.list"
-      type="link"
+      type="text"
       {...props}
       onClick={() => {
         const { url } = detail;
@@ -446,7 +447,7 @@ JobDetail.context = (props = {}) => {
   const CopyBtn = (props = {}) => (
     <AuthButton
       required="jobs.list.edit"
-      type="link"
+      type="text"
       {...props}
       onClick={() => {
         handleCopyClicked(detail);
@@ -464,7 +465,7 @@ JobDetail.context = (props = {}) => {
   const EditBtn = (props = {}) => (
     <AuthButton
       required="jobs.list.edit"
-      type="link"
+      type="text"
       {...props}
       onClick={() => {
         handleEditClicked(detail);
@@ -482,7 +483,7 @@ JobDetail.context = (props = {}) => {
   const DeleteBtn = () => (
     <AuthButton
       required="jobs.list.edit"
-      type="link"
+      type="text"
       onClick={() => {
         handleDeleteClicked(detail);
       }}

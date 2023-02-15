@@ -67,6 +67,8 @@ module.exports = {
     imagesList: 'get|/notebook/image',
     sourceList: 'get|/notebook/source',
     serverList: 'get|/servers',
+    serverTask: 'get|/servers/statistic/task',
+    serverSource: 'get|servers/statistic/sources',
   },
   breadcrumbConfig: {
     '/overview/list': '总览',

@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-15 15:50:01
+ * @LastEditTime: 2023-02-15 16:23:57
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
@@ -251,7 +251,7 @@ const NotebookDetail = () => {
   };
 
   const operations = useMemo(() => {
-    if (currTab === 'event-monitor') return null;
+    if (currTab === 'event') return null;
 
     const dateFormat = 'YYYY/MM/DD HH:mm:ss';
     return (
@@ -332,6 +332,7 @@ const NotebookDetail = () => {
       <div className="monitor-container">
         <Card
           activeTabKey={currTab}
+          tabBarExtraContent={operations}
           tabList={[
             {
               key: 'chart',
@@ -367,7 +368,7 @@ NotebookDetail.context = (props = {}) => {
         label: (
           <AuthButton
             required="notebooks.list.edit"
-            type="link"
+            type="text"
             onClick={() => {
               handleEditClicked(detail);
             }}
@@ -386,7 +387,7 @@ NotebookDetail.context = (props = {}) => {
         label: (
           <AuthButton
             required="notebooks.list.edit"
-            type="link"
+            type="text"
             onClick={() => {
               handleDelete(detail);
             }}

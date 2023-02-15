@@ -175,7 +175,7 @@ const JobsTable = ({
     const DebugBtn = () => (
       <AuthButton
         required="jobs.list"
-        type="link"
+        type="text"
         onClick={() => {
           handleOpenClicked(record);
         }}
@@ -191,7 +191,7 @@ const JobsTable = ({
     const CopyBtn = () => (
       <AuthButton
         required="jobs.list.edit"
-        type="link"
+        type="text"
         onClick={() => {
           handleCopyClicked(record);
         }}
@@ -224,7 +224,7 @@ const JobsTable = ({
     const DeleteBtn = () => (
       <AuthButton
         required="jobs.list.edit"
-        type="link"
+        type="text"
         onClick={() => {
           handleDeleteClicked(record);
         }}
@@ -251,7 +251,7 @@ const JobsTable = ({
     if (taskModel === DEBUG) {
       items.unshift({
         key: 'edit',
-        label: <EditBtn />,
+        label: <EditBtn type="text" />,
       });
     }
 
