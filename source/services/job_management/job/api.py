@@ -242,7 +242,7 @@ async def update_job(request: Request,
     k8s_info['image'] = je.image.name
     update_data.update({"image": je.image.name,
                         "custom": je.image.custom,
-                        "working_dir": je.work_dir,})
+                        "work_dir": je.work_dir,})
     storages, volumes_k8s = await volume_check(authorization, je.hooks, extra_info['en_name'])
     path_set = {x['path'] for x in storages}
     if len(path_set) != len(storages):
