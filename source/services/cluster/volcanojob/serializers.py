@@ -38,16 +38,11 @@ class VolcanoJobCreateReq(BaseModelValidatorName):
                 "nvidia.com/gpu": self.gpu,
             },
             "volumes": [v.dict() for v in self.volumes],
-            "command": self.command,
+            "command": ['sh', "-c"] + self.command if self.command else self.command,
             "working_dir": self.working_dir,
             "annotations": self.annotations,
         }
 
-    @validator('command')
-    def format(cls):
-        if len(cls.command) > 0:
-            return ["sh", "-c"] + cls.command
-        return cls.command
 
 class VolcanoJobDeleteReq(BaseModel):
     name: str
