@@ -13,7 +13,7 @@ router_overview = APIRouter()
 
 
 @router_overview.post(
-    '/task',
+    '/tasks',
     description='开发统计',
     response_model_exclude_unset=True
 )
