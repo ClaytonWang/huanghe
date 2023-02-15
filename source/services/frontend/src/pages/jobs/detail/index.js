@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-14 12:56:04
+ * @LastEditTime: 2023-02-15 16:33:08
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Col,
+  Card,
   Row,
   Tabs,
   Space,
@@ -51,7 +52,7 @@ const { RangePicker } = DatePicker;
 const JobDetail = () => {
   const [tableData, setTableData] = useState([]);
   const [detailData, setDetailData] = useState(null);
-  const [currTab, setCurrTab] = useState('');
+  const [currTab, setCurrTab] = useState('chart');
   const [dateRange, setDateRange] = useState({
     from: moment().add(-1, 'h'), // 默认1小时
     to: moment(),
@@ -244,7 +245,7 @@ const JobDetail = () => {
     setCurrTab(key);
     // eslint-disable-next-line default-case
     switch (key) {
-      case 'event-monitor':
+      case 'event':
         requestEvent({ loading: true });
         break;
     }
@@ -260,7 +261,7 @@ const JobDetail = () => {
   };
 
   const operations = useMemo(() => {
-    if (currTab === 'chart-monitor') {
+    if (currTab === 'chart') {
       const dateFormat = 'YYYY/MM/DD HH:mm:ss';
       return (
         <RangePicker
@@ -278,11 +279,24 @@ const JobDetail = () => {
       );
     }
 
-    if (currTab === 'log-monitor') {
+    if (currTab === 'log') {
       return <Button>下载</Button>;
     }
     return null;
   }, [currTab]);
+
+  const contentList = {
+    chart: <ChartMonitor urls={detailData?.grafana} dateRange={dateRange} />,
+    event: (
+      <EventMonitor
+        onPageNoChange={onPageNoChange}
+        tableData={tableData}
+        reload={reload}
+        loading={loading}
+      />
+    ),
+    log: <LogMonitor />,
+  };
 
   return (
     <div className="detail">
@@ -331,41 +345,28 @@ const JobDetail = () => {
           )}
         </Row>
       </div>
-      <div className="dbr-table-container">
-        <Tabs
-          defaultActiveKey="chart-monitor"
+      <div className="monitor-container">
+        <Card
+          activeTabKey={currTab}
           tabBarExtraContent={operations}
-          items={[
+          tabList={[
             {
-              key: 'chart-monitor',
-              label: `监控`,
-              children: (
-                <ChartMonitor
-                  urls={detailData?.grafana}
-                  dateRange={dateRange}
-                />
-              ),
+              key: 'chart',
+              tab: '监控',
             },
             {
-              key: 'event-monitor',
-              label: `事件`,
-              children: (
-                <EventMonitor
-                  onPageNoChange={onPageNoChange}
-                  tableData={tableData}
-                  reload={reload}
-                  loading={loading}
-                />
-              ),
+              key: 'event',
+              tab: '事件',
             },
             {
-              key: 'log-monitor',
-              label: `日志`,
-              children: <LogMonitor />,
+              key: 'log',
+              tab: '日志',
             },
           ]}
-          onChange={onTabChange}
-        />
+          onTabChange={onTabChange}
+        >
+          {contentList[currTab]}
+        </Card>
       </div>
     </div>
   );
@@ -428,7 +429,7 @@ JobDetail.context = (props = {}) => {
   const DebugBtn = (props = {}) => (
     <AuthButton
       required="jobs.list"
-      type="link"
+      type="text"
       {...props}
       onClick={() => {
         const { url } = detail;
@@ -446,7 +447,7 @@ JobDetail.context = (props = {}) => {
   const CopyBtn = (props = {}) => (
     <AuthButton
       required="jobs.list.edit"
-      type="link"
+      type="text"
       {...props}
       onClick={() => {
         handleCopyClicked(detail);
@@ -464,7 +465,7 @@ JobDetail.context = (props = {}) => {
   const EditBtn = (props = {}) => (
     <AuthButton
       required="jobs.list.edit"
-      type="link"
+      type="text"
       {...props}
       onClick={() => {
         handleEditClicked(detail);
@@ -482,7 +483,7 @@ JobDetail.context = (props = {}) => {
   const DeleteBtn = () => (
     <AuthButton
       required="jobs.list.edit"
-      type="link"
+      type="text"
       onClick={() => {
         handleDeleteClicked(detail);
       }}

@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-02 15:30:25
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-10 15:49:41
+ * @LastEditTime: 2023-02-15 11:40:06
  * @FilePath: /huanghe/source/services/frontend/config/webpack.dev.config.js
  * @Description:
  */

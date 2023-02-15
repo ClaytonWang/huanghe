@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-14 12:59:25
+ * @LastEditTime: 2023-02-15 16:23:57
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
@@ -11,7 +11,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Col,
   Row,
-  Tabs,
+  Card,
   Space,
   Skeleton,
   Dropdown,
@@ -40,7 +40,7 @@ const { RangePicker } = DatePicker;
 const NotebookDetail = () => {
   const [tableData, setTableData] = useState([]);
   const [detailData, setDetailData] = useState(null);
-  const [currTab, setCurrTab] = useState('');
+  const [currTab, setCurrTab] = useState('chart');
   const [dateRange, setDateRange] = useState({
     from: moment().add(-1, 'h'), // 默认1小时
     to: moment(),
@@ -235,7 +235,7 @@ const NotebookDetail = () => {
     setCurrTab(key);
     // eslint-disable-next-line default-case
     switch (key) {
-      case 'event-monitor':
+      case 'event':
         requestEvent({ loading: true });
         break;
     }
@@ -251,7 +251,7 @@ const NotebookDetail = () => {
   };
 
   const operations = useMemo(() => {
-    if (currTab === 'event-monitor') return null;
+    if (currTab === 'event') return null;
 
     const dateFormat = 'YYYY/MM/DD HH:mm:ss';
     return (
@@ -269,6 +269,18 @@ const NotebookDetail = () => {
       />
     );
   }, [currTab]);
+
+  const contentList = {
+    chart: <ChartMonitor urls={detailData?.grafana} dateRange={dateRange} />,
+    event: (
+      <EventMonitor
+        onPageNoChange={onPageNoChange}
+        tableData={tableData}
+        reload={reload}
+        loading={loading}
+      />
+    ),
+  };
 
   return (
     <div className="detail">
@@ -317,36 +329,24 @@ const NotebookDetail = () => {
           )}
         </Row>
       </div>
-      <div className="dbr-table-container">
-        <Tabs
-          defaultActiveKey="chart-monitor"
+      <div className="monitor-container">
+        <Card
+          activeTabKey={currTab}
           tabBarExtraContent={operations}
-          items={[
+          tabList={[
             {
-              key: 'chart-monitor',
-              label: `监控`,
-              children: (
-                <ChartMonitor
-                  urls={detailData?.grafana}
-                  dateRange={dateRange}
-                />
-              ),
+              key: 'chart',
+              tab: '监控',
             },
             {
-              key: 'event-monitor',
-              label: `事件`,
-              children: (
-                <EventMonitor
-                  onPageNoChange={onPageNoChange}
-                  tableData={tableData}
-                  reload={reload}
-                  loading={loading}
-                />
-              ),
+              key: 'event',
+              tab: '事件',
             },
           ]}
-          onChange={onTabChange}
-        />
+          onTabChange={onTabChange}
+        >
+          {contentList[currTab]}
+        </Card>
       </div>
     </div>
   );
@@ -368,7 +368,7 @@ NotebookDetail.context = (props = {}) => {
         label: (
           <AuthButton
             required="notebooks.list.edit"
-            type="link"
+            type="text"
             onClick={() => {
               handleEditClicked(detail);
             }}
@@ -387,7 +387,7 @@ NotebookDetail.context = (props = {}) => {
         label: (
           <AuthButton
             required="notebooks.list.edit"
-            type="link"
+            type="text"
             onClick={() => {
               handleDelete(detail);
             }}
