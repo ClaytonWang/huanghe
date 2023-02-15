@@ -258,6 +258,7 @@ async def update_job(request: Request,
     update_data.update({"project_by_id": project_id,
                         "project_by": extra_info['name']})
     k8s_info['namespace'] = extra_info['en_name']
+
     k8s_info['name'] = f"{request.user.en_name}-{_job.name}"
     k8s_info["command"] = [je.start_command]
 
