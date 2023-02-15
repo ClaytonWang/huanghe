@@ -229,9 +229,11 @@ async def update_job(request: Request,
                      ):
     # user: AccountGetter = request.user
     authorization: str = request.headers.get('authorization')
+    if je.mode == "调试":
+        je.start_command = "sleep 14400"
     update_data = {"mode": je.mode,
                    "work_dir": je.work_dir,
-                   "start_command": "sleep 14400" if je.mode == "调试" else je.start_command,}
+                   "start_command": je.start_command,}
     if not update_data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
 
@@ -250,10 +252,9 @@ async def update_job(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
     update_data.update({"project_by_id": project_id,
                         "project_by": extra_info['name']})
-    if je.mode == "调试":
-        k8s_info['command'] = ["sleep 14400"]
     k8s_info['namespace'] = extra_info['en_name']
     k8s_info['name'] = f"{request.user.en_name}-{_job.name}"
+    k8s_info["command"] = [je.start_command]
 
     if je.source:
         gpu_count = 0
