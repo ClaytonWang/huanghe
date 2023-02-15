@@ -223,9 +223,11 @@ def create_vcjob(vjc: VolcanoJobCreateReq, ignore_exist=False):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='创建vcjob失败')
     return True
 
-def delete_vcjob(vjd: VolcanoJobDeleteReq):
+def delete_vcjob(vjd: VolcanoJobDeleteReq, ignore_no_found=False):
     try:
         response = requests.delete(f"http://{CLUSTER_SERVICE_URL}{CLUSTER_VCJOB_PREFIX_URL}", json=vjd.dict()).json()
+        if ignore_no_found and response["success"] is not True and response["message"] == "NotFound":
+            return True
         assert response['success'] is True
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='删除vcjob失败')

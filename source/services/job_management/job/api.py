@@ -301,7 +301,6 @@ async def update_job(request: Request,
 async def operate_job(request: Request,
                       data: JobOp,
                       job_id: int = Path(..., ge=1, description="JobID")):
-    authorization: str = request.headers.get('authorization')
     action = int(data.dict()['action'])
     _job, reason = await operate_auth(request, job_id)
     if not _job:
@@ -318,9 +317,7 @@ async def operate_job(request: Request,
         #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
         stat = await Status.objects.get(name='stopped')
         update_data['status'] = stat.id
-        delete_vcjob(vjd=VolcanoJobDeleteReq.parse_raw(payloads))
-        # if response.status != 200:
-        #     _job.status = None
+        delete_vcjob(vjd=VolcanoJobDeleteReq.parse_raw(payloads), ignore_no_found=True)
     elif action == 1:
         # if _job.status.name not in ['start_fail', 'run_fail', 'stopped']:
         #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
@@ -328,9 +325,6 @@ async def operate_job(request: Request,
         update_data['status'] = stat.id
         # todo response返回不为200时更新job状态到异常
         create_vcjob(vjc=VolcanoJobCreateReq.parse_raw(payloads))
-        # if response.status != 200:
-        #     _job.status = None
-    # print(response)
 
     if not update_data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
@@ -354,11 +348,11 @@ async def delete_job(request: Request,
     # if _job.status.name not in ['stopped', 'error']:
     #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job未停止')
 
-    # payloads = _job.k8s_info
+    payloads = _job.k8s_info
     # # error状态调用删除需要释放资源
-    # if _job.status.name == 'error':
+    if _job.status.name != 'stop':
     #     authorization: str = request.headers.get('authorization')
-    #     response = await delete_job_k8s(authorization, payloads)
+        delete_vcjob(vjd=VolcanoJobDeleteReq.parse_obj(dict(payloads)), ignore_no_found=True)
     # if response.status != 200:
     #     _job.status = None
     await _job.delete()
