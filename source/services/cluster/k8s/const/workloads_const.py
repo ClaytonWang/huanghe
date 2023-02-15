@@ -15,6 +15,7 @@ SECRET_NAME_DOCKER_CONFIG = "huaweicloud-bj-registry"
 IMAGE_PULL_POLICY_ALWAYS = "always"
 IMAGE_PULL_POLICY_IF_NOT_PRESENT = "IfNotPresent"
 
+RESTART_POLICY_NEVER = "Never"
 
 # resource requirement fields
 RESOURCE_REQUIREMENTS_CPU = "cpu"
