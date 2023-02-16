@@ -46,7 +46,7 @@ const NotebooksTable = ({
         }
         return (
           <label>
-            <Tooltip title={value.desc}>{icon}</Tooltip>
+            {icon}
             {value.desc}
           </label>
         );
@@ -56,8 +56,15 @@ const NotebooksTable = ({
       title: '名称',
       dataIndex: 'name',
       width: '10%',
+      ellipsis: {
+        showTitle: false,
+      },
       render(value, _) {
-        return <Link to={`/notebooks/list/detail?id=${_.id}`}>{value}</Link>;
+        return (
+          <Tooltip placement="topLeft" title={value}>
+            <Link to={`/notebooks/list/detail?id=${_.id}`}>{value}</Link>
+          </Tooltip>
+        );
       },
     },
     {
@@ -121,7 +128,7 @@ const NotebooksTable = ({
             label: (
               <AuthButton
                 required="notebooks.list.edit"
-                type="link"
+                type="text"
                 onClick={() => {
                   handleEditClicked(record);
                 }}
@@ -140,7 +147,7 @@ const NotebooksTable = ({
             label: (
               <AuthButton
                 required="notebooks.list.edit"
-                type="link"
+                type="text"
                 onClick={() => {
                   handleDeleteClicked(record);
                 }}

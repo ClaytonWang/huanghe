@@ -139,6 +139,11 @@ class Job(GenericDateModel):
         else:
             return f"CPU {self.cpu}C {self.memory}G"
 
+
+    @property
+    def webkubectl(self):
+        return "http://121.36.41.231:31767/?arg=-nkubeflow&arg=jupyter-web-app-deployment-65685cc86d-lt85h&arg=bash"
+
     def gen_job_pagation_response(self):
         return {
             "id": self.id,
@@ -153,7 +158,7 @@ class Job(GenericDateModel):
                         "name": self.project_by,},
             "image": {"name": self.image,
                       "custom": self.custom,},
-            "url": self.url,
+            "url": self.webkubectl,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "mode": self.mode,
@@ -181,4 +186,5 @@ class Job(GenericDateModel):
                         "gpu": self.gpu_url,
                         "ram": self.ram_url,
                         "vram": self.vram_url,},
+            "url": self.webkubectl,
         }

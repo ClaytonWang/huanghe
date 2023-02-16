@@ -55,7 +55,7 @@ const EventMonitor = ({
   return (
     <Table
       className="dbr-table"
-      style={{ marginTop: 20 }}
+      style={{ marginTop: -10 }}
       rowKey="id"
       size="small"
       columns={columns}

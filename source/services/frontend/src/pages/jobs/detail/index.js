@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-13 15:21:34
+ * @LastEditTime: 2023-02-15 16:33:08
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Col,
+  Card,
   Row,
   Tabs,
   Space,
@@ -20,16 +21,26 @@ import {
   message,
   Modal,
   DatePicker,
+  Button,
 } from 'antd';
-import { useAuth } from '@/common/hooks/useAuth';
-import Icon from '@ant-design/icons';
-import { ChartMonitor, EventMonitor, AuthButton } from '@/common/components';
+import Icon, { InfoCircleOutlined } from '@ant-design/icons';
+import {
+  ChartMonitor,
+  EventMonitor,
+  AuthButton,
+  LogMonitor,
+  Auth,
+} from '@/common/components';
 import { get } from 'lodash';
 
-import { purifyDeep, transformDate } from '@/common/utils/helper';
+import {
+  purifyDeep,
+  transformDate,
+  getStatusName,
+} from '@/common/utils/helper';
 import api from '@/common/api';
 import qs from 'qs';
-import { JOB_ACTION, START, STOP, UPDATE } from '@/common/constants';
+import { JOB_ACTION, START, STOP, UPDATE, DEBUG } from '@/common/constants';
 import Icons from '@/common/components/Icon';
 import { useContextProps } from '@/common/hooks/RoutesProvider';
 import moment from 'moment';
@@ -41,7 +52,7 @@ const { RangePicker } = DatePicker;
 const JobDetail = () => {
   const [tableData, setTableData] = useState([]);
   const [detailData, setDetailData] = useState(null);
-  const [currTab, setCurrTab] = useState('');
+  const [currTab, setCurrTab] = useState('chart');
   const [dateRange, setDateRange] = useState({
     from: moment().add(-1, 'h'), // 默认1小时
     to: moment(),
@@ -234,7 +245,7 @@ const JobDetail = () => {
     setCurrTab(key);
     // eslint-disable-next-line default-case
     switch (key) {
-      case 'event-monitor':
+      case 'event':
         requestEvent({ loading: true });
         break;
     }
@@ -250,24 +261,42 @@ const JobDetail = () => {
   };
 
   const operations = useMemo(() => {
-    if (currTab === 'event-monitor') return null;
+    if (currTab === 'chart') {
+      const dateFormat = 'YYYY/MM/DD HH:mm:ss';
+      return (
+        <RangePicker
+          allowClear={false}
+          presets={rangePresets}
+          showTime
+          format={dateFormat}
+          onChange={onRangeChange}
+          placement="bottomRight"
+          defaultValue={[
+            moment(dateRange.from, dateFormat),
+            moment(dateRange.to, dateFormat),
+          ]}
+        />
+      );
+    }
 
-    const dateFormat = 'YYYY/MM/DD HH:mm:ss';
-    return (
-      <RangePicker
-        allowClear={false}
-        presets={rangePresets}
-        showTime
-        format={dateFormat}
-        onChange={onRangeChange}
-        placement="bottomRight"
-        defaultValue={[
-          moment(dateRange.from, dateFormat),
-          moment(dateRange.to, dateFormat),
-        ]}
-      />
-    );
+    if (currTab === 'log') {
+      return <Button>下载</Button>;
+    }
+    return null;
   }, [currTab]);
+
+  const contentList = {
+    chart: <ChartMonitor urls={detailData?.grafana} dateRange={dateRange} />,
+    event: (
+      <EventMonitor
+        onPageNoChange={onPageNoChange}
+        tableData={tableData}
+        reload={reload}
+        loading={loading}
+      />
+    ),
+    log: <LogMonitor />,
+  };
 
   return (
     <div className="detail">
@@ -298,6 +327,13 @@ const JobDetail = () => {
               <Col span={6} title={detailData?.source}>
                 资源规格：{detailData?.source}
               </Col>
+              <Col span={6} title="SSH远程开发">
+                SSH远程开发
+                <Tooltip title="prompt text">
+                  <InfoCircleOutlined />
+                </Tooltip>
+                :<a style={{ marginLeft: 5 }}>查看配置信息</a>
+              </Col>
               <Col span={6} title={detailData?.creator?.username}>
                 创建人：{detailData?.creator?.username}
               </Col>
@@ -309,36 +345,28 @@ const JobDetail = () => {
           )}
         </Row>
       </div>
-      <div className="dbr-table-container">
-        <Tabs
-          defaultActiveKey="chart-monitor"
+      <div className="monitor-container">
+        <Card
+          activeTabKey={currTab}
           tabBarExtraContent={operations}
-          items={[
+          tabList={[
             {
-              key: 'chart-monitor',
-              label: `监控`,
-              children: (
-                <ChartMonitor
-                  urls={detailData?.grafana}
-                  dateRange={dateRange}
-                />
-              ),
+              key: 'chart',
+              tab: '监控',
             },
             {
-              key: 'event-monitor',
-              label: `事件`,
-              children: (
-                <EventMonitor
-                  onPageNoChange={onPageNoChange}
-                  tableData={tableData}
-                  reload={reload}
-                  loading={loading}
-                />
-              ),
+              key: 'event',
+              tab: '事件',
+            },
+            {
+              key: 'log',
+              tab: '日志',
             },
           ]}
-          onChange={onTabChange}
-        />
+          onTabChange={onTabChange}
+        >
+          {contentList[currTab]}
+        </Card>
       </div>
     </div>
   );
@@ -349,132 +377,187 @@ JobDetail.context = (props = {}) => {
     handleStartClicked,
     handleStopClicked,
     handleEditClicked,
-    handleDelete,
+    handleCopyClicked,
+    handleDeleteClicked,
     detail,
   } = props;
-  const statusName = get(detail, 'status.name');
   const statusDesc = get(detail, 'status.desc');
+  const _sname = get(detail, 'status.name');
+  const statusName = getStatusName(_sname);
+  const taskModel = get(detail, 'mode');
+
+  const StartStopBtn = (props = {}) => {
+    if (
+      statusName === 'stopped' ||
+      _sname === 'run_fail' ||
+      _sname === 'start_fail'
+    ) {
+      return (
+        <AuthButton
+          required="jobs.list.edit"
+          onClick={() => {
+            handleStartClicked(detail);
+          }}
+          condition={[
+            (user) => get(detail, 'creator.username') === get(user, 'username'),
+          ]}
+          {...props}
+        >
+          启动
+        </AuthButton>
+      );
+    }
+    if (statusName !== 'stopped') {
+      return (
+        <AuthButton
+          required="jobs.list.edit"
+          onClick={() => {
+            handleStopClicked(detail);
+          }}
+          condition={[
+            () => ['stop_fail', 'stop', 'completed'].indexOf(statusName) < 0,
+            (user) => get(detail, 'creator.username') === get(user, 'username'),
+          ]}
+          {...props}
+        >
+          停止
+        </AuthButton>
+      );
+    }
+  };
+
+  const DebugBtn = (props = {}) => (
+    <AuthButton
+      required="jobs.list"
+      type="text"
+      {...props}
+      onClick={() => {
+        const { url } = detail;
+        window.open(url);
+      }}
+      condition={[
+        () => ['running'].indexOf(statusName) > -1,
+        (user) => get(detail, 'creator.username') === get(user, 'username'),
+      ]}
+    >
+      调试
+    </AuthButton>
+  );
+
+  const CopyBtn = (props = {}) => (
+    <AuthButton
+      required="jobs.list.edit"
+      type="text"
+      {...props}
+      onClick={() => {
+        handleCopyClicked(detail);
+      }}
+      condition={[
+        () => ['error', 'stopped', 'completed'].indexOf(statusName) > -1,
+        () => ['stop_fail'].indexOf(_sname) < 0,
+        (user) => get(detail, 'creator.username') === get(user, 'username'),
+      ]}
+    >
+      复制
+    </AuthButton>
+  );
+
+  const EditBtn = (props = {}) => (
+    <AuthButton
+      required="jobs.list.edit"
+      type="text"
+      {...props}
+      onClick={() => {
+        handleEditClicked(detail);
+      }}
+      condition={[
+        () => ['error', 'stopped', 'completed'].indexOf(statusName) > -1,
+        () => ['stop_fail'].indexOf(_sname) < 0,
+        (user) => get(detail, 'creator.username') === get(user, 'username'),
+      ]}
+    >
+      编辑
+    </AuthButton>
+  );
+
+  const DeleteBtn = () => (
+    <AuthButton
+      required="jobs.list.edit"
+      type="text"
+      onClick={() => {
+        handleDeleteClicked(detail);
+      }}
+      condition={[
+        () => ['stopped', 'error', 'completed'].indexOf(statusName) > -1,
+        () => ['stop_fail'].indexOf(_sname) < 0,
+        (user) => get(detail, 'creator.username') === get(user, 'username'),
+      ]}
+    >
+      删除
+    </AuthButton>
+  );
+  let items = [
+    {
+      key: 'copy',
+      label: <CopyBtn />,
+    },
+    {
+      key: 'delete',
+      label: <DeleteBtn />,
+    },
+  ];
+
+  if (taskModel === DEBUG) {
+    items.unshift({
+      key: 'edit',
+      label: <EditBtn />,
+    });
+  }
   const menuProps = {
-    items: [
-      {
-        label: (
-          <AuthButton
-            required="jobs.list.edit"
-            type="link"
-            onClick={() => {
-              handleEditClicked(detail);
-            }}
-            condition={[
-              () => ['stopped'].indexOf(statusName) > -1,
-              (user) =>
-                get(detail, 'creator.username') === get(user, 'username'),
-            ]}
-          >
-            编辑
-          </AuthButton>
-        ),
-        key: 'edit',
-      },
-      {
-        label: (
-          <AuthButton
-            required="jobs.list.edit"
-            type="link"
-            onClick={() => {
-              handleDelete(detail);
-            }}
-            condition={[
-              () => ['stopped', 'error'].indexOf(statusName) > -1,
-              (user) =>
-                get(detail, 'creator.username') === get(user, 'username'),
-            ]}
-          >
-            删除
-          </AuthButton>
-        ),
-        key: 'delete',
-      },
-    ],
+    items,
   };
   return (
-    <Space>
-      {(() => {
-        if (!statusName) return null;
-        let icon = (
-          <Icon
-            style={{ fontSize: 18, marginRight: 5 }}
-            component={Icons[statusName]}
-          />
-        );
-        if (/^(stop|start|pending)$/.test(statusName)) {
-          icon = (
-            <Spin
-              indicator={
-                <Icon
-                  style={{ fontSize: 16, marginRight: 5 }}
-                  component={Icons[statusName]}
-                  spin
-                  rotate={(/pending/.test(statusName) && 180) || 0}
-                />
-              }
+    <Auth required="jobs.list.edit">
+      <Space>
+        {(() => {
+          if (!statusName) return null;
+          let icon = (
+            <Icon
+              style={{ fontSize: 18, marginRight: 5 }}
+              component={Icons[statusName]}
             />
           );
-        }
-        return (
-          <label>
-            <Tooltip title={statusDesc}>{icon}</Tooltip>
-            {statusDesc}
-          </label>
-        );
-      })()}
-      <Dropdown.Button menu={menuProps}>
-        {statusName === 'stopped' && (
-          <AuthButton
-            required="jobs.list.edit"
-            type="text"
-            onClick={() => {
-              handleStartClicked(detail);
-            }}
-            condition={[
-              (user) =>
-                get(detail, 'creator.username') === get(user, 'username'),
-            ]}
-          >
-            启动
-          </AuthButton>
-        )}
-        {statusName !== 'stopped' && (
-          <AuthButton
-            required="jobs.list.edit"
-            type="text"
-            onClick={() => {
-              handleStopClicked(detail);
-            }}
-            condition={[
-              () => ['error', 'stop'].indexOf(statusName) < 0,
-              (user) =>
-                get(detail, 'creator.username') === get(user, 'username'),
-            ]}
-          >
-            停止
-          </AuthButton>
-        )}
-      </Dropdown.Button>
-      <AuthButton
-        required="jobs.list"
-        type="primary"
-        onClick={() => {
-          const { url } = detail;
-          window.open(url);
-        }}
-        condition={[
-          () => ['running'].indexOf(statusName) > -1,
-          (user) => get(detail, 'creator.username') === get(user, 'username'),
-        ]}
-      >
-        打开
-      </AuthButton>
-    </Space>
+          if (/^(stop|start|pending|running)$/.test(statusName)) {
+            icon = (
+              <Spin
+                indicator={
+                  <Icon
+                    style={{ fontSize: 16, marginRight: 5 }}
+                    component={Icons[statusName]}
+                    spin
+                    rotate={(/pending/.test(statusName) && 180) || 0}
+                  />
+                }
+              />
+            );
+          }
+          return (
+            <label>
+              <Tooltip title={statusDesc}>{icon}</Tooltip>
+              {statusDesc}
+            </label>
+          );
+        })()}
+        <Dropdown.Button menu={menuProps}>
+          {taskModel === DEBUG ? (
+            <DebugBtn type="text" />
+          ) : (
+            <EditBtn type="text" />
+          )}
+        </Dropdown.Button>
+        <StartStopBtn type="primary" />
+      </Space>
+    </Auth>
   );
 };
 

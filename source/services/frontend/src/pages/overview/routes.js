@@ -6,12 +6,14 @@
  * @Description 总览
  */
 import { Navigate, Route, Routes } from 'react-router-dom';
-import OverviewList from './list';
+import OverviewList from './summary';
+import ServerList from './list';
 
 const OverviewRoutes = () => (
   <Routes>
     <Route path="" element={<Navigate to="list" />} />
     <Route path="list" element={<OverviewList />} />
+    <Route path="serverlist" element={<ServerList />} />
   </Routes>
 );
 export default OverviewRoutes;
