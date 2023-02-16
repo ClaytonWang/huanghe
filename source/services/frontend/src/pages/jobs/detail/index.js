@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-16 17:43:34
+ * @LastEditTime: 2023-02-16 17:58:48
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -289,18 +289,19 @@ const JobDetail = () => {
 
     if (currTab === 'log') {
       return (
-        <RangePicker
-          allowClear={false}
-          presets={rangePresets}
-          showTime
-          format={dateFormat}
-          onChange={onLogRangeChange}
-          placement="bottomRight"
-          defaultValue={[
-            moment(logRange.from, dateFormat),
-            moment(logRange.to, dateFormat),
-          ]}
-        />
+        // <RangePicker
+        //   allowClear={false}
+        //   presets={rangePresets}
+        //   showTime
+        //   format={dateFormat}
+        //   onChange={onLogRangeChange}
+        //   placement="bottomRight"
+        //   defaultValue={[
+        //     moment(logRange.from, dateFormat),
+        //     moment(logRange.to, dateFormat),
+        //   ]}
+        // />
+        null
       );
     }
     return null;
@@ -318,6 +319,7 @@ const JobDetail = () => {
     ),
     log: (
       <ChartMonitor
+        style={{ height: 800 }}
         urls={{
           log: `https://grafana.digitalbrain.cn:32443/d/o6-BGgnnk/kubernetes-logs?orgId=1&var-query=&theme=light&viewPanel=2&kiosk=tv`,
         }}
