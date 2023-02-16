@@ -215,9 +215,10 @@ async def update_job(request: Request,
     k8s_info = _job.k8s_info
 
     # TODO(jiangshouchen): add more status
-    if _job.status.name != 'stopped':
+    if _job.status.name not in {'stopped', "completed", "run_fail"}:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job未停止')
-
+    stat = await Status.objects.get(name='stopped')
+    update_data['status'] = stat.id
     project_id = je.project.id
     check, extra_info = await project_check_obj(request, project_id)
     if not check:
