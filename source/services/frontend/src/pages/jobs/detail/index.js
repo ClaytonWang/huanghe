@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-15 16:33:08
+ * @LastEditTime: 2023-02-16 17:43:34
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -12,7 +12,6 @@ import {
   Col,
   Card,
   Row,
-  Tabs,
   Space,
   Skeleton,
   Dropdown,
@@ -21,14 +20,12 @@ import {
   message,
   Modal,
   DatePicker,
-  Button,
 } from 'antd';
 import Icon, { InfoCircleOutlined } from '@ant-design/icons';
 import {
   ChartMonitor,
   EventMonitor,
   AuthButton,
-  LogMonitor,
   Auth,
 } from '@/common/components';
 import { get } from 'lodash';
@@ -54,6 +51,10 @@ const JobDetail = () => {
   const [detailData, setDetailData] = useState(null);
   const [currTab, setCurrTab] = useState('chart');
   const [dateRange, setDateRange] = useState({
+    from: moment().add(-1, 'h'), // 默认1小时
+    to: moment(),
+  });
+  const [logRange, setLogRange] = useState({
     from: moment().add(-1, 'h'), // 默认1小时
     to: moment(),
   });
@@ -253,16 +254,23 @@ const JobDetail = () => {
 
   const onRangeChange = (dates) => {
     if (dates) {
-      console.log('From: ', dates[0], ', to: ', dates[1]);
       setDateRange({ from: dates[0]?.valueOf(), to: dates[1]?.valueOf() });
     } else {
       console.log('Clear');
     }
   };
 
+  const onLogRangeChange = (dates) => {
+    if (dates) {
+      setLogRange({ from: dates[0]?.valueOf(), to: dates[1]?.valueOf() });
+    } else {
+      console.log('Clear');
+    }
+  };
+
   const operations = useMemo(() => {
+    const dateFormat = 'YYYY/MM/DD HH:mm:ss';
     if (currTab === 'chart') {
-      const dateFormat = 'YYYY/MM/DD HH:mm:ss';
       return (
         <RangePicker
           allowClear={false}
@@ -280,7 +288,20 @@ const JobDetail = () => {
     }
 
     if (currTab === 'log') {
-      return <Button>下载</Button>;
+      return (
+        <RangePicker
+          allowClear={false}
+          presets={rangePresets}
+          showTime
+          format={dateFormat}
+          onChange={onLogRangeChange}
+          placement="bottomRight"
+          defaultValue={[
+            moment(logRange.from, dateFormat),
+            moment(logRange.to, dateFormat),
+          ]}
+        />
+      );
     }
     return null;
   }, [currTab]);
@@ -295,7 +316,14 @@ const JobDetail = () => {
         loading={loading}
       />
     ),
-    log: <LogMonitor />,
+    log: (
+      <ChartMonitor
+        urls={{
+          log: `https://grafana.digitalbrain.cn:32443/d/o6-BGgnnk/kubernetes-logs?orgId=1&var-query=&theme=light&viewPanel=2&kiosk=tv`,
+        }}
+        dateRange={logRange}
+      />
+    ),
   };
 
   return (
