@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 18:03:06
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-07 20:23:58
+ * @LastEditTime: 2023-02-16 14:19:01
  * @FilePath: /huanghe/source/services/frontend/src/common/components/Monitor/index.js
  * @Description: 监控公共组建
  */
@@ -10,7 +10,7 @@ import React from 'react';
 import './index.less';
 
 const ChartMonitor = ({ urls = {}, dateRange }) => {
-  const time = `&from=${dateRange?.from?.valueOf()}&to=${dateRange?.to?.valueOf()}`;
+  const time = `&theme=light&from=${dateRange?.from?.valueOf()}&to=${dateRange?.to?.valueOf()}`;
   return (
     <>
       {Object.keys(urls)?.map((key, index) => {

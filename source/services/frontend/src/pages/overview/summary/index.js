@@ -2,13 +2,13 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-01-31 15:07:28
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-16 12:02:53
+ * @LastEditTime: 2023-02-16 15:02:49
  * @FilePath: /huanghe/source/services/frontend/src/pages/overview/summary/index.js
  * @Description: Overview Summary page
  */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Select, Space, Row, Col, Card, Statistic } from 'antd';
+import { Select, Space, Row, Col, Card, Statistic, Skeleton } from 'antd';
 import { DownOutlined, UpOutlined, RightOutlined } from '@ant-design/icons';
 import { ADMIN } from '@/common/constants';
 import { useAuth } from '@/common/hooks/useAuth';
@@ -16,7 +16,9 @@ import api from '@/common/api';
 import CountUp from 'react-countup';
 import './index.less';
 
-const formatter = (value) => <CountUp end={value} separator="," />;
+const formatter = (value) => (
+  <CountUp end={value} separator="," duration="0.5" />
+);
 
 const StatisticCard = ({ title, total = 0, run = 0 }) => (
   <Card.Grid style={{ width: '100%', padding: 15 }}>
@@ -88,8 +90,9 @@ const OverviewChartMonitor = () => {
 const OverviewList = () => {
   const [projectsDatasource, setProjectsDatasource] = useState([]);
   const [selectedProj, setSelectedProj] = useState([]);
-  const [tasksData, setTasksData] = useState();
-  const [sourceData, setSourceData] = useState();
+  const [tasksData, setTasksData] = useState([]);
+  const [sourceData, setSourceData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
@@ -103,12 +106,12 @@ const OverviewList = () => {
   }
 
   const handleChange = (value) => {
-    console.log(`selected ${value}`);
     setSelectedProj(value);
   };
 
   const requestProjects = async () => {
     try {
+      setLoading(true);
       if (user.role.name === ADMIN) {
         const { result } = await api.bamProjectsList();
         setProjectsDatasource(result.data);
@@ -123,22 +126,28 @@ const OverviewList = () => {
 
   const requestTasks = async (project) => {
     try {
+      setLoading(true);
       const params = { project };
       const { result } = await api.serverTask(params);
       setTasksData(result);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const requestSource = async (project) => {
+    setLoading(true);
     try {
-      console.log(project);
+      setLoading(true);
       const params = { project };
       const { result } = await api.serverSource(params);
       setSourceData(result);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -151,10 +160,15 @@ const OverviewList = () => {
     if (projectsDatasource && projectsDatasource.length > 0) {
       const _data = projectsDatasource.map(({ id }) => id);
       setSelectedProj(_data);
-      requestTasks(_data);
-      requestSource(_data);
     }
   }, [projectsDatasource]);
+
+  useEffect(() => {
+    if (selectedProj && selectedProj.length > 0) {
+      requestTasks(selectedProj);
+      requestSource(selectedProj);
+    }
+  }, [selectedProj]);
 
   return (
     <div className="detail">
@@ -170,6 +184,7 @@ const OverviewList = () => {
                 minWidth: 400,
                 maxWidth: 800,
               }}
+              loading={loading}
               placeholder="请选择项目"
               value={selectedProj}
               onChange={handleChange}
@@ -183,29 +198,37 @@ const OverviewList = () => {
       </Row>
       <Card size="small" title="开发统计">
         <Row gutter={10}>
-          <Col span={6}>
-            <StatisticCard title="Notebooke" />
-          </Col>
-          <Col span={6}>
-            <StatisticCard title="Job" />
-          </Col>
+          {loading && <Skeleton active />}
+          {tasksData?.map(({ name = '-', total = 0, running = 0 }) => (
+            <Col key={name} span={6}>
+              <StatisticCard title={name} total={total} run={running} />
+            </Col>
+          ))}
         </Row>
       </Card>
       <br />
       <Card size="small" title="资源统计">
         <Row gutter={10}>
-          <Col span={6}>
-            <SourceStatisticCard title="CPU" />
-          </Col>
-          <Col span={6}>
-            <SourceStatisticCard title="GPU" />
-          </Col>
-          <Col span={6}>
-            <SourceStatisticCard title="内存" suffix="T" />
-          </Col>
-          <Col span={6}>
-            <SourceStatisticCard title="存储" suffix="T" />
-          </Col>
+          {loading && <Skeleton active />}
+          {sourceData?.map(
+            ({ name = '-', occupied = 0, occupiedRate = 0, used = 0 }) => {
+              let suffix = 'T';
+              if (name === 'CPU' || name === 'GPU') {
+                suffix = 'C';
+              }
+              return (
+                <Col key={name} span={6}>
+                  <SourceStatisticCard
+                    title={name}
+                    occupied={occupied}
+                    occupied_rate={occupiedRate * 100}
+                    used={used}
+                    suffix={suffix}
+                  />
+                </Col>
+              );
+            }
+          )}
         </Row>
         <Row style={{ marginTop: 15 }}>
           <Col span={24}>
