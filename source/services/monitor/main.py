@@ -14,7 +14,7 @@ from pydantic.error_wrappers import ValidationError
 from config import *
 from fastapi.exceptions import RequestValidationError
 from basic.middleware.rsp import add_common_response_data
-# from servers.api import router_servers
+from servers.api import router_servers
 from overview.api import router_overview
 
 app = FastAPI()
@@ -24,8 +24,9 @@ app = FastAPI()
 def status():
     return {"status": "ok"}
 
-# app.include_router(router_servers,prefix="/servers")
-app.include_router(router_overview,prefix="/overview")
+
+app.include_router(router_servers, prefix="/servers")
+app.include_router(router_overview, prefix="/overview")
 
 # 配置中间件
 app.add_middleware(BaseHTTPMiddleware, dispatch=verify_token)

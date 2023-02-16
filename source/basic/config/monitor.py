@@ -11,6 +11,34 @@ import yaml
 import importlib
 from pathlib import Path
 
+SECRET_KEY = "dc393487a84ddf9da61fe0180ef295cf0642ecbc5d678a1589ef2e26b35fce9c"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 8
+
+ENV_COMMON_URL = "http://121.36.41.231:32767/api/v1"
+# AUTH_PREFIX_URL = "/user/v1/auth/login"
+# USER_PREFIX_URL = "/user/user"
+# ACCOUNT_PREFIX_URL = "/user/user/account"
+# PROJECT_PREFIX_URL = "/user/project"
+# VOLUME_PREFIX_URL = "/storages/volume"
+# CLUSTER_JOB_PREFIX_URL = "/cluster/job"
+ENV_COMMON_NAMESPACE = "juece"
+ENV_COMMON_AFTER = "svc.cluster.local"
+AUTH_PREFIX_URL = "/v1/auth/login"
+USER_PREFIX_URL = "/user"
+ACCOUNT_PREFIX_URL = "/user/account"
+PROJECT_PREFIX_URL = "/project"
+VOLUME_PREFIX_URL = "/volume"
+CLUSTER_PVC_PREFIX_URL = "/pvc"
+CLUSTER_SERVER_PREFIX_URL = "/monitor/server"
+ENV = "uat"
+MOCK = os.getenv("MOCK_ACCOUNT_GETTER", False)
+MOCK_USER_JSON = {"id": 60, 'username': "shouchen"}
+MOCK_PROJECT_JSON = {"id": 1, "name": "决策平台"}
+USER = "user"
+ADMIN = "admin"
+OWNER = "owner"
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -74,3 +102,7 @@ if os.path.exists(K8S_YAML_CONFIG_PATH):
             locals().update(**data)
     except Exception as e:
         print(f'Loading k8s config error. {e}')
+
+USER_SERVICE_URL = f"user.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
+CLUSTER_SERVICE_URL = f"cluster.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
+STORAGE_SERVICE_URL = f"storage.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
