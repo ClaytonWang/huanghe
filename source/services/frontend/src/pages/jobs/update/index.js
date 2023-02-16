@@ -79,6 +79,7 @@ const JobsUpdate = () => {
       id: type === COPY ? null : detail?.id,
       name: type === COPY ? `${detail?.name}-1` : detail?.name,
     };
+    setTaskMode(_detail.mode);
     form.setFieldsValue(_detail);
     updateSelectedStorage(_detail);
   };
