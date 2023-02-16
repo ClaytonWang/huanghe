@@ -254,7 +254,7 @@ async def update_job(request: Request,
     if _job.status.name not in {'stopped', "completed", "run_fail"}:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job未停止')
     if _job.status.name != 'stopped':
-        delete_vcjob(vjd=VolcanoJobDeleteReq.parse_raw(k8s_info), ignore_no_found=True)
+        delete_vcjob(vjd=VolcanoJobDeleteReq.parse_obj(k8s_info), ignore_no_found=True)
     stat = await Status.objects.get(name='stopped')
     update_data['status'] = stat.id
     project_id = je.project.id
