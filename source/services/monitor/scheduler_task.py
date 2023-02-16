@@ -1,25 +1,30 @@
-# -*- coding: utf-8 -*-
-"""
-@Time ： 2023/2/10 15:23
-@Auth ： Z01
-@File ：scheduler_task.py
-@Motto：You are the best!
-"""
 import asyncio
 import logging
 from datetime import datetime
-from source.services.monitor.node.serializers import NodeCreate
+from servers.serializers import ServerCreateReq
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 from models.initdb import startup_event
-from k8s.cluster_client import cc
+from models.server import Server
+from utils.k8s_request import list_server_k8s
 
 
 async def job_func(job_id):
     await startup_event()
-    ncr = NodeCreate()
-    await  cc.get_node_list(ncr)
     print(f"job {job_id} run in {datetime.now()}")
+    serverlist = await  list_server_k8s()
+    for node in serverlist:
+        ServerCreateReq.status = node['status']
+        ServerCreateReq.server = node['serverIP']
+        ServerCreateReq.cpu = node['cpu']
+        ServerCreateReq.memory = node['memory']
+        if node.get('gpu'):
+            ServerCreateReq.gpu = node['gpu']
+            ServerCreateReq.type = node['type']
+        else:
+            ServerCreateReq.gpu = 0
+            ServerCreateReq.type = 'cpu'
+        await Server.create_node_database(ServerCreateReq)
 
 
 def job_listener(event):
