@@ -83,7 +83,11 @@ const JobsTable = ({
         showTitle: false,
       },
       render(value) {
-        const _value = get(value, 'name', '-');
+        let _value = get(value, 'name', '-');
+        _value = _value?.replace(
+          'swr.cn-north-4.myhuaweicloud.com/digitalbrain/',
+          ''
+        );
         return (
           <Tooltip placement="topLeft" title={_value}>
             {_value}
