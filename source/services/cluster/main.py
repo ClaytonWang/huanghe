@@ -10,6 +10,7 @@ from pvc.api import router_pvc
 from notebook.api import router_notebook
 from secret.api import router_secret
 from volcanojob.api import router_vcjob
+from server.api import router_server
 from starlette.middleware.base import BaseHTTPMiddleware
 from basic.middleware.exception import validation_pydantic_exception_handler
 from basic.middleware.rsp import add_common_response_data
@@ -34,7 +35,7 @@ app.include_router(router_pvc, prefix="/pvc")
 app.include_router(router_notebook, prefix="/notebook")
 app.include_router(router_secret, prefix='/secret')
 app.include_router(router_vcjob, prefix='/job')
-
+app.include_router(router_server, prefix='/server')
 app.add_middleware(BaseHTTPMiddleware, dispatch=add_common_response_data)
 
 # 异常处理

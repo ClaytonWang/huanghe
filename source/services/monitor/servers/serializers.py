@@ -2,17 +2,17 @@ from pydantic import BaseModel
 from typing import Optional
 
 
-class NodeCreate(BaseModel):
-    server: Optional[str] = "default"
-    status: Optional[str] = "False"
-    cpu: Optional[int] = 0
-    memory: Optional[int] = 0
-    gpu: Optional[int] = 0
-    type: Optional[str] = "cpu"
+class ServerCreateReq(BaseModel):
+    server: str
+    status: str
+    cpu: int
+    memory: int
+    gpu: int = 0
+    type: str = "cpu"
 
 
 class NodePodCreatedBy(BaseModel):
-    id: int
+    id: Optional[int] = 1
     username: str
 
 
