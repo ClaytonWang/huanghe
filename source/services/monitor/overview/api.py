@@ -7,17 +7,17 @@
 """
 
 from fastapi import APIRouter, Request
-from overview.serializers import ProjectReq
+# from overview.serializers import ProjectReq
 
 router_overview = APIRouter()
 
 
-@router_overview.post(
+@router_overview.get(
     '/tasks',
     description='开发统计',
     response_model_exclude_unset=True
 )
-async def task_statistic(request: Request, projects: ProjectReq):
+async def task_statistic(request: Request):
     return [{
         "name": "Notebook",
         "total": 10,
@@ -29,12 +29,12 @@ async def task_statistic(request: Request, projects: ProjectReq):
     }]
 
 
-@router_overview.post(
+@router_overview.get(
     '/sources',
     description='资源统计',
     response_model_exclude_unset=True
 )
-async def sources_statistic(request: Request, projects: ProjectReq):
+async def sources_statistic(request: Request):
     return [
         {
             "name": "CPU",
