@@ -1,7 +1,7 @@
 import ormar
 from basic.common.base_model import DateModel, OnlyPrimaryKeyModel
 from servers.serializers import ServerCreateReq
-from initdb import DB, META
+from models import DB, META
 from basic.middleware.rsp import success_common_response
 
 
