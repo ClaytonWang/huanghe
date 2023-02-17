@@ -117,7 +117,7 @@ class Job(GenericDateModel):
 
     @property
     def pod_name(self):
-        return f"{self.k8s_info.get('name')}-0"
+        return f"{self.k8s_info.get('name')}-tfjob-0"
 
     @property
     def cpu_url(self):
