@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import ormar
 from basic.utils.dt_format import dt_to_string
-
+from basic.config.job_management import WEBKUBECTL_URL
 from basic.common.base_model import DateModel, GenericDateModel
 from models import DB, META
 from typing import List
@@ -153,7 +153,7 @@ class Job(GenericDateModel):
 
     @property
     def webkubectl(self):
-        return f"http://121.36.41.231:31767/?arg=-n{self.project_en_by}&arg={self.create_en_by}-{self.name}-tfjob-0&arg=bash"
+        return f"{WEBKUBECTL_URL}/?arg=-n{self.project_en_by}&arg={self.create_en_by}-{self.name}-tfjob-0&arg=bash"
 
     def gen_job_pagation_response(self):
         return {

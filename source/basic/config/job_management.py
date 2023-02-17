@@ -34,6 +34,8 @@ ENV = "uat"
 MOCK = os.getenv("MOCK_ACCOUNT_GETTER", False)
 MOCK_USER_JSON = {"id": 60, 'username': "shouchen"}
 MOCK_PROJECT_JSON = {"id": 1, "name": "决策平台"}
+WEBKUBECTL_URL = "http://121.36.41.231:31767"
+
 USER = "user"
 ADMIN = "admin"
 OWNER = "owner"
