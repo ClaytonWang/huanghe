@@ -142,6 +142,10 @@ class Job(GenericDateModel):
             return ""
 
 
+    @property
+    def logging_url(self):
+        return "https://grafana.digitalbrain.cn:32443/d/o6-BGgnnk/kubernetes-logs?orgId=1&theme=light&theme=light&viewPanel=2&kiosk=&var-namespace=All&var-app=notebook-controller"
+
 
     @property
     def source(self):
