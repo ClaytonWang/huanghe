@@ -69,7 +69,7 @@ async def get_volume_notebook(volume_id: int = Path(..., ge=1, description='需�
 
 
 @router_notebook.get(
-    '/simple',
+    '/items',
     description='notebook概况',
     response_model=List[NotebookSimple],
     response_model_exclude_unset=True
@@ -78,28 +78,19 @@ async def get_simple_notebook(request: Request,
                               query_params: QueryParameters = Depends(QueryParameters),):
     params_filter = query_params.filter_
     authorization: str = request.headers.get('authorization')
-    role_name = request.user.role.name
 
-    user_list = await get_user_list(authorization)
-    id_proj_map = {x['id']: x['project_ids'] for x in user_list}
-    viewable_project_ids = set()
+    if params_filter:
+        if 'creator_id' in params_filter:
+            creator_id = params_filter.pop('creator_id')
+            params_filter['created_by_id'] = int(creator_id)
+        if 'project_ids' in params_filter:
+            project_ids = params_filter.pop('project_ids')
+            if isinstance(project_ids, str):
+                project_ids = [int(x) for x in project_ids.split(',')]
+            params_filter['project_by_id__in'] = project_ids
 
     project_list = await get_project_list(authorization)
     res_proj_map = {x['id']: {'name': x['name'], "id": x['id']} for x in project_list}
-
-    if role_name != 'admin':
-        viewable_project_ids = id_proj_map.get(request.user.id)
-        params_filter['project_by_id__in'] = viewable_project_ids
-
-    if 'project_ids' in params_filter:
-        project_ids = params_filter.pop('project_ids')
-        if isinstance(project_ids, str):
-            project_ids = [int(x) for x in project_ids.split(',')]
-        if viewable_project_ids:
-            params_filter['project_by_id__in'] = set(viewable_project_ids).intersection(set(project_ids))
-        else:
-            params_filter['project_by_id__in'] = project_ids
-    # print(params_filter)
 
     query = await Notebook.objects.select_related('status').filter(**params_filter).all()
     # print(query)
