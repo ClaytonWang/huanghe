@@ -29,6 +29,7 @@ import { CREATE, UPDATE, COPY, ADMIN } from '@/common/constants';
 import { useContextProps } from '@/common/hooks/RoutesProvider';
 import { useAuth } from '@/common/hooks/useAuth';
 import { genUniqueIdByPrefix, ID } from '@/common/utils/helper';
+import { AuthButton } from '@/common/components';
 import './index.less';
 
 const { Option } = Select;
@@ -213,6 +214,13 @@ const JobsUpdate = () => {
     updateStorage(changedFields, allFields);
     return changedFields;
   };
+  const handleCreateStorageClicked = () => {
+    navigate('/storages/list', {
+      state: {
+        params: { showCreateModal: true },
+      },
+    });
+  };
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
@@ -288,6 +296,18 @@ const JobsUpdate = () => {
                     value: id,
                   })
                 )}
+                notFoundContent={
+                  <div className="select-notfound">
+                    <span>暂无存储盘</span>,
+                    <AuthButton
+                      required="storages.list.create"
+                      type="link"
+                      onClick={handleCreateStorageClicked}
+                    >
+                      点击新建
+                    </AuthButton>
+                  </div>
+                }
               />
             </Form.Item>
             <Form.Item
