@@ -152,8 +152,8 @@ async def create_job(request: Request,
                       "project_by": pg.name,
                       "project_en_by": pg.en_name, })
 
-    if await Job.objects.filter(name=init_data['name'], project_by_id=int(jc.project.id)).count():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='job不能重名')
+    if await Job.objects.filter(name=init_data['name'], project_by_id=int(jc.project.id), created_by_id=ag.id).count():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户, job不能重名')
 
     if jc.mode == "调试":
         jc.start_command = "sleep 14400"
@@ -234,7 +234,7 @@ async def update_job(request: Request,
                      je: JobEdit,
                      job_id: int = Path(..., ge=1, description="JobID"),
                      ):
-    # user: AccountGetter = request.user
+    ag: AccountGetter = request.user
     authorization: str = request.headers.get('authorization')
     if je.mode == "调试":
         je.start_command = "sleep 14400"
@@ -247,6 +247,11 @@ async def update_job(request: Request,
     _job, reason = await operate_auth(request, job_id)
     if not _job:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
+
+    duplicate_name = await Job.objects.filter(name=_job.name, project_by_id=int(je.project.id),
+                                              created_by_id=ag.id).exclude(id=job_id).count()
+    if duplicate_name:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户，Job不能重名')
     k8s_info = _job.k8s_info
 
     # TODO(jiangshouchen): add more status

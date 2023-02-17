@@ -46,7 +46,6 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
 
     def list_notebook(self, nblr: NoteBookListReq) -> list:
         notebooks = []
-
         for notebook in self.custom_object_api.list_cluster_custom_object(group=KUBEFLOW_NOTEBOOK_GROUP,
                                                                           version=KUBEFLOW_V1_VERSION,
                                                                           plural=KUBEFLOW_NOTEBOOK_PLURAL,
