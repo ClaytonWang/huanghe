@@ -46,8 +46,8 @@ def start():
     service_port = int(os.getenv('MONITOR_SERVICE_PORT', 80))
     uvicorn.run(
         'main:app', host='0.0.0.0', port=service_port,
-        reload=False,
-        # debug=DEBUG,
+        reload=False if DEBUG else True,
+        debug=DEBUG,
         workers=2,
 
     )
