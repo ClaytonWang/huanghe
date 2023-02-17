@@ -145,7 +145,7 @@ async def get_project(token, proj_id):
 
 
 async def project_check(request, project_id):
-    if request.user.role.name != 'admin' and project_id not in request.user.project_ids:
+    if request.user.role.name != 'admin' and project_id not in [project.id for project in request.user.projects]:
         return False, '不是用户所属项目'
     stat, proj = await get_project(request.headers.get('authorization'), project_id)
     if stat != 200:
@@ -154,7 +154,7 @@ async def project_check(request, project_id):
 
 
 async def project_check_obj(request, project_id):
-    if request.user.role.name != 'admin' and project_id not in request.user.project_ids:
+    if request.user.role.name != 'admin' and project_id not in [project.id for project in request.user.projects]:
         return False, '不是用户所属项目'
     stat, proj = await get_project(request.headers.get('authorization'), project_id)
     if stat != 200:
