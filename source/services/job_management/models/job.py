@@ -164,6 +164,20 @@ class Job(GenericDateModel):
             "mode": self.mode,
         }
 
+    def gen_job_simple_response(self):
+        return {
+            "id": self.id,
+            "status": self.status.name,
+            "name": self.name,
+            "creator": {"id": self.created_by_id,
+                        "username": self.created_by,},
+            "project": {"id": self.project_by_id,
+                        "name": self.project_by,},
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "mode": self.mode,
+        }
+
     def gen_job_detail_response(self):
         return {
             "id": self.id,
