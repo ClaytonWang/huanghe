@@ -112,11 +112,10 @@ async def list_job(request: Request,
     :return:
     """
     user: AccountGetter = request.user
-    projects = [project.id for project in user.projects]
     if user.role.name == ADMIN:
         jobs = await Job.all_jobs()
     else:
-        jobs = await Job.self_projects(projects)
+        jobs = await Job.self_view(user.id)
     p = await paginate(jobs.select_related(
         'status'
     ).order_by(Job.updated_at.desc()).filter(
