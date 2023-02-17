@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, Request, HTTPException, status, Path
 from fastapi.responses import JSONResponse
 from models import Notebook, Status, Image
 from notebook.serializers import NotebookList, NotebookCreate, NotebookEdit, NotebookOp, NotebookDetail, EventItem, \
-    EventCreate
+    EventCreate, NotebookSimple
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from basic.common.common_model import Event
@@ -66,6 +66,51 @@ async def get_volume_notebook(volume_id: int = Path(..., ge=1, description='需�
     note_map = {x.id: {"id": x.id, "name": x.name} for x in _notebook}
     result = [note_map[x] for x in note_ids]
     return result
+
+
+@router_notebook.get(
+    '/items',
+    description='notebook概况',
+    response_model=List[NotebookSimple],
+    response_model_exclude_unset=True
+)
+async def get_simple_notebook(request: Request,
+                              query_params: QueryParameters = Depends(QueryParameters),):
+    params_filter = query_params.filter_
+    authorization: str = request.headers.get('authorization')
+
+    if params_filter:
+        if 'creator_id' in params_filter:
+            creator_id = params_filter.pop('creator_id')
+            params_filter['created_by_id'] = int(creator_id)
+        if 'project_ids' in params_filter:
+            project_ids = params_filter.pop('project_ids')
+            if isinstance(project_ids, str):
+                project_ids = [int(x) for x in project_ids.split(',')]
+            params_filter['project_by_id__in'] = project_ids
+
+    project_list = await get_project_list(authorization)
+    res_proj_map = {x['id']: {'name': x['name'], "id": x['id']} for x in project_list}
+
+    query = await Notebook.objects.select_related('status').filter(**params_filter).all()
+    # print(query)
+    res = []
+
+    for x in query:
+        item = dict(
+            id=x.id,
+            name=x.name,
+            created_at=x.created_at,
+            updated_at=x.updated_at,
+            status=x.status.name,
+        )
+        item['creator'] = {
+            "id": int(x.created_by_id),
+            "username": x.created_by,
+        }
+        item['project'] = res_proj_map.get(x.project_by_id)
+        res.append(item)
+    return res
 
 
 @router_notebook.get(
