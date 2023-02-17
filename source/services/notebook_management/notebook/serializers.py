@@ -114,6 +114,16 @@ class NotebookCreate(BaseModel):
         return k8s_format(name)
 
 
+class NotebookSimple(BaseModel):
+    id: int
+    name: str
+    creator: Creator
+    created_at: Optional[datetime]
+    status: str
+    project: Project
+    updated_at: Optional[datetime]
+
+
 class NotebookDetail(BaseModel):
     id: int
     name: str
