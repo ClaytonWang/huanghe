@@ -109,7 +109,7 @@ class Job(GenericDateModel):
 
     @classmethod
     async def self_view(cls, _id: int):
-        return cls.objects.filter((cls.created_by_id << _id))
+        return cls.objects.filter(cls.created_by_id == _id)
 
     @property
     def namespace_name(self):
