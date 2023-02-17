@@ -3,9 +3,9 @@
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { Form, Input, InputNumber, message, Modal, Select } from 'antd';
-import { find, map } from 'lodash';
+import { find, map, get } from 'lodash';
 import qs from 'qs';
 import { PlusOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useAuth } from '@/common/hooks/useAuth';
@@ -36,6 +36,7 @@ const StoragesList = () => {
   const [loading, setLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
+  const location = useLocation();
 
   const getFilters = useCallback(
     () => ({ ...defaultFilters, ...qs.parse(searchParams.toString()) }),
@@ -93,6 +94,13 @@ const StoragesList = () => {
     const filters = getFilters();
     setSearchParams(qs.stringify(filters));
   }, []);
+
+  useEffect(() => {
+    const { showCreateModal = null } = get(location, 'state.params', {});
+    if (showCreateModal === true) {
+      handleCreateClicked();
+    }
+  }, [location]);
 
   const reload = (args) => {
     const filters = getFilters();
