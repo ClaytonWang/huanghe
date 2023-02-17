@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-16 17:58:48
+ * @LastEditTime: 2023-02-17 11:43:49
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -269,6 +269,9 @@ const JobDetail = () => {
   };
 
   const operations = useMemo(() => {
+    const from = moment(dateRange.from);
+    const to = moment(dateRange.to);
+
     const dateFormat = 'YYYY/MM/DD HH:mm:ss';
     if (currTab === 'chart') {
       return (
@@ -279,10 +282,7 @@ const JobDetail = () => {
           format={dateFormat}
           onChange={onRangeChange}
           placement="bottomRight"
-          defaultValue={[
-            moment(dateRange.from, dateFormat),
-            moment(dateRange.to, dateFormat),
-          ]}
+          defaultValue={[moment(from, dateFormat), moment(to, dateFormat)]}
         />
       );
     }

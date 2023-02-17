@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-15 16:23:57
+ * @LastEditTime: 2023-02-17 11:42:20
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
@@ -46,6 +46,7 @@ const NotebookDetail = () => {
     to: moment(),
   });
   const [loading, setLoading] = useState(false);
+  const [eventLoading, setEventLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const setContextProps = useContextProps();
   const navigate = useNavigate();
@@ -110,13 +111,13 @@ const NotebookDetail = () => {
       const { loading = false, ...rest } = args;
       const params = purifyDeep({ ...getFilters(), ...rest });
       try {
-        setLoading(loading);
+        setEventLoading(loading);
         const { result } = await api.notebooksDetailEvent(params);
         setTableData(result);
-        setLoading(false);
       } catch (error) {
         console.log(error);
-        setLoading(false);
+      } finally {
+        setEventLoading(false);
       }
     },
     [getFilters]
@@ -243,7 +244,6 @@ const NotebookDetail = () => {
 
   const onRangeChange = (dates) => {
     if (dates) {
-      console.log('From: ', dates[0], ', to: ', dates[1]);
       setDateRange({ from: dates[0]?.valueOf(), to: dates[1]?.valueOf() });
     } else {
       console.log('Clear');
@@ -253,6 +253,8 @@ const NotebookDetail = () => {
   const operations = useMemo(() => {
     if (currTab === 'event') return null;
 
+    const from = moment(dateRange.from);
+    const to = moment(dateRange.to);
     const dateFormat = 'YYYY/MM/DD HH:mm:ss';
     return (
       <RangePicker
@@ -262,13 +264,10 @@ const NotebookDetail = () => {
         format={dateFormat}
         onChange={onRangeChange}
         placement="bottomRight"
-        defaultValue={[
-          moment(dateRange.from, dateFormat),
-          moment(dateRange.to, dateFormat),
-        ]}
+        defaultValue={[moment(from, dateFormat), moment(to, dateFormat)]}
       />
     );
-  }, [currTab]);
+  }, [currTab, dateRange]);
 
   const contentList = {
     chart: <ChartMonitor urls={detailData?.grafana} dateRange={dateRange} />,
@@ -277,7 +276,7 @@ const NotebookDetail = () => {
         onPageNoChange={onPageNoChange}
         tableData={tableData}
         reload={reload}
-        loading={loading}
+        loading={eventLoading}
       />
     ),
   };
