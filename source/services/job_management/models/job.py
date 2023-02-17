@@ -108,8 +108,8 @@ class Job(GenericDateModel):
         return cls.objects.filter()
 
     @classmethod
-    async def self_projects(cls, project_ids: List[int]):
-        return cls.objects.filter((cls.project_by_id << project_ids))
+    async def self_view(cls, _id: int):
+        return cls.objects.filter((cls.created_by_id << _id))
 
     @property
     def namespace_name(self):
