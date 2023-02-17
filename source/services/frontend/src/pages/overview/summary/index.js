@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-01-31 15:07:28
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-16 15:02:49
+ * @LastEditTime: 2023-02-17 11:21:35
  * @FilePath: /huanghe/source/services/frontend/src/pages/overview/summary/index.js
  * @Description: Overview Summary page
  */
@@ -20,14 +20,14 @@ const formatter = (value) => (
   <CountUp end={value} separator="," duration="0.5" />
 );
 
-const StatisticCard = ({ title, total = 0, run = 0 }) => (
+const StatisticCard = ({ title, total = 0, run = 0, to }) => (
   <Card.Grid style={{ width: '100%', padding: 15 }}>
     <Row justify="space-between">
       <Col span={12} style={{ fontWeight: 'bold' }}>
         {title}
       </Col>
       <Col span={12} style={{ textAlign: 'right' }}>
-        <Link to={`/overview/serverlist`}>
+        <Link to={to}>
           查看详情
           <RightOutlined />
         </Link>
@@ -201,7 +201,12 @@ const OverviewList = () => {
           {loading && <Skeleton active />}
           {tasksData?.map(({ name = '-', total = 0, running = 0 }) => (
             <Col key={name} span={6}>
-              <StatisticCard title={name} total={total} run={running} />
+              <StatisticCard
+                title={name}
+                total={total}
+                run={running}
+                to={`/${name.toLocaleLowerCase()}s/list`}
+              />
             </Col>
           ))}
         </Row>
