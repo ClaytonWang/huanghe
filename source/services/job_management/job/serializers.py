@@ -77,6 +77,23 @@ class SourceItem(BaseModel):
     name: str
 
 
+class JobSimple(BaseModel):
+    id: int
+    status: str
+    name: str
+    creator: Optional[UserStr]
+    project: Optional[ProjectStr]
+    created_at: Union[datetime, str, None]
+    updated_at: Union[datetime, str, None]
+    mode: str
+
+    @validator('created_at', 'updated_at')
+    def format_dt(cls, dt):
+        if isinstance(dt, str):
+            return dt
+        return dt_to_string(dt, '%Y-%m-%d')
+
+
 class JobList(BaseModel):
     id: int
     status: StatusItem

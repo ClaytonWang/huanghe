@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 
 class Project(BaseModel):
@@ -8,7 +8,7 @@ class Project(BaseModel):
 
 
 class ProjectReq(BaseModel):
-    project: list[Project]
+    project: List[int]
 
 
 # class StatisticNoteBookReq(BaseModel):
