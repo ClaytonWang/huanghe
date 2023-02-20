@@ -12,7 +12,7 @@ import importlib
 from pathlib import Path
 
 DEBUG = True
-SERVICE_PORT = 8000
+SERVICE_PORT = 8003
 DO_NOT_AUTH_URI = ['/auth/login', '/docs', '/openapi', '/openapi.json']
 NO_AUTH_WORDS = ['events']
 
