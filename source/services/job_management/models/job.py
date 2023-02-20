@@ -113,7 +113,10 @@ class Job(GenericDateModel):
 
     @classmethod
     async def self_project(cls, _id: int):
-        return cls.objects.filter(cls.project_by_id == _id)
+        j = await cls.objects.get_or_none(cls.project_by_id == _id)
+        if not j:
+            return False
+        return True
 
     @property
     def namespace_name(self):
