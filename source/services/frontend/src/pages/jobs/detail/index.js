@@ -1,8 +1,8 @@
 /*
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
- * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-17 11:43:49
+ * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
+ * @LastEditTime: 2023-02-20 19:09:55
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -20,6 +20,7 @@ import {
   message,
   Modal,
   DatePicker,
+  Button,
 } from 'antd';
 import Icon, { InfoCircleOutlined } from '@ant-design/icons';
 import {
@@ -208,6 +209,20 @@ const JobDetail = () => {
     });
   };
 
+  const handleConfigInfoClicked = () => {
+    const sshConfig = detailData?.ssh;
+    Modal.info({
+      title: 'SSH配置信息',
+      content: (
+        <div className="ssh-config">
+          <p>账号：{sshConfig?.account}</p>
+          <p>密码：{sshConfig?.password}</p>
+          <p>地址：{sshConfig?.address}</p>
+        </div>
+      ),
+    });
+  };
+
   useEffect(() => {
     const timer = setInterval(() => {
       reload();
@@ -321,7 +336,8 @@ const JobDetail = () => {
       <ChartMonitor
         style={{ height: 800 }}
         urls={{
-          log: `https://grafana.digitalbrain.cn:32443/d/o6-BGgnnk/kubernetes-logs?orgId=1&var-query=&theme=light&viewPanel=2&kiosk=tv`,
+          log: `https://grafana.digitalbrain.cn:32443/d/o6-BGgnnk
+          /kubernetes-logs?orgId=1&var-query=&theme=light&viewPanel=2&kiosk=tv`,
         }}
         dateRange={logRange}
       />
@@ -348,21 +364,48 @@ const JobDetail = () => {
                   detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
               >
                 存储挂载：
-                {(() =>
-                  detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
+                <Tooltip
+                  title={(() =>
+                    detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
+                >
+                  {(() =>
+                    detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
+                </Tooltip>
               </Col>
               <Col span={6} title={detailData?.image?.name}>
-                镜像：{detailData?.image?.name}
+                镜像：
+                <Tooltip title={detailData?.image?.name}>
+                  {detailData?.image?.name}
+                </Tooltip>
               </Col>
               <Col span={6} title={detailData?.source}>
                 资源规格：{detailData?.source}
               </Col>
               <Col span={6} title="SSH远程开发">
                 SSH远程开发
-                <Tooltip title="prompt text">
+                <Tooltip
+                  title={
+                    <span>
+                      详细说明请参考
+                      <Button
+                        type="link"
+                        href="https://digital-brain.feishu.cn/docx/IzMPd7NCYoSTYjxJNDTcLC1HnCg"
+                      >
+                        使用手册
+                      </Button>
+                    </span>
+                  }
+                >
                   <InfoCircleOutlined />
                 </Tooltip>
-                :<a style={{ marginLeft: 5 }}>查看配置信息</a>
+                :
+                <Button
+                  type="link"
+                  style={{ marginLeft: 5 }}
+                  onClick={handleConfigInfoClicked}
+                >
+                  查看配置信息
+                </Button>
               </Col>
               <Col span={6} title={detailData?.creator?.username}>
                 创建人：{detailData?.creator?.username}
