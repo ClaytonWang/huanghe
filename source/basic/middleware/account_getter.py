@@ -243,14 +243,6 @@ def query_notebook_volume(token: str, volume_id) -> List[Dict]:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='查询notebook存储盘失败')
     return response['result']
 
-def query_job_by_project(token: str, project_id) -> bool:
-    try:
-        response = requests.get(f"http://{JOB_SERVICE_URL}/{JOB_PREFIX_URL}/{project_id}",
-                                headers={"Authorization": token}).json()
-        assert response['success'] is True
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='根据项目查询任务失败')
-    return response['result']
 
 
 async def verify_token(request: Request, call_next):

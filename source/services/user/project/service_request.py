@@ -8,6 +8,7 @@
 
 import aiohttp
 import json
+import requests
 
 from typing import Optional, List, Dict, Set
 # from config import USER_SERVICE_PATH
@@ -93,3 +94,13 @@ async def get_volume_list(token):
                 res.append(VolumeInfo.parse_obj(vol))
     return [x.get_dict() for x in res]
 
+
+def query_job_by_project(token: str, project_id) -> bool:
+    try:
+        response = requests.get(f"http://{JOB_SERVICE_URL}{JOB_PREFIX_URL}/{project_id}",
+                                headers={"Authorization": token})
+        response = response.json()
+        assert response['success'] is True
+    except Exception as e:
+        raise e
+    return response['result']
