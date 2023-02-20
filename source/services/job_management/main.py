@@ -3,6 +3,7 @@
 """
 
 import uvicorn
+from config import *
 from asyncpg.exceptions import PostgresError
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
