@@ -79,11 +79,10 @@ async def get_simple_job(request: Request,
             params_filter['project_by_id__in'] = project_ids
     # print(params_filter)
 
-    projects = [project.id for project in user.projects]
     if user.role.name == ADMIN:
         jobs = await Job.all_jobs()
     else:
-        jobs = await Job.self_projects(projects)
+        jobs = await Job.self_view(user.id)
 
     query = await jobs.select_related('status').filter(**params_filter).all()
     # print(query)
