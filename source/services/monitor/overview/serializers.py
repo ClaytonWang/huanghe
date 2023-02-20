@@ -11,6 +11,12 @@ class ProjectReq(BaseModel):
     project: List[int]
 
 
+class TaskItem(BaseModel):
+    name: str
+    total: int
+    running: int
+
+
 # class StatisticNoteBookReq(BaseModel):
 #     name: str = "Notebook"
 #     total: Optional[int] = 0
