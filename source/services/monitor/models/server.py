@@ -3,6 +3,7 @@ from basic.common.base_model import DateModel, OnlyPrimaryKeyModel
 from servers.serializers import ServerCreateReq
 from initdb import DB, META
 from basic.middleware.rsp import success_common_response
+from notebook_management.models.notebook import Notebook
 
 
 class Server(OnlyPrimaryKeyModel):
@@ -58,5 +59,18 @@ class Server(OnlyPrimaryKeyModel):
         return success_common_response()
 
     @classmethod
+    async def get_server_occupied(self):
+        # notebooks = await Notebook.objects.filter(server_IP=self.server).sum('cpu')
+        async for node in Server.objects.iterate(status="Success"):
+            print(node)
+            occupied_cpu= await Notebook.objects.all(status=4,server_IP=node.server)
+            print(occupied_cpu)
+        # print(notebooks)
+
+    @classmethod
     async def all_servers(cls):
         return cls.objects.filter()
+
+# filterif __name__ == '__main__':
+#
+#     server= Server().get_server_occupied()
