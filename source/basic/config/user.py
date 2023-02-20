@@ -15,7 +15,7 @@ SECRET_KEY = "dc393487a84ddf9da61fe0180ef295cf0642ecbc5d678a1589ef2e26b35fce9c"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 8
 JOB_PREFIX_URL = "/jobs/project_backend"
-
+NOTEBOOK_BACK_PREFIX_URL = "/notebooks/project_backend"
 ENV_COMMON_URL = "http://121.36.41.231:32767/api/v1"
 # NOTEBOOK_PREFIX_URL = "/notebook/notebooks"
 # VOLUME_PREFIX_URL = "/storages/volume"

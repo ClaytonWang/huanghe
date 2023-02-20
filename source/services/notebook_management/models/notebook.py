@@ -119,3 +119,10 @@ class Notebook(GenericDateModel):
             nb.status = status_dic["pending"]
         elif status == NOTEBOOK_STATUS_RUNNING:
             nb.status = status_dic['start']
+
+    @classmethod
+    async def self_project(cls, _id: int):
+        j = await cls.objects.get_or_none(cls.project_by_id == _id)
+        if not j:
+            return False
+        return True
