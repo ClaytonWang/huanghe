@@ -60,6 +60,15 @@ class Server(OnlyPrimaryKeyModel):
 
 
     @classmethod
+    async def get_server_occupied(self):
+        # notebooks = await Notebook.objects.filter(server_IP=self.server).sum('cpu')
+        async for node in Server.objects.iterate(status="Success"):
+            print(node)
+            occupied_cpu= await Notebook.objects.all(status=4,server_IP=node.server)
+            print(occupied_cpu)
+        # print(notebooks)
+
+    @classmethod
     async def all_servers(cls):
         return cls.objects.filter()
 
