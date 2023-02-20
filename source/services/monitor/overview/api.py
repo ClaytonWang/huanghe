@@ -67,7 +67,7 @@ async def task_statistic(request: Request,
     }
 
     job = await get_job_list(authorization, filter_path)
-    total_job_running = list(filter(lambda x: x['status'] == 'running', job))
+    total_job_running = list(filter(lambda x: x['status'] == 'run', job))
     res_job = {
         "name": "Job",
         "total": len(job),
