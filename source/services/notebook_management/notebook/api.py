@@ -28,6 +28,15 @@ router_notebook = APIRouter()
 COMMON = "https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
 
 
+@router_notebook.get(
+    '/project_backend/{project_id}',
+    description='通过项目查询nb',
+)
+async def list_nb_by_project(project_id: int = Path(..., ge=1, description='需要查询项目的project id')) -> bool:
+    return await Notebook.self_project(project_id)
+
+
+
 def format_notebook_detail(nb: Notebook):
     result = nb.dict()
     result['source'] = nb.get_str()
