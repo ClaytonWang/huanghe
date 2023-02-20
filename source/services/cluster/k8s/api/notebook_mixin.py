@@ -44,7 +44,7 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                                                                       plural=KUBEFLOW_NOTEBOOK_PLURAL,
                                                                       name=nbdr.name,)
 
-    def list_notebook(self, nblr: NoteBookListReq):
+    def list_notebook(self, nblr: NoteBookListReq) -> list:
         notebooks = []
 
         for notebook in self.custom_object_api.list_cluster_custom_object(group=KUBEFLOW_NOTEBOOK_GROUP,
@@ -59,11 +59,21 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                 status, reason = NOTEBOOK_STATUS_ON, "success"
             else:
                 status, reason = self.process_notebook_status(notebook_name, namespace)
+            node_name="default"
             notebooks.append({"name": notebook_name,
                               "namespace": namespace,
                               "status": status,
                               "reason": reason,
-                              "url": f"{KUBEFLOW_NOTEBOOK_URL}/{namespace}/{notebook_name}/lab"})
+                              "url": f"{KUBEFLOW_NOTEBOOK_URL}/{namespace}/{notebook_name}/lab",
+                              "server_IP": node_name
+                              })
+        nodeIP={}
+        for pod in self.core_v1_api.list_pod_for_all_namespaces(label_selector=f"env=dev").to_dict()['items']:
+            nodeIP[pod["metadata"]['annotations']['kubectl.kubernetes.io/default-container']]=pod["spec"]["node_name"]
+
+        for notebook in notebooks:
+            notebook["server_IP"]=nodeIP.get(notebook["name"])
+        print(notebooks)
         return notebooks
 
     def watch_notebook(self):

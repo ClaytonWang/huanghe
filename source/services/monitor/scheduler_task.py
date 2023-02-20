@@ -11,6 +11,7 @@ from utils.k8s_request import list_server_k8s
 
 async def job_func(job_id):
     await startup_event()
+    await Server.get_server_occupied()
     print(f"job {job_id} run in {datetime.now()}")
     serverlist = await  list_server_k8s()
     for node in serverlist:

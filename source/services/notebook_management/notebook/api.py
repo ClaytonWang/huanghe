@@ -46,6 +46,7 @@ def format_notebook_detail(nb: Notebook):
         'gpu': nb.gpu_url(COMMON),
         'vram': nb.vram_url(COMMON),
     }
+    result['node']=nb.server_IP
     return result
 
 
@@ -246,6 +247,7 @@ async def create_notebook(request: Request,
         'gpu': gpu_count,
         'type': machine_type,
         'volumes': volumes_k8s,
+        # 'server_IP':
     }
     init_data['k8s_info'] = json.dumps(k8s_info)
 
