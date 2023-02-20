@@ -95,7 +95,7 @@ async def get_volume_list(token):
     return [x.get_dict() for x in res]
 
 
-def query_job_by_project(token: str, project_id) -> bool:
+def query_job_by_project(token: str, project_id: str) -> bool:
     try:
         response = requests.get(f"http://{JOB_SERVICE_URL}{JOB_PREFIX_URL}/{project_id}",
                                 headers={"Authorization": token})
