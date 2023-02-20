@@ -2,7 +2,7 @@ name: Service:job
 
 on:
   push:
-    branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/jiangshouchen"]
+    branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/jiangshouchen", "feature/xinkai"]
     paths:
      - source/basic/**
      - source/services/job_management/**
