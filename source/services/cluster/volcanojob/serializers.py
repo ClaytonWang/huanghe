@@ -44,12 +44,6 @@ class VolcanoJobCreateReq(BaseModelValidatorName):
         }
 
 
-    @validator('command')
-    def format(cls):
-        if len(cls.command) > 0:
-            return ["sh", "-c"] + cls.command
-        return cls.command
-
 class VolcanoJobDeleteReq(BaseModel):
     name: str
     namespace: str

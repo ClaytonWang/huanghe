@@ -11,14 +11,13 @@ import json
 from fastapi import APIRouter, Depends, Request, HTTPException, status, Path
 from fastapi.responses import JSONResponse
 
-from typing import List
 from basic.common.env_variable import get_string_variable
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project, create_vcjob,\
     delete_vcjob, VolcanoJobCreateReq, VolcanoJobDeleteReq
 from job.serializers import JobCreate, JobDetail, JobList, JobEdit,\
-    JobOp, EventItem, EventCreate, JobStatusUpdate, JobSimple
+    JobOp, EventItem, EventCreate, JobStatusUpdate
 from models import Job, Status, Source
 from utils.auth import operate_auth
 from utils.storage_request import volume_check
@@ -56,41 +55,6 @@ async def list_job_by_project(project_id: int = Path(..., ge=1, description='需
     c = await Job.self_project(project_id).count()
     return True if len(c) > 0 else False
 
-
-
-@router_job.get(
-    '/items',
-    description='job概况',
-    response_model=List[JobSimple],
-    response_model_exclude_unset=True
-)
-async def get_simple_job(request: Request,
-                         query_params: QueryParameters = Depends(QueryParameters),):
-    params_filter = query_params.filter_
-    user: AccountGetter = request.user
-
-    if params_filter:
-        if 'creator_id' in params_filter:
-            creator_id = params_filter.pop('creator_id')
-            params_filter['created_by_id'] = int(creator_id)
-        if 'project_ids' in params_filter:
-            project_ids = params_filter.pop('project_ids')
-            if isinstance(project_ids, str):
-                project_ids = [int(x) for x in project_ids.split(',')]
-            params_filter['project_by_id__in'] = project_ids
-    # print(params_filter)
-
-    projects = [project.id for project in user.projects]
-    if user.role.name == ADMIN:
-        jobs = await Job.all_jobs()
-    else:
-        jobs = await Job.self_projects(projects)
-
-    query = await jobs.select_related('status').filter(**params_filter).all()
-    # print(query)
-    res = [x.gen_job_simple_response() for x in query]
-    # print(res)
-    return res
 
 
 @router_job.get(
@@ -277,7 +241,6 @@ async def update_job(request: Request,
     update_data.update({"project_by_id": project_id,
                         "project_by": extra_info['name']})
     k8s_info['namespace'] = extra_info['en_name']
-
     k8s_info['name'] = f"{request.user.en_name}-{_job.name}"
     k8s_info["command"] = [je.start_command]
 
