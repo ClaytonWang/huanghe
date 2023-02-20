@@ -14,7 +14,7 @@ from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from basic.common.env_variable import get_string_variable
 from pypinyin import lazy_pinyin, Style
-from basic.middleware.account_getter import create_ns, Namespace, create_secret, SecretNamespace
+from basic.middleware.account_getter import create_ns, Namespace, create_secret, SecretNamespace, query_job_by_project
 from project.service_request import get_notebook_list
 from typing import List
 
@@ -116,6 +116,9 @@ async def delete_project(
     project = await Project.objects.get(id=project_id)
     if await project.member.count():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联用户，不能删除')
+    result = await query_job_by_project(authorization, project_id=project_id)
+    if result:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联job，不能删除')
 
     notebook_list = await get_notebook_list(authorization, project.code)
     if notebook_list:

@@ -10,13 +10,12 @@ from __future__ import annotations
 
 import ormar
 from basic.utils.dt_format import dt_to_string
-
+from basic.config.job_management import WEBKUBECTL_URL
 from basic.common.base_model import DateModel, GenericDateModel
 from models import DB, META
 from typing import List
 
 # 状态
-# JOB_STATUS_PENDING = "pending"  # 排队中
 # JOB_STATUS_RUNNING = "running"  # 已启动(运行中)
 # JOB_STATUS_STOP = "stop"  # 停止中
 # JOB_STATUS_START_FAIL = "start_fail"  # 启动失败
@@ -24,6 +23,18 @@ from typing import List
 # JOB_STATUS_STOP_FAIL = "stop_fail"  # 停止失败
 # JOB_STATUS_ON = "on"  # 已完成
 # JOB_STATUS_STOPPED = "stopped"  # 已停止
+
+JOB_STATUS_PENDING = "Pending"
+JOB_STATUS_COMPLETING = "Completing"
+JOB_STATUS_COMPLETED = "Completed"
+JOB_STATUS_TERMINATING = "Terminating"
+JOB_STATUS_TERMINATED = "Terminated"
+JOB_STATUS_FAILED = "Failed"
+JOB_STATUS_RESTARTING = "Restarting"
+JOB_STATUS_ABORTED = "Aborted"
+JOB_STATUS_ABORTING = "Aborting"
+JOB_STATUS_RUNNING = "Running"
+
 COMMON = "https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
 
 class Status(ormar.Model):
@@ -82,7 +93,7 @@ class Job(GenericDateModel):
     image: str = ormar.String(max_length=150, comment='镜像名称')
 
     status: Status = ormar.ForeignKey(Status, related_name='job_status')
-    work_dir: str = ormar.String(max_length=100, comment='工作目录')
+    work_dir: str = ormar.String(max_length=100, comment='工作目录', nullable=True)
     k8s_info: str = ormar.JSON(comment="集群信息")
 
     cpu: int = ormar.Integer(comment='CPU数量')
@@ -97,8 +108,12 @@ class Job(GenericDateModel):
         return cls.objects.filter()
 
     @classmethod
-    async def self_projects(cls, project_ids: List[int]):
-        return cls.objects.filter((cls.project_by_id << project_ids))
+    async def self_view(cls, _id: int):
+        return cls.objects.filter(cls.created_by_id == _id)
+
+    @classmethod
+    async def self_project(cls, _id: int):
+        return cls.objects.filter(cls.project_by_id == _id)
 
     @property
     def namespace_name(self):
@@ -106,7 +121,7 @@ class Job(GenericDateModel):
 
     @property
     def pod_name(self):
-        return f"{self.k8s_info.get('name')}-0"
+        return f"{self.k8s_info.get('name')}-tfjob-0"
 
     @property
     def cpu_url(self):
@@ -131,6 +146,10 @@ class Job(GenericDateModel):
             return ""
 
 
+    @property
+    def logging_url(self):
+        return "https://grafana.digitalbrain.cn:32443/d/o6-BGgnnk/kubernetes-logs?orgId=1&theme=light&theme=light&viewPanel=2&kiosk=&var-namespace=All&var-app=notebook-controller"
+
 
     @property
     def source(self):
@@ -142,7 +161,7 @@ class Job(GenericDateModel):
 
     @property
     def webkubectl(self):
-        return "http://121.36.41.231:31767/?arg=-nkubeflow&arg=jupyter-web-app-deployment-65685cc86d-lt85h&arg=bash"
+        return f"{WEBKUBECTL_URL}/?arg=-n{self.project_en_by}&arg={self.create_en_by}-{self.name}-tfjob-0&arg=bash"
 
     def gen_job_pagation_response(self):
         return {
@@ -202,3 +221,17 @@ class Job(GenericDateModel):
                         "vram": self.vram_url,},
             "url": self.webkubectl,
         }
+
+    @classmethod
+    def compare_status_and_update(cls, status: str, status_dic):
+        if status == JOB_STATUS_PENDING:
+            return status_dic['pending']
+        elif status == JOB_STATUS_RUNNING:
+            return status_dic['run']
+        elif status == JOB_STATUS_FAILED:
+            return status_dic['run_fail']
+        elif status in {JOB_STATUS_COMPLETED, JOB_STATUS_COMPLETING}:
+            return status_dic['completed']
+        elif status in {JOB_STATUS_TERMINATING, JOB_STATUS_TERMINATED, JOB_STATUS_ABORTED, JOB_STATUS_ABORTING}:
+            return status_dic['error']
+        return 1

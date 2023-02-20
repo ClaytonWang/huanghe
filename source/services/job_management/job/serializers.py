@@ -44,7 +44,7 @@ class ProjectStr(BaseModel):
 
 class Storage(BaseModel):
     name: Optional[str]
-    id: str
+    id: int
 
 
 class HookItem(BaseModel):
@@ -118,10 +118,10 @@ class JobCreate(BaseModel):
     name: str = Field(..., max_length=20)
     project: Project
     source: str
-    start_command: str
+    start_command: Optional[str]
     mode: str
     image: Image
-    work_dir: str
+    work_dir: Optional[str]
     hooks: List[HookItem] = []
 
     @validator('name')
@@ -153,14 +153,18 @@ class JobDetail(BaseModel):
 class JobEdit(BaseModel):
     project: Project
     mode: str
-    start_command: str
+    start_command: Optional[str]
     image: Image
-    work_dir: str
+    work_dir: Optional[str]
     hooks: List[HookItem] = []
     source: str
 
 class StatusItemOnlyDesc(BaseModel):
     desc: str = None
+
+class JobStatusUpdate(BaseModel):
+    status: str
+
 
 class EventItem(BaseModel):
     id: Optional[int]

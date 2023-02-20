@@ -11,13 +11,13 @@ import json
 from fastapi import APIRouter, Depends, Request, HTTPException, status, Path
 from fastapi.responses import JSONResponse
 
-from typing import List
 from basic.common.env_variable import get_string_variable
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project, create_vcjob,\
     delete_vcjob, VolcanoJobCreateReq, VolcanoJobDeleteReq
-from job.serializers import JobCreate, JobDetail, JobList, JobEdit, JobOp, EventItem, EventCreate, JobSimple
+from job.serializers import JobCreate, JobDetail, JobList, JobEdit,\
+    JobOp, EventItem, EventCreate, JobStatusUpdate
 from models import Job, Status, Source
 from utils.auth import operate_auth
 from utils.storage_request import volume_check
@@ -47,40 +47,14 @@ router_job = APIRouter()
 #     result = [note_map[x] for x in note_ids]
 #     return result
 
-
 @router_job.get(
-    '/items',
-    description='job概况',
-    response_model=List[JobSimple],
-    response_model_exclude_unset=True
+    '/{project_id}',
+    description='通过项目查询job',
 )
-async def get_simple_job(request: Request,
-                         query_params: QueryParameters = Depends(QueryParameters),):
-    params_filter = query_params.filter_
-    user: AccountGetter = request.user
+async def list_job_by_project(project_id: int = Path(..., ge=1, description='需要查询项目的project id')) -> bool:
+    c = await Job.self_project(project_id).count()
+    return True if len(c) > 0 else False
 
-    if params_filter:
-        if 'creator_id' in params_filter:
-            creator_id = params_filter.pop('creator_id')
-            params_filter['created_by_id'] = int(creator_id)
-        if 'project_ids' in params_filter:
-            project_ids = params_filter.pop('project_ids')
-            if isinstance(project_ids, str):
-                project_ids = [int(x) for x in project_ids.split(',')]
-            params_filter['project_by_id__in'] = project_ids
-    # print(params_filter)
-
-    projects = [project.id for project in user.projects]
-    if user.role.name == ADMIN:
-        jobs = await Job.all_jobs()
-    else:
-        jobs = await Job.self_projects(projects)
-
-    query = await jobs.select_related('status').filter(**params_filter).all()
-    # print(query)
-    res = [x.gen_job_simple_response() for x in query]
-    # print(res)
-    return res
 
 
 @router_job.get(
@@ -111,11 +85,10 @@ async def list_job(request: Request,
     :return:
     """
     user: AccountGetter = request.user
-    projects = [project.id for project in user.projects]
     if user.role.name == ADMIN:
         jobs = await Job.all_jobs()
     else:
-        jobs = await Job.self_projects(projects)
+        jobs = await Job.self_view(user.id)
     p = await paginate(jobs.select_related(
         'status'
     ).order_by(Job.updated_at.desc()).filter(
@@ -152,9 +125,11 @@ async def create_job(request: Request,
                       "project_by": pg.name,
                       "project_en_by": pg.en_name, })
 
-    if await Job.objects.filter(name=init_data['name'], project_by_id=int(jc.project.id)).count():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='job不能重名')
+    if await Job.objects.filter(name=init_data['name'], project_by_id=int(jc.project.id), created_by_id=ag.id).count():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户, job不能重名')
 
+    if jc.mode == "调试":
+        jc.start_command = "sleep 14400"
     init_data.update({"mode": jc.mode,
                       "start_command": jc.start_command,
                       "custom": jc.image.custom,
@@ -198,24 +173,30 @@ async def create_job(request: Request,
     init_data['k8s_info'] = json.dumps(k8s_info)
 
     _job = await Job.objects.create(**init_data)
+    k8s_info['annotations'] = {"id": str(_job.id)}
+    await _job.update(**{"k8s_info": k8s_info})
     return _job.gen_job_detail_response()
 
 
-# @router_job.put(
-#     '/{job_id}/{status}',
-#     description='状态修改',
-# )
-# async def update_status(request: Request,
-#                         job_id: int = Path(..., ge=1, description="JobID"),
-#                         status: int = Path(..., ge=1, description="status_id"),
-#                         ):
-#     _job, reason = await operate_auth(request, job_id)
-#     if not _job:
-#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
-#
-#     if not await _job.update(status=status):
-#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job不存在')
-#     return JSONResponse(dict(id=job_id))
+@router_job.put(
+    '/{job_id}/status_update',
+    description='状态更新',
+)
+async def update_status(jsu: JobStatusUpdate,
+                        job_id: int = Path(..., ge=1, description="JobID")):
+    j = await Job.objects.select_related(['status']).get(pk=job_id)
+    if not j:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Job不存在")
+    status_dic = {}
+    status_objs = await Status.objects.all()
+    for status_obj in status_objs:
+        status_dic[status_obj.name] = status_obj.id
+    st = Job.compare_status_and_update(jsu.status, status_dic)
+    update_data = {"status": st}
+    await j.update(**update_data)
+    # if not await _job.update(status=status):
+    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job不存在')
+    return JSONResponse(dict(id=job_id))
 
 
 @router_job.put(
@@ -226,8 +207,10 @@ async def update_job(request: Request,
                      je: JobEdit,
                      job_id: int = Path(..., ge=1, description="JobID"),
                      ):
-    # user: AccountGetter = request.user
+    ag: AccountGetter = request.user
     authorization: str = request.headers.get('authorization')
+    if je.mode == "调试":
+        je.start_command = "sleep 14400"
     update_data = {"mode": je.mode,
                    "work_dir": je.work_dir,
                    "start_command": je.start_command,}
@@ -237,22 +220,29 @@ async def update_job(request: Request,
     _job, reason = await operate_auth(request, job_id)
     if not _job:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
+
+    duplicate_name = await Job.objects.filter(name=_job.name, project_by_id=int(je.project.id),
+                                              created_by_id=ag.id).exclude(id=job_id).count()
+    if duplicate_name:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户，Job不能重名')
     k8s_info = _job.k8s_info
 
     # TODO(jiangshouchen): add more status
-    if _job.status.name != 'stopped':
+    if _job.status.name not in {'stopped', "completed", "run_fail"}:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job未停止')
-
+    if _job.status.name != 'stopped':
+        delete_vcjob(vjd=VolcanoJobDeleteReq.parse_obj(k8s_info), ignore_no_found=True)
+    stat = await Status.objects.get(name='stopped')
+    update_data['status'] = stat.id
     project_id = je.project.id
     check, extra_info = await project_check_obj(request, project_id)
     if not check:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
     update_data.update({"project_by_id": project_id,
                         "project_by": extra_info['name']})
-
     k8s_info['namespace'] = extra_info['en_name']
-
     k8s_info['name'] = f"{request.user.en_name}-{_job.name}"
+    k8s_info["command"] = [je.start_command]
 
     if je.source:
         gpu_count = 0
@@ -276,7 +266,8 @@ async def update_job(request: Request,
 
     k8s_info['image'] = je.image.name
     update_data.update({"image": je.image.name,
-                        "custom": je.image.custom,})
+                        "custom": je.image.custom,
+                        "work_dir": je.work_dir,})
     storages, volumes_k8s = await volume_check(authorization, je.hooks, extra_info['en_name'])
     path_set = {x['path'] for x in storages}
     if len(path_set) != len(storages):
@@ -298,7 +289,6 @@ async def update_job(request: Request,
 async def operate_job(request: Request,
                       data: JobOp,
                       job_id: int = Path(..., ge=1, description="JobID")):
-    authorization: str = request.headers.get('authorization')
     action = int(data.dict()['action'])
     _job, reason = await operate_auth(request, job_id)
     if not _job:
@@ -311,23 +301,18 @@ async def operate_job(request: Request,
     # todo 状态还需要调整
     update_data = {}
     if action == 0:
-        if _job.status.name not in ['pending', 'running', 'stop_fail', 'on']:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
-        stat = await Status.objects.get(name='stop')
+        # if _job.status.name not in ['pending', 'running', 'stop_fail', 'on']:
+        #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
+        stat = await Status.objects.get(name='stopped')
         update_data['status'] = stat.id
-        delete_vcjob(vjd=VolcanoJobDeleteReq.parse_raw(payloads))
-        # if response.status != 200:
-        #     _job.status = None
+        delete_vcjob(vjd=VolcanoJobDeleteReq.parse_raw(payloads), ignore_no_found=True)
     elif action == 1:
-        if _job.status.name not in ['start_fail', 'run_fail', 'stopped']:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
+        # if _job.status.name not in ['start_fail', 'run_fail', 'stopped']:
+        #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
         stat = await Status.objects.get(name='pending')
         update_data['status'] = stat.id
         # todo response返回不为200时更新job状态到异常
         create_vcjob(vjc=VolcanoJobCreateReq.parse_raw(payloads))
-        # if response.status != 200:
-        #     _job.status = None
-    # print(response)
 
     if not update_data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
@@ -351,11 +336,11 @@ async def delete_job(request: Request,
     # if _job.status.name not in ['stopped', 'error']:
     #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job未停止')
 
-    # payloads = _job.k8s_info
+    payloads = _job.k8s_info
     # # error状态调用删除需要释放资源
-    # if _job.status.name == 'error':
+    if _job.status.name != 'stop':
     #     authorization: str = request.headers.get('authorization')
-    #     response = await delete_job_k8s(authorization, payloads)
+        delete_vcjob(vjd=VolcanoJobDeleteReq.parse_obj(dict(payloads)), ignore_no_found=True)
     # if response.status != 200:
     #     _job.status = None
     await _job.delete()
@@ -369,8 +354,8 @@ async def delete_job(request: Request,
 async def list_job_event(query_params: QueryParameters = Depends(QueryParameters),
                               job_id: int = Path(..., ge=1, description="JobID")):
     params_filter = query_params.filter_
-    # events = await Event.find_notebook_events(notebook_id)
-    events = await paginate(Event.objects.filter(**params_filter), params=query_params.params)
+    events = await Event.find_vcjob_events(job_id)
+    events = await paginate(events.filter(**params_filter), params=query_params.params)
     for i, v in enumerate(events.data):
         events.data[i] = EventItem.parse_obj(v.gen_pagation_event())
     return events

@@ -5,7 +5,7 @@ from k8s.model.v1_affinity import V1Affinity
 from k8s.model.v1_container import V1Container
 from k8s.model.v1_volume import V1Volume
 from k8s.model.v1_toleration import V1Toleration
-from k8s.const.workloads_const import IMAGE_PULL_POLICY_IF_NOT_PRESENT, SECRET_NAME_DOCKER_CONFIG
+from k8s.const.workloads_const import IMAGE_PULL_POLICY_IF_NOT_PRESENT, SECRET_NAME_DOCKER_CONFIG, RESTART_POLICY_NEVER
 from k8s.model.v1_local_object_reference import V1LocalObjectReference
 from notebook.serializers import Volume
 
@@ -39,6 +39,7 @@ class V1PodSpec(GenericMixin):
     volumes: Optional[List[V1Volume]] = None
     tolerations: Optional[List[V1Toleration]]
     image_pull_secrets: Optional[List[V1LocalObjectReference]]
+    restart_policy: Optional[str]
 
     openapi_types = {
         'active_deadline_seconds': 'int',
@@ -65,7 +66,7 @@ class V1PodSpec(GenericMixin):
         # 'priority': 'int',
         # 'priority_class_name': 'str',
         # 'readiness_gates': 'list[V1PodReadinessGate]',
-        # 'restart_policy': 'str',
+        'restart_policy': 'str',
         # 'runtime_class_name': 'str',
         'scheduler_name': 'str',
         # 'security_context': 'V1PodSecurityContext',
@@ -146,6 +147,10 @@ class V1PodSpec(GenericMixin):
             self.image_pull_secrets = []
         self.image_pull_secrets.extend([V1LocalObjectReference.new(ims) for ims in image_pull_secrets])
 
+    def set_restart_policy(self, restart_policy: str):
+        self.restart_policy = restart_policy
+        return self
+
     @classmethod
     def default(cls, name, image):
         return cls.new([V1Container.default(name=name, image=image)])
@@ -165,7 +170,7 @@ class V1PodSpec(GenericMixin):
                  tolerations: List[str], command: List[str] = None, working_dir: Optional[str] = None):
         c = V1Container.default(name=name, image=image, command=command, working_dir=working_dir)
         c.set_envs(envs).set_resources(resource).set_image_pull_policy(IMAGE_PULL_POLICY_IF_NOT_PRESENT)
-        spec = cls.new([c])
+        spec = cls.new([c]).set_restart_policy(RESTART_POLICY_NEVER)
         spec.add_pvc_volume_and_volume_mount(volumes).add_tolerations(tolerations).add_dshm().add_image_pull_secrets([SECRET_NAME_DOCKER_CONFIG])
         return spec
 

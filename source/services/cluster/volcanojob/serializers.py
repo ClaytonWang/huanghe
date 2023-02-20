@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from typing import Optional, Dict, List
-from  basic.common.validator_name import  BaseModelValidatorName
-
+from basic.common.validator_name import BaseModelValidatorName
 
 
 class Volume(BaseModel):
     name: str
     mount_path: str
     mount_propagation: Optional[str] = "HostToContainer"
-
 
 
 class VolcanoJobCreateReq(BaseModelValidatorName):
@@ -28,7 +26,6 @@ class VolcanoJobCreateReq(BaseModelValidatorName):
     working_dir: Optional[str] = None
     annotations: Dict = {}
 
-
     def gen_vcjob_dict(self):
         return {
             "name": self.name,
@@ -41,23 +38,25 @@ class VolcanoJobCreateReq(BaseModelValidatorName):
                 "nvidia.com/gpu": self.gpu,
             },
             "volumes": [v.dict() for v in self.volumes],
-            "command": self.command,
+            "command": ['sh', "-c"] + self.command if self.command else self.command,
             "working_dir": self.working_dir,
             "annotations": self.annotations,
         }
+
 
 class VolcanoJobDeleteReq(BaseModel):
     name: str
     namespace: str
 
+
 class VolcanoJobListReq(BaseModel):
     platform: str = "mvp"
     env: str
 
+
 class VolcanoStatusPostReq(BaseModel):
     name: str
     status: str
-
 
 
 class VolcanoJob(BaseModelValidatorName):
