@@ -9,7 +9,7 @@
 from typing import List, Dict
 from fastapi import APIRouter, Request, Depends
 from basic.common.query_filter_params import QueryParameters
-from overview.serializers import ProjectReq
+from overview.serializers import ProjectReq, TaskItem
 from utils.service_requests import get_user_list, get_notebook_list, get_job_list
 
 
@@ -19,17 +19,13 @@ router_overview = APIRouter()
 @router_overview.get(
     '/tasks',
     description='开发统计',
+    response_model=List[TaskItem],
     response_model_exclude_unset=True
 )
 async def task_statistic(request: Request,
-                         query_params: QueryParameters = Depends(QueryParameters),):
-    params_filter = query_params.filter_
+                         project: str = None):
     authorization: str = request.headers.get('authorization')
     role_name = request.user.role.name
-    # print(projects)
-    # project_ids = None
-    # if params_filter:
-    #     project_ids = params_filter.pop('project_ids')
 
     user_list = await get_user_list(authorization)
     id_proj_map = {x['id']: x['project_ids'] for x in user_list}
@@ -39,13 +35,11 @@ async def task_statistic(request: Request,
 
     if role_name != 'admin':
         viewable_project_ids = id_proj_map.get(request.user.id)
-        params_filter['project_by_id__in'] = viewable_project_ids
     if role_name == 'user':
         filter_list.append(f'filter[created_by_id]={request.user.id}')
-    # print(viewable_project_ids)
 
-    if 'project_ids' in params_filter:
-        project_ids = params_filter.pop('project_ids')
+    if project:
+        project_ids = project
         if isinstance(project_ids, str):
             project_ids = [int(x) for x in project_ids.split(',')]
         if viewable_project_ids:
@@ -69,7 +63,6 @@ async def task_statistic(request: Request,
     }
 
     job = await get_job_list(authorization, filter_path)
-    # todo 这里需要确认显示job是运行中还是已完成
     total_job_running = list(filter(lambda x: x['status'] == 'running', job))
     res_job = {
         "name": "Job",
