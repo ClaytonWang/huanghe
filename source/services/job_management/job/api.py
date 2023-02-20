@@ -52,8 +52,7 @@ router_job = APIRouter()
     description='通过项目查询job',
 )
 async def list_job_by_project(project_id: int = Path(..., ge=1, description='需要查询项目的project id')) -> bool:
-    c = await Job.self_project(project_id).count()
-    return True if len(c) > 0 else False
+    return await Job.self_project(project_id)
 
 
 
