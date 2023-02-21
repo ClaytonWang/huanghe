@@ -31,7 +31,7 @@ class VolcanoJobCreateReq(BaseModelValidatorName):
             "name": self.name,
             "namespace": self.namespace,
             "image": self.image,
-            "labels": {"env": self.env},
+            "labels": {"env": self.env, "app": self.name},
             "resource": {
                 "cpu": self.cpu,
                 "memory": f"{self.memory}Gi",
@@ -43,12 +43,6 @@ class VolcanoJobCreateReq(BaseModelValidatorName):
             "annotations": self.annotations,
         }
 
-
-    @validator('command')
-    def format(cls):
-        if len(cls.command) > 0:
-            return ["sh", "-c"] + cls.command
-        return cls.command
 
 class VolcanoJobDeleteReq(BaseModel):
     name: str
