@@ -33,8 +33,8 @@ async def job_func(job_id):
         namespace = notebook['namespace']
         status = notebook['status']
         url = notebook['url']
-        server_IP = notebook['server_IP']
-        notebook_dic[f'{name}-{namespace}'] = {"status": status, 'url': url, 'server_IP': server_IP}
+        server_ip = notebook['server_ip']
+        notebook_dic[f'{name}-{namespace}'] = {"status": status, 'url': url, 'server_ip': server_ip}
     print(notebook_dic)
     status_dic = {}
     status_objs = await Status.objects.all()

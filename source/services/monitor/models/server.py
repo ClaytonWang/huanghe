@@ -58,14 +58,6 @@ class Server(OnlyPrimaryKeyModel):
             await Server.objects.filter(server=scr.server).update(status=scr.status)
         return success_common_response()
 
-    @classmethod
-    async def get_server_occupied(self):
-        # notebooks = await Notebook.objects.filter(server_IP=self.server).sum('cpu')
-        async for node in Server.objects.iterate(status="Success"):
-            print(node)
-            occupied_cpu= await Notebook.objects.all(status=4,server_IP=node.server)
-            print(occupied_cpu)
-        # print(notebooks)
 
     @classmethod
     async def all_servers(cls):

@@ -137,7 +137,7 @@ class NotebookDetail(BaseModel):
     hooks: List[HookItem]
     updated_at: Optional[datetime]
     grafana: Optional[Grafana]
-    server_IP: str
+    server_ip: str
 
 
 class NotebookEdit(BaseModel):

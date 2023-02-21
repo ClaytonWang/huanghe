@@ -1,4 +1,7 @@
 from __future__ import annotations
+
+from typing import Dict, List
+
 from k8s.api.core import Core
 from k8s.model.v1_status import V1Status
 from k8s.api.custom_object_api import CustomerObjectApi
@@ -64,15 +67,13 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                               "status": status,
                               "reason": reason,
                               "url": f"{KUBEFLOW_NOTEBOOK_URL}/{namespace}/{notebook_name}/lab",
-                              "server_IP": node_name
+                              "server_ip": node_name
                               })
-        nodeIP={}
-        for pod in self.core_v1_api.list_pod_for_all_namespaces(label_selector=f"env=dev").to_dict()['items']:
-            nodeIP[pod["metadata"]['annotations']['kubectl.kubernetes.io/default-container']]=pod["spec"]["node_name"]
-
+        name_ip={}
+        for pod in self.core_v1_api.list_pod_for_all_namespaces(label_selector=f"env=dev").items:
+            name_ip[pod.spec.containers[0].name]=pod.spec.node_name
         for notebook in notebooks:
-            notebook["server_IP"]=nodeIP.get(notebook["name"])
-        print(notebooks)
+            notebook["server_ip"] = name_ip.get(notebook["name"])
         return notebooks
 
     def watch_notebook(self):
