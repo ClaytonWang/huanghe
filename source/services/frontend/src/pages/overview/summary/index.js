@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-01-31 15:07:28
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-21 17:26:26
+ * @LastEditTime: 2023-02-21 18:34:12
  * @FilePath: /huanghe/source/services/frontend/src/pages/overview/summary/index.js
  * @Description: Overview Summary page
  */
@@ -27,6 +27,36 @@ import './index.less';
 
 const formatter = (value) => (
   <CountUp end={value} separator="," duration="0.5" />
+);
+
+const SourceStatisticCard = ({
+  title,
+  occupied = 0,
+  used = 0,
+  occupied_rate = 0,
+  suffix = 'C',
+}) => (
+  <Card.Grid style={{ width: '100%', padding: 15 }}>
+    <Row>
+      <Col span={24} style={{ fontWeight: 'bold' }}>
+        {title}
+      </Col>
+    </Row>
+    <Row style={{ marginTop: 10 }}>
+      <Col span={8}>
+        <Statistic value={occupied} formatter={formatter} suffix={suffix} />
+        已占用
+      </Col>
+      <Col span={8} style={{ textAlign: 'center' }}>
+        <Statistic value={used} formatter={formatter} suffix={suffix} />
+        已使用
+      </Col>
+      <Col span={8} style={{ textAlign: 'right' }}>
+        <Statistic value={occupied_rate} formatter={formatter} suffix="%" />
+        占用率
+      </Col>
+    </Row>
+  </Card.Grid>
 );
 
 const StatisticCard = ({ title, total = 0, run = 0, to }) => (
@@ -206,16 +236,25 @@ const OverviewList = () => {
             <Skeleton active />
           ) : (
             (sourceData?.length > 0 &&
-              sourceData.map(({ name = '-', total = 0, running = 0 }) => (
-                <Col key={name} span={6}>
-                  <StatisticCard
-                    title={name}
-                    total={total}
-                    run={running}
-                    to={`/${name.toLocaleLowerCase()}s/list`}
-                  />
-                </Col>
-              ))) || (
+              sourceData?.map(
+                ({ name = '-', occupied = 0, occupiedRate = 0, used = 0 }) => {
+                  let suffix = 'T';
+                  if (name === 'CPU' || name === 'GPU') {
+                    suffix = 'C';
+                  }
+                  return (
+                    <Col key={name} span={6}>
+                      <SourceStatisticCard
+                        title={name}
+                        occupied={occupied}
+                        occupied_rate={occupiedRate * 100}
+                        used={used}
+                        suffix={suffix}
+                      />
+                    </Col>
+                  );
+                }
+              )) || (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
                 style={{ width: '100%' }}
