@@ -60,15 +60,15 @@ def status():
 @app.get('/image')
 async def get_image(request: Request):
     authorization: str = request.headers.get('authorization')
-    volume_list = await get_image_list(authorization)
-    return volume_list
+    res_image = await get_image_list(authorization)
+    return res_image
 
 
 @app.get('/source')
 async def get_source(request: Request):
     authorization: str = request.headers.get('authorization')
-    source_list = await get_source_list(authorization)
-    return source_list
+    res_source = await get_source_list(authorization)
+    return res_source
 
 
 # 路由配置
