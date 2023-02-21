@@ -26,7 +26,8 @@ import datetime
 
 router_notebook = APIRouter()
 COMMON = "https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
-
+ACCOUNT = "jovyan"
+PASSWORD = "jovyan"
 
 @router_notebook.get(
     '/project_backend/{project_id}',
@@ -55,7 +56,11 @@ def format_notebook_detail(nb: Notebook):
         'gpu': nb.gpu_url(COMMON),
         'vram': nb.vram_url(COMMON),
     }
-    result['node']=nb.server_IP
+    result['ssh'] = {
+        "account": ACCOUNT,
+        "password": PASSWORD,
+        "address": nb.server_ip,
+    }
     return result
 
 
