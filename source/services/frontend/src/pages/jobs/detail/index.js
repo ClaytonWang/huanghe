@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-20 19:09:55
+ * @LastEditTime: 2023-02-21 11:09:09
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -336,8 +336,7 @@ const JobDetail = () => {
       <ChartMonitor
         style={{ height: 800 }}
         urls={{
-          log: `https://grafana.digitalbrain.cn:32443/d/o6-BGgnnk
-          /kubernetes-logs?orgId=1&var-query=&theme=light&viewPanel=2&kiosk=tv`,
+          log: detailData?.loggingUrl,
         }}
         dateRange={logRange}
       />
