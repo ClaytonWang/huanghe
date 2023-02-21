@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-21 11:09:09
+ * @LastEditTime: 2023-02-21 14:39:52
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -209,20 +209,6 @@ const JobDetail = () => {
     });
   };
 
-  const handleConfigInfoClicked = () => {
-    const sshConfig = detailData?.ssh;
-    Modal.info({
-      title: 'SSH配置信息',
-      content: (
-        <div className="ssh-config">
-          <p>账号：{sshConfig?.account}</p>
-          <p>密码：{sshConfig?.password}</p>
-          <p>地址：{sshConfig?.address}</p>
-        </div>
-      ),
-    });
-  };
-
   useEffect(() => {
     const timer = setInterval(() => {
       reload();
@@ -379,32 +365,6 @@ const JobDetail = () => {
               </Col>
               <Col span={6} title={detailData?.source}>
                 资源规格：{detailData?.source}
-              </Col>
-              <Col span={6} title="SSH远程开发">
-                SSH远程开发
-                <Tooltip
-                  title={
-                    <span>
-                      详细说明请参考
-                      <Button
-                        type="link"
-                        href="https://digital-brain.feishu.cn/docx/IzMPd7NCYoSTYjxJNDTcLC1HnCg"
-                      >
-                        使用手册
-                      </Button>
-                    </span>
-                  }
-                >
-                  <InfoCircleOutlined />
-                </Tooltip>
-                :
-                <Button
-                  type="link"
-                  style={{ marginLeft: 5 }}
-                  onClick={handleConfigInfoClicked}
-                >
-                  查看配置信息
-                </Button>
               </Col>
               <Col span={6} title={detailData?.creator?.username}>
                 创建人：{detailData?.creator?.username}
