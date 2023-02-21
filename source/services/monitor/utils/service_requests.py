@@ -52,6 +52,11 @@ class NotebookInfo(BaseModel):
     name: str
     project_id: int
     status: str
+    cpu: int
+    memory: int
+    gpu: int
+    storage_value: int
+    storage_size: int
 
     class Config:
         orm_mode = True
@@ -63,6 +68,11 @@ class NotebookInfo(BaseModel):
             'name': self.name,
             'project_id': self.project_id,
             'status': self.status,
+            'cpu': self.cpu,
+            'memory': self.memory,
+            'gpu': self.gpu,
+            'storage_value': self.storage_value,
+            'storage_size': self.storage_size,
         }
 
 
