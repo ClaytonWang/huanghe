@@ -26,7 +26,7 @@ def k8s_format(name):
 class Ssh(BaseModel):
     account: str
     password: str
-    address: str = ""
+    address: Optional[str]
 
 
 class StatusItem(BaseModel):
