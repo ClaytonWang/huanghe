@@ -17,7 +17,7 @@ from basic.common.query_filter_params import QueryParameters
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project, create_vcjob,\
     delete_vcjob, VolcanoJobCreateReq, VolcanoJobDeleteReq
 from job.serializers import JobCreate, JobDetail, JobList, JobEdit,\
-    JobOp, EventItem, EventCreate, JobStatusUpdate
+    JobOp, EventItem, EventCreate, JobStatusUpdate, JobSimple
 from models import Job, Status, Source
 from utils.auth import operate_auth
 from utils.storage_request import volume_check

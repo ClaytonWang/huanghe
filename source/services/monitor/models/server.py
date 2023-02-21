@@ -1,7 +1,7 @@
 import ormar
 from basic.common.base_model import DateModel, OnlyPrimaryKeyModel
 from servers.serializers import ServerCreateReq
-from models import DB, META
+from initdb import DB, META
 from basic.middleware.rsp import success_common_response
 
 
@@ -56,6 +56,7 @@ class Server(OnlyPrimaryKeyModel):
         else:
             await Server.objects.filter(server=scr.server).update(status=scr.status)
         return success_common_response()
+
 
     @classmethod
     async def all_servers(cls):

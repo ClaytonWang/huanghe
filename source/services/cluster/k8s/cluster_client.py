@@ -11,7 +11,6 @@ from k8s.api import c
 class ClusterClient(NamespaceMixin, NotebookMixin, PodMixin, PersistentVolumeClaimMixin,
                     SecretMixin, VolcanoJobMixin, ServerMixin):
 
-
     def __init__(self):
         super(ClusterClient, self).__init__(c=c)
 

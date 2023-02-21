@@ -76,6 +76,7 @@ class Notebook(GenericDateModel):
     custom: bool = ormar.Boolean(default=False)
     storage: str = ormar.JSON(comment='存储信息')
     k8s_info: str = ormar.JSON(comment='集群信息')
+    server_ip: str = ormar.String(max_length=20, comment='所在的node', nullable=True)
 
     # def __repr__(self):
     #     return f'{self.name}_{self.value}'
