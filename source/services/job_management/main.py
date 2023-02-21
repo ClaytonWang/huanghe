@@ -24,8 +24,7 @@ from basic.utils.log import configure_logging
 from models import startup_event, shutdown_event
 from job.api import router_job
 from basic.middleware.account_getter import verify_token
-from utils.notebook_request import get_source_list
-from utils.storage_request import get_volume_list
+from utils.notebook_request import get_source_list, get_image_list
 
 # oauth2_scheme = OFOAuth2PasswordBearer(token_url="/v1/auth/login")
 # oauth2_scheme = OFOAuth2PasswordBearer(token_url=USER_SERVICE_PATH + "/v1/auth/login")
@@ -58,10 +57,10 @@ def status():
     return {"status": "ok"}
 
 
-@app.get('/volume')
-async def get_volume(request: Request):
+@app.get('/image')
+async def get_image(request: Request):
     authorization: str = request.headers.get('authorization')
-    volume_list = await get_volume_list(authorization)
+    volume_list = await get_image_list(authorization)
     return volume_list
 
 

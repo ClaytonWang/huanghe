@@ -32,3 +32,18 @@ async def get_source_list(token):
             source_data = text['result']["data"]
             # print(job_data)
             return source_data
+
+
+async def get_image_list(token):
+    async with aiohttp.ClientSession() as session:
+        url = f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_IMAGE_PREFIX_URL}"
+        headers = {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+        }
+        async with session.get(url, headers=headers) as response:
+            # print("status:{}".format(response.status))
+            text = await response.json()
+            source_data = text['result']["data"]
+            # print(job_data)
+            return source_data
