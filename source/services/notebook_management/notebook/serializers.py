@@ -23,6 +23,11 @@ def k8s_format(name):
 
 
 
+class Ssh(BaseModel):
+    account: str
+    password: str
+    address: str = ""
+
 
 class StatusItem(BaseModel):
     code: Optional[str] = None
@@ -137,7 +142,8 @@ class NotebookDetail(BaseModel):
     hooks: List[HookItem]
     updated_at: Optional[datetime]
     grafana: Optional[Grafana]
-    server_ip: str
+    server_ip: Optional[str]
+    ssh: Optional[Ssh]
 
 
 class NotebookEdit(BaseModel):
