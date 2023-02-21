@@ -36,6 +36,7 @@ JOB_STATUS_ABORTING = "Aborting"
 JOB_STATUS_RUNNING = "Running"
 
 COMMON = "https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
+LOG_COMMON = "https://grafana.digitalbrain.cn:32443/d/o6-BGgnnk/kubernetes-logs?"
 
 class Status(ormar.Model):
     class Meta(ormar.ModelMeta):
@@ -151,7 +152,7 @@ class Job(GenericDateModel):
 
     @property
     def logging_url(self):
-        return "https://grafana.digitalbrain.cn:32443/d/o6-BGgnnk/kubernetes-logs?orgId=1&theme=light&theme=light&viewPanel=2&kiosk=&var-namespace=All&var-app=notebook-controller"
+        return f"{LOG_COMMON}orgId=1&theme=light&viewPanel=2&var-namespace={self.namespace_name}&var-app={self.name}"
 
 
     @property
@@ -223,6 +224,7 @@ class Job(GenericDateModel):
                         "ram": self.ram_url,
                         "vram": self.vram_url,},
             "url": self.webkubectl,
+            "logging_url": self.logging_url,
         }
 
     @classmethod

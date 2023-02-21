@@ -31,7 +31,7 @@ class VolcanoJobCreateReq(BaseModelValidatorName):
             "name": self.name,
             "namespace": self.namespace,
             "image": self.image,
-            "labels": {"env": self.env},
+            "labels": {"env": self.env, "app": self.name},
             "resource": {
                 "cpu": self.cpu,
                 "memory": f"{self.memory}Gi",
