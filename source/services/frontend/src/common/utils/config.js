@@ -63,6 +63,8 @@ module.exports = {
     jobListUpdate: 'put|/job/jobs/:id',
     jobListDelete: 'delete|/job/jobs/:id',
     jobDetailEvent: 'get|/job/jobs/:id/events',
+    jobSourceList: 'get|/job/source',
+    jobImageList: 'get|/job/image',
 
     imagesList: 'get|/notebook/image',
     sourceList: 'get|/notebook/source',
