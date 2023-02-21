@@ -31,6 +31,7 @@ VOLUME_PREFIX_URL = "/volume"
 CLUSTER_PVC_PREFIX_URL = "/pvc"
 CLUSTER_JOB_PREFIX_URL = "/job"
 NOTEBOOK_SOURCE_PREFIX_URL = "/source"
+NOTEBOOK_IMAGE_PREFIX_URL = "/image"
 ENV = "uat"
 MOCK = os.getenv("MOCK_ACCOUNT_GETTER", False)
 MOCK_USER_JSON = {"id": 60, 'username': "shouchen"}
