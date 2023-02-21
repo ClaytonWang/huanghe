@@ -3,8 +3,9 @@
 """
 
 import uvicorn
+from config import *
 from asyncpg.exceptions import PostgresError
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from ormar.exceptions import AsyncOrmException
 from pydantic.error_wrappers import ValidationError
@@ -23,6 +24,7 @@ from basic.utils.log import configure_logging
 from models import startup_event, shutdown_event
 from job.api import router_job
 from basic.middleware.account_getter import verify_token
+from utils.notebook_request import get_source_list, get_image_list
 
 # oauth2_scheme = OFOAuth2PasswordBearer(token_url="/v1/auth/login")
 # oauth2_scheme = OFOAuth2PasswordBearer(token_url=USER_SERVICE_PATH + "/v1/auth/login")
@@ -53,6 +55,20 @@ app.add_exception_handler(AsyncOrmException, ormar_db_exception_handler)
 @app.get('/status')
 def status():
     return {"status": "ok"}
+
+
+@app.get('/image')
+async def get_image(request: Request):
+    authorization: str = request.headers.get('authorization')
+    volume_list = await get_image_list(authorization)
+    return volume_list
+
+
+@app.get('/source')
+async def get_source(request: Request):
+    authorization: str = request.headers.get('authorization')
+    source_list = await get_source_list(authorization)
+    return source_list
 
 
 # 路由配置

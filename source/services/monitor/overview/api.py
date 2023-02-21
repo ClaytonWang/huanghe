@@ -46,6 +46,10 @@ async def task_statistic(request: Request,
             viewable_project_ids = set(viewable_project_ids).intersection(set(project_ids))
         else:
             viewable_project_ids = project_ids
+    else:
+        return [{"name": "Notebook", "total": 0, "running": 0},
+                {"name": "Job", "total": 0, "running": 0}]
+
     # print(viewable_project_ids)
     if viewable_project_ids:
         project_str = ','.join([str(x) for x in viewable_project_ids])
@@ -63,7 +67,7 @@ async def task_statistic(request: Request,
     }
 
     job = await get_job_list(authorization, filter_path)
-    total_job_running = list(filter(lambda x: x['status'] == 'running', job))
+    total_job_running = list(filter(lambda x: x['status'] == 'run', job))
     res_job = {
         "name": "Job",
         "total": len(job),
