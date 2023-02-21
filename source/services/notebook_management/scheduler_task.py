@@ -53,7 +53,7 @@ async def job_func(job_id):
         if name and namespace and obj:
             bulk_update = True
             nb.url = obj['url']
-            nb.server_IP = obj['server_IP']
+            nb.server_ip = obj['server_ip']
             Notebook.compare_status_and_update(nb, obj['status'], status_dic)
     if bulk_update:
         await Notebook.objects.bulk_update(db_notebooks)
@@ -73,7 +73,7 @@ async def job_func(job_id):
             bulk_update = True
             nb.url = None
             nb.status = stopped_status
-            nb.server_IP = obj['server_IP']
+            nb.server_ip = obj['server_ip']
     if bulk_update:
         await Notebook.objects.bulk_update(stop_notebooks)
 
