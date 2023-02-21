@@ -1,13 +1,14 @@
 /*
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-14 13:53:37
- * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-14 17:45:52
+ * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
+ * @LastEditTime: 2023-02-21 18:24:36
  * @FilePath: /huanghe/source/services/frontend/src/pages/overview/serverlist/ServerListTable/index.js
  * @Description: Server List Table
  */
 import { useSearchParams } from 'react-router-dom';
 import { Table, Tooltip } from 'antd';
+import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons';
 import qs from 'qs';
 
 const ServerListTable = ({
@@ -21,14 +22,26 @@ const ServerListTable = ({
       dataIndex: 'status',
       width: '10%',
       render(value) {
-        return value || '-';
+        const icon = {
+          success: (
+            <Tooltip title="正常">
+              <CheckCircleFilled style={{ color: '#05e087' }} />
+            </Tooltip>
+          ),
+          error: (
+            <Tooltip title="异常">
+              <CloseCircleFilled style={{ color: '#ff4538' }} />
+            </Tooltip>
+          ),
+        };
+        return icon[value.toLowerCase()];
       },
     },
     {
       title: '服务器',
       dataIndex: 'server',
       width: '20%',
-      render(value, _) {
+      render(value) {
         return value || '-';
       },
     },

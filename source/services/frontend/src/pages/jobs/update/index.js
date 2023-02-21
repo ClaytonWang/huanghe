@@ -110,7 +110,7 @@ const JobsUpdate = () => {
 
   const requestImages = async () => {
     try {
-      const { result } = await api.imagesList();
+      const { result } = await api.jobImageList();
       setImagesDatasource(result.data);
     } catch (error) {
       console.log(error);
@@ -129,7 +129,7 @@ const JobsUpdate = () => {
 
   const requestSource = async () => {
     try {
-      const { result } = await api.sourceList();
+      const { result } = await api.jobSourceList();
       setSourceDatasource(result.data);
     } catch (error) {
       console.log(error);

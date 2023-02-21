@@ -1,8 +1,8 @@
 /*
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
- * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-17 11:43:49
+ * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
+ * @LastEditTime: 2023-02-21 14:39:52
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -20,6 +20,7 @@ import {
   message,
   Modal,
   DatePicker,
+  Button,
 } from 'antd';
 import Icon, { InfoCircleOutlined } from '@ant-design/icons';
 import {
@@ -321,7 +322,7 @@ const JobDetail = () => {
       <ChartMonitor
         style={{ height: 800 }}
         urls={{
-          log: `https://grafana.digitalbrain.cn:32443/d/o6-BGgnnk/kubernetes-logs?orgId=1&var-query=&theme=light&viewPanel=2&kiosk=tv`,
+          log: detailData?.loggingUrl,
         }}
         dateRange={logRange}
       />
@@ -348,21 +349,22 @@ const JobDetail = () => {
                   detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
               >
                 存储挂载：
-                {(() =>
-                  detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
+                <Tooltip
+                  title={(() =>
+                    detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
+                >
+                  {(() =>
+                    detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
+                </Tooltip>
               </Col>
               <Col span={6} title={detailData?.image?.name}>
-                镜像：{detailData?.image?.name}
+                镜像：
+                <Tooltip title={detailData?.image?.name}>
+                  {detailData?.image?.name}
+                </Tooltip>
               </Col>
               <Col span={6} title={detailData?.source}>
                 资源规格：{detailData?.source}
-              </Col>
-              <Col span={6} title="SSH远程开发">
-                SSH远程开发
-                <Tooltip title="prompt text">
-                  <InfoCircleOutlined />
-                </Tooltip>
-                :<a style={{ marginLeft: 5 }}>查看配置信息</a>
               </Col>
               <Col span={6} title={detailData?.creator?.username}>
                 创建人：{detailData?.creator?.username}
