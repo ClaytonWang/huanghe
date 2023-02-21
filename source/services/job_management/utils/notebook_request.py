@@ -29,9 +29,8 @@ async def get_source_list(token):
         async with session.get(url, headers=headers) as response:
             # print("status:{}".format(response.status))
             text = await response.json()
-            source_data = text['result']["data"]
-            # print(job_data)
-            return source_data
+            result = text['result']
+            return result
 
 
 async def get_image_list(token):
@@ -44,6 +43,6 @@ async def get_image_list(token):
         async with session.get(url, headers=headers) as response:
             # print("status:{}".format(response.status))
             text = await response.json()
-            source_data = text['result']["data"]
+            result = text['result']
             # print(job_data)
-            return source_data
+            return result

@@ -125,6 +125,11 @@ class NotebookSimple(BaseModel):
     creator: Creator
     created_at: Optional[datetime]
     status: str
+    cpu: int
+    memory: int
+    gpu: int
+    storage_value: int
+    storage_size: int
     project: Project
     updated_at: Optional[datetime]
 
