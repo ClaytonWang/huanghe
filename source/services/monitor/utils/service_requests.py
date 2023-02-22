@@ -16,7 +16,7 @@ from collections import defaultdict
 from datetime import datetime
 from pydantic import BaseModel, Field
 from basic.config.monitor import *
-
+from job_management.models.job import Job
 
 class RoleInfo(BaseModel):
     id: int
@@ -84,7 +84,23 @@ class JobInfo(BaseModel):
             'status': self.status,
         }
 
+class PodInfoByServer(BaseModel):
+    id: int
+    name: str
+    created_by_id: int
+    cpu: int
+    gpu: int
+    memory: int
 
+    def get_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'created_by_id': self.created_by_id,
+            'cpu': self.cpu,
+            'gpu': self.gpu,
+            'memory': self.memory
+        }
 async def get_user_list(token):
     async with aiohttp.ClientSession() as session:
         # url = USER_SERVICE_PATH + f"/user?pagesize=100&pageno={page_no}"
@@ -127,6 +143,22 @@ async def get_notebook_list(token, filter_path=None):
                 res.append(NotebookInfo.parse_obj(note))
     return [x.get_dict() for x in res]
 
+async def get_notebook_job_list_by_server(server_ip):
+        res=[]
+        async with aiohttp.ClientSession() as session:
+            # url = f"{ENV_COMMON_URL}{NOTEBOOK_PREFIX_URL}?filter[project__code]={project_code}"
+            url = f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_PREFIX_URL}/by_server/{server_ip}"
+            headers = {
+                'Content-Type': 'application/json'
+            }
+            async with session.get(url, headers=headers) as response:
+                text_notebook = await response.json()
+                for note in text_notebook:
+                    res.append(PodInfoByServer.parse_obj(note))
+            text_job = await Job.objects.all(server_ip=server_ip, status__in=[4,11])
+            for note in text_job:
+                res.append(PodInfoByServer.parse_obj(note))
+        return [x.get_dict() for x in res]
 
 async def get_job_list(token, filter_path=None):
     res = []

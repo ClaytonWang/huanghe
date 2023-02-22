@@ -61,7 +61,7 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                 status, reason = NOTEBOOK_STATUS_ON, "success"
             else:
                 status, reason = self.process_notebook_status(notebook_name, namespace)
-            node_name="default"
+            node_name = "default"
             notebooks.append({"name": notebook_name,
                               "namespace": namespace,
                               "status": status,
@@ -69,9 +69,9 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                               "url": f"{KUBEFLOW_NOTEBOOK_URL}/{namespace}/{notebook_name}/lab",
                               "server_ip": node_name
                               })
-        name_ip={}
+        name_ip = {}
         for pod in self.core_v1_api.list_pod_for_all_namespaces(label_selector=f"env=dev").items:
-            name_ip[pod.spec.containers[0].name]=pod.spec.node_name
+            name_ip[pod.spec.containers[0].name] = pod.spec.node_name
         for notebook in notebooks:
             notebook["server_ip"] = name_ip.get(notebook["name"])
         return notebooks

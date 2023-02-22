@@ -6,13 +6,15 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 from models.initdb import startup_event
 from models.server import Server
-from utils.k8s_request import list_server_k8s
+from models.user import User
+from utils.k8s_request import list_server_ip_k8s
+from utils.service_requests import get_notebook_job_list_by_server
 
 
 async def job_func(job_id):
     await startup_event()
     print(f"job {job_id} run in {datetime.now()}")
-    serverlist = await list_server_k8s()
+    serverlist = await  list_server_ip_k8s()
     for node in serverlist:
         ServerCreateReq.status = node['status']
         ServerCreateReq.server = node['serverIP']
