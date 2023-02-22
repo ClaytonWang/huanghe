@@ -16,7 +16,7 @@ from collections import defaultdict
 from datetime import datetime
 from pydantic import BaseModel, Field
 from basic.config.monitor import *
-from job_management.models.job import Job
+from models.job import Job
 
 class RoleInfo(BaseModel):
     id: int
