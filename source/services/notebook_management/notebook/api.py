@@ -126,6 +126,8 @@ async def get_simple_notebook(request: Request,
             cpu=x.cpu,
             memory=x.memory,
             gpu=x.gpu,
+            namespace_name=x.namespace_name(),
+            pod_name=x.pod_name(),
         )
         item['creator'] = {
             "id": int(x.created_by_id),

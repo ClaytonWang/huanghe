@@ -130,6 +130,8 @@ class NotebookSimple(BaseModel):
     gpu: int
     storage_value: int
     storage_size: int
+    namespace_name: str
+    pod_name: str
     project: Project
     updated_at: Optional[datetime]
 
