@@ -91,6 +91,7 @@ class PodInfoByServer(BaseModel):
     cpu: int
     gpu: int
     memory: int
+    created_by: str
 
     def get_dict(self):
         return {
@@ -99,7 +100,8 @@ class PodInfoByServer(BaseModel):
             'created_by_id': self.created_by_id,
             'cpu': self.cpu,
             'gpu': self.gpu,
-            'memory': self.memory
+            'memory': self.memory,
+            'created_by': self.created_by
         }
 async def get_user_list(token):
     async with aiohttp.ClientSession() as session:
@@ -145,20 +147,41 @@ async def get_notebook_list(token, filter_path=None):
 
 async def get_notebook_job_list_by_server(server_ip):
         res=[]
-        async with aiohttp.ClientSession() as session:
-            # url = f"{ENV_COMMON_URL}{NOTEBOOK_PREFIX_URL}?filter[project__code]={project_code}"
-            url = f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_PREFIX_URL}/by_server/{server_ip}"
-            headers = {
-                'Content-Type': 'application/json'
-            }
-            async with session.get(url, headers=headers) as response:
-                text_notebook = await response.json()
-                for note in text_notebook:
-                    res.append(PodInfoByServer.parse_obj(note))
-            text_job = await Job.objects.all(server_ip=server_ip, status__in=[4,11])
-            for note in text_job:
-                res.append(PodInfoByServer.parse_obj(note))
+        response = requests.get(f"http://127.0.0.1:8012/notebooks/by_server/{server_ip}",
+                                headers={'Content-Type': 'application/json'})
+        text_notebook = response.json()
+        for note in text_notebook:
+            res.append(PodInfoByServer.parse_obj(note))
+        response_job = requests.get(f"http://127.0.0.1:8013/jobs/by_server/{server_ip}",
+                                headers={'Content-Type': 'application/json'})
+        text_job = response_job.json()
+        for note in text_job:
+            res.append(PodInfoByServer.parse_obj(note))
         return [x.get_dict() for x in res]
+
+        # async with aiohttp.ClientSession() as session:
+        #     # url = f"{ENV_COMMON_URL}{NOTEBOOK_PREFIX_URL}?filter[project__code]={project_code}"
+        #     # url = f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_PREFIX_URL}/by_server/{server_ip}"
+        #     url = f"http://127.0.0.1:8012/notebooks/by_server/{server_ip}"
+        #     headers = {
+        #         'Content-Type': 'application/json'
+        #     }
+        #     async with session.get(url, headers=headers) as response:
+        #         text_notebook = await response.json()
+        #         for note in text_notebook:
+        #             res.append(PodInfoByServer.parse_obj(note))
+        # async with aiohttp.ClientSession() as session:
+        #     # url = f"{ENV_COMMON_URL}{NOTEBOOK_PREFIX_URL}?filter[project__code]={project_code}"
+        #     # url = f"http://{JOB_SERVICE_URL}{JOB_PREFIX_URL}/by_server/{server_ip}"
+        #     url = f"http://127.0.0.1:8013/jobs/by_server/{server_ip}"
+        #     headers = {
+        #         'Content-Type': 'application/json'
+        #     }
+        #     async with session.get(url, headers=headers) as response:
+        #         text_job = await response.json()
+        #         for note in text_job:
+        #             res.append(PodInfoByServer.parse_obj(note))
+        # return [x.get_dict() for x in res]
 
 async def get_job_list(token, filter_path=None):
     res = []

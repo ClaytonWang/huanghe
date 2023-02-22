@@ -241,3 +241,7 @@ class Job(GenericDateModel):
         elif status in {JOB_STATUS_TERMINATING, JOB_STATUS_TERMINATED, JOB_STATUS_ABORTED, JOB_STATUS_ABORTING}:
             return status_dic['error']
         return 1
+
+    @classmethod
+    async def project_list_by_ip(cls, _ip: int):
+        return await cls.objects.all(cls.server_ip == _ip, status__in=[4, 11])

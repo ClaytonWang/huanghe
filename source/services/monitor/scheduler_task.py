@@ -26,6 +26,24 @@ async def job_func(job_id):
         else:
             ServerCreateReq.gpu = 0
             ServerCreateReq.type = 'cpu'
+        pod_list = await get_notebook_job_list_by_server(node['serverIP'])
+        occupied_cpu = 0
+        occupied_gpu = 0
+        occupied_memory = 0
+        occupied_user = []
+        occupied_by = []
+        for pod in pod_list:
+            occupied_cpu += pod["cpu"]
+            occupied_gpu += pod["gpu"]
+            occupied_memory += pod["memory"]
+            # print(f"node:{node['serverIP']} has:{pod}")
+            if pod["created_by_id"] not in occupied_user:
+                occupied_user.append(pod["created_by_id"])
+                occupied_by.append({pod["created_by_id"]: pod["created_by"]})
+        ServerCreateReq.occupied_cpu = occupied_cpu
+        ServerCreateReq.occupied_gpu = occupied_gpu
+        ServerCreateReq.occupied_memory = occupied_memory
+        ServerCreateReq.occupied_by = occupied_by
         await Server.create_node_database(ServerCreateReq)
 
 

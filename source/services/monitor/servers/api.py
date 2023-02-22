@@ -10,7 +10,7 @@ router_servers = APIRouter()
 @router_servers.get(
     '',
     description='查询节点列表',
-    response_model=Page[NodeDetailRes],
+    # response_model=Page[NodeDetailRes],
     response_model_exclude_unset=True
 )
 async def list_server(query_params: QueryParameters = Depends(QueryParameters)):
