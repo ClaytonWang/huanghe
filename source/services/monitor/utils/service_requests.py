@@ -115,6 +115,8 @@ class PodInfoByServer(BaseModel):
             'memory': self.memory,
             'created_by': self.created_by
         }
+
+
 async def get_user_list(token):
     async with aiohttp.ClientSession() as session:
         # url = USER_SERVICE_PATH + f"/user?pagesize=100&pageno={page_no}"
@@ -159,17 +161,17 @@ async def get_notebook_list(token, filter_path=None):
 
 async def get_notebook_job_list_by_server(server_ip):
     res = []
-    # response = requests.get(f"http://127.0.0.1:8012/notebooks/by_server/{server_ip}",
-    #                         headers={'Content-Type': 'application/json'})
-    response = requests.get(f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_PREFIX_URL}/by_server/{server_ip}",
+    response = requests.get(f"http://127.0.0.1:8012/notebooks/by_server/{server_ip}",
                             headers={'Content-Type': 'application/json'})
+    # response = requests.get(f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_PREFIX_URL}/by_server/{server_ip}",
+    #                         headers={'Content-Type': 'application/json'})
     text_notebook = response.json()
     for note in text_notebook:
         res.append(PodInfoByServer.parse_obj(note))
-    # response_job = requests.get(f"http://127.0.0.1:8013/jobs/by_server/{server_ip}",
-    #                         headers={'Content-Type': 'application/json'})
-    response_job = requests.get(f"http://{JOB_SERVICE_URL}{JOB_PREFIX_URL}/by_server/{server_ip}",
-                                headers={'Content-Type': 'application/json'})
+    response_job = requests.get(f"http://127.0.0.1:8013/jobs/by_server/{server_ip}",
+                            headers={'Content-Type': 'application/json'})
+    # response_job = requests.get(f"http://{JOB_SERVICE_URL}{JOB_PREFIX_URL}/by_server/{server_ip}",
+    #                             headers={'Content-Type': 'application/json'})
     text_job = response_job.json()
     for note in text_job:
         res.append(PodInfoByServer.parse_obj(note))
