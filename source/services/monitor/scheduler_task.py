@@ -37,9 +37,9 @@ async def job_func(job_id):
             occupied_gpu += pod["gpu"]
             occupied_memory += pod["memory"]
             # print(f"node:{node['serverIP']} has:{pod}")
-            if pod["created_by_id"] not in occupied_user:
+            if occupied_user.count(pod["created_by_id"]) == 0:
                 occupied_user.append(pod["created_by_id"])
-                occupied_by.append({pod["created_by_id"]: pod["created_by"]})
+                occupied_by.append({"id": pod["created_by_id"], "username": pod["created_by"]})
         ServerCreateReq.occupied_cpu = occupied_cpu
         ServerCreateReq.occupied_gpu = occupied_gpu
         ServerCreateReq.occupied_memory = occupied_memory
