@@ -1,12 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Path, Header, Request
+from fastapi import APIRouter, Depends, HTTPException, status, Path, Request
 from basic.middleware.rsp import success_common_response
 from models import Volume
 from typing import List
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from volume.serializers import VolumeCreateReq, VolumeEditReq, VolumeDetailRes
-from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project,\
-    ADMIN, OWNER, USER, create_pvc, delete_pvc, PVCCreateReq, PVCDeleteReq, query_notebook_volume, list_user_by_project
+from basic.middleware.account_getter import AccountGetter, ADMIN, OWNER, \
+    query_notebook_volume, list_user_by_project
 
 router_volume = APIRouter()
 
@@ -30,7 +30,8 @@ async def get_volume(volume_id: int = Path(..., ge=1, description="存储ID")
 async def list_volume(request: Request,
                       query_params: QueryParameters = Depends(QueryParameters)):
     user: AccountGetter = request.user
-    user_array: List[AccountGetter] = list_user_by_project(request.headers.get('authorization'), [str(project.id) for project in user.projects])
+    user_array: List[AccountGetter] = list_user_by_project(request.headers.get('authorization'),
+                                                           [str(project.id) for project in user.projects])
 
     if user.role.name == ADMIN:
         volumes = await Volume.undeleted_volumes()
@@ -98,10 +99,7 @@ async def delete_volume(request: Request,
     result = query_notebook_volume(request.headers.get('authorization'), volume_id)
     if len(result) != 0:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'还存留notebook挂载这个盘，不能删除')
-    if user.role != USER:
-        await Volume.set_deleted(volume_id)
-    else:
-        await Volume.set_self_deleted(volume_id, user.id)
+    await Volume.set_self_deleted(volume_id, user.id)
     return success_common_response()
 
 
