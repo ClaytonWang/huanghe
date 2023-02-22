@@ -73,18 +73,18 @@ class Volume(GenericNoProjectModel):
     @classmethod
     async def undeleted_volumes(cls):
         return cls.objects.filter(
-            (cls.deleted_at is None) | (cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7)))
+            (cls.deleted_at == None) | (cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7)))
 
     @classmethod
     async def undeleted_self_volumes(cls, owner_id):
         return cls.objects.filter(
-            ((cls.deleted_at is None) | (cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7))) & (
+            ((cls.deleted_at == None) | (cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7))) & (
                         cls.owner_by_id == owner_id))
 
     @classmethod
     async def undeleted_self_project_volumes(cls, owner_ids):
         return cls.objects.filter(
-            (cls.owner_by_id << owner_ids) & ((cls.deleted_at is None) | (
+            (cls.owner_by_id << owner_ids) & ((cls.deleted_at == None) | (
                     cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7)))
         )
 
