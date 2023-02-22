@@ -165,6 +165,7 @@ class StatusItemOnlyDesc(BaseModel):
 
 class JobStatusUpdate(BaseModel):
     status: str
+    server_ip: Optional[str]
 
 
 class EventItem(BaseModel):

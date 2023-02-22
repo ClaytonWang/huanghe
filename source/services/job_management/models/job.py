@@ -102,6 +102,7 @@ class Job(GenericDateModel):
     gpu: int = ormar.Integer(comment='GPU数量')
     type: str = ormar.String(max_length=40, default='', comment='CPU/GPU类型')
     url: str = ormar.String(max_length=160, comment='url地址', nullable=True)
+    server_ip: str = ormar.String(max_length=20, comment='所在的node', nullable=True)
 
 
     @classmethod
