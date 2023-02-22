@@ -16,8 +16,7 @@ def check_status(status_data):
 
 
 def translate_memory(memory_data):
-    memory = (int)(memory_data[:-2])
-    return (int)(memory / (1024 * 1024))
+    return int(int(memory_data[:-2]) / (1024 * 1024))
 
 
 class ServerMixin(CoreV1Api):

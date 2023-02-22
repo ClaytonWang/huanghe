@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Path
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter
 from k8s.cluster_client import cc
 from secret.serializers import SecretNamespace
 from basic.middleware.rsp import success_common_response

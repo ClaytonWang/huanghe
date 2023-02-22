@@ -25,7 +25,6 @@ class V1Pod(BaseModel):
     spec: V1PodSpec
     status: Optional[V1PodStatus]
 
-
     openapi_types = {
         'api_version': 'str',
         'kind': 'str',

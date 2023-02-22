@@ -2,14 +2,13 @@
 
 from pydantic import BaseModel
 from typing import Optional, Dict, List
-from  basic.common.validator_name import  BaseModelValidatorName
+from basic.common.validator_name import BaseModelValidatorName
 
 
 class Volume(BaseModel):
     name: str
     mount_path: str
     mount_propagation: Optional[str] = "HostToContainer"
-
 
 
 class NoteBookCreateReq(BaseModelValidatorName):
@@ -39,13 +38,17 @@ class NoteBookCreateReq(BaseModelValidatorName):
             "annotations": self.annotations,
             "volumes": [v.dict() for v in self.volumes]
         }
+
+
 class NoteBookDeleteReq(BaseModel):
     name: str
     namespace: str
 
+
 class NoteBookListReq(BaseModel):
     platform: str = "mvp"
     env: str
+
 
 class NoteBook(BaseModelValidatorName):
     namespace: str
@@ -56,4 +59,3 @@ class NoteBook(BaseModelValidatorName):
     volumes: List[Volume] = []
     tolerations: List[str] = []
     annotations: Dict = {}
-

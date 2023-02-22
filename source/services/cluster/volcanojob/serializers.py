@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 from typing import Optional, Dict, List
 from basic.common.validator_name import BaseModelValidatorName
 

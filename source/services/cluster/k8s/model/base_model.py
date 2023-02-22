@@ -2,8 +2,8 @@ from k8s.model.generic_mixin import GenericMixin
 from k8s.model.v1_object_meta import V1ObjectMeta
 from typing import Optional
 
-class BaseModel(GenericMixin):
 
+class BaseModel(GenericMixin):
     """
     Attributes:
       attribute_map (dict): The key is attribute name
@@ -22,9 +22,6 @@ class BaseModel(GenericMixin):
         'spec': 'spec',
         'status': 'status'
     }
-
-
-
 
 
 if __name__ == '__main__':

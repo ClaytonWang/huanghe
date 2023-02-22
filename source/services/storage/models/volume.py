@@ -13,7 +13,7 @@ import ormar
 from basic.common.base_model import GenericNoProjectModel
 from models import DB, META
 from volume.serializers import VolumeCreateReq, VolumeEditReq
-from basic.middleware.account_getter import AccountGetter, ProjectGetter, ADMIN
+from basic.middleware.account_getter import AccountGetter, ADMIN
 
 
 class Volume(GenericNoProjectModel):
@@ -29,9 +29,6 @@ class Volume(GenericNoProjectModel):
     value: int = ormar.Integer(minimum=0, maximum=99999, default=0, comment="当前容量")
     size: int = ormar.Integer(minimum=0, maximum=99999, comment="最大容量")
     max: int = ormar.Integer(minimum=0, maximum=9999999, default=1024, comment="当前限制")
-
-    # def __repr__(self):
-    #     return f'{self.username}_{self.name}'
 
     def __gt__(self, other: Volume):
         return self.size > other.size
@@ -81,14 +78,14 @@ class Volume(GenericNoProjectModel):
     @classmethod
     async def undeleted_self_volumes(cls, owner_id):
         return cls.objects.filter(
-            ((cls.deleted_at == None) | (cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7))) & (cls.owner_by_id == owner_id))
-
+            ((cls.deleted_at == None) | (cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7))) & (
+                        cls.owner_by_id == owner_id))
 
     @classmethod
     async def undeleted_self_project_volumes(cls, owner_ids):
         return cls.objects.filter(
             (cls.owner_by_id << owner_ids) & ((cls.deleted_at == None) | (
-                        cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7)))
+                    cls.deleted_at >= datetime.datetime.now() - datetime.timedelta(days=7)))
         )
 
     @classmethod

@@ -1,7 +1,7 @@
 from k8s.api.core import Core
-from typing import Optional
 
-class CustomerObjectApi():
+
+class CustomerObjectApi:
     def __init__(self, c: Core):
         self._c = c
 
