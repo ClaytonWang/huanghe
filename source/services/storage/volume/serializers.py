@@ -11,10 +11,12 @@ class Owner(BaseModel):
     id: int
     username: str
 
+
 class Creator(BaseModel):
     id: int
     username: str
     en_name: str
+
 
 class Config(BaseModel):
     value: Optional[int] = 0
@@ -40,11 +42,6 @@ class VolumeCreateReq(BaseModel):
 class VolumeEditReq(BaseModel):
     config: Optional[Config] = None
     owner: Optional[Owner] = None
-
-
-
-# class VolumeResetReq(BaseModel):
-#     id: int
 
 
 class VolumeDetailRes(BaseModel):
