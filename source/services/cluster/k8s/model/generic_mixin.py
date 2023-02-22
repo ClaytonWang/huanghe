@@ -2,6 +2,7 @@ import pprint
 import six
 from pydantic import BaseModel as BM
 
+
 class GenericMixin(BM):
     attribute_map: dict = {}
 

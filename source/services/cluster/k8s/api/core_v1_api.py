@@ -1,6 +1,7 @@
 from k8s.api.core import Core
 
-class CoreV1Api():
+
+class CoreV1Api:
     def __init__(self, c: Core):
         self._c = c
 

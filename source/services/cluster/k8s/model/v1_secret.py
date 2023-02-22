@@ -50,15 +50,17 @@ class V1Secret(GenericMixin):
 
     @classmethod
     def default(cls, name, namespace, data, type):
-        return cls.new(api_version=API_VERSION_V1, kind=SECRET_KIND, metadata=V1ObjectMeta.default(name=name, namespace=namespace)
-                       ,data=data, type=type)
+        return cls.new(api_version=API_VERSION_V1, kind=SECRET_KIND,
+                       metadata=V1ObjectMeta.default(name=name, namespace=namespace)
+                       , data=data, type=type)
 
     @classmethod
     def huaweiyun_swr_secret(cls, namespace):
-        return cls.default(name=SECRET_NAME_DOCKER_CONFIG, namespace=namespace, data=SECRET_DATA_DOCKER_CONFIG, type=SECRET_TYPE_DOCKER_CONFIG)
+        return cls.default(name=SECRET_NAME_DOCKER_CONFIG, namespace=namespace, data=SECRET_DATA_DOCKER_CONFIG,
+                           type=SECRET_TYPE_DOCKER_CONFIG)
 
     @staticmethod
     def new(api_version: str, data: Dict[str, str],
-            kind: str, metadata: V1ObjectMeta, type, string_data = None, immutable: Optional[bool] = None):
+            kind: str, metadata: V1ObjectMeta, type, string_data=None, immutable: Optional[bool] = None):
         return V1Secret(api_version=api_version, data=data, immutable=immutable,
                         kind=kind, metadata=metadata, string_data=string_data, type=type)

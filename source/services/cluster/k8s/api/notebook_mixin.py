@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import List
 
 from k8s.api.core import Core
 from k8s.model.v1_status import V1Status
@@ -8,7 +8,7 @@ from k8s.api.custom_object_api import CustomerObjectApi
 from k8s.api.core_v1_api import CoreV1Api
 from k8s.const.crd_kubeflow_const import KUBEFLOW_NOTEBOOK_GROUP, KUBEFLOW_V1_VERSION, KUBEFLOW_NOTEBOOK_PLURAL
 from k8s.model.v1_notebook import V1Notebook
-from typing import Optional, Dict
+from typing import Dict
 from notebook.serializers import NoteBook, NoteBookListReq, NoteBookDeleteReq
 from basic.config.cluster import KUBEFLOW_NOTEBOOK_URL
 
@@ -45,7 +45,7 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                                                                       version=KUBEFLOW_V1_VERSION,
                                                                       namespace=nbdr.namespace,
                                                                       plural=KUBEFLOW_NOTEBOOK_PLURAL,
-                                                                      name=nbdr.name,)
+                                                                      name=nbdr.name, )
 
     def list_notebook(self, nblr: NoteBookListReq) -> List:
         notebooks = []

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from pydantic import BaseModel, validator
-from typing import Dict
-
+from pydantic import BaseModel
 
 
 class SecretCommon(BaseModel):
@@ -10,8 +8,5 @@ class SecretCommon(BaseModel):
     namespace: str
 
 
-
 class SecretNamespace(BaseModel):
     namespace: str
-
-
