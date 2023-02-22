@@ -3,7 +3,6 @@ from volcanojob.serializers import VolcanoJobCreateReq, VolcanoJobDeleteReq, Vol
 from k8s.cluster_client import cc
 from basic.middleware.rsp import success_common_response
 
-
 router_vcjob = APIRouter()
 
 
@@ -24,8 +23,6 @@ def update_status(vspr: VolcanoStatusPostReq):
     print(vspr.name)
     print(vspr.status)
     return success_common_response()
-
-
 
 
 #

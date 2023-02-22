@@ -41,7 +41,6 @@ class V1Alpha1VolcanoJobTaskTemplate(GenericMixin):
         return V1Alpha1VolcanoJobTaskTemplate(spec=spec, metadata=metadata)
 
 
-
 if __name__ == '__main__':
     s = V1PodSpec()
     s.to_dict()

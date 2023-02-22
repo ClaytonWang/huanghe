@@ -28,12 +28,12 @@ class V1NotebookTemplate(GenericMixin):
 
     @classmethod
     def default(cls, name, image, resource, envs, volumes, tolerations):
-        return cls.new(spec=V1PodSpec.notebook(name=name, image=image, resource=resource, envs=envs, volumes=volumes, tolerations=tolerations))
+        return cls.new(spec=V1PodSpec.notebook(name=name, image=image, resource=resource, envs=envs, volumes=volumes,
+                                               tolerations=tolerations))
 
     @staticmethod
     def new(spec: V1PodSpec):
         return V1NotebookTemplate(spec=spec)
-
 
 
 if __name__ == '__main__':

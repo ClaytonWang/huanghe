@@ -9,6 +9,7 @@ from k8s.model.v1_container_port import V1ContainerPort
 from k8s.model.v1_resource_requirements import V1ResourceRequirements
 from k8s.model.v1_volume_mount import V1VolumeMount
 
+
 class V1Container(GenericMixin):
     args: Optional[List[str]]
     command: Optional[List[str]]
@@ -112,5 +113,6 @@ class V1Container(GenericMixin):
         return cls.new(name=name, image=image, resources=None, command=command, working_dir=working_dir)
 
     @staticmethod
-    def new(name: str, image: str, resources: Optional[V1ResourceRequirements], command: Optional[List[str]], working_dir: Optional[str]):
+    def new(name: str, image: str, resources: Optional[V1ResourceRequirements], command: Optional[List[str]],
+            working_dir: Optional[str]):
         return V1Container(name=name, image=image, resources=resources, command=command, working_dir=working_dir)

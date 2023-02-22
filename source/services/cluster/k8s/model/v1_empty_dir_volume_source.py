@@ -34,5 +34,5 @@ class V1EmptyDirVolumeSource(GenericMixin):
         return cls.new(medium="Memory")
 
     @staticmethod
-    def new(medium: str, size_limit: Optional[str]=None):
+    def new(medium: str, size_limit: Optional[str] = None):
         return V1EmptyDirVolumeSource(medium=medium, size_limit=size_limit)

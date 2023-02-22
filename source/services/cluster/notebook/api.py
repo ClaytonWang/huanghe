@@ -3,7 +3,6 @@ from notebook.serializers import NoteBookCreateReq, NoteBookDeleteReq, NoteBookL
 from k8s.cluster_client import cc
 from basic.middleware.rsp import success_common_response
 
-
 router_notebook = APIRouter()
 
 
@@ -22,6 +21,7 @@ def create_notebook(nbcr: NoteBookCreateReq):
 )
 def list_notebook(nblr: NoteBookListReq):
     return cc.list_notebook(nblr)
+
 
 @router_notebook.delete(
     '',
