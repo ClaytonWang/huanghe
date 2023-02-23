@@ -2,9 +2,15 @@ from pydantic import BaseModel
 from typing import Optional, List
 
 
+class TaskDetail(BaseModel):
+    name: str
+    source: str
+
+
 class PodCreatedBy(BaseModel):
     id: int
     username: str
+    tasks: List[TaskDetail]
 
 
 class ServerCreateReq(BaseModel):
@@ -18,8 +24,6 @@ class ServerCreateReq(BaseModel):
     occupied_gpu: Optional[int] = 0
     occupied_memory: Optional[int] = 0
     occupied_by: Optional[List[PodCreatedBy]] = []
-    # occupied_by: Optional[list]
-
 
 
 class NodeDetailRes(BaseModel):
