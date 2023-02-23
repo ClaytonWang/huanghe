@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-14 13:53:37
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-21 18:24:36
+ * @LastEditTime: 2023-02-23 12:22:10
  * @FilePath: /huanghe/source/services/frontend/src/pages/overview/serverlist/ServerListTable/index.js
  * @Description: Server List Table
  */
@@ -66,8 +66,18 @@ const ServerListTable = ({
       },
       render(value) {
         const _value = value?.map((v) => v.username).join(',');
+        const tooltip = value?.reduce((prev, curr) => {
+          const { tasks, username } = curr;
+          return tasks.reduce((prevTask, currTask) => {
+            const text = `${username} ${currTask.name} ${currTask.source}`;
+            if (prevTask) {
+              return `${prevTask}\n${text}`;
+            }
+            return text;
+          }, prev);
+        }, null);
         return (
-          <Tooltip placement="topLeft" title={_value}>
+          <Tooltip placement="topLeft" title={tooltip}>
             {_value}
           </Tooltip>
         );
