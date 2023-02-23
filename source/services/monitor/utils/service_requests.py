@@ -167,23 +167,16 @@ async def get_notebook_job_list_by_server(server_ip):
     #                         headers={'Content-Type': 'application/json'})
     response = requests.get(f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_PREFIX_URL}/by_server/{server_ip}",
                             headers={'Content-Type': 'application/json'})
-
     text_notebook = response.json()
-    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-    print(f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_PREFIX_URL}/by_server/{server_ip}")
-    print(text_notebook)
-    # for note in text_notebook:
-    #     res.append(PodInfoByServer.parse_obj(note))
+    for note in text_notebook:
+        res.append(PodInfoByServer.parse_obj(note))
     # response_job = requests.get(f"http://127.0.0.1:8013/jobs/by_server/{server_ip}",
     #                             headers={'Content-Type': 'application/json'})
     response_job = requests.get(f"http://{JOB_SERVICE_URL}{JOB_PREFIX_URL}/by_server/{server_ip}",
                                 headers={'Content-Type': 'application/json'})
     text_job = response_job.json()
-    # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-    # print(text_job)
-    # for note in text_job:
-    #     res.append(PodInfoByServer.parse_obj(note))
-
+    for note in text_job:
+        res.append(PodInfoByServer.parse_obj(note))
     return [x.get_dict() for x in res]
 
 

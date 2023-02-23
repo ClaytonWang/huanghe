@@ -44,6 +44,7 @@ async def job_func(job_id):
         ServerCreateReq.occupied_gpu = occupied_gpu
         ServerCreateReq.occupied_memory = occupied_memory
         ServerCreateReq.occupied_by = occupied_by
+        print(ServerCreateReq.occupied_by)
         await Server.create_node_database(ServerCreateReq)
 
 
