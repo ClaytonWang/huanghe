@@ -17,9 +17,9 @@ from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project, create_vcjob,\
     delete_vcjob, VolcanoJobCreateReq, VolcanoJobDeleteReq
-from job.serializers import JobCreate, JobDetail, JobList, JobEdit,\
+from job_management.job.serializers import JobCreate, JobDetail, JobList, JobEdit,\
     JobOp, EventItem, EventCreate, JobStatusUpdate, JobSimple
-from models import Job, Status, Source
+from job_management.models.job import Job, Status, Source
 from utils.auth import operate_auth
 from utils.storage_request import volume_check
 from utils.user_request import get_user_list, get_project_list, project_check, project_check_obj
@@ -55,7 +55,12 @@ router_job = APIRouter()
 async def list_job_by_project(project_id: int = Path(..., ge=1, description='需要查询项目的project id')) -> bool:
     return await Job.self_project(project_id)
 
-
+@router_job.get(
+    '/by_server/{server_ip}',
+    description='通过节点IP查询job',
+)
+async def list_nb_by_server(server_ip: str = Path(..., description='需要查询项目的server_ip')):
+    return await Job.project_list_by_ip(server_ip)
 
 @router_job.get(
     '/items',

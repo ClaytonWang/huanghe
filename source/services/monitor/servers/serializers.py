@@ -1,5 +1,10 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
+
+
+class PodCreatedBy(BaseModel):
+    id: int
+    username: str
 
 
 class ServerCreateReq(BaseModel):
@@ -9,11 +14,12 @@ class ServerCreateReq(BaseModel):
     memory: int
     gpu: int = 0
     type: str = "cpu"
+    occupied_cpu: Optional[int] = 0
+    occupied_gpu: Optional[int] = 0
+    occupied_memory: Optional[int] = 0
+    occupied_by: Optional[List[PodCreatedBy]] = []
+    # occupied_by: Optional[list]
 
-
-class NodePodCreatedBy(BaseModel):
-    id: Optional[int] = 1
-    username: str
 
 
 class NodeDetailRes(BaseModel):
@@ -22,4 +28,5 @@ class NodeDetailRes(BaseModel):
     server: str
     occupied_rate: str
     source: str
-    occupied_by: list[NodePodCreatedBy]
+    occupied_by: Optional[List[PodCreatedBy]] = []
+    # occupied_by: list

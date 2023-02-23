@@ -18,6 +18,10 @@ class Server(OnlyPrimaryKeyModel):
     memory: int = ormar.Integer(comment='存储容量G')
     gpu: int = ormar.Integer(comment='GPU数量')
     type: str = ormar.String(max_length=40, default='', comnet='CPU/GPU类型')
+    occupied_cpu: int = ormar.Integer(comment='被占用CPU总数', nullable=True)
+    occupied_gpu: int = ormar.Integer(comment='被占用GPU总数', nullable=True)
+    occupied_memory: int = ormar.Integer(comment='被占用内存总数', nullable=True)
+    occupied_by: str = ormar.JSON(comment='占用人', nullable=True)
 
     def get_str(self):
         if self.gpu:
@@ -42,11 +46,26 @@ class Server(OnlyPrimaryKeyModel):
             "id": scr.id,
             "status": scr.status,
             "server": scr.server,
-            "occupied_rate": "1/3",
+            "occupied_rate": self.get_occupied_rate(scr),
             "source": self.get_str(scr),
-            "occupied_by": [{"id": 1, "username": "张三"},
-                            {"id": 2, "username": "李四"}]
+            "occupied_by": scr.occupied_by
         }
+
+    def get_occupied_rate(self):
+        res = max(self.occupied_cpu / self.cpu, self.occupied_memory / self.memory)
+        if (self.type != "cpu" and (self.occupied_gpu / self.gpu) <= res) or (self.type == "cpu"):
+            if self.occupied_cpu / self.cpu >= self.occupied_memory / self.memory:
+                if self.occupied_cpu == 0:
+                    return "0"
+                else:
+                    return f"{self.occupied_cpu}/{self.cpu}"
+            else:
+                if self.occupied_memory == 0:
+                    return "0"
+                else:
+                    return f"{self.occupied_memory}/{self.memory}"
+        else:
+            return f"{self.occupied_gpu}/{self.gpu}"
 
     @classmethod
     async def create_node_database(self, scr: ServerCreateReq):
@@ -54,7 +73,10 @@ class Server(OnlyPrimaryKeyModel):
         if node is None:
             await Server.objects.create(**Server.gen_create_dict(scr))
         else:
-            await Server.objects.filter(server=scr.server).update(status=scr.status)
+            await Server.objects.filter(server=scr.server).update(status=scr.status, occupied_cpu=scr.occupied_cpu,
+                                                                  occupied_gpu=scr.occupied_gpu,
+                                                                  occupied_memory=scr.occupied_memory,
+                                                                  occupied_by=scr.occupied_by)
         return success_common_response()
 
 

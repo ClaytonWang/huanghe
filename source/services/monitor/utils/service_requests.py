@@ -16,6 +16,8 @@ from collections import defaultdict
 from datetime import datetime
 from pydantic import BaseModel, Field
 from basic.config.monitor import *
+import requests
+
 
 
 class RoleInfo(BaseModel):
@@ -95,6 +97,27 @@ class JobInfo(BaseModel):
         }
 
 
+class PodInfoByServer(BaseModel):
+    id: int
+    name: str
+    created_by_id: int
+    cpu: int
+    gpu: int
+    memory: int
+    created_by: str
+
+    def get_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'created_by_id': self.created_by_id,
+            'cpu': self.cpu,
+            'gpu': self.gpu,
+            'memory': self.memory,
+            'created_by': self.created_by
+        }
+
+
 async def get_user_list(token):
     async with aiohttp.ClientSession() as session:
         # url = USER_SERVICE_PATH + f"/user?pagesize=100&pageno={page_no}"
@@ -135,6 +158,32 @@ async def get_notebook_list(token, filter_path=None):
             for note in note_data:
                 note['project_id'] = note['project']['id']
                 res.append(NotebookInfo.parse_obj(note))
+    return [x.get_dict() for x in res]
+
+
+async def get_notebook_job_list_by_server(server_ip):
+    res = []
+    # response = requests.get(f"http://127.0.0.1:8012/notebooks/by_server/{server_ip}",
+    #                         headers={'Content-Type': 'application/json'})
+    response = requests.get(f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_PREFIX_URL}/by_server/{server_ip}",
+                            headers={'Content-Type': 'application/json'})
+
+    text_notebook = response.json()
+    # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+    # print(f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_PREFIX_URL}/by_server/{server_ip}")
+    print(text_notebook)
+    for note in text_notebook:
+        res.append(PodInfoByServer.parse_obj(note))
+    # response_job = requests.get(f"http://127.0.0.1:8013/jobs/by_server/{server_ip}",
+    #                             headers={'Content-Type': 'application/json'})
+    response_job = requests.get(f"http://{JOB_SERVICE_URL}{JOB_PREFIX_URL}/by_server/{server_ip}",
+                                headers={'Content-Type': 'application/json'})
+    text_job = response_job.json()
+    # print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+    # print(text_job)
+    for note in text_job:
+        res.append(PodInfoByServer.parse_obj(note))
+
     return [x.get_dict() for x in res]
 
 

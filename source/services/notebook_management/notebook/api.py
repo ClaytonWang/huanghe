@@ -36,7 +36,12 @@ PASSWORD = "jovyan"
 async def list_nb_by_project(project_id: int = Path(..., ge=1, description='需要查询项目的project id')) -> bool:
     return await Notebook.self_project(project_id)
 
-
+@router_notebook.get(
+    '/by_server/{server_ip}',
+    description='通过节点IP查询nb',
+)
+async def list_nb_by_server(server_ip: str = Path(..., description='需要查询项目的server_ip')):
+    return await Notebook.project_list_by_ip(server_ip)
 
 def format_notebook_detail(nb: Notebook):
     result = nb.dict()
@@ -314,7 +319,6 @@ async def create_notebook(request: Request,
         'gpu': gpu_count,
         'type': machine_type,
         'volumes': volumes_k8s,
-        # 'server_IP':
     }
     init_data['k8s_info'] = json.dumps(k8s_info)
 
