@@ -197,7 +197,7 @@ const JobsUpdate = () => {
     const values = form.getFieldsValue();
     const { id = null } = get(location, 'state.params', {});
     console.log(values);
-    if (type === CREATE) {
+    if (type === CREATE || type === COPY) {
       saveJob(values);
     } else {
       updateJob({ id, ...values });
