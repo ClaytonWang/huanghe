@@ -121,7 +121,7 @@ const JobsTable = ({
     },
     {
       title: '操作',
-      width: '10%',
+      width: '15%',
       shouldCellUpdate: (record, prevRecord) =>
         record?.status?.desc !== prevRecord?.status?.desc,
       render(_value, record) {
@@ -132,7 +132,7 @@ const JobsTable = ({
   const OperationBtnGroup = ({ record }) => {
     const _sname = get(record, 'status.name');
     const statusName = getStatusName(_sname);
-    const taskModel = get(record, 'taskModel_name');
+    const mode = get(record, 'mode');
 
     const StartStopBtn = () => {
       if (
@@ -188,7 +188,7 @@ const JobsTable = ({
           (user) => get(record, 'creator.username') === get(user, 'username'),
         ]}
       >
-        {taskModel}
+        {mode}
       </AuthButton>
     );
 
@@ -252,7 +252,7 @@ const JobsTable = ({
       },
     ];
 
-    if (taskModel === DEBUG) {
+    if (mode === DEBUG) {
       items.unshift({
         key: 'edit',
         label: <EditBtn type="text" />,
@@ -264,7 +264,7 @@ const JobsTable = ({
         <span className="dbr-table-actions">
           <Space>
             <StartStopBtn />
-            {taskModel === DEBUG ? <DebugBtn /> : <EditBtn />}
+            {mode === DEBUG ? <DebugBtn /> : <EditBtn />}
             <Dropdown menu={{ items }} placement="bottom">
               <a>
                 <EllipsisOutlined style={{ fontSize: 24 }} />
