@@ -173,7 +173,9 @@ async def get_notebook_job_list_by_server(server_ip):
     print(text_notebook)
     # for note in text_notebook:
     #     res.append(PodInfoByServer.parse_obj(note))
-    response_job = requests.get(f"http://127.0.0.1:8013/jobs/by_server/{server_ip}",
+    # response_job = requests.get(f"http://127.0.0.1:8013/jobs/by_server/{server_ip}",
+    #                             headers={'Content-Type': 'application/json'})
+    response_job = requests.get(f"http://{JOB_SERVICE_URL}{JOB_PREFIX_URL}/by_server/{server_ip}",
                                 headers={'Content-Type': 'application/json'})
     text_job = response_job.json()
     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
