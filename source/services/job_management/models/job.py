@@ -9,11 +9,9 @@
 from __future__ import annotations
 
 import ormar
-from basic.utils.dt_format import dt_to_string
 from basic.config.job_management import WEBKUBECTL_URL
 from basic.common.base_model import DateModel, GenericDateModel
 from models import DB, META
-from typing import List
 
 # 状态
 # JOB_STATUS_RUNNING = "running"  # 已启动(运行中)
@@ -95,7 +93,7 @@ class Job(GenericDateModel):
 
     status: Status = ormar.ForeignKey(Status, related_name='job_status')
     work_dir: str = ormar.String(max_length=100, comment='工作目录', nullable=True)
-    k8s_info: str = ormar.JSON(comment="集群信息")
+    k8s_info: dict = ormar.JSON(comment="集群信息")
 
     cpu: int = ormar.Integer(comment='CPU数量')
     memory: int = ormar.Integer(comment='存储容量G')
