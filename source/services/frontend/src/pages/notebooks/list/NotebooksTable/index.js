@@ -30,7 +30,7 @@ const NotebooksTable = ({
             component={Icons[value.name]}
           />
         );
-        if (/^(stop|start|pending|running)$/.test(value.name)) {
+        if (/^(stop|start|pending)$/.test(value.name)) {
           icon = (
             <Spin
               indicator={

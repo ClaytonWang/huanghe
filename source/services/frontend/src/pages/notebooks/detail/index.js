@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-20 19:08:00
+ * @LastEditTime: 2023-02-24 10:24:53
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
@@ -448,7 +448,7 @@ NotebookDetail.context = (props = {}) => {
             component={Icons[statusName]}
           />
         );
-        if (/^(stop|start|pending|running)$/.test(statusName)) {
+        if (/^(stop|start|pending)$/.test(statusName)) {
           icon = (
             <Spin
               indicator={

@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-21 14:39:52
+ * @LastEditTime: 2023-02-24 10:24:48
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -559,7 +559,7 @@ JobDetail.context = (props = {}) => {
               component={Icons[statusName]}
             />
           );
-          if (/^(stop|start|pending|running)$/.test(statusName)) {
+          if (/^(stop|start|pending)$/.test(statusName)) {
             icon = (
               <Spin
                 indicator={

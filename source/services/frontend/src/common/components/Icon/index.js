@@ -1,8 +1,8 @@
 /*
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-08 18:14:27
- * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-09 14:46:06
+ * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
+ * @LastEditTime: 2023-02-24 10:21:59
  * @FilePath: /huanghe/source/services/frontend/src/common/components/Icon/index.js
  * @Description: 自定义图标
  */
@@ -34,7 +34,7 @@ const Icons = {
   jobs: JupyterSvg,
   start: LoadingSvg,
   stop: LoadingSvg,
-  running: LoadingSvg,
+  running: SuccessSvg,
   pending: PendingSvg,
   error: ErrorFillSvg,
   stopped: StoppedSvg,
