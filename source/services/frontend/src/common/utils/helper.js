@@ -3,7 +3,7 @@
  * @author liguanlin<guanlin.li@digitalbrain.cn>
  */
 import React from 'react';
-import { uniqueId, cloneDeep } from 'lodash';
+import { uniqueId, cloneDeep, debounce } from 'lodash';
 import accounting from 'accounting';
 import moment from 'moment';
 import { apiUriParamsPattern } from '@/common/utils/config';
@@ -450,3 +450,15 @@ export const getStatusName = (value) => {
   }
   return status;
 };
+/**
+ * 给事件增加防抖
+ *
+ * @param {function} event
+ * @param {number} duration
+ * @return function
+ */
+export const debounceEvent = (event, duration = 1000) =>
+  debounce(event, duration, {
+    leading: true,
+    trailing: false,
+  });
