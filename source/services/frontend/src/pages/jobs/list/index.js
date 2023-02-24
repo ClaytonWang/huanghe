@@ -108,7 +108,7 @@ const JobList = () => {
     reload({ pageno, pagesize });
   };
 
-  const deleteNotebook = async (record) => {
+  const deleteJob = async (record) => {
     const { id } = record;
     try {
       await api.jobListDelete({ id });
@@ -171,7 +171,7 @@ const JobList = () => {
       okType: 'danger',
       cancelText: '取消',
       onOk: () => {
-        deleteNotebook(record);
+        deleteJob(record);
       },
     });
   };
