@@ -55,12 +55,14 @@ router_job = APIRouter()
 async def list_job_by_project(project_id: int = Path(..., ge=1, description='需要查询项目的project id')) -> bool:
     return await Job.self_project(project_id)
 
+
 @router_job.get(
     '/by_server/{server_ip}',
     description='通过节点IP查询job',
 )
 async def list_nb_by_server(server_ip: str = Path(..., description='需要查询项目的server_ip')):
     return await Job.project_list_by_ip(server_ip)
+
 
 @router_job.get(
     '/items',
@@ -400,8 +402,6 @@ async def list_job_event(query_params: QueryParameters = Depends(QueryParameters
     for i, v in enumerate(events.data):
         events.data[i] = EventItem.parse_obj(v.gen_pagation_event())
     return events
-
-
 
 
 @router_job.post(

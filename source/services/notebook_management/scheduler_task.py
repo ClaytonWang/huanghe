@@ -73,7 +73,7 @@ async def job_func(job_id):
             bulk_update = True
             nb.url = None
             nb.status = stopped_status
-            nb.server_ip = obj['server_ip']
+            nb.server_ip = None
     if bulk_update:
         await Notebook.objects.bulk_update(stop_notebooks)
 
