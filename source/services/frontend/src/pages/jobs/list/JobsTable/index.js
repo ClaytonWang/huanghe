@@ -211,10 +211,11 @@ const JobsTable = ({
       </AuthButton>
     );
 
-    const EditBtn = () => (
+    const EditBtn = (props = {}) => (
       <AuthButton
         required="jobs.list.edit"
         type="link"
+        {...props}
         onClick={() => {
           handleEditClicked(record);
         }}

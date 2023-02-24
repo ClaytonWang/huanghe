@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-24 14:34:36
+ * @LastEditTime: 2023-02-24 17:51:42
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -37,7 +37,14 @@ import {
 } from '@/common/utils/helper';
 import api from '@/common/api';
 import qs from 'qs';
-import { JOB_ACTION, START, STOP, UPDATE, DEBUG, COPY } from '@/common/constants';
+import {
+  JOB_ACTION,
+  START,
+  STOP,
+  UPDATE,
+  DEBUG,
+  COPY,
+} from '@/common/constants';
 import Icons from '@/common/components/Icon';
 import { useContextProps } from '@/common/hooks/RoutesProvider';
 import moment from 'moment';
