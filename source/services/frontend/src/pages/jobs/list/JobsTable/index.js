@@ -148,9 +148,7 @@ const JobsTable = ({
           <AuthButton
             required="jobs.list.edit"
             type="link"
-            onClick={debounceEvent(() => {
-              handleStartClicked(record);
-            })}
+            onClick={debounceEvent(() => handleStartClicked(record))}
             condition={[
               (user) =>
                 get(record, 'creator.username') === get(user, 'username'),
