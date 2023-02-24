@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-08 18:14:27
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-24 10:21:59
+ * @LastEditTime: 2023-02-24 15:35:59
  * @FilePath: /huanghe/source/services/frontend/src/common/components/Icon/index.js
  * @Description: 自定义图标
  */
@@ -15,6 +15,7 @@ import CustomSvg from '@/common/images/custom.svg';
 import DevelopSvg from '@/common/images/develop.svg';
 import JupyterSvg from '@/common/images/jupyter.svg';
 import SuccessSvg from '@/common/images/success.svg';
+import CompletedSvg from '@/common/images/completed.svg';
 import LoadingSvg from '@/common/images/loading.svg';
 import PendingSvg from '@/common/images/pending.svg';
 import ErrorFillSvg from '@/common/images/error-fill.svg';
@@ -38,6 +39,6 @@ const Icons = {
   pending: PendingSvg,
   error: ErrorFillSvg,
   stopped: StoppedSvg,
-  completed: SuccessSvg,
+  completed: CompletedSvg,
 };
 export default Icons;
