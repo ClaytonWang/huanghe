@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-21 14:39:52
+ * @LastEditTime: 2023-02-24 17:51:42
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -20,9 +20,8 @@ import {
   message,
   Modal,
   DatePicker,
-  Button,
 } from 'antd';
-import Icon, { InfoCircleOutlined } from '@ant-design/icons';
+import Icon from '@ant-design/icons';
 import {
   ChartMonitor,
   EventMonitor,
@@ -38,7 +37,14 @@ import {
 } from '@/common/utils/helper';
 import api from '@/common/api';
 import qs from 'qs';
-import { JOB_ACTION, START, STOP, UPDATE, DEBUG } from '@/common/constants';
+import {
+  JOB_ACTION,
+  START,
+  STOP,
+  UPDATE,
+  DEBUG,
+  COPY,
+} from '@/common/constants';
 import Icons from '@/common/components/Icon';
 import { useContextProps } from '@/common/hooks/RoutesProvider';
 import moment from 'moment';
@@ -186,6 +192,16 @@ const JobDetail = () => {
     });
   };
 
+  const handleCopyClicked = (values) => {
+    navigate('/jobs/list/copy', {
+      state: {
+        params: values,
+        type: COPY,
+      },
+    });
+    console.log('copy clicked');
+  };
+
   const deleteJob = async (record) => {
     const { id } = record;
     try {
@@ -197,7 +213,7 @@ const JobDetail = () => {
     }
   };
 
-  const handleDelete = (record) => {
+  const handleDeleteClicked = (record) => {
     Modal.confirm({
       title: '确定要删除该Job服务吗？',
       okText: '删除',
@@ -230,7 +246,8 @@ const JobDetail = () => {
       handleStartClicked,
       handleStopClicked,
       handleEditClicked,
-      handleDelete,
+      handleCopyClicked,
+      handleDeleteClicked,
       detail: detailData,
     });
   }, [detailData]);
@@ -559,7 +576,7 @@ JobDetail.context = (props = {}) => {
               component={Icons[statusName]}
             />
           );
-          if (/^(stop|start|pending|running)$/.test(statusName)) {
+          if (/^(stop|start|pending)$/.test(statusName)) {
             icon = (
               <Spin
                 indicator={

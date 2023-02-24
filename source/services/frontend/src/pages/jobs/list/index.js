@@ -108,7 +108,7 @@ const JobList = () => {
     reload({ pageno, pagesize });
   };
 
-  const deleteNotebook = async (record) => {
+  const deleteJob = async (record) => {
     const { id } = record;
     try {
       await api.jobListDelete({ id });
@@ -135,6 +135,7 @@ const JobList = () => {
       const { id } = record;
       await api.jobListAction({ id, action: JOB_ACTION[START] });
       message.success('已触发启动！');
+      reload();
     } catch (error) {
       console.log(error);
     }
@@ -171,7 +172,7 @@ const JobList = () => {
       okType: 'danger',
       cancelText: '取消',
       onOk: () => {
-        deleteNotebook(record);
+        deleteJob(record);
       },
     });
   };

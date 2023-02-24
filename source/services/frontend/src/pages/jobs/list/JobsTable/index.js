@@ -1,9 +1,13 @@
 import { useSearchParams, Link } from 'react-router-dom';
 import { Modal, Spin, Table, Tooltip, Dropdown, Space } from 'antd';
 import qs from 'qs';
-import { get } from 'lodash';
+import { get, debounce } from 'lodash';
 import Icon, { EllipsisOutlined } from '@ant-design/icons';
-import { transformDate, getStatusName } from '@/common/utils/helper';
+import {
+  transformDate,
+  getStatusName,
+  debounceEvent,
+} from '@/common/utils/helper';
 import { AuthButton, Auth } from '@/common/components';
 import Icons from '@/common/components/Icon';
 import { DEBUG } from '@/common/constants';
@@ -32,7 +36,7 @@ const JobsTable = ({
             component={Icons[status]}
           />
         );
-        if (/^(stop|start|pending|running)$/.test(status)) {
+        if (/^(stop|start|pending)$/.test(status)) {
           icon = (
             <Spin
               indicator={
@@ -121,7 +125,7 @@ const JobsTable = ({
     },
     {
       title: '操作',
-      width: '10%',
+      width: '15%',
       shouldCellUpdate: (record, prevRecord) =>
         record?.status?.desc !== prevRecord?.status?.desc,
       render(_value, record) {
@@ -132,7 +136,7 @@ const JobsTable = ({
   const OperationBtnGroup = ({ record }) => {
     const _sname = get(record, 'status.name');
     const statusName = getStatusName(_sname);
-    const taskModel = get(record, 'taskModel_name');
+    const mode = get(record, 'mode');
 
     const StartStopBtn = () => {
       if (
@@ -144,9 +148,7 @@ const JobsTable = ({
           <AuthButton
             required="jobs.list.edit"
             type="link"
-            onClick={() => {
-              handleStartClicked(record);
-            }}
+            onClick={debounceEvent(() => handleStartClicked(record))}
             condition={[
               (user) =>
                 get(record, 'creator.username') === get(user, 'username'),
@@ -188,7 +190,7 @@ const JobsTable = ({
           (user) => get(record, 'creator.username') === get(user, 'username'),
         ]}
       >
-        {taskModel}
+        {mode}
       </AuthButton>
     );
 
@@ -209,10 +211,11 @@ const JobsTable = ({
       </AuthButton>
     );
 
-    const EditBtn = () => (
+    const EditBtn = (props = {}) => (
       <AuthButton
         required="jobs.list.edit"
         type="link"
+        {...props}
         onClick={() => {
           handleEditClicked(record);
         }}
@@ -252,7 +255,7 @@ const JobsTable = ({
       },
     ];
 
-    if (taskModel === DEBUG) {
+    if (mode === DEBUG) {
       items.unshift({
         key: 'edit',
         label: <EditBtn type="text" />,
@@ -264,7 +267,7 @@ const JobsTable = ({
         <span className="dbr-table-actions">
           <Space>
             <StartStopBtn />
-            {taskModel === DEBUG ? <DebugBtn /> : <EditBtn />}
+            {mode === DEBUG ? <DebugBtn /> : <EditBtn />}
             <Dropdown menu={{ items }} placement="bottom">
               <a>
                 <EllipsisOutlined style={{ fontSize: 24 }} />

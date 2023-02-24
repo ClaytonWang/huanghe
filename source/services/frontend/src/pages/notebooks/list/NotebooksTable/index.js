@@ -3,7 +3,7 @@ import { Modal, Spin, Table, Tooltip, Dropdown, Space } from 'antd';
 import qs from 'qs';
 import { get } from 'lodash';
 import Icon, { EllipsisOutlined } from '@ant-design/icons';
-import { transformDate } from '@/common/utils/helper';
+import { debounceEvent, transformDate } from '@/common/utils/helper';
 import { AuthButton, Auth } from '@/common/components';
 import Icons from '@/common/components/Icon';
 
@@ -30,7 +30,7 @@ const NotebooksTable = ({
             component={Icons[value.name]}
           />
         );
-        if (/^(stop|start|pending|running)$/.test(value.name)) {
+        if (/^(stop|start|pending)$/.test(value.name)) {
           icon = (
             <Spin
               indicator={
@@ -187,9 +187,7 @@ const NotebooksTable = ({
                 <AuthButton
                   required="notebooks.list.edit"
                   type="link"
-                  onClick={() => {
-                    handleStartClicked(record);
-                  }}
+                  onClick={debounceEvent(() => handleStartClicked(record))}
                   condition={[
                     (user) =>
                       get(record, 'creator.username') === get(user, 'username'),
