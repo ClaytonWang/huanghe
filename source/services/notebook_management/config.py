@@ -15,7 +15,7 @@ from pathlib import Path
 DEBUG = True
 SERVICE_PORT = 8000
 DO_NOT_AUTH_URI = ['/auth/login', '/docs', '/openapi', '/openapi.json']
-NO_AUTH_WORDS = ['events', "project_backend", "by_server"]
+NO_AUTH_WORDS = ['events', "status_update", "project_backend", "by_server"]
 
 
 APP_NAME = Path(__file__).parent.name
