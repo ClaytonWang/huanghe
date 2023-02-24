@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-01-31 15:07:28
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-21 18:34:12
+ * @LastEditTime: 2023-02-24 17:32:38
  * @FilePath: /huanghe/source/services/frontend/src/pages/overview/summary/index.js
  * @Description: Overview Summary page
  */
@@ -19,7 +19,7 @@ import {
   Skeleton,
   Empty,
 } from 'antd';
-import { DownOutlined, UpOutlined, RightOutlined } from '@ant-design/icons';
+import { RightOutlined } from '@ant-design/icons';
 import { ADMIN } from '@/common/constants';
 import { useAuth } from '@/common/hooks/useAuth';
 import api from '@/common/api';
@@ -27,36 +27,6 @@ import './index.less';
 
 const formatter = (value) => (
   <CountUp end={value} separator="," duration="0.5" />
-);
-
-const SourceStatisticCard = ({
-  title,
-  occupied = 0,
-  used = 0,
-  occupied_rate = 0,
-  suffix = 'C',
-}) => (
-  <Card.Grid style={{ width: '100%', padding: 15 }}>
-    <Row>
-      <Col span={24} style={{ fontWeight: 'bold' }}>
-        {title}
-      </Col>
-    </Row>
-    <Row style={{ marginTop: 10 }}>
-      <Col span={8}>
-        <Statistic value={occupied} formatter={formatter} suffix={suffix} />
-        已占用
-      </Col>
-      <Col span={8} style={{ textAlign: 'center' }}>
-        <Statistic value={used} formatter={formatter} suffix={suffix} />
-        已使用
-      </Col>
-      <Col span={8} style={{ textAlign: 'right' }}>
-        <Statistic value={occupied_rate} formatter={formatter} suffix="%" />
-        占用率
-      </Col>
-    </Row>
-  </Card.Grid>
 );
 
 const StatisticCard = ({ title, total = 0, run = 0, to }) => (
@@ -100,10 +70,8 @@ const OverviewList = () => {
   const [projectsDatasource, setProjectsDatasource] = useState([]);
   const [selectedProject, setSelectedProject] = useState([]);
   const [tasksData, setTasksData] = useState([]);
-  const [sourceData, setSourceData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const [open, setOpen] = useState(false);
   const { user } = useAuth();
 
   const handleChange = (value) => {
@@ -139,18 +107,6 @@ const OverviewList = () => {
     }
   };
 
-  const requestSource = async (project) => {
-    try {
-      const params = { project };
-      const { result } = await api.serverSource(params);
-      setSourceData(result);
-      return Promise.resolve();
-    } catch (error) {
-      console.log(error);
-      return Promise.reject(error);
-    }
-  };
-
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     requestProjects();
@@ -164,11 +120,9 @@ const OverviewList = () => {
   }, [projectsDatasource]);
 
   useEffect(() => {
-    if (selectedProject && selectedProject.length > 0) {
+    if (selectedProject && selectedProject.length >= 0) {
       setLoading(true);
-      const promises = [requestTasks, requestSource].map((fn) =>
-        fn(selectedProject)
-      );
+      const promises = [requestTasks].map((fn) => fn(selectedProject));
       Promise.all(promises)
         .then(() => {
           setLoading(false);
@@ -196,6 +150,7 @@ const OverviewList = () => {
               loading={loading}
               placeholder="请选择项目"
               value={selectedProject}
+              onClear={() => handleChange([])}
               onChange={handleChange}
               options={projectsDatasource.map(({ id, name = '-' }) => ({
                 label: name,
@@ -231,56 +186,11 @@ const OverviewList = () => {
       </Card>
       <br />
       <Card size="small" title="资源统计">
-        <Row gutter={10}>
-          {loading ? (
-            <Skeleton active />
-          ) : (
-            (sourceData?.length > 0 &&
-              sourceData?.map(
-                ({ name = '-', occupied = 0, occupiedRate = 0, used = 0 }) => {
-                  let suffix = 'T';
-                  if (name === 'CPU' || name === 'GPU') {
-                    suffix = 'C';
-                  }
-                  return (
-                    <Col key={name} span={6}>
-                      <SourceStatisticCard
-                        title={name}
-                        occupied={occupied}
-                        occupied_rate={occupiedRate * 100}
-                        used={used}
-                        suffix={suffix}
-                      />
-                    </Col>
-                  );
-                }
-              )) || (
-              <Empty
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                style={{ width: '100%' }}
-              />
-            )
-          )}
-        </Row>
-        <Row style={{ marginTop: 15 }}>
+        <Row>
           <Col span={24}>
-            <a
-              onClick={() => {
-                setOpen(!open);
-              }}
-            >
-              {open ? '收起' : '展开'}
-              {open ? <UpOutlined /> : <DownOutlined />}
-            </a>
+            <OverviewChartMonitor />
           </Col>
         </Row>
-        {open ? (
-          <Row>
-            <Col span={24}>
-              <OverviewChartMonitor />
-            </Col>
-          </Row>
-        ) : null}
       </Card>
     </div>
   );
