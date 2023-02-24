@@ -32,7 +32,7 @@ const JobsTable = ({
             component={Icons[status]}
           />
         );
-        if (/^(stop|start|pending|running)$/.test(status)) {
+        if (/^(stop|start|pending)$/.test(status)) {
           icon = (
             <Spin
               indicator={
