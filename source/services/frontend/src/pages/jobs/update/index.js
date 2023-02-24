@@ -358,7 +358,7 @@ const JobsUpdate = () => {
       <>
         {custom ? (
           <Input
-            addonBefore="swr.cn-north-4.myhuaweicloud.com/digitalbrain/"
+            addonBefore="harbor.digitalbrain.cn/"
             placeholder="输入镜像地址"
             onChange={onInputChange}
             value={value?.name}
