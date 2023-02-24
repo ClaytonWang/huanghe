@@ -1,9 +1,13 @@
 import { useSearchParams, Link } from 'react-router-dom';
 import { Modal, Spin, Table, Tooltip, Dropdown, Space } from 'antd';
 import qs from 'qs';
-import { get } from 'lodash';
+import { get, debounce } from 'lodash';
 import Icon, { EllipsisOutlined } from '@ant-design/icons';
-import { transformDate, getStatusName } from '@/common/utils/helper';
+import {
+  transformDate,
+  getStatusName,
+  debounceEvent,
+} from '@/common/utils/helper';
 import { AuthButton, Auth } from '@/common/components';
 import Icons from '@/common/components/Icon';
 import { DEBUG } from '@/common/constants';
@@ -144,9 +148,9 @@ const JobsTable = ({
           <AuthButton
             required="jobs.list.edit"
             type="link"
-            onClick={() => {
+            onClick={debounceEvent(() => {
               handleStartClicked(record);
-            }}
+            })}
             condition={[
               (user) =>
                 get(record, 'creator.username') === get(user, 'username'),

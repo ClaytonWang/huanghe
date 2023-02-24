@@ -135,6 +135,7 @@ const JobList = () => {
       const { id } = record;
       await api.jobListAction({ id, action: JOB_ACTION[START] });
       message.success('已触发启动！');
+      reload();
     } catch (error) {
       console.log(error);
     }
