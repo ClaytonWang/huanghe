@@ -19,6 +19,7 @@
 FROM ubuntu:22.04
 
 ENV TZ=Asia/Shanghai
+COPY Shanghai /usr/share/zoneinfo/$TZ
 
 RUN sed -i s@/archive.ubuntu.com//@/mirrors.aliyun.com/@g /etc/apt/sources.list \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
