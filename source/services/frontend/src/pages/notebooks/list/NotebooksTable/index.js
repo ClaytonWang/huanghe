@@ -1,7 +1,7 @@
 import { useSearchParams, Link } from 'react-router-dom';
 import { Modal, Spin, Table, Tooltip, Dropdown, Space } from 'antd';
 import qs from 'qs';
-import { get, debounce } from 'lodash';
+import { get } from 'lodash';
 import Icon, { EllipsisOutlined } from '@ant-design/icons';
 import { debounceEvent, transformDate } from '@/common/utils/helper';
 import { AuthButton, Auth } from '@/common/components';
