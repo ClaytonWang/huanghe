@@ -7,15 +7,13 @@
 """
 
 import aiohttp
-import json
 
-from typing import List, Dict
-# from config import STORAGE_SERVICE_PATH
-from collections import defaultdict
+from typing import List
 from pydantic import BaseModel, Field
 from basic.config.job_management import *
 from basic.middleware.account_getter import PVCCreateReq, create_pvc
 from job.serializers import HookItem
+
 
 class VolumeConfigInfo(BaseModel):
     value: int
@@ -82,5 +80,5 @@ async def volume_check(authorization: str, hooks: List[HookItem], namespace: str
         storages.append({'storage': volume_info, 'path': path})
         # 校验创建pvc
         create_pvc(PVCCreateReq(name=volume_k8s_name, namespace=namespace, size=volume_info['config']['size']),
-                         ignore_exist=True)
+                   ignore_exist=True)
     return storages, volumes_k8s

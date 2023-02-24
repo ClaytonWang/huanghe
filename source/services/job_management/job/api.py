@@ -15,15 +15,15 @@ from typing import List
 from basic.common.env_variable import get_string_variable
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
-from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project, create_vcjob,\
+from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project, create_vcjob, \
     delete_vcjob, VolcanoJobCreateReq, VolcanoJobDeleteReq
-from job.serializers import JobCreate, JobDetail, JobList, JobEdit,\
+from job.serializers import JobCreate, JobDetail, JobList, JobEdit, \
     JobOp, EventItem, EventCreate, JobStatusUpdate, JobSimple
 from models.job import Job, Status, Source
 from utils.auth import operate_auth
 from utils.storage_request import volume_check
-from utils.user_request import get_user_list, get_project_list, project_check, project_check_obj
-from basic.middleware.account_getter import ADMIN, USER, OWNER
+from utils.user_request import project_check, project_check_obj
+from basic.middleware.account_getter import ADMIN
 from basic.common.common_model import Event
 
 router_job = APIRouter()
@@ -71,7 +71,7 @@ async def list_nb_by_server(server_ip: str = Path(..., description='需要查询
     response_model_exclude_unset=True
 )
 async def get_simple_job(request: Request,
-                         query_params: QueryParameters = Depends(QueryParameters),):
+                         query_params: QueryParameters = Depends(QueryParameters), ):
     params_filter = query_params.filter_
     user: AccountGetter = request.user
 
@@ -210,7 +210,7 @@ async def create_job(request: Request,
                                    gpu=gpu_count,
                                    volumes=volumes_k8s,
                                    command=[jc.start_command],
-                                   working_dir=jc.work_dir,).dict()
+                                   working_dir=jc.work_dir, ).dict()
     init_data['k8s_info'] = json.dumps(k8s_info)
 
     _job = await Job.objects.create(**init_data)
@@ -237,8 +237,6 @@ async def update_status(jsu: JobStatusUpdate,
     if jsu.server_ip:
         update_data['server_ip'] = jsu.server_ip
     await j.update(**update_data)
-    # if not await _job.update(status=status):
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job不存在')
     return JSONResponse(dict(id=job_id))
 
 
@@ -256,7 +254,7 @@ async def update_job(request: Request,
         je.start_command = "sleep 14400"
     update_data = {"mode": je.mode,
                    "work_dir": je.work_dir,
-                   "start_command": je.start_command,}
+                   "start_command": je.start_command, }
     if not update_data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
 
@@ -270,7 +268,6 @@ async def update_job(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户，Job不能重名')
     k8s_info = _job.k8s_info
 
-    # TODO(jiangshouchen): add more status
     if _job.status.name not in {'stopped', "completed", "run_fail"}:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job未停止')
     if _job.status.name != 'stopped':
@@ -301,16 +298,16 @@ async def update_job(request: Request,
             cpu_count = cpu_count.split("C")[0]
             memory = memory.split("G")[0]
         source_dic = {'cpu': cpu_count,
-            'memory': memory,
-            'gpu': gpu_count,
-            'type': machine_type,}
+                      'memory': memory,
+                      'gpu': gpu_count,
+                      'type': machine_type, }
         k8s_info.update(source_dic)
         update_data.update(source_dic)
 
     k8s_info['image'] = je.image.name
     update_data.update({"image": je.image.name,
                         "custom": je.image.custom,
-                        "work_dir": je.work_dir,})
+                        "work_dir": je.work_dir, })
     storages, volumes_k8s = await volume_check(authorization, je.hooks, extra_info['en_name'])
     path_set = {x['path'] for x in storages}
     if len(path_set) != len(storages):
@@ -341,20 +338,14 @@ async def operate_job(request: Request,
     payloads = json.dumps(_job.k8s_info)
 
     # 数字，0（停止）｜1（启动）
-    # todo 状态还需要调整
     update_data = {}
     if action == 0:
-        # if _job.status.name not in ['pending', 'running', 'stop_fail', 'on']:
-        #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
         stat = await Status.objects.get(name='stopped')
         update_data['status'] = stat.id
         delete_vcjob(vjd=VolcanoJobDeleteReq.parse_raw(payloads), ignore_no_found=True)
     elif action == 1:
-        # if _job.status.name not in ['start_fail', 'run_fail', 'stopped']:
-        #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
         stat = await Status.objects.get(name='pending')
         update_data['status'] = stat.id
-        # todo response返回不为200时更新job状态到异常
         create_vcjob(vjc=VolcanoJobCreateReq.parse_raw(payloads))
 
     if not update_data:
@@ -376,16 +367,11 @@ async def delete_job(request: Request,
     check, extra_info = await project_check(request, _job.project_by_id)
     if not check:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
-    # if _job.status.name not in ['stopped', 'error']:
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job未停止')
 
     payloads = _job.k8s_info
     # # error状态调用删除需要释放资源
     if _job.status.name != 'stop':
-    #     authorization: str = request.headers.get('authorization')
         delete_vcjob(vjd=VolcanoJobDeleteReq.parse_obj(dict(payloads)), ignore_no_found=True)
-    # if response.status != 200:
-    #     _job.status = None
     await _job.delete()
 
 
@@ -395,7 +381,7 @@ async def delete_job(request: Request,
     response_model=Page[EventItem],
 )
 async def list_job_event(query_params: QueryParameters = Depends(QueryParameters),
-                              job_id: int = Path(..., ge=1, description="JobID")):
+                         job_id: int = Path(..., ge=1, description="JobID")):
     params_filter = query_params.filter_
     events = await Event.find_vcjob_events(job_id)
     events = await paginate(events.filter(**params_filter), params=query_params.params)
