@@ -39,13 +39,24 @@ async def job_func(job_id):
             # print(f"node:{node['serverIP']} has:{pod}")
             if occupied_user.count(pod["created_by_id"]) == 0:
                 occupied_user.append(pod["created_by_id"])
-                occupied_by.append({"id": pod["created_by_id"], "username": pod["created_by"]})
+                occupied_by.append({"id": pod["created_by_id"], "username": pod["created_by"],
+                                    "tasks": [{"name":pod["name"],"source":get_str(pod,ServerCreateReq.type)}]})
+            else:
+                for x in occupied_by:
+                    if x["id"]==pod["created_by_id"]:
+                        x["tasks"].append({"name":pod["name"],"source":get_str(pod,ServerCreateReq.type)})
+
         ServerCreateReq.occupied_cpu = occupied_cpu
         ServerCreateReq.occupied_gpu = occupied_gpu
         ServerCreateReq.occupied_memory = occupied_memory
         ServerCreateReq.occupied_by = occupied_by
+        print(ServerCreateReq.occupied_by)
         await Server.create_node_database(ServerCreateReq)
-
+def get_str(pod,type):
+    if type != 'cpu':
+        return f"GPU {pod['gpu']}*{type} {pod['cpu']}C {pod['memory']}G"
+    else:
+        return f"CPU {pod['cpu']}C {pod['memory']}G"
 
 def job_listener(event):
     if event.exception:
