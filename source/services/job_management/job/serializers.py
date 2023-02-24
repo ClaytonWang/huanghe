@@ -128,7 +128,7 @@ class JobCreate(BaseModel):
     hooks: List[HookItem] = []
 
     @validator('name')
-    def job_name_validator(cls, name):
+    def job_name_validator(self, name):
         return k8s_format(name)
 
 
@@ -149,7 +149,7 @@ class JobDetail(BaseModel):
     logging_url: Optional[str]
 
     @validator('created_at', 'updated_at')
-    def format_dt(cls, dt):
+    def format_dt(self, dt):
         if isinstance(dt, str):
             return dt
         return dt_to_string(dt, '%Y-%m-%d')
