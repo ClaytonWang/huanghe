@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-14 13:53:37
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-23 12:22:10
+ * @LastEditTime: 2023-02-24 15:55:07
  * @FilePath: /huanghe/source/services/frontend/src/pages/overview/serverlist/ServerListTable/index.js
  * @Description: Server List Table
  */
@@ -54,7 +54,7 @@ const ServerListTable = ({
       },
     },
     {
-      title: '总资源规格',
+      title: '服务器规格',
       dataIndex: 'source',
       width: '20%',
     },
