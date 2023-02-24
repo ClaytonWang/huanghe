@@ -31,11 +31,13 @@ class UserStr(BaseModel):
     id: int
     username: str = None
 
+
 class Grafana(BaseModel):
     cpu: str
     ram: str
     gpu: str
     vram: str
+
 
 class ProjectStr(BaseModel):
     id: int
@@ -125,7 +127,7 @@ class JobCreate(BaseModel):
     hooks: List[HookItem] = []
 
     @validator('name')
-    def job_name_validator(cls, name):
+    def job_name_validator(self, name):
         return k8s_format(name)
 
 
@@ -146,10 +148,11 @@ class JobDetail(BaseModel):
     logging_url: Optional[str]
 
     @validator('created_at', 'updated_at')
-    def format_dt(cls, dt):
+    def format_dt(self, dt):
         if isinstance(dt, str):
             return dt
         return dt_to_string(dt, '%Y-%m-%d')
+
 
 class JobEdit(BaseModel):
     project: Project
@@ -160,8 +163,10 @@ class JobEdit(BaseModel):
     hooks: List[HookItem] = []
     source: str
 
+
 class StatusItemOnlyDesc(BaseModel):
     desc: str = None
+
 
 class JobStatusUpdate(BaseModel):
     status: str
@@ -173,6 +178,7 @@ class EventItem(BaseModel):
     status: StatusItemOnlyDesc
     name: Optional[str] = ""
     time: Optional[datetime]
+
 
 class EventCreate(BaseModel):
     name: str

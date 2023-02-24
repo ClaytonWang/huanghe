@@ -8,6 +8,7 @@
 import databases
 import sqlalchemy
 from config import DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
+
 DB_CONN = f'{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
 DB_POSTGRESQL_CONN = f'postgresql://{DB_CONN}'
