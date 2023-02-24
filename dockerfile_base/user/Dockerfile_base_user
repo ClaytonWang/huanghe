@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4
-ARG BASE_IMG=containers.git.digitalbrain.cn/engineering-group/huanghe.backend-base:2023-01-04.3
+ARG BASE_IMG=containers.git.digitalbrain.cn/engineering-group/huanghe.backend-base:2023-02-24.11
 FROM $BASE_IMG
 WORKDIR /source/services/user
 
