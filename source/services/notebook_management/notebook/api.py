@@ -39,7 +39,7 @@ async def list_nb_by_project(project_id: int = Path(..., ge=1, description='éœ€è
         nc = await Notebook.self_project_and_self_view(project_id=project_id, self_id=user_id)
     else:
         nc = await Notebook.self_project(project_id)
-    if nc > 1:
+    if not nc:
         return False
     return True
 

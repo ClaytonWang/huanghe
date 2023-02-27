@@ -58,7 +58,7 @@ async def list_job_by_project(project_id: int = Path(..., ge=1, description='需
         jc = await Job.self_project_and_self_view(project_id=project_id, self_id=user_id)
     else:
         jc = await Job.self_project(project_id)
-    if jc > 1:
+    if not jc:
         return False
     return True
 
