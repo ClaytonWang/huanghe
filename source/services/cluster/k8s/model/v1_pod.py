@@ -1,11 +1,11 @@
 # coding: utf-8
 from __future__ import annotations
-from source.services.cluster.k8s.model.base_model import BaseModel
+from services.cluster.k8s.model.base_model import BaseModel
 from typing import Optional
 from k8s.const.workloads_const import API_VERSION_V1, POD_KIND
-from source.services.cluster.k8s.model.v1_object_meta import V1ObjectMeta
-from source.services.cluster.k8s.model.v1_pod_spec import V1PodSpec
-from source.services.cluster.k8s.model.v1_pod_status import V1PodStatus
+from services.cluster.k8s.model.v1_object_meta import V1ObjectMeta
+from services.cluster.k8s.model.v1_pod_spec import V1PodSpec
+from services.cluster.k8s.model.v1_pod_status import V1PodStatus
 
 
 class V1Pod(BaseModel):
