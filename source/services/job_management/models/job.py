@@ -119,6 +119,14 @@ class Job(GenericDateModel):
     async def self_project_and_self_view(cls, project_id: int, self_id: int):
         return await cls.objects.filter((cls.project_by_id == project_id) & (cls.created_by_id == self_id)).count()
 
+    @classmethod
+    async def self_project_and_self_view(cls, project_id: int, self_id: int):
+        j = await cls.objects.get_or_none((cls.project_by_id == project_id) & (cls.created_by_id == self_id))
+        if not j:
+            return False
+        return True
+
+
     @property
     def namespace_name(self):
         return f"{self.k8s_info.get('namespace')}"
