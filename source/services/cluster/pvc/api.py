@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from pvc.serializers import PVCCreateReq, PVCDeleteReq
-from k8s.cluster_client import cc
+from services.cluster.pvc.serializers import PVCCreateReq, PVCDeleteReq
+from services.cluster.k8s.cluster_client import cc
 from basic.middleware.rsp import success_common_response
 
 

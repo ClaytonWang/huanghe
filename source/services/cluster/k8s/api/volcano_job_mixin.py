@@ -1,10 +1,10 @@
 from __future__ import annotations
-from k8s.api.core import Core
-from k8s.model.v1_status import V1Status
-from k8s.api.custom_object_api import CustomerObjectApi
-from k8s.api.core_v1_api import CoreV1Api
-from k8s.const.crd_kubeflow_const import VOLCANO_JOB_GROUP, VOLCANO_JOB_PLURAL, VOLCANO_V1_ALPHA1_VERSION
-from k8s.model.v1_alpha1_volcano_job import V1Alpha1VolcanoJob
+from services.cluster.k8s.api.core import Core
+from services.cluster.k8s.model.v1_status import V1Status
+from services.cluster.k8s.api.custom_object_api import CustomerObjectApi
+from services.cluster.k8s.api.core_v1_api import CoreV1Api
+from services.cluster.k8s.const.crd_kubeflow_const import VOLCANO_JOB_GROUP, VOLCANO_JOB_PLURAL, VOLCANO_V1_ALPHA1_VERSION
+from services.cluster.k8s.model.v1_alpha1_volcano_job import V1Alpha1VolcanoJob
 from volcanojob.serializers import VolcanoJob, VolcanoJobDeleteReq, VolcanoJobListReq
 from typing import Dict
 

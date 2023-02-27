@@ -1,9 +1,9 @@
 # coding: utf-8
 from __future__ import annotations
-from k8s.model.base_model import BaseModel
-from k8s.model.v1_alpha1_volcano_job_spec import V1Alpha1VolcanoJobSpec
-from k8s.model.v1_object_meta import V1ObjectMeta
-from k8s.const.crd_kubeflow_const import VOLCANO_V1_ALPHA1_API_VERSION, VOLCANO_JOB_KIND
+from services.cluster.k8s.model.base_model import BaseModel
+from services.cluster.k8s.model.v1_alpha1_volcano_job_spec import V1Alpha1VolcanoJobSpec
+from services.cluster.k8s.model.v1_object_meta import V1ObjectMeta
+from services.cluster.k8s.const.crd_kubeflow_const import VOLCANO_V1_ALPHA1_API_VERSION, VOLCANO_JOB_KIND
 
 
 class V1Alpha1VolcanoJob(BaseModel):

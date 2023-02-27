@@ -1,6 +1,6 @@
 from __future__ import annotations
-from k8s.model.generic_mixin import GenericMixin
-from k8s.model.v1_notebook_template import V1NotebookTemplate
+from services.cluster.k8s.model.generic_mixin import GenericMixin
+from services.cluster.k8s.model.v1_notebook_template import V1NotebookTemplate
 
 
 class V1NotebookSpec(GenericMixin):

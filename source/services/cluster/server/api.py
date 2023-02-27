@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from k8s.cluster_client import cc
+from services.cluster.k8s.cluster_client import cc
 
 router_server = APIRouter()
 
