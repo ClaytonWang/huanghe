@@ -55,8 +55,12 @@ router_job = APIRouter()
 async def list_job_by_project(project_id: int = Path(..., ge=1, description='需要查询项目的project id'),
                               user_id: int = Query(None, description='用户id')) -> bool:
     if user_id:
-        return await Job.self_project_and_self_view(project_id=project_id, self_id=user_id)
-    return await Job.self_project(project_id)
+        jc = await Job.self_project_and_self_view(project_id=project_id, self_id=user_id)
+    else:
+        jc = await Job.self_project(project_id)
+    if jc > 1:
+        return False
+    return True
 
 
 @router_job.get(
