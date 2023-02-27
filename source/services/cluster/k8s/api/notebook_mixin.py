@@ -45,7 +45,7 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                                                                       version=KUBEFLOW_V1_VERSION,
                                                                       namespace=nbdr.namespace,
                                                                       plural=KUBEFLOW_NOTEBOOK_PLURAL,
-                                                                      name=nbdr.name, )
+                                                                      name=nbdr.name,)
 
     def list_notebook(self, nblr: NoteBookListReq) -> List:
         notebooks = []
@@ -70,7 +70,7 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                               "server_ip": node_name
                               })
         name_ip = {}
-        for pod in self.core_v1_api.list_pod_for_all_namespaces(label_selector=f"env=dev").items:
+        for pod in self.core_v1_api.list_pod_for_all_namespaces(label_selector=f"env={nblr.env}").items:
             name_ip[pod.spec.containers[0].name] = pod.spec.node_name
         for notebook in notebooks:
             notebook["server_ip"] = name_ip.get(notebook["name"])
