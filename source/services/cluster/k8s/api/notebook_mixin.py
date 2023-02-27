@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from typing import List
 
 from k8s.api.core import Core
 from k8s.model.v1_status import V1Status
@@ -8,7 +7,7 @@ from k8s.api.custom_object_api import CustomerObjectApi
 from k8s.api.core_v1_api import CoreV1Api
 from k8s.const.crd_kubeflow_const import KUBEFLOW_NOTEBOOK_GROUP, KUBEFLOW_V1_VERSION, KUBEFLOW_NOTEBOOK_PLURAL
 from k8s.model.v1_notebook import V1Notebook
-from typing import Dict
+from typing import Optional, Dict
 from notebook.serializers import NoteBook, NoteBookListReq, NoteBookDeleteReq
 from basic.config.cluster import KUBEFLOW_NOTEBOOK_URL
 
@@ -45,7 +44,7 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                                                                       version=KUBEFLOW_V1_VERSION,
                                                                       namespace=nbdr.namespace,
                                                                       plural=KUBEFLOW_NOTEBOOK_PLURAL,
-                                                                      name=nbdr.name, )
+                                                                      name=nbdr.name,)
 
     def list_notebook(self, nblr: NoteBookListReq) -> List:
         notebooks = []
@@ -70,7 +69,7 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                               "server_ip": node_name
                               })
         name_ip = {}
-        for pod in self.core_v1_api.list_pod_for_all_namespaces(label_selector=f"env=dev").items:
+        for pod in self.core_v1_api.list_pod_for_all_namespaces(label_selector=f"env={nblr.env}").items:
             name_ip[pod.spec.containers[0].name] = pod.spec.node_name
         for notebook in notebooks:
             notebook["server_ip"] = name_ip.get(notebook["name"])
