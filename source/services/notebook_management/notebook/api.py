@@ -7,7 +7,7 @@
 """
 import json
 from typing import List, Dict
-from fastapi import APIRouter, Depends, Request, HTTPException, status, Path
+from fastapi import APIRouter, Depends, Request, HTTPException, status, Path, Query
 from fastapi.responses import JSONResponse
 from models import Notebook, Status, Image
 from notebook.serializers import NotebookList, NotebookCreate, NotebookEdit, NotebookOp, NotebookDetail, EventItem, \
@@ -33,7 +33,10 @@ PASSWORD = "jovyan"
     '/project_backend/{project_id}',
     description='通过项目查询nb',
 )
-async def list_nb_by_project(project_id: int = Path(..., ge=1, description='需要查询项目的project id')) -> bool:
+async def list_nb_by_project(project_id: int = Path(..., ge=1, description='需要查询项目的project id'),
+                             user_id: int = Query(None, description='用户id')) -> bool:
+    if user_id:
+        return await Notebook.self_project_and_self_view(project_id=project_id, self_id=user_id)
     return await Notebook.self_project(project_id)
 
 @router_notebook.get(

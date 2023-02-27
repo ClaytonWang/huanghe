@@ -78,8 +78,6 @@ class Notebook(GenericDateModel):
     k8s_info: str = ormar.JSON(comment='集群信息')
     server_ip: str = ormar.String(max_length=20, comment='所在的node', nullable=True)
 
-    # def __repr__(self):
-    #     return f'{self.name}_{self.value}'
     def cpu_url(self, common: str):
         return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&panelId=4"
 
@@ -124,6 +122,13 @@ class Notebook(GenericDateModel):
     @classmethod
     async def self_project(cls, _id: int):
         j = await cls.objects.get_or_none(cls.project_by_id == _id)
+        if not j:
+            return False
+        return True
+
+    @classmethod
+    async def self_project_and_self_view(cls, project_id: int, self_id: int):
+        j = await cls.objects.get_or_none((cls.project_by_id == project_id) & (cls.created_by_id == self_id))
         if not j:
             return False
         return True

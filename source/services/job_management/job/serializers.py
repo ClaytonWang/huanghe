@@ -31,11 +31,13 @@ class UserStr(BaseModel):
     id: int
     username: str = None
 
+
 class Grafana(BaseModel):
     cpu: str
     ram: str
     gpu: str
     vram: str
+
 
 class ProjectStr(BaseModel):
     id: int
@@ -151,6 +153,7 @@ class JobDetail(BaseModel):
             return dt
         return dt_to_string(dt, '%Y-%m-%d')
 
+
 class JobEdit(BaseModel):
     project: Project
     mode: str
@@ -160,8 +163,10 @@ class JobEdit(BaseModel):
     hooks: List[HookItem] = []
     source: str
 
+
 class StatusItemOnlyDesc(BaseModel):
     desc: str = None
+
 
 class JobStatusUpdate(BaseModel):
     status: str
@@ -173,6 +178,7 @@ class EventItem(BaseModel):
     status: StatusItemOnlyDesc
     name: Optional[str] = ""
     time: Optional[datetime]
+
 
 class EventCreate(BaseModel):
     name: str

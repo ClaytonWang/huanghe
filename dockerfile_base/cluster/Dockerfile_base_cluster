@@ -1,7 +1,7 @@
 #python3.8
 #ARG BASE_IMG=containers.git.digitalbrain.cn/engineering-group/huanghe.backend-base:2023-01-04.3
 #python3.11
-ARG BASE_IMG=containers.git.digitalbrain.cn/engineering-group/huanghe.backend-base:2023-01-11.9
+ARG BASE_IMG=containers.git.digitalbrain.cn/engineering-group/huanghe.backend-base:2023-02-24.12
 FROM $BASE_IMG
 WORKDIR /source/services/cluster
 
