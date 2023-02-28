@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from pod.serializers import Pod
-from k8s.cluster_client import cc
+from services.cluster.pod.serializers import Pod
+from services.cluster.k8s.cluster_client import cc
 from basic.middleware.rsp import success_common_response
 
 router_pod = APIRouter()

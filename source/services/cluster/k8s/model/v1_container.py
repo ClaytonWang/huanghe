@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import Optional, List, Dict
-from k8s.model.generic_mixin import GenericMixin
-from k8s.model.v1_env_var import V1EnvVar
-from k8s.model.v1_env_from_source import V1EnvFromSource
-from k8s.model.v1_lifecycle import V1Lifecycle
-from k8s.model.v1_probe import V1Probe
-from k8s.model.v1_container_port import V1ContainerPort
-from k8s.model.v1_resource_requirements import V1ResourceRequirements
-from k8s.model.v1_volume_mount import V1VolumeMount
+from services.cluster.k8s.model.generic_mixin import GenericMixin
+from services.cluster.k8s.model.v1_env_var import V1EnvVar
+from services.cluster.k8s.model.v1_env_from_source import V1EnvFromSource
+from services.cluster.k8s.model.v1_lifecycle import V1Lifecycle
+from services.cluster.k8s.model.v1_probe import V1Probe
+from services.cluster.k8s.model.v1_container_port import V1ContainerPort
+from services.cluster.k8s.model.v1_resource_requirements import V1ResourceRequirements
+from services.cluster.k8s.model.v1_volume_mount import V1VolumeMount
 
 
 class V1Container(GenericMixin):

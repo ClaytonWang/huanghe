@@ -1,10 +1,10 @@
 # coding: utf-8
 from __future__ import annotations
-from k8s.model.generic_mixin import GenericMixin
+from services.cluster.k8s.model.generic_mixin import GenericMixin
 from typing import Optional, Dict
-from k8s.const.workloads_const import API_VERSION_V1, SECRET_KIND, \
+from services.cluster.k8s.const.workloads_const import API_VERSION_V1, SECRET_KIND, \
     SECRET_TYPE_DOCKER_CONFIG, SECRET_DATA_DOCKER_CONFIG, SECRET_NAME_DOCKER_CONFIG
-from k8s.model.v1_object_meta import V1ObjectMeta
+from services.cluster.k8s.model.v1_object_meta import V1ObjectMeta
 
 
 class V1Secret(GenericMixin):

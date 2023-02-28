@@ -1,6 +1,6 @@
 # coding: utf-8
 from __future__ import annotations
-from k8s.model.base_model import BaseModel
+from services.cluster.k8s.model.base_model import BaseModel
 
 """
     Kubernetes

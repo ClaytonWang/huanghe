@@ -1,7 +1,7 @@
 from __future__ import annotations
-from k8s.model.generic_mixin import GenericMixin
-from k8s.model.v1_alpha1_volcano_job_task_template import V1Alpha1VolcanoJobTaskTemplate
-from k8s.const.crd_kubeflow_const import VOLCANO_TASK_DEFAULT_NAME, VOLCANO_TASK_REPLICAS
+from services.cluster.k8s.model.generic_mixin import GenericMixin
+from services.cluster.k8s.model.v1_alpha1_volcano_job_task_template import V1Alpha1VolcanoJobTaskTemplate
+from services.cluster.k8s.const.crd_kubeflow_const import VOLCANO_TASK_DEFAULT_NAME, VOLCANO_TASK_REPLICAS
 
 
 class V1Alpha1VolcanoJobTask(GenericMixin):

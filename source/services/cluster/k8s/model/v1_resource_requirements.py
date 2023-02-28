@@ -1,6 +1,6 @@
 from typing import Dict, Optional
-from k8s.model.generic_mixin import GenericMixin
-from k8s.const.workloads_const import RESOURCE_REQUIREMENTS_ATTRIBUTE_SETS, RESOURCE_REQUIREMENTS_STORAGE
+from services.cluster.k8s.model.generic_mixin import GenericMixin
+from services.cluster.k8s.const.workloads_const import RESOURCE_REQUIREMENTS_ATTRIBUTE_SETS, RESOURCE_REQUIREMENTS_STORAGE
 
 
 class V1ResourceRequirements(GenericMixin):

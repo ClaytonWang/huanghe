@@ -121,17 +121,11 @@ class Notebook(GenericDateModel):
 
     @classmethod
     async def self_project(cls, _id: int):
-        j = await cls.objects.get_or_none(cls.project_by_id == _id)
-        if not j:
-            return False
-        return True
+        return await cls.objects.filter(cls.project_by_id == _id).count()
 
     @classmethod
     async def self_project_and_self_view(cls, project_id: int, self_id: int):
-        j = await cls.objects.get_or_none((cls.project_by_id == project_id) & (cls.created_by_id == self_id))
-        if not j:
-            return False
-        return True
+        return await cls.objects.filter((cls.project_by_id == project_id) & (cls.created_by_id == self_id)).count()
 
     @classmethod
     async def project_list_by_ip(cls, _ip: int):

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from k8s.cluster_client import cc
-from secret.serializers import SecretNamespace
+from services.cluster.k8s.cluster_client import cc
+from services.cluster.secret.serializers import SecretNamespace
 from basic.middleware.rsp import success_common_response
 
 

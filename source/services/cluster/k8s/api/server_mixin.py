@@ -1,5 +1,5 @@
-from k8s.api.core import Core
-from k8s.api.core_v1_api import CoreV1Api
+from services.cluster.k8s.api.core import Core
+from services.cluster.k8s.api.core_v1_api import CoreV1Api
 
 
 def check_status(status_data):

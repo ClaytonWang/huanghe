@@ -1,9 +1,9 @@
 # coding: utf-8
 from __future__ import annotations
 from typing import Optional
-from k8s.model.generic_mixin import GenericMixin
-from k8s.model.v1_persistent_volume_claim_volume_source import V1PersistentVolumeClaimVolumeSource
-from k8s.model.v1_empty_dir_volume_source import V1EmptyDirVolumeSource
+from services.cluster.k8s.model.generic_mixin import GenericMixin
+from services.cluster.k8s.model.v1_persistent_volume_claim_volume_source import V1PersistentVolumeClaimVolumeSource
+from services.cluster.k8s.model.v1_empty_dir_volume_source import V1EmptyDirVolumeSource
 
 """
     Kubernetes

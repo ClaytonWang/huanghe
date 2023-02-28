@@ -1,10 +1,10 @@
 # coding: utf-8
 from __future__ import annotations
-from k8s.model.base_model import BaseModel
-from k8s.model.v1_namespace_spec import V1NamespaceSpec
-from k8s.model.v1_namespace_status import V1NamespaceStatus
-from k8s.model.v1_object_meta import V1ObjectMeta
-from k8s.const.workloads_const import API_VERSION_V1, NAMESPACE_KIND
+from services.cluster.k8s.model.base_model import BaseModel
+from services.cluster.k8s.model.v1_namespace_spec import V1NamespaceSpec
+from services.cluster.k8s.model.v1_namespace_status import V1NamespaceStatus
+from services.cluster.k8s.model.v1_object_meta import V1ObjectMeta
+from services.cluster.k8s.const.workloads_const import API_VERSION_V1, NAMESPACE_KIND
 from typing import Optional
 
 

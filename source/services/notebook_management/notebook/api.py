@@ -36,8 +36,12 @@ PASSWORD = "jovyan"
 async def list_nb_by_project(project_id: int = Path(..., ge=1, description='需要查询项目的project id'),
                              user_id: int = Query(None, description='用户id')) -> bool:
     if user_id:
-        return await Notebook.self_project_and_self_view(project_id=project_id, self_id=user_id)
-    return await Notebook.self_project(project_id)
+        nc = await Notebook.self_project_and_self_view(project_id=project_id, self_id=user_id)
+    else:
+        nc = await Notebook.self_project(project_id)
+    if not nc:
+        return False
+    return True
 
 @router_notebook.get(
     '/by_server/{server_ip}',

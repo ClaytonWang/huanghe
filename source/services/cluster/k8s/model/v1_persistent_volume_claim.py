@@ -1,8 +1,8 @@
 from __future__ import annotations
-from k8s.model.base_model import BaseModel
-from k8s.model.v1_persistent_volume_claim_spec import V1PersistentVolumeClaimSpec
-from k8s.model.v1_object_meta import V1ObjectMeta
-from k8s.const.workloads_const import API_VERSION_V1, PERSISTENT_VOLUME_CLAIM_KIND
+from services.cluster.k8s.model.base_model import BaseModel
+from services.cluster.k8s.model.v1_persistent_volume_claim_spec import V1PersistentVolumeClaimSpec
+from services.cluster.k8s.model.v1_object_meta import V1ObjectMeta
+from services.cluster.k8s.const.workloads_const import API_VERSION_V1, PERSISTENT_VOLUME_CLAIM_KIND
 
 
 class V1PersistentVolumeClaim(BaseModel):
