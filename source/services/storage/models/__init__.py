@@ -5,5 +5,5 @@
     >Mail    : jindu.yin@digitalbrain.cn
     >Time    : 2022/10/11 09:29
 """
-from models.initdb import *
-from models.volume import Volume
+from services.storage.models.initdb import *
+from services.storage.models.volume import Volume
