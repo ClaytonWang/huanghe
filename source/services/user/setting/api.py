@@ -11,7 +11,7 @@ from api.serializers import OwnerUserList
 from setting.serializers import ProjectSetUser
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
-from project.service_request import query_notebook_by_project
+from project.service_request import query_notebook_by_project, query_job_by_project
 
 
 router_setting = APIRouter()
@@ -132,6 +132,8 @@ async def project_set_user(
     notebook_list = query_notebook_by_project(authorization, _project.id, _user.id)
     if notebook_list:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联notebook，不能删除')
+    if query_job_by_project(authorization, _project.id, _user.id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联job，不能删除')
     if _user in _project.member:
         await _project.member.remove(_user)
     await pms.permissions.clear()

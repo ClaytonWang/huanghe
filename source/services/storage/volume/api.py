@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Path, Request
 from basic.middleware.rsp import success_common_response
-from models import Volume
+from services.storage.models import Volume
 from typing import List
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
-from volume.serializers import VolumeCreateReq, VolumeEditReq, VolumeDetailRes
+from services.storage.volume.serializers import VolumeCreateReq, VolumeEditReq, VolumeDetailRes
 from basic.middleware.account_getter import AccountGetter, ADMIN, OWNER, \
     query_notebook_volume, list_user_by_project
 
