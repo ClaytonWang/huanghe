@@ -1,6 +1,6 @@
 import ormar
 from basic.common.base_model import DateModel, OnlyPrimaryKeyModel
-from servers.serializers import ServerCreateReq
+from monitor.servers.serializers import ServerCreateReq, PodCreatedBy
 from models import DB, META
 from basic.middleware.rsp import success_common_response
 
@@ -38,6 +38,7 @@ class Server(OnlyPrimaryKeyModel):
             "type": scr.type,
             "status": scr.status,
             "server": scr.server,
+            "server_ip": scr.server_ip
         }
 
     @classmethod
