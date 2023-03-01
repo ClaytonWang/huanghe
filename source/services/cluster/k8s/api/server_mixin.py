@@ -29,13 +29,15 @@ class ServerMixin(CoreV1Api):
         for node in response['items']:
             server = node['metadata']['name']
             node_source_data = node['status']['capacity']
+            server_ip=node['status']['addresses'][0]['address']
             cpu = node_source_data['cpu']
             memory = translate_memory(node_source_data['memory'])
             status = check_status(node['status']['conditions'])
             if node_source_data.get("nvidia.com/gpu") is None:
                 nodes.append({
                     'status': status,
-                    'serverIP': server,
+                    'server_ip':server_ip,
+                    'server_name': server,
                     'cpu': cpu,
                     'memory': memory,
                 })
@@ -44,7 +46,8 @@ class ServerMixin(CoreV1Api):
                 type = node["metadata"]["labels"]["nvidia.com/gpu.product"].split("-")[1]
                 nodes.append({
                     'status': status,
-                    'serverIP': server,
+                    'server_ip': server_ip,
+                    'server_name': server,
                     'cpu': cpu,
                     'gpu': gpu,
                     'memory': memory,

@@ -16,8 +16,9 @@ async def job_func(job_id):
     print(f"job {job_id} run in {datetime.now()}")
     serverlist = await  list_server_ip_k8s()
     for node in serverlist:
+        ServerCreateReq.server_ip = node['server_ip']
         ServerCreateReq.status = node['status']
-        ServerCreateReq.server = node['serverIP']
+        ServerCreateReq.server = node['server_name']
         ServerCreateReq.cpu = node['cpu']
         ServerCreateReq.memory = node['memory']
         if node.get('gpu'):
@@ -26,7 +27,7 @@ async def job_func(job_id):
         else:
             ServerCreateReq.gpu = 0
             ServerCreateReq.type = 'cpu'
-        pod_list = await get_notebook_job_list_by_server(node['serverIP'])
+        pod_list = await get_notebook_job_list_by_server(node['server_name'])
         occupied_cpu = 0
         occupied_gpu = 0
         occupied_memory = 0

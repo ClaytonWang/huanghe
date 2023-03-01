@@ -11,8 +11,8 @@ class Server(OnlyPrimaryKeyModel):
         metadata = META
         database = DB
         orders_by = ['-id']
-
-    server: str = ormar.String(max_length=18, comment='服务器IP地址')
+    server_ip: str = ormar.String(max_length=18, comment='服务器IP地址')
+    server: str = ormar.String(max_length=18, comment='服务器名称')
     status: str = ormar.String(max_length=17, comment='服务器状态')
     cpu: int = ormar.Integer(comment='CPU总数')
     memory: int = ormar.Integer(comment='存储容量G')
@@ -45,7 +45,7 @@ class Server(OnlyPrimaryKeyModel):
         return {
             "id": scr.id,
             "status": scr.status,
-            "server": scr.server,
+            "server": scr.server_ip,
             "occupied_rate": self.get_occupied_rate(scr),
             "source": self.get_str(scr),
             "occupied_by": scr.occupied_by
@@ -76,7 +76,7 @@ class Server(OnlyPrimaryKeyModel):
             await Server.objects.filter(server=scr.server).update(status=scr.status, occupied_cpu=scr.occupied_cpu,
                                                                   occupied_gpu=scr.occupied_gpu,
                                                                   occupied_memory=scr.occupied_memory,
-                                                                  occupied_by=scr.occupied_by)
+                                                                  occupied_by=scr.occupied_by,server_ip=scr.server_ip)
         return success_common_response()
 
 
