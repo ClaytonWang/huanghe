@@ -46,6 +46,24 @@ class UserInfo(BaseModel):
         }
 
 
+class ProjectInfo(BaseModel):
+    id: int = Field(..., alias='project_id')
+    code: str = Field(..., )
+    name: str = Field(..., alias='project_by')
+    en_name: str = Field(..., )
+
+    class Config:
+        allow_population_by_field_name = True
+
+    def get_dict(self):
+        return {
+            "id": self.id,
+            "code": self.code,
+            "name": self.name,
+            "en_name": self.en_name,
+        }
+
+
 class NotebookInfo(BaseModel):
     id: int
     name: str
@@ -117,8 +135,25 @@ async def get_user_list(token):
             return [x.get_dict() for x in res]
 
 
+async def get_project_list(token):
+    async with aiohttp.ClientSession() as session:
+        url = f"http://{USER_SERVICE_URL}{PROJECT_ITEMS_URL}"
+        headers = {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+        }
+        async with session.get(url, headers=headers) as response:
+            # print("status:{}".format(response.status))
+            text = await response.json()
+            # print(text)
+            proj_data = text['result']
+            res = []
+            for proj in proj_data:
+                res.append(ProjectInfo.parse_obj(proj))
+            return [x.get_dict() for x in res]
+
+
 async def get_notebook_list(token, filter_path=None):
-    res = []
     async with aiohttp.ClientSession() as session:
         url = f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_ITEMS_URL}"
         headers = {
@@ -132,14 +167,14 @@ async def get_notebook_list(token, filter_path=None):
             # print("status:{}".format(response.status))
             text = await response.json()
             note_data = text['result']
+            res = []
             for note in note_data:
                 note['project_id'] = note['project']['id']
                 res.append(NotebookInfo.parse_obj(note))
-    return [x.get_dict() for x in res]
+            return [x.get_dict() for x in res]
 
 
 async def get_job_list(token, filter_path=None):
-    res = []
     async with aiohttp.ClientSession() as session:
         url = f"http://{JOB_SERVICE_URL}{JOB_ITEMS_URL}"
         headers = {
@@ -154,7 +189,8 @@ async def get_job_list(token, filter_path=None):
             text = await response.json()
             job_data = text['result']
             # print(job_data)
+            res = []
             for job in job_data:
                 job['project_id'] = job['project']['id']
                 res.append(JobInfo.parse_obj(job))
-    return [x.get_dict() for x in res]
+            return [x.get_dict() for x in res]

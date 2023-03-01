@@ -16,6 +16,7 @@ USER_PREFIX_URL = "/user"
 ACCOUNT_PREFIX_URL = "/user/account"
 USER_ITEMS_URL = "/user/items"
 PROJECT_PREFIX_URL = "/project"
+PROJECT_ITEMS_URL = "/project/items"
 
 CLUSTER_PVC_PREFIX_URL = "/pvc"
 CLUSTER_NAMESPACE_PREFIX_URL = "/namespace"
