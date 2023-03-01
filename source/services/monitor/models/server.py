@@ -11,7 +11,7 @@ class Server(OnlyPrimaryKeyModel):
         metadata = META
         database = DB
         orders_by = ['-id']
-    server_ip: str = ormar.String(max_length=18, comment='服务器IP地址')
+    server_ip: str = ormar.String(max_length=18, comment='服务器IP地址', nullable=True)
     server: str = ormar.String(max_length=18, comment='服务器名称')
     status: str = ormar.String(max_length=17, comment='服务器状态')
     cpu: int = ormar.Integer(comment='CPU总数')
