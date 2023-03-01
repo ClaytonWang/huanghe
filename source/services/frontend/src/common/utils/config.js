@@ -66,6 +66,9 @@ module.exports = {
     jobSourceList: 'get|/job/source',
     jobImageList: 'get|/job/image',
 
+    // services
+    servicesList: 'get|/service/services',
+
     imagesList: 'get|/notebook/image',
     sourceList: 'get|/notebook/source',
     serverList: 'get|/monitor/servers',
@@ -93,6 +96,11 @@ module.exports = {
     '/jobs/list/update': '编辑Job',
     '/jobs/list/create': '新建Job',
     '/jobs/list/detail': 'Job详情',
+
+    '/services/list': '部署',
+    '/services/list/update': '编辑部署',
+    '/services/list/create': '新建部署',
+    '/services/list/detail': '部署详情',
   },
   menuItemsConfig: [
     {
@@ -133,6 +141,19 @@ module.exports = {
           key: 'jobs.list',
           label: 'Job列表',
           permission: 'jobs.list',
+        },
+      ],
+    },
+    {
+      key: 'services',
+      label: '服务部署',
+      icon: 'services',
+      permission: 'services',
+      children: [
+        {
+          key: 'services.list',
+          label: '部署',
+          permission: 'services.list',
         },
       ],
     },

@@ -2,7 +2,7 @@
  * @Author guanlin.li guanlin.li@digitalbrain.cn
  * @Date 2022-11-29 10:59:16
  * @LastEditors guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime 2022-12-01 10:14:16
+ * @LastEditTime 2023-02-28 20:41:35
  * @Description 个人账号接口
  */
 const admin = [
@@ -49,6 +49,12 @@ const owner = [
   'jobs.list.create',
   'jobs.list.edit',
   'jobs.list.delete',
+
+  'services',
+  'services.list',
+  'services.list.create',
+  'services.list.edit',
+  'services.list.delete',
 ];
 // const user = [];
 const account = {
