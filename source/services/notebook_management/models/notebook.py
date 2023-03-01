@@ -77,7 +77,7 @@ class Notebook(GenericDateModel):
     storage: str = ormar.JSON(comment='存储信息')
     k8s_info: str = ormar.JSON(comment='集群信息')
     server_ip: str = ormar.String(max_length=20, comment='所在的node name', nullable=True)
-    host_ip: ormar.String(max_length=20, comment='所在的node ip', nullable=True)
+    host_ip: str = ormar.String(max_length=20, comment='所在的node ip', nullable=True)
 
     def cpu_url(self, common: str):
         return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&panelId=4"
