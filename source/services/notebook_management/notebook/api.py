@@ -76,7 +76,6 @@ def format_notebook_detail(nb: Notebook):
     }
     return result
 
-
 @router_notebook.get(
     '/volume/{volume_id}',
     description='存储-notebook列表',
