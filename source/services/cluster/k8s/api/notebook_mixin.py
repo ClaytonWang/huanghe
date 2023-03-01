@@ -66,7 +66,7 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                               "namespace": namespace,
                               "status": status,
                               "reason": reason,
-                              "url": f"{KUBEFLOW_NOTEBOOK_URL}/{namespace}/{notebook_name}/lab",
+                              "url": f"{KUBEFLOW_NOTEBOOK_URL}/{namespace}/{notebook_name}/" if "annotations" in notebook['metadata'] and "notebooks.kubeflow.org/http-rewrite-uri" in notebook["metadata"]["annotations"] else f"{KUBEFLOW_NOTEBOOK_URL}/{namespace}/{notebook_name}/lab",
                               "server_ip": node_name
                               })
         name_ip = {}
