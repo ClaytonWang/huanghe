@@ -199,6 +199,7 @@ class Job(GenericDateModel):
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "mode": self.mode,
+            "volume_ids": [x['storage']['id'] for x in self.storage],
         }
 
     def gen_job_detail_response(self):

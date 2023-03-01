@@ -88,6 +88,7 @@ class JobSimple(BaseModel):
     created_at: Union[datetime, str, None]
     updated_at: Union[datetime, str, None]
     mode: str
+    volume_ids: List[int]
 
     @validator('created_at', 'updated_at')
     def format_dt(cls, dt):

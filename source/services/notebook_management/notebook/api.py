@@ -141,6 +141,7 @@ async def get_simple_notebook(request: Request,
             "username": x.created_by,
         }
         item['project'] = res_proj_map.get(x.project_by_id)
+        item['volume_ids'] = [y['storage']['id'] for y in x.storage]
         note_config = [y['storage']['config'] for y in x.storage]
         item['storage_value'] = sum([conf['value'] for conf in note_config])
         item['storage_size'] = sum([conf['size'] for conf in note_config])
