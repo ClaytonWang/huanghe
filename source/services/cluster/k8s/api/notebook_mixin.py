@@ -74,7 +74,6 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
         node_names = {}
         node_ips = {}
         for pod in self.core_v1_api.list_pod_for_all_namespaces(label_selector=f"env={nblr.env}").items:
-            print(pod)
             node_names[pod.spec.containers[0].name] = pod.spec.node_name
             node_ips[pod.spec.containers[0].name] = pod.status.host_ip
         for notebook in notebooks:
