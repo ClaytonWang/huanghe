@@ -327,6 +327,7 @@ async def create_notebook(request: Request,
         'gpu': gpu_count,
         'type': machine_type,
         'volumes': volumes_k8s,
+        'annotations': {"notebooks.kubeflow.org/http-rewrite-uri": "/"} if "codeserver" in nc.image.name else {},
     }
     init_data['k8s_info'] = json.dumps(k8s_info)
 
@@ -412,6 +413,7 @@ async def update_notebook(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
     update_data['storage'] = json.dumps(storages)
     k8s_info['volumes'] = volumes_k8s
+    k8s_info['annotations'] = {"notebooks.kubeflow.org/http-rewrite-uri": "/"} if "codeserver" in ne.image.name else {}
 
     update_data['k8s_info'] = json.dumps(k8s_info)
     update_data['updated_at'] = datetime.datetime.now()
