@@ -1,6 +1,6 @@
 import ormar
 from basic.common.base_model import DateModel, OnlyPrimaryKeyModel
-from monitor.servers.serializers import ServerCreateReq, PodCreatedBy
+from servers.serializers import ServerCreateReq, PodCreatedBy
 from models import DB, META
 from basic.middleware.rsp import success_common_response
 
