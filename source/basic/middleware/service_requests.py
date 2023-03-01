@@ -14,8 +14,36 @@ from typing import Optional, List, Dict, Set
 from collections import defaultdict
 from datetime import datetime
 from pydantic import BaseModel, Field
-# todo 后续集中config
-from basic.config.monitor import *
+from basic.config.service_requests import *
+
+
+class RoleInfo(BaseModel):
+    id: int
+    name: str
+
+
+class UserInfo(BaseModel):
+    id: int = Field(..., alias='user_id')
+    username: str = Field(..., alias='user_name')
+    en_name: str = Field(..., )
+    role: RoleInfo
+    permissions: Optional[List[str]]
+    project_ids: Set
+
+    class Config:
+        orm_mode = True
+        allow_population_by_field_name = True
+
+    def get_dict(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "en_name": self.en_name,
+            "role_id": self.role.id,
+            "role_name": self.role.name,
+            "permissions": self.permissions,
+            "project_ids": self.project_ids,
+        }
 
 
 class NotebookInfo(BaseModel):
@@ -45,8 +73,6 @@ class NotebookInfo(BaseModel):
             'gpu': self.gpu,
             'storage_value': self.storage_value,
             'storage_size': self.storage_size,
-            'namespace_name': self.namespace_name,
-            'pod_name': self.pod_name,
             'volume_ids': self.volume_ids,
         }
 
@@ -72,10 +98,29 @@ class JobInfo(BaseModel):
         }
 
 
+async def get_user_list(token):
+    async with aiohttp.ClientSession() as session:
+        url = f"http://{USER_SERVICE_URL}{USER_ITEMS_URL}"
+        headers = {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+        }
+        async with session.get(url, headers=headers) as response:
+            # print("status:{}".format(response.status))
+            text = await response.json()
+            user_data = text['result']
+            res = []
+            for user in user_data:
+                projects = user.pop('projects')
+                user['project_ids'] = {x["id"] for x in projects}
+                res.append(UserInfo.parse_obj(user))
+            return [x.get_dict() for x in res]
+
+
 async def get_notebook_list(token, filter_path=None):
     res = []
     async with aiohttp.ClientSession() as session:
-        url = f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_PREFIX_URL}/items"
+        url = f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_ITEMS_URL}"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
@@ -96,7 +141,7 @@ async def get_notebook_list(token, filter_path=None):
 async def get_job_list(token, filter_path=None):
     res = []
     async with aiohttp.ClientSession() as session:
-        url = f"http://{JOB_SERVICE_URL}{JOB_PREFIX_URL}/items"
+        url = f"http://{JOB_SERVICE_URL}{JOB_ITEMS_URL}"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
