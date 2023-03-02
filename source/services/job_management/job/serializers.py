@@ -147,6 +147,7 @@ class JobDetail(BaseModel):
     url: Optional[str]
     grafana: Optional[Grafana]
     logging_url: Optional[str]
+    start_command: Optional[str]
 
     @validator('created_at', 'updated_at')
     def format_dt(cls, dt):
