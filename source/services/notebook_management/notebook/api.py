@@ -17,7 +17,7 @@ from basic.common.query_filter_params import QueryParameters
 from basic.common.common_model import Event
 from basic.common.env_variable import get_string_variable
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project
-from basic.middleware.service_requests import get_user_list, get_project_list
+from utils.user_request import get_user_list, get_project_list
 from utils.user_request import project_check, project_check_obj
 from utils.storage_request import volume_check
 from utils.k8s_request import create_notebook_k8s, delete_notebook_k8s
