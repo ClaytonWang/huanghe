@@ -10,7 +10,7 @@ from typing import List, Dict
 from fastapi import APIRouter, Request, Depends
 from basic.common.query_filter_params import QueryParameters
 from overview.serializers import ProjectReq, TaskItem
-from utils.service_requests import get_user_list, get_notebook_list, get_job_list
+from basic.middleware.service_requests import get_user_list, get_notebook_list, get_job_list
 
 
 router_overview = APIRouter()
@@ -27,7 +27,7 @@ async def generate_filter_path(request, authorization, project_ids):
     if role_name != 'admin':
         viewable_project_ids = id_proj_map.get(request.user.id)
     if role_name == 'user':
-        filter_list.append(f'filter[created_by_id]={request.user.id}')
+        filter_list.append(f'filter[creator_id]={request.user.id}')
 
     if isinstance(project_ids, str):
         project_ids = [int(x) for x in project_ids.split(',')]

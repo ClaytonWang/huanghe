@@ -1,7 +1,7 @@
 # coding: utf-8
 from __future__ import annotations as anno
-from k8s.model.generic_mixin import GenericMixin
-from k8s.const.crd_kubeflow_const import ISTIO_DISABLE_INJECT_ANNOTATION
+from services.cluster.k8s.model.generic_mixin import GenericMixin
+from services.cluster.k8s.const.crd_kubeflow_const import ISTIO_DISABLE_INJECT_ANNOTATION
 from typing import Optional, List, Dict
 from datetime import datetime
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from notebook.serializers import NoteBookCreateReq, NoteBookDeleteReq, NoteBookListReq, NoteBook
-from k8s.cluster_client import cc
+from services.cluster.notebook.serializers import NoteBookCreateReq, NoteBookDeleteReq, NoteBookListReq, NoteBook
+from services.cluster.k8s.cluster_client import cc
 from basic.middleware.rsp import success_common_response
 
 router_notebook = APIRouter()

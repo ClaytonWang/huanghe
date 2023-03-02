@@ -9,11 +9,9 @@
 from __future__ import annotations
 
 import ormar
-from basic.utils.dt_format import dt_to_string
 from basic.config.job_management import WEBKUBECTL_URL
 from basic.common.base_model import DateModel, GenericDateModel
 from models import DB, META
-from typing import List
 
 # 状态
 # JOB_STATUS_RUNNING = "running"  # 已启动(运行中)
@@ -95,7 +93,7 @@ class Job(GenericDateModel):
 
     status: Status = ormar.ForeignKey(Status, related_name='job_status')
     work_dir: str = ormar.String(max_length=100, comment='工作目录', nullable=True)
-    k8s_info: str = ormar.JSON(comment="集群信息")
+    k8s_info: dict = ormar.JSON(comment="集群信息")
 
     cpu: int = ormar.Integer(comment='CPU数量')
     memory: int = ormar.Integer(comment='存储容量G')
@@ -115,10 +113,19 @@ class Job(GenericDateModel):
 
     @classmethod
     async def self_project(cls, _id: int):
-        j = await cls.objects.get_or_none(cls.project_by_id == _id)
+        return await cls.objects.filter(cls.project_by_id == _id).count()
+
+    @classmethod
+    async def self_project_and_self_view(cls, project_id: int, self_id: int):
+        return await cls.objects.filter((cls.project_by_id == project_id) & (cls.created_by_id == self_id)).count()
+
+    @classmethod
+    async def self_project_and_self_view(cls, project_id: int, self_id: int):
+        j = await cls.objects.get_or_none((cls.project_by_id == project_id) & (cls.created_by_id == self_id))
         if not j:
             return False
         return True
+
 
     @property
     def namespace_name(self):
@@ -200,6 +207,7 @@ class Job(GenericDateModel):
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "mode": self.mode,
+            "volume_ids": [x['storage']['id'] for x in self.storage],
         }
 
     def gen_job_detail_response(self):
@@ -217,6 +225,7 @@ class Job(GenericDateModel):
                       "custom": self.custom,},
             "source": self.source,
             "mode": self.mode,
+            "start_command": self.start_command,
             "updated_at": self.updated_at,
             "created_at": self.created_at,
             "hooks": self.storage,

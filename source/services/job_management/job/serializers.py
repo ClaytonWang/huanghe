@@ -31,11 +31,13 @@ class UserStr(BaseModel):
     id: int
     username: str = None
 
+
 class Grafana(BaseModel):
     cpu: str
     ram: str
     gpu: str
     vram: str
+
 
 class ProjectStr(BaseModel):
     id: int
@@ -86,6 +88,7 @@ class JobSimple(BaseModel):
     created_at: Union[datetime, str, None]
     updated_at: Union[datetime, str, None]
     mode: str
+    volume_ids: List[int]
 
     @validator('created_at', 'updated_at')
     def format_dt(cls, dt):
@@ -144,12 +147,14 @@ class JobDetail(BaseModel):
     url: Optional[str]
     grafana: Optional[Grafana]
     logging_url: Optional[str]
+    start_command: Optional[str]
 
     @validator('created_at', 'updated_at')
     def format_dt(cls, dt):
         if isinstance(dt, str):
             return dt
         return dt_to_string(dt, '%Y-%m-%d')
+
 
 class JobEdit(BaseModel):
     project: Project
@@ -160,8 +165,10 @@ class JobEdit(BaseModel):
     hooks: List[HookItem] = []
     source: str
 
+
 class StatusItemOnlyDesc(BaseModel):
     desc: str = None
+
 
 class JobStatusUpdate(BaseModel):
     status: str
@@ -173,6 +180,7 @@ class EventItem(BaseModel):
     status: StatusItemOnlyDesc
     name: Optional[str] = ""
     time: Optional[datetime]
+
 
 class EventCreate(BaseModel):
     name: str

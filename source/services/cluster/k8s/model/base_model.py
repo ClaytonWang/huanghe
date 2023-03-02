@@ -1,5 +1,5 @@
-from k8s.model.generic_mixin import GenericMixin
-from k8s.model.v1_object_meta import V1ObjectMeta
+from services.cluster.k8s.model.generic_mixin import GenericMixin
+from services.cluster.k8s.model.v1_object_meta import V1ObjectMeta
 from typing import Optional
 
 

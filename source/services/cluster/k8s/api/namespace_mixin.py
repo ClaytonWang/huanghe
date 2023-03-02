@@ -1,8 +1,8 @@
 from __future__ import annotations
-from k8s.api.core import Core
-from k8s.api.core_v1_api import CoreV1Api
-from k8s.model.v1_namespace import V1Namespace
-from k8s.model.v1_status import V1Status
+from services.cluster.k8s.api.core import Core
+from services.cluster.k8s.api.core_v1_api import CoreV1Api
+from services.cluster.k8s.model.v1_namespace import V1Namespace
+from services.cluster.k8s.model.v1_status import V1Status
 from namespace.serializers import Namespace
 
 

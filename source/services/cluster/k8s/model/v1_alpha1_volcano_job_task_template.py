@@ -1,7 +1,7 @@
 from __future__ import annotations
-from k8s.model.generic_mixin import GenericMixin
-from k8s.model.v1_pod_spec import V1PodSpec
-from k8s.model.v1_object_meta import V1ObjectMeta
+from services.cluster.k8s.model.generic_mixin import GenericMixin
+from services.cluster.k8s.model.v1_pod_spec import V1PodSpec
+from services.cluster.k8s.model.v1_object_meta import V1ObjectMeta
 
 
 class V1Alpha1VolcanoJobTaskTemplate(GenericMixin):

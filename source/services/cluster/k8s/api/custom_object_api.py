@@ -1,4 +1,4 @@
-from k8s.api.core import Core
+from services.cluster.k8s.api.core import Core
 
 
 class CustomerObjectApi:

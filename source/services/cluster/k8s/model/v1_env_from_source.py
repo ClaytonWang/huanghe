@@ -1,4 +1,4 @@
-from k8s.model.generic_mixin import GenericMixin
+from services.cluster.k8s.model.generic_mixin import GenericMixin
 
 
 class V1EnvFromSource(GenericMixin):

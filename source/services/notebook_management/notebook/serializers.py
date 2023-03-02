@@ -132,6 +132,7 @@ class NotebookSimple(BaseModel):
     storage_size: int
     namespace_name: str
     pod_name: str
+    volume_ids: List[int]
     project: Project
     updated_at: Optional[datetime]
 

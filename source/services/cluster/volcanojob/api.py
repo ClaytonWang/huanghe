@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from volcanojob.serializers import VolcanoJobCreateReq, VolcanoJobDeleteReq, VolcanoJob, VolcanoStatusPostReq
-from k8s.cluster_client import cc
+from services.cluster.volcanojob.serializers import VolcanoJobCreateReq, VolcanoJobDeleteReq, VolcanoJob, VolcanoStatusPostReq
+from services.cluster.k8s.cluster_client import cc
 from basic.middleware.rsp import success_common_response
 
 router_vcjob = APIRouter()

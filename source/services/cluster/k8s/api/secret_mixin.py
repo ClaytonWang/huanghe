@@ -1,8 +1,8 @@
 from __future__ import annotations
-from k8s.api.core import Core
-from k8s.api.core_v1_api import CoreV1Api
-from k8s.model.v1_secret import V1Secret
-from k8s.model.v1_status import V1Status
+from services.cluster.k8s.api.core import Core
+from services.cluster.k8s.api.core_v1_api import CoreV1Api
+from services.cluster.k8s.model.v1_secret import V1Secret
+from services.cluster.k8s.model.v1_status import V1Status
 from secret.serializers import SecretCommon, SecretNamespace
 
 

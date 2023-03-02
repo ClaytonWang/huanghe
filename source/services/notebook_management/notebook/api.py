@@ -7,7 +7,7 @@
 """
 import json
 from typing import List, Dict
-from fastapi import APIRouter, Depends, Request, HTTPException, status, Path
+from fastapi import APIRouter, Depends, Request, HTTPException, status, Path, Query
 from fastapi.responses import JSONResponse
 from models import Notebook, Status, Image
 from notebook.serializers import NotebookList, NotebookCreate, NotebookEdit, NotebookOp, NotebookDetail, EventItem, \
@@ -17,7 +17,8 @@ from basic.common.query_filter_params import QueryParameters
 from basic.common.common_model import Event
 from basic.common.env_variable import get_string_variable
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project
-from utils.user_request import get_user_list, get_project_list, project_check, project_check_obj
+from utils.user_request import get_user_list, get_project_list
+from utils.user_request import project_check, project_check_obj
 from utils.storage_request import volume_check
 from utils.k8s_request import create_notebook_k8s, delete_notebook_k8s
 from utils.auth import operate_auth
@@ -33,8 +34,15 @@ PASSWORD = "jovyan"
     '/project_backend/{project_id}',
     description='通过项目查询nb',
 )
-async def list_nb_by_project(project_id: int = Path(..., ge=1, description='需要查询项目的project id')) -> bool:
-    return await Notebook.self_project(project_id)
+async def list_nb_by_project(project_id: int = Path(..., ge=1, description='需要查询项目的project id'),
+                             user_id: int = Query(None, description='用户id')) -> bool:
+    if user_id:
+        nc = await Notebook.self_project_and_self_view(project_id=project_id, self_id=user_id)
+    else:
+        nc = await Notebook.self_project(project_id)
+    if not nc:
+        return False
+    return True
 
 @router_notebook.get(
     '/by_server/{server_ip}',
@@ -64,10 +72,9 @@ def format_notebook_detail(nb: Notebook):
     result['ssh'] = {
         "account": ACCOUNT,
         "password": PASSWORD,
-        "address": nb.server_ip,
+        "address": nb.host_ip,
     }
     return result
-
 
 @router_notebook.get(
     '/volume/{volume_id}',
@@ -134,6 +141,7 @@ async def get_simple_notebook(request: Request,
             "username": x.created_by,
         }
         item['project'] = res_proj_map.get(x.project_by_id)
+        item['volume_ids'] = [y['storage']['id'] for y in x.storage]
         note_config = [y['storage']['config'] for y in x.storage]
         item['storage_value'] = sum([conf['value'] for conf in note_config])
         item['storage_size'] = sum([conf['size'] for conf in note_config])
@@ -319,6 +327,7 @@ async def create_notebook(request: Request,
         'gpu': gpu_count,
         'type': machine_type,
         'volumes': volumes_k8s,
+        'annotations': {"notebooks.kubeflow.org/http-rewrite-uri": "/"} if "codeserver" in nc.image.name else {},
     }
     init_data['k8s_info'] = json.dumps(k8s_info)
 
@@ -404,6 +413,7 @@ async def update_notebook(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
     update_data['storage'] = json.dumps(storages)
     k8s_info['volumes'] = volumes_k8s
+    k8s_info['annotations'] = {"notebooks.kubeflow.org/http-rewrite-uri": "/"} if "codeserver" in ne.image.name else {}
 
     update_data['k8s_info'] = json.dumps(k8s_info)
     update_data['updated_at'] = datetime.datetime.now()

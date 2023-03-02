@@ -1,7 +1,7 @@
 from __future__ import annotations
-from k8s.model.v1_resource_requirements import V1ResourceRequirements
-from k8s.model.generic_mixin import GenericMixin
-from k8s.const.workloads_const import VOLUME_ACCESS_MODE_READ_WRITE_MANY, VOLUME_STORAGE_CLASS_JUICEFS
+from services.cluster.k8s.model.v1_resource_requirements import V1ResourceRequirements
+from services.cluster.k8s.model.generic_mixin import GenericMixin
+from services.cluster.k8s.const.workloads_const import VOLUME_ACCESS_MODE_READ_WRITE_MANY, VOLUME_STORAGE_CLASS_JUICEFS
 from typing import List
 
 

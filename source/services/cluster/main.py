@@ -5,13 +5,13 @@ import os
 import uvicorn
 from fastapi import FastAPI, status as st
 from fastapi.responses import JSONResponse
-from namespace.api import router_namespace
-from pod.api import router_pod
-from pvc.api import router_pvc
-from notebook.api import router_notebook
-from secret.api import router_secret
-from volcanojob.api import router_vcjob
-from server.api import router_server
+from services.cluster.namespace.api import router_namespace
+from services.cluster.pod.api import router_pod
+from services.cluster.pvc.api import router_pvc
+from services.cluster.notebook.api import router_notebook
+from services.cluster.secret.api import router_secret
+from services.cluster.volcanojob.api import router_vcjob
+from services.cluster.server.api import router_server
 from starlette.middleware.base import BaseHTTPMiddleware
 from basic.middleware.exception import validation_pydantic_exception_handler
 from basic.middleware.rsp import add_common_response_data

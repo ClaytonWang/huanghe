@@ -1,8 +1,8 @@
 from __future__ import annotations
-from k8s.model.generic_mixin import GenericMixin
-from k8s.model.v1_alpha1_volcano_job_task import V1Alpha1VolcanoJobTask
+from services.cluster.k8s.model.generic_mixin import GenericMixin
+from services.cluster.k8s.model.v1_alpha1_volcano_job_task import V1Alpha1VolcanoJobTask
 from typing import List, Optional
-from k8s.const.crd_kubeflow_const import VOLCANO_DEFAULT_QUEUE, VOLCANO_DEFAULT_MAX_RETRY, VOLCANO_DEFAULT_MIN_AVAILABLE
+from services.cluster.k8s.const.crd_kubeflow_const import VOLCANO_DEFAULT_QUEUE, VOLCANO_DEFAULT_MAX_RETRY, VOLCANO_DEFAULT_MIN_AVAILABLE
 
 
 class V1Alpha1VolcanoJobSpec(GenericMixin):

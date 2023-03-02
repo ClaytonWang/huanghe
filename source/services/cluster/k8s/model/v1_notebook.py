@@ -1,9 +1,9 @@
 # coding: utf-8
 from __future__ import annotations
-from k8s.model.base_model import BaseModel
-from k8s.model.v1_notebook_spec import V1NotebookSpec
-from k8s.model.v1_object_meta import V1ObjectMeta
-from k8s.const.crd_kubeflow_const import KUBEFLOW_V1_API_VERSION, KUBEFLOW_NOTEBOOK_KIND
+from services.cluster.k8s.model.base_model import BaseModel
+from services.cluster.k8s.model.v1_notebook_spec import V1NotebookSpec
+from services.cluster.k8s.model.v1_object_meta import V1ObjectMeta
+from services.cluster.k8s.const.crd_kubeflow_const import KUBEFLOW_V1_API_VERSION, KUBEFLOW_NOTEBOOK_KIND
 
 
 class V1Notebook(BaseModel):

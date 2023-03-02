@@ -1,11 +1,11 @@
-from k8s.api.namespace_mixin import NamespaceMixin
-from k8s.api.notebook_mixin import NotebookMixin
-from k8s.api.pod_mixin import PodMixin
-from k8s.api.persistent_volume_claim_mixin import PersistentVolumeClaimMixin
-from k8s.api.secret_mixin import SecretMixin
-from k8s.api.volcano_job_mixin import VolcanoJobMixin
-from k8s.api.server_mixin import ServerMixin
-from k8s.api import c
+from services.cluster.k8s.api.namespace_mixin import NamespaceMixin
+from services.cluster.k8s.api.notebook_mixin import NotebookMixin
+from services.cluster.k8s.api.pod_mixin import PodMixin
+from services.cluster.k8s.api.persistent_volume_claim_mixin import PersistentVolumeClaimMixin
+from services.cluster.k8s.api.secret_mixin import SecretMixin
+from services.cluster.k8s.api.volcano_job_mixin import VolcanoJobMixin
+from services.cluster.k8s.api.server_mixin import ServerMixin
+from services.cluster.k8s.api import c
 
 
 class ClusterClient(NamespaceMixin, NotebookMixin, PodMixin, PersistentVolumeClaimMixin,

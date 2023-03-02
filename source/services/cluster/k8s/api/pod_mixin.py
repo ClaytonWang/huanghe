@@ -1,7 +1,7 @@
 from __future__ import annotations
-from k8s.api.core import Core
-from k8s.api.core_v1_api import CoreV1Api
-from k8s.model.v1_pod import V1Pod
+from services.cluster.k8s.api.core import Core
+from services.cluster.k8s.api.core_v1_api import CoreV1Api
+from services.cluster.k8s.model.v1_pod import V1Pod
 from pod.serializers import Pod
 
 

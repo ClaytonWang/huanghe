@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from typing import List
 
-from k8s.api.core import Core
-from k8s.model.v1_status import V1Status
-from k8s.api.custom_object_api import CustomerObjectApi
-from k8s.api.core_v1_api import CoreV1Api
-from k8s.const.crd_kubeflow_const import KUBEFLOW_NOTEBOOK_GROUP, KUBEFLOW_V1_VERSION, KUBEFLOW_NOTEBOOK_PLURAL
-from k8s.model.v1_notebook import V1Notebook
+from services.cluster.k8s.api.core import Core
+from services.cluster.k8s.model.v1_status import V1Status
+from services.cluster.k8s.api.custom_object_api import CustomerObjectApi
+from services.cluster.k8s.api.core_v1_api import CoreV1Api
+from services.cluster.k8s.const.crd_kubeflow_const import KUBEFLOW_NOTEBOOK_GROUP, KUBEFLOW_V1_VERSION, KUBEFLOW_NOTEBOOK_PLURAL
+from services.cluster.k8s.model.v1_notebook import V1Notebook
 from typing import Dict
 from notebook.serializers import NoteBook, NoteBookListReq, NoteBookDeleteReq
 from basic.config.cluster import KUBEFLOW_NOTEBOOK_URL
@@ -45,7 +45,7 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                                                                       version=KUBEFLOW_V1_VERSION,
                                                                       namespace=nbdr.namespace,
                                                                       plural=KUBEFLOW_NOTEBOOK_PLURAL,
-                                                                      name=nbdr.name, )
+                                                                      name=nbdr.name,)
 
     def list_notebook(self, nblr: NoteBookListReq) -> List:
         notebooks = []
@@ -62,18 +62,23 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
             else:
                 status, reason = self.process_notebook_status(notebook_name, namespace)
             node_name = "default"
+            node_ip = "default"
             notebooks.append({"name": notebook_name,
                               "namespace": namespace,
                               "status": status,
                               "reason": reason,
-                              "url": f"{KUBEFLOW_NOTEBOOK_URL}/{namespace}/{notebook_name}/lab",
-                              "server_ip": node_name
+                              "url": f"{KUBEFLOW_NOTEBOOK_URL}/{namespace}/{notebook_name}/" if "annotations" in notebook['metadata'] and "notebooks.kubeflow.org/http-rewrite-uri" in notebook["metadata"]["annotations"] else f"{KUBEFLOW_NOTEBOOK_URL}/{namespace}/{notebook_name}/lab",
+                              "server_ip": node_name,
+                              "host_ip": node_ip
                               })
-        name_ip = {}
-        for pod in self.core_v1_api.list_pod_for_all_namespaces(label_selector=f"env=dev").items:
-            name_ip[pod.spec.containers[0].name] = pod.spec.node_name
+        node_names = {}
+        node_ips = {}
+        for pod in self.core_v1_api.list_pod_for_all_namespaces(label_selector=f"env={nblr.env}").items:
+            node_names[pod.spec.containers[0].name] = pod.spec.node_name
+            node_ips[pod.spec.containers[0].name] = pod.status.host_ip
         for notebook in notebooks:
-            notebook["server_ip"] = name_ip.get(notebook["name"])
+            notebook["server_ip"] = node_names.get(notebook["name"])
+            notebook["host_ip"] = node_ips.get(notebook["name"])
         return notebooks
 
     def watch_notebook(self):

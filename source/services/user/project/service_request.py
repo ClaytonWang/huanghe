@@ -95,9 +95,10 @@ async def get_volume_list(token):
     return [x.get_dict() for x in res]
 
 
-def query_job_by_project(token: str, project_id: int) -> bool:
+def query_job_by_project(token: str, project_id: int, user_id: Optional[int] = None) -> bool:
     try:
-        response = requests.get(f"http://{JOB_SERVICE_URL}{JOB_PREFIX_URL}/{project_id}",
+        response = requests.get(f"http://{JOB_SERVICE_URL}{JOB_PREFIX_URL}/{project_id}?user_id={user_id}" if user_id
+                                else f"http://{JOB_SERVICE_URL}{JOB_PREFIX_URL}/{project_id}",
                                 headers={"Authorization": token})
         response = response.json()
         assert response['success'] is True
@@ -106,10 +107,12 @@ def query_job_by_project(token: str, project_id: int) -> bool:
     return response['result']
 
 
-def query_notebook_by_project(token: str, project_id: int) -> bool:
+def query_notebook_by_project(token: str, project_id: int, user_id: Optional[int] = None) -> bool:
     try:
-        response = requests.get(f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_BACK_PREFIX_URL}/{project_id}",
-                                headers={"Authorization": token})
+        response = requests.get(
+            f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_BACK_PREFIX_URL}/{project_id}?user_id={user_id}" if user_id else
+            f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_BACK_PREFIX_URL}/{project_id}",
+            headers={"Authorization": token})
         response = response.json()
         assert response['success'] is True
     except Exception as e:
