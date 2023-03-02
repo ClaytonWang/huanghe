@@ -220,7 +220,8 @@ const JobsTable = ({
           handleEditClicked(record);
         }}
         condition={[
-          () => ['stopped', 'completed'].indexOf(statusName) > -1,
+          () => ['error', 'stopped', 'completed'].indexOf(statusName) > -1,
+          () => ['stop_fail'].indexOf(_sname) < 0,
           (user) => get(record, 'creator.username') === get(user, 'username'),
         ]}
       >
