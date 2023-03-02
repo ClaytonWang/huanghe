@@ -13,7 +13,7 @@ from typing import Optional, List, Dict, Set
 # from config import USER_SERVICE_PATH
 from collections import defaultdict
 from pydantic import BaseModel, Field
-from basic.config.service_requests import *
+from basic.config.notebook_management import *
 
 
 class RoleInfo(BaseModel):
