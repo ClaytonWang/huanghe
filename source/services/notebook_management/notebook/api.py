@@ -331,7 +331,7 @@ async def create_notebook(request: Request,
     init_data['k8s_info'] = json.dumps(k8s_info)
 
     _notebook = await Notebook.objects.create(**init_data)
-    k8s_info['annotations'] = {"id": str(_notebook.id)}
+    k8s_info['annotations'].update({"id": str(_notebook.id)})
     await _notebook.update(**{"k8s_info": k8s_info})
     return format_notebook_detail(_notebook)
 
