@@ -10,7 +10,7 @@ from typing import List, Dict
 from fastapi import APIRouter, Request, Depends
 from basic.common.query_filter_params import QueryParameters
 from overview.serializers import ProjectReq, TaskItem
-from basic.middleware.service_requests import get_user_list, get_notebook_list, get_job_list
+from utils.service_requests import get_user_list, get_notebook_list, get_job_list
 
 
 router_overview = APIRouter()
