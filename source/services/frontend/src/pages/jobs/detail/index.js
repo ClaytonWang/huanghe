@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-24 17:51:42
+ * @LastEditTime: 2023-03-02 18:19:32
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -597,7 +597,7 @@ JobDetail.context = (props = {}) => {
             </label>
           );
         })()}
-        <Dropdown.Button menu={menuProps}>
+        <Dropdown.Button menu={menuProps} trigger="click">
           {taskModel === DEBUG ? (
             <DebugBtn type="text" />
           ) : (

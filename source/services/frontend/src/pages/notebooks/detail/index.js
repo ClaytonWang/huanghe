@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-24 10:24:53
+ * @LastEditTime: 2023-03-02 18:19:10
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
@@ -469,7 +469,7 @@ NotebookDetail.context = (props = {}) => {
           </label>
         );
       })()}
-      <Dropdown.Button menu={menuProps}>
+      <Dropdown.Button menu={menuProps} trigger="click">
         {statusName === 'stopped' && (
           <AuthButton
             required="notebooks.list.edit"
