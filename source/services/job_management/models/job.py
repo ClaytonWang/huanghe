@@ -225,6 +225,7 @@ class Job(GenericDateModel):
                       "custom": self.custom,},
             "source": self.source,
             "mode": self.mode,
+            "start_command": self.start_command,
             "updated_at": self.updated_at,
             "created_at": self.created_at,
             "hooks": self.storage,
