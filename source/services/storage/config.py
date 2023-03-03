@@ -22,6 +22,7 @@ SOURCE_PATH = Path.joinpath(Path(BASIC_PATH).parent)
 sys.path.insert(0, SOURCE_PATH.__str__())
 K8S_YAML_CONFIG_PATH = '/etc/juece/config.yaml'
 COMMON_CONFIG_PATH = f'basic.config.{APP_NAME}'
+SERVICE_CONFIG_PATH = 'basic.config.service_requests'
 
 
 try:
@@ -30,6 +31,19 @@ try:
         if key.startswith('__'):
             continue
         val = getattr(common_module, key)
+        locals().__setitem__(key, val)
+except ModuleNotFoundError:
+    pass
+
+
+# 从服务间请求加载
+try:
+    # print(SERVICE_CONFIG_PATH)
+    service_module = importlib.import_module(SERVICE_CONFIG_PATH)
+    for key in service_module.__dict__:
+        if key.startswith('__'):
+            continue
+        val = getattr(service_module, key)
         locals().__setitem__(key, val)
 except ModuleNotFoundError:
     pass

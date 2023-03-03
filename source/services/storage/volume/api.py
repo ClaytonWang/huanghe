@@ -7,7 +7,7 @@ from basic.common.query_filter_params import QueryParameters
 from services.storage.volume.serializers import VolumeCreateReq, VolumeEditReq, VolumeDetailRes
 from basic.middleware.account_getter import AccountGetter, ADMIN, OWNER, \
     query_notebook_volume, list_user_by_project
-# from basic.middleware.service_requests import get_job_list
+from basic.middleware.service_requests import get_job_list
 
 router_volume = APIRouter()
 
@@ -100,10 +100,10 @@ async def delete_volume(request: Request,
     result = query_notebook_volume(request.headers.get('authorization'), volume_id)
     if len(result) != 0:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'还存留notebook挂载这个盘，不能删除')
-    # job_query = await get_job_list(request.headers.get('authorization'))
-    # job_volumes = set(sum([x['volume_ids'] for x in job_query], []))
-    # if volume_id in job_volumes:
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'还存留job挂载这个盘，不能删除')
+    job_query = await get_job_list(request.headers.get('authorization'))
+    job_volumes = set(sum([x['volume_ids'] for x in job_query], []))
+    if volume_id in job_volumes:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'还存留job挂载这个盘，不能删除')
     await Volume.set_self_deleted(volume_id, user.id)
     return success_common_response()
 

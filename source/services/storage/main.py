@@ -1,6 +1,7 @@
 """
 启动入口、根路由配置
 """
+from config import *
 import uvicorn
 from fastapi import FastAPI
 from volume.api import router_volume
@@ -12,7 +13,6 @@ from basic.middleware.exception import validation_ormar_exception_handler
 from basic.middleware.exception import ormar_db_exception_handler
 from asyncpg.exceptions import PostgresError
 from pydantic.error_wrappers import ValidationError
-from config import *
 from fastapi.exceptions import RequestValidationError
 from basic.middleware.rsp import add_common_response_data
 
