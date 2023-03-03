@@ -10,7 +10,7 @@ from typing import List, Dict
 from fastapi import APIRouter, Request, Depends
 from basic.common.query_filter_params import QueryParameters
 from overview.serializers import ProjectReq, TaskItem
-from utils.service_requests import get_user_list, get_notebook_list, get_job_list
+from basic.middleware.service_requests import get_user_list, get_notebook_list, get_job_list
 
 
 router_overview = APIRouter()
@@ -123,6 +123,13 @@ async def sources_statistic(request: Request, project: str = None):
     occupied_gpu = sum([x['gpu'] for x in notebook])
     occupied_mem = sum([x['memory'] for x in notebook])
     occupied_size = sum([x['storage_size'] for x in notebook])
+
+    pod_tuple = [(x['namespace_name'], x['pod_name'], x['cpu']) for x in notebook]
+
+    for x in notebook:
+        print(x['name'], x['status'])
+        get_prometheus_query(x['namespace_name'], x['pod_name'], x['cpu'])
+
     return [
         {
             "name": "CPU",
