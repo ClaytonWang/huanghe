@@ -1,5 +1,5 @@
 @import '../../../common/css/index.less';
-.detail {
+.notebooks-detail {
   .detail-section {
     padding: @dbr-container-padding;
     background-color: @background-color;
@@ -32,5 +32,12 @@
     .ant-tabs .ant-tabs-tab+.ant-tabs-tab{
       margin: 0 0 0 32px;
     }
+  }
+  .ant-typography .overflow {
+    max-width: 18em;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    float: left;
   }
 }

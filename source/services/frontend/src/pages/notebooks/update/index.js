@@ -354,7 +354,7 @@ const NotebooksUpdate = () => {
             placeholder="请选择镜像"
             showSearch
             filterOption={(input, option) =>
-              (option?.children ?? '').includes(input)
+              (option?.value ?? '').includes(input)
             }
             defaultValue={value?.name}
             onChange={onSelectChange}

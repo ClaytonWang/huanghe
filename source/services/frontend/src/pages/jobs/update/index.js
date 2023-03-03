@@ -367,7 +367,7 @@ const JobsUpdate = () => {
             placeholder="请选择镜像"
             showSearch
             filterOption={(input, option) =>
-              (option?.children ?? '').includes(input)
+              (option?.value ?? '').includes(input)
             }
             defaultValue={value?.name}
             onChange={onSelectChange}
@@ -538,7 +538,7 @@ const JobsUpdate = () => {
           <CustomImage />
         </Form.Item>
         <Form.Item
-          name="work_dir"
+          name="workDir"
           label="工作路径"
           tooltip={{
             title: '输入容器的工作目录',
