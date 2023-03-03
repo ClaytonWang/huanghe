@@ -98,13 +98,13 @@ K8S_YAML_CONFIG_PATH = '/etc/juece/config.yaml'
 #     print("BASIC ModuleNotFoundError")
 #     pass
 
-if os.path.exists(K8S_YAML_CONFIG_PATH):
-    try:
-        with open(K8S_YAML_CONFIG_PATH) as f:
-            data = yaml.load(f, Loader=yaml.FullLoader)
-            locals().update(**data)
-    except Exception as e:
-        print(f'Loading k8s config error. {e}')
+# if os.path.exists(K8S_YAML_CONFIG_PATH):
+#     try:
+#         with open(K8S_YAML_CONFIG_PATH) as f:
+#             data = yaml.load(f, Loader=yaml.FullLoader)
+#             locals().update(**data)
+#     except Exception as e:
+#         print(f'Loading k8s config error. {e}')
 
 # USER_SERVICE_URL = f"user.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
 # CLUSTER_SERVICE_URL = f"cluster.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
