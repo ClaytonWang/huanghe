@@ -72,7 +72,7 @@ def format_notebook_detail(nb: Notebook):
     result['ssh'] = {
         "account": ACCOUNT,
         "password": PASSWORD,
-        "address": nb.host_ip,
+        "address": nb.pod_ip,
     }
     return result
 
