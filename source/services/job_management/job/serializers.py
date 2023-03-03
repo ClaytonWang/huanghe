@@ -16,7 +16,7 @@ from basic.utils.dt_format import dt_to_string
 
 
 def k8s_format(name):
-    if not name or not re.match('^[a-zA-Z][0-9a-zA-Z-]*$', name):
+    if not name or not re.match('^[a-z][0-9a-z-]*$', name):
         raise ValueError("Job命名必须为英文数字中划线组合,且首位必须是字母")
     return name.lower()
 
