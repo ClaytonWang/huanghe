@@ -16,7 +16,7 @@ from fastapi.security.utils import get_authorization_scheme_param
 from jose.jwt import JWTError
 from pydantic import BaseModel, Field, validator
 import requests
-from basic.config.storage import *
+from basic.config.service_requests import *
 from basic.common.validator_name import BaseModelValidatorName
 
 

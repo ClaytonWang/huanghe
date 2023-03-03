@@ -5,10 +5,21 @@
     >Mail   : xinkai.tao@digitalbrain.cn
     >Time   : 2023/3/1 11:01
 """
+import os
+import sys
+import yaml
+import importlib
+from pathlib import Path
+
 # 用于集中服务间调用的URL配置
 
 ENV_COMMON_NAMESPACE = "juece"
 ENV_COMMON_AFTER = "svc.cluster.local"
+
+# MOCK
+MOCK = os.getenv("MOCK_ACCOUNT_GETTER", False)
+MOCK_USER_JSON = {"id": 60, 'username': "shouchen"}
+MOCK_PROJECT_JSON = {"id": 1, "name": "决策平台"}
 
 # user service
 AUTH_PREFIX_URL = "/v1/auth/login"
