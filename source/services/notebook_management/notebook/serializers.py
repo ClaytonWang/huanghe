@@ -10,17 +10,13 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from basic.utils.dt_format import dt_to_string
-from image.serializers import ImageItem
-from source.serializers import SourceList
 from pydantic import validator
 
 
 def k8s_format(name):
-    if not name or not re.match('^[a-zA-Z][0-9a-zA-Z-]*$', name):
-        raise ValueError("Notebook命名必须为英文数字中划线组合,且首位必须是字母")
+    if not name or not re.match('^[a-z][0-9a-z-]*$', name):
+        raise ValueError("Notebook命名必须为小写英文字母数字中划线组合,且首位必须是字母")
     return name.lower()
-
-
 
 
 class Ssh(BaseModel):
@@ -33,6 +29,7 @@ class StatusItem(BaseModel):
     code: Optional[str] = None
     name: Optional[str] = None
     desc: str = None
+
 
 class StatusItemOnlyDesc(BaseModel):
     desc: str = None
@@ -51,6 +48,7 @@ class ProjectStr(BaseModel):
 class Storage(BaseModel):
     name: Optional[str]
     id: int
+
 
 class HookItem(BaseModel):
     storage: Storage
