@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-01-31 15:07:28
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-24 17:32:38
+ * @LastEditTime: 2023-03-03 16:06:52
  * @FilePath: /huanghe/source/services/frontend/src/pages/overview/summary/index.js
  * @Description: Overview Summary page
  */
@@ -160,7 +160,7 @@ const OverviewList = () => {
           </Space>
         </Col>
       </Row>
-      <Card size="small" title="开发统计">
+      <Card title="开发统计">
         <Row gutter={10}>
           {loading ? (
             <Skeleton active />
@@ -185,7 +185,7 @@ const OverviewList = () => {
         </Row>
       </Card>
       <br />
-      <Card size="small" title="资源统计">
+      <Card title="资源统计">
         <Row>
           <Col span={24}>
             <OverviewChartMonitor />
