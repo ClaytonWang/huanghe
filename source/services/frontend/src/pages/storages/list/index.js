@@ -262,7 +262,7 @@ const StoragesList = () => {
           rules={[
             { required: true, message: '请输入存储名称' },
             {
-              pattern: /^[a-zA-Z]\w*/,
+              pattern: /^[a-zA-z][0-9a-zA-Z-]*$/,
               message:
                 '名字需字母开头，由字母、数字、中划线组合，长度不超过20位',
             },
