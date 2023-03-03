@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-24 17:51:42
+ * @LastEditTime: 2023-03-03 15:51:48
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -20,6 +20,7 @@ import {
   message,
   Modal,
   DatePicker,
+  Typography,
 } from 'antd';
 import Icon from '@ant-design/icons';
 import {
@@ -61,7 +62,7 @@ const JobDetail = () => {
     from: moment().add(-1, 'h'), // 默认1小时
     to: moment(),
   });
-  const [logRange, setLogRange] = useState({
+  const [logRange] = useState({
     from: moment().add(-1, 'h'), // 默认1小时
     to: moment(),
   });
@@ -277,15 +278,6 @@ const JobDetail = () => {
       console.log('Clear');
     }
   };
-
-  const onLogRangeChange = (dates) => {
-    if (dates) {
-      setLogRange({ from: dates[0]?.valueOf(), to: dates[1]?.valueOf() });
-    } else {
-      console.log('Clear');
-    }
-  };
-
   const operations = useMemo(() => {
     const from = moment(dateRange.from);
     const to = moment(dateRange.to);
@@ -306,21 +298,7 @@ const JobDetail = () => {
     }
 
     if (currTab === 'log') {
-      return (
-        // <RangePicker
-        //   allowClear={false}
-        //   presets={rangePresets}
-        //   showTime
-        //   format={dateFormat}
-        //   onChange={onLogRangeChange}
-        //   placement="bottomRight"
-        //   defaultValue={[
-        //     moment(logRange.from, dateFormat),
-        //     moment(logRange.to, dateFormat),
-        //   ]}
-        // />
-        null
-      );
+      return null;
     }
     return null;
   }, [currTab]);
@@ -347,7 +325,7 @@ const JobDetail = () => {
   };
 
   return (
-    <div className="detail">
+    <div className="jobs-detail">
       <div className="detail-section">
         <Row gutter={[16, 24]}>
           {loading ? (
@@ -374,10 +352,21 @@ const JobDetail = () => {
                     detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
                 </Tooltip>
               </Col>
+              <Col span={6} title={detailData?.mode}>
+                任务模式：{detailData?.mode}
+              </Col>
               <Col span={6} title={detailData?.image?.name}>
-                镜像：
                 <Tooltip title={detailData?.image?.name}>
-                  {detailData?.image?.name}
+                  <Typography.Text
+                    copyable={{
+                      tooltips: false,
+                      text: detailData?.image?.name,
+                    }}
+                  >
+                    <span className="overflow">
+                      镜像：{detailData?.image?.name}
+                    </span>
+                  </Typography.Text>
                 </Tooltip>
               </Col>
               <Col span={6} title={detailData?.source}>
@@ -597,7 +586,7 @@ JobDetail.context = (props = {}) => {
             </label>
           );
         })()}
-        <Dropdown.Button menu={menuProps}>
+        <Dropdown.Button menu={menuProps} trigger="click">
           {taskModel === DEBUG ? (
             <DebugBtn type="text" />
           ) : (

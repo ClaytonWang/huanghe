@@ -235,6 +235,7 @@ class Job(GenericDateModel):
                         "vram": self.vram_url,},
             "url": self.webkubectl,
             "logging_url": self.logging_url,
+            "work_dir": self.work_dir,
         }
 
     @classmethod

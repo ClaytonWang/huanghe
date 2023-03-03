@@ -3,6 +3,7 @@
 from __future__ import annotations
 from typing import Optional, Union
 import datetime
+import re
 
 from pydantic import BaseModel, validator
 
@@ -36,6 +37,8 @@ class VolumeCreateReq(BaseModel):
 
     @validator('name')
     def k8s_name_validator(cls, name):
+        if not name or not re.match('^[a-z][0-9a-z-]*$', name):
+            raise ValueError("存储命名必须为小写英文字母数字中划线组合,且首位必须是字母")
         return name
 
 

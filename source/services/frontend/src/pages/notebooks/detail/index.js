@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-24 10:24:53
+ * @LastEditTime: 2023-03-03 15:51:39
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
@@ -21,6 +21,7 @@ import {
   Modal,
   DatePicker,
   Button,
+  Typography,
 } from 'antd';
 import Icon, { InfoCircleOutlined } from '@ant-design/icons';
 import { ChartMonitor, EventMonitor, AuthButton } from '@/common/components';
@@ -296,7 +297,7 @@ const NotebookDetail = () => {
   };
 
   return (
-    <div className="detail">
+    <div className="notebooks-detail">
       <div className="detail-section">
         <Row gutter={[16, 24]}>
           {loading ? (
@@ -319,9 +320,17 @@ const NotebookDetail = () => {
                   detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
               </Col>
               <Col span={6} title={detailData?.image?.name}>
-                镜像：
                 <Tooltip title={detailData?.image?.name}>
-                  {detailData?.image?.name}
+                  <Typography.Text
+                    copyable={{
+                      tooltips: false,
+                      text: detailData?.image?.name,
+                    }}
+                  >
+                    <span className="overflow">
+                      镜像：{detailData?.image?.name}
+                    </span>
+                  </Typography.Text>
                 </Tooltip>
               </Col>
               <Col span={6} title={detailData?.source}>
@@ -344,7 +353,8 @@ const NotebookDetail = () => {
                 >
                   <InfoCircleOutlined />
                 </Tooltip>
-                :<Button
+                :
+                <Button
                   type="link"
                   style={{ marginLeft: 5 }}
                   onClick={handleConfigInfoClicked}
@@ -469,7 +479,7 @@ NotebookDetail.context = (props = {}) => {
           </label>
         );
       })()}
-      <Dropdown.Button menu={menuProps}>
+      <Dropdown.Button menu={menuProps} trigger="click">
         {statusName === 'stopped' && (
           <AuthButton
             required="notebooks.list.edit"
