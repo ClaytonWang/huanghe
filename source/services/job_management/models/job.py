@@ -160,7 +160,7 @@ class Job(GenericDateModel):
 
     @property
     def logging_url(self):
-        return f"{LOG_COMMON}orgId=1&theme=light&viewPanel=2&var-namespace={self.namespace_name}&var-app={self.name}"
+        return f"{LOG_COMMON}orgId=1&theme=light&viewPanel=2&var-namespace={self.namespace_name}&var-app={self.create_en_by}-{self.name}"
 
 
     @property
