@@ -67,10 +67,11 @@ async def get_volume_list(token, page_no=1):
 
 
 async def volume_check(authorization: str, hooks: List[HookItem], namespace: str):
+    storages, volumes_k8s = [], []
+    if not hooks:
+        return storages, volumes_k8s
     volume_list = await get_volume_list(authorization)
     volume_map = {int(x['id']): x for x in volume_list}
-    storages = []
-    volumes_k8s = []
 
     for hook in hooks:
         path = hook.path

@@ -3,7 +3,6 @@
 """
 
 import uvicorn
-from config import *
 from asyncpg.exceptions import PostgresError
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -21,14 +20,12 @@ from basic.middleware.exception import validation_ormar_exception_handler
 from basic.middleware.exception import validation_pydantic_exception_handler
 from basic.middleware.rsp import add_common_response_data
 from basic.utils.log import configure_logging
-from models import startup_event, shutdown_event
+from basic.common.initdb import startup_event, shutdown_event
 from job.api import router_job
 from basic.middleware.account_getter import verify_token
 from utils.notebook_request import get_source_list, get_image_list
 
-# oauth2_scheme = OFOAuth2PasswordBearer(token_url="/v1/auth/login")
-# oauth2_scheme = OFOAuth2PasswordBearer(token_url=USER_SERVICE_PATH + "/v1/auth/login")
-# oauth2_scheme = OFOAuth2PasswordBearer(token_url=ENV_COMMON_URL + AUTH_PREFIX_URL)
+
 oauth2_scheme = OFOAuth2PasswordBearer(token_url=f"http://{USER_SERVICE_URL}{AUTH_PREFIX_URL}")
 configure_logging('logging.config.dictConfig', LOGGING)
 app = FastAPI(
