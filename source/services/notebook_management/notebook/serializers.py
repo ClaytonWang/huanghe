@@ -9,13 +9,15 @@ import re
 from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Optional, List
+from fastapi import HTTPException, status
 from basic.utils.dt_format import dt_to_string
 from pydantic import validator
 
 
 def k8s_format(name):
     if not name or not re.match('^[a-z][0-9a-z-]*$', name):
-        raise ValueError("Notebook命名必须为小写英文字母数字中划线组合,且首位必须是字母")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail='Notebook命名必须为小写英文字母数字中划线组合,且首位必须是字母')
     return name.lower()
 
 
