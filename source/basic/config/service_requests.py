@@ -10,6 +10,7 @@ import sys
 import yaml
 import importlib
 from pathlib import Path
+from basic.common.env_variable import get_lower_string_variable
 
 # 用于集中服务间调用的URL配置
 
@@ -112,3 +113,11 @@ CLUSTER_SERVICE_URL = f"cluster.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
 STORAGE_SERVICE_URL = f"storage.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
 NOTEBOOK_SERVICE_URL = f"notebook.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
 JOB_SERVICE_URL = f"job.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
+
+ENV = get_lower_string_variable('ENV', 'dev')
+
+DB_USER = 'root'
+DB_PASSWORD = 'linshimima2!'
+DB_NAME = 'huanghe_dev'
+DB_HOST = '123.60.43.172'
+DB_PORT = '5432'

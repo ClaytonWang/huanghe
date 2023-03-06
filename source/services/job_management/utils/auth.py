@@ -5,20 +5,12 @@
     >Mail   : xinkai.tao@digitalbrain.cn
     >Time   : 2022/12/20 17:42
 """
-import json
 
-from jose import jwt
 from fastapi import Request, Response, status
-from fastapi import HTTPException
-from typing import Optional
 from config import DO_NOT_AUTH_URI
-from starlette.authentication import AuthCredentials, SimpleUser
-from fastapi.security import OAuth2PasswordBearer
-from fastapi.security.utils import get_authorization_scheme_param
 from jose.jwt import JWTError
 from utils.user_request import get_current_user_aio, get_project
-from models import Job
-
+from services.job_management.models.job import Job
 
 async def verify_token(request: Request, call_next):
     auth_error = Response(

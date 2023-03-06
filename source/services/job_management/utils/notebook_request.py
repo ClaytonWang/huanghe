@@ -12,6 +12,7 @@ from typing import Optional, List, Dict, Set
 from collections import defaultdict
 from pydantic import BaseModel, Field
 from basic.config.job_management import *
+from basic.config.service_requests import *
 
 
 class SourceInfo(BaseModel):

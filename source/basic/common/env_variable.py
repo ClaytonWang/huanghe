@@ -17,3 +17,6 @@ def get_integer_variable(name: str, default: int = None) -> int:
 def get_string_variable(name: str, default: str = None) -> str:
     var = os.getenv(name.upper())
     return var if var else default
+
+def get_lower_string_variable(name: str, default: str = None) -> str:
+    return os.getenv(name, default).lower()
