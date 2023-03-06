@@ -7,6 +7,7 @@
 """
 import re
 from datetime import datetime
+from fastapi import HTTPException, status
 from typing import Optional, List, Union
 
 from pydantic import BaseModel, Field
@@ -17,7 +18,8 @@ from basic.utils.dt_format import dt_to_string
 
 def k8s_format(name):
     if not name or not re.match('^[a-z][0-9a-z-]*$', name):
-        raise ValueError("Job命名必须为英文数字中划线组合,且首位必须是字母")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail='Job命名必须为小写英文字母数字中划线组合,且首位必须是字母')
     return name.lower()
 
 

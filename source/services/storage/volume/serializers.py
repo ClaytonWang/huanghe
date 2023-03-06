@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from typing import Optional, Union
+from fastapi import HTTPException, status
 import datetime
 import re
 
@@ -38,7 +39,8 @@ class VolumeCreateReq(BaseModel):
     @validator('name')
     def k8s_name_validator(cls, name):
         if not name or not re.match('^[a-z][0-9a-z-]*$', name):
-            raise ValueError("存储命名必须为小写英文字母数字中划线组合,且首位必须是字母")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail='存储命名必须为小写英文字母数字中划线组合,且首位必须是字母')
         return name
 
 
