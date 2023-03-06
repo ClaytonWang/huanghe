@@ -20,6 +20,12 @@ DEBUG = True
 SERVICE_PORT = 8000
 DO_NOT_AUTH_URI = ['/auth/login', '/docs', '/openapi', '/openapi.json']
 
+# APP_NAME = Path(__file__).parent.name
+BASIC_PATH = Path.joinpath(Path(__file__).parent.parent.parent, 'basic')
+SOURCE_PATH = Path.joinpath(Path(BASIC_PATH).parent)
+sys.path.insert(0, SOURCE_PATH.__str__())
+K8S_YAML_CONFIG_PATH = '/etc/juece/config.yaml'
+
 # MOCK
 MOCK = os.getenv("MOCK_ACCOUNT_GETTER", False)
 MOCK_USER_JSON = {"id": 60, 'username': "shouchen"}
@@ -90,6 +96,15 @@ NOTEBOOK_ITEMS_URL = "/notebooks/items"
 NOTEBOOK_VOLUME_PREFIX_URL = "/notebooks/volume"
 NOTEBOOK_SOURCE_PREFIX_URL = "/source"
 NOTEBOOK_IMAGE_PREFIX_URL = "/image"
+
+
+if os.path.exists(K8S_YAML_CONFIG_PATH):
+    try:
+        with open(K8S_YAML_CONFIG_PATH) as f:
+            data = yaml.load(f, Loader=yaml.FullLoader)
+            locals().update(**data)
+    except Exception as e:
+        print(f'Loading k8s config error. {e}')
 
 
 USER_SERVICE_URL = f"user.{ENV_COMMON_NAMESPACE}.{ENV_COMMON_AFTER}"
