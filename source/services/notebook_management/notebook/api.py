@@ -14,7 +14,7 @@ from notebook.serializers import NotebookList, NotebookCreate, NotebookEdit, Not
     EventCreate, NotebookSimple
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
-from basic.common.common_model import Event
+from basic.common.event_model import Event
 from basic.common.env_variable import get_string_variable
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project
 from utils.user_request import project_check, project_check_obj, get_user_list, get_project_list
