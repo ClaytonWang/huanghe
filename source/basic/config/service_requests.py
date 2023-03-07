@@ -14,6 +14,10 @@ from basic.common.env_variable import get_lower_string_variable
 
 # 用于集中服务间调用的URL配置
 
+SECRET_KEY = "dc393487a84ddf9da61fe0180ef295cf0642ecbc5d678a1589ef2e26b35fce9c"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 8
+
 ENV_COMMON_NAMESPACE = "juece"
 ENV_COMMON_AFTER = "svc.cluster.local"
 

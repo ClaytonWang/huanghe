@@ -9,8 +9,7 @@ from jose import jwt
 from fastapi import Request, Response, status
 from fastapi import HTTPException
 from typing import Optional
-from config import SECRET_KEY
-from config import DO_NOT_AUTH_URI
+from basic.config.service_requests import SECRET_KEY, DO_NOT_AUTH_URI
 from starlette.authentication import AuthCredentials, SimpleUser
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
