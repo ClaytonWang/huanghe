@@ -7,7 +7,7 @@
 """
 import databases
 import sqlalchemy
-from basic.config.service_requests import DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
+from basic.common.base_config import DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
 
 DB_CONN = f'{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 

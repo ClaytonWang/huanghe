@@ -26,7 +26,7 @@ from utils.user_request import project_check, project_check_obj
 from basic.middleware.account_getter import ADMIN
 from basic.common.event_model import Event
 from basic.common.status_cache import sc
-from basic.config.service_requests import ENV
+from basic.common.base_config import ENV
 
 router_job = APIRouter()
 

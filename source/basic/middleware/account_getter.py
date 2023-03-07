@@ -10,13 +10,12 @@ from __future__ import annotations
 from fastapi import Request, Response, status
 from fastapi import HTTPException
 from typing import Optional, List, Dict
-from config import DO_NOT_AUTH_URI, NO_AUTH_WORDS
+from config import *
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
 from jose.jwt import JWTError
 from pydantic import BaseModel, Field, validator
 import requests
-from basic.config.service_requests import *
 from basic.common.validator_name import BaseModelValidatorName
 
 
