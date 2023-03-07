@@ -2,7 +2,7 @@
 
 import ormar
 from basic.common.base_model import DateModel
-from models import DB, META
+from basic.common.initdb import DB, META
 
 
 class Event(DateModel):

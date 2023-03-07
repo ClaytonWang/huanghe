@@ -7,13 +7,12 @@
 """
 
 import aiohttp
-import json
 
-from typing import Optional, List, Dict, Set
+from typing import Optional, List, Set
 # from config import USER_SERVICE_PATH
-from collections import defaultdict
 from pydantic import BaseModel, Field
 from basic.config.job_management import *
+from basic.config.service_requests import *
 
 
 class RoleInfo(BaseModel):

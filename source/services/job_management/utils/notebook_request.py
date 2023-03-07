@@ -6,12 +6,8 @@
     >Time   : 2023/2/20 16:29
 """
 import aiohttp
-import json
-
-from typing import Optional, List, Dict, Set
-from collections import defaultdict
-from pydantic import BaseModel, Field
-from basic.config.job_management import *
+from pydantic import BaseModel
+from basic.config.service_requests import *
 
 
 class SourceInfo(BaseModel):
