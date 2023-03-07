@@ -26,7 +26,6 @@ from basic.middleware.account_getter import verify_token
 from utils.notebook_request import get_source_list, get_image_list
 
 
-oauth2_scheme = OFOAuth2PasswordBearer(token_url=f"http://{USER_SERVICE_URL}{AUTH_PREFIX_URL}")
 configure_logging('logging.config.dictConfig', LOGGING)
 app = FastAPI(
     title='job管理',
