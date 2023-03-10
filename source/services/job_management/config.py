@@ -25,12 +25,6 @@ sys.path.insert(0, SOURCE_PATH.__str__())
 K8S_YAML_CONFIG_PATH = '/etc/juece/config.yaml'
 COMMON_CONFIG_PATH = f'basic.common.base_config'
 
-DO_NOT_AUTH_URI = ['/auth/login', '/docs', '/openapi', '/openapi.json']
-NO_AUTH_WORDS = ['events', "status_update", "project_backend", "by_server"]
-
-
-debug = False if 'PRODUCTION' == get_string_variable('ENV', 'DEV') else True
-
 """
 加载公用配置 
 """
@@ -45,6 +39,12 @@ try:
 except ModuleNotFoundError:
     pass
 
+
+DO_NOT_AUTH_URI = ['/auth/login', '/docs', '/openapi', '/openapi.json']
+NO_AUTH_WORDS = ['events', "status_update", "project_backend", "by_server"]
+
+
+debug = False if 'PRODUCTION' == get_string_variable('ENV', 'DEV') else True
 
 """
 加载服务器配置
