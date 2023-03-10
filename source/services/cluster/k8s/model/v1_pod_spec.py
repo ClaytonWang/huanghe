@@ -7,7 +7,7 @@ from services.cluster.k8s.model.v1_volume import V1Volume
 from services.cluster.k8s.model.v1_toleration import V1Toleration
 from services.cluster.k8s.const.workloads_const import IMAGE_PULL_POLICY_IF_NOT_PRESENT, SECRET_NAME_DOCKER_CONFIG, RESTART_POLICY_NEVER
 from services.cluster.k8s.model.v1_local_object_reference import V1LocalObjectReference
-from notebook.serializers import Volume
+from services.cluster.notebook.serializers import Volume
 
 
 class V1PodSpec(GenericMixin):

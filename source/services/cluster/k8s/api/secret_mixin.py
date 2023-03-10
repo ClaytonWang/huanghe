@@ -3,7 +3,7 @@ from services.cluster.k8s.api.core import Core
 from services.cluster.k8s.api.core_v1_api import CoreV1Api
 from services.cluster.k8s.model.v1_secret import V1Secret
 from services.cluster.k8s.model.v1_status import V1Status
-from secret.serializers import SecretCommon, SecretNamespace
+from services.cluster.secret.serializers import SecretCommon, SecretNamespace
 
 
 class SecretMixin(CoreV1Api):
