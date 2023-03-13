@@ -24,6 +24,7 @@ ENV_COMMON_AFTER = "svc.cluster.local"
 DEBUG = True
 SERVICE_PORT = 8000
 DO_NOT_AUTH_URI = ['/auth/login', '/docs', '/openapi', '/openapi.json']
+NO_AUTH_WORDS = ['events']
 
 # APP_NAME = Path(__file__).parent.name
 BASIC_PATH = Path.joinpath(Path(__file__).parent.parent.parent, 'basic')

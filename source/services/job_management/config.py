@@ -23,7 +23,7 @@ BASIC_PATH = Path.joinpath(Path(__file__).parent.parent.parent, 'basic')
 SOURCE_PATH = Path.joinpath(Path(BASIC_PATH).parent)
 sys.path.insert(0, SOURCE_PATH.__str__())
 K8S_YAML_CONFIG_PATH = '/etc/juece/config.yaml'
-COMMON_CONFIG_PATH = f'basic.common.base_config'
+COMMON_CONFIG_PATH = 'basic.common.base_config'
 
 """
 加载公用配置 

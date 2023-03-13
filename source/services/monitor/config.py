@@ -11,17 +11,13 @@ import yaml
 import importlib
 from pathlib import Path
 
-DEBUG = True
-SERVICE_PORT = 8000
-DO_NOT_AUTH_URI = ['/auth/login', '/docs', '/openapi', '/openapi.json']
-NO_AUTH_WORDS = ['events']
 
 APP_NAME = Path(__file__).parent.name
 BASIC_PATH = Path.joinpath(Path(__file__).parent.parent.parent, 'basic')
 SOURCE_PATH = Path.joinpath(Path(BASIC_PATH).parent)
 sys.path.insert(0, SOURCE_PATH.__str__())
 K8S_YAML_CONFIG_PATH = '/etc/juece/config.yaml'
-COMMON_CONFIG_PATH = f'basic.common.base_config'
+COMMON_CONFIG_PATH = 'basic.common.base_config'
 
 
 try:
@@ -35,11 +31,10 @@ except ModuleNotFoundError:
     pass
 
 
-DB_USER = 'root'
-DB_PASSWORD = 'linshimima2!'
-DB_NAME = 'huanghe_dev'
-DB_HOST = '123.60.43.172'
-DB_PORT = '5432'
+# DEBUG = True
+# SERVICE_PORT = 8000
+# DO_NOT_AUTH_URI = ['/auth/login', '/docs', '/openapi', '/openapi.json']
+# NO_AUTH_WORDS = ['events']
 
 
 if os.path.exists(K8S_YAML_CONFIG_PATH):

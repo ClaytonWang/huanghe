@@ -243,7 +243,6 @@ def query_notebook_volume(token: str, volume_id) -> List[Dict]:
     return response['result']
 
 
-
 async def verify_token(request: Request, call_next):
     auth_error = Response(
         status_code=status.HTTP_401_UNAUTHORIZED,

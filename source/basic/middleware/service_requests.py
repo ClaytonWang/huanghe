@@ -7,12 +7,8 @@
 """
 
 import aiohttp
-import json
 
-from typing import Optional, List, Dict, Set
-# from config import USER_SERVICE_PATH
-from collections import defaultdict
-from datetime import datetime
+from typing import Optional, List, Set
 from pydantic import BaseModel, Field
 from basic.common.base_config import *
 
