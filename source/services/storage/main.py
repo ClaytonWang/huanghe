@@ -4,8 +4,8 @@
 from config import *
 import uvicorn
 from fastapi import FastAPI
-from volume.api import router_volume
-from models import startup_event, shutdown_event
+from services.storage.volume.api import router_volume
+from basic.common.initdb import startup_event, shutdown_event
 from basic.middleware.account_getter import verify_token
 from starlette.middleware.base import BaseHTTPMiddleware
 from basic.middleware.exception import validation_pydantic_exception_handler
@@ -52,4 +52,5 @@ def start():
 
 # USER_SERVICE_PORT
 if __name__ == '__main__':
+    print(sys.path)
     start()
