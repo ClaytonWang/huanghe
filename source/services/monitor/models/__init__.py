@@ -5,4 +5,3 @@
     >Mail    : jindu.yin@digitalbrain.cn
     >Time    : 2022/10/11 09:29
 """
-from models.initdb import *

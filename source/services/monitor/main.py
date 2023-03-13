@@ -3,7 +3,7 @@
 """
 import uvicorn
 from fastapi import FastAPI
-from models import startup_event, shutdown_event
+from basic.common.initdb import startup_event, shutdown_event
 from basic.middleware.account_getter import verify_token
 from starlette.middleware.base import BaseHTTPMiddleware
 from basic.middleware.exception import validation_pydantic_exception_handler

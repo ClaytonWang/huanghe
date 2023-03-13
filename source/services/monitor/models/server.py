@@ -1,7 +1,7 @@
 import ormar
-from basic.common.base_model import DateModel, OnlyPrimaryKeyModel
-from servers.serializers import ServerCreateReq, PodCreatedBy
-from models import DB, META
+from basic.common.base_model import OnlyPrimaryKeyModel
+from services.monitor.servers.serializers import ServerCreateReq
+from basic.common.initdb import DB, META
 from basic.middleware.rsp import success_common_response
 
 
@@ -42,13 +42,13 @@ class Server(OnlyPrimaryKeyModel):
         }
 
     @classmethod
-    def gen_server_pagation_response(self, scr: ServerCreateReq):
+    def gen_server_pagation_response(cls, scr: ServerCreateReq):
         return {
             "id": scr.id,
             "status": scr.status,
             "server": scr.server_ip,
-            "occupied_rate": self.get_occupied_rate(scr),
-            "source": self.get_str(scr),
+            "occupied_rate": cls.get_occupied_rate(scr),
+            "source": cls.get_str(scr),
             "occupied_by": scr.occupied_by
         }
 
