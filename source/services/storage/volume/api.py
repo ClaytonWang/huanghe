@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Path, Request
 from basic.middleware.rsp import success_common_response
-from services.storage.models import Volume
+from services.storage.models.volume import Volume
 from typing import List
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
