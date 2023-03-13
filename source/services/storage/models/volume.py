@@ -12,8 +12,9 @@ from fastapi import HTTPException, status
 import ormar
 from basic.common.base_model import GenericNoProjectModel
 from basic.common.initdb import DB, META
+from basic.common.base_config import ADMIN
 from services.storage.volume.serializers import VolumeCreateReq
-from basic.middleware.account_getter import AccountGetter, ADMIN
+from basic.middleware.account_getter import AccountGetter
 
 
 class Volume(GenericNoProjectModel):
