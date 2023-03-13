@@ -105,8 +105,8 @@ class GenericDateModel(ormar.Model):
     created_at: datetime = ormar.DateTime(server_default=func.now(), comment='创建日期')
     updated_at: datetime = ormar.DateTime(server_default=func.now(), onupdate=func.now(), comment='更新日期')
     deleted_at: datetime = ormar.DateTime(comment="删除日期", nullable=True)
-    started_at: datetime = ormar.DateTime(comment="启动日期")
-    ended_at: datetime = ormar.DateTime(comment="结束日期")
+    started_at: datetime = ormar.DateTime(comment="启动日期", nullable=True)
+    ended_at: datetime = ormar.DateTime(comment="结束日期", nullable=True)
 
 class GenericNoProjectModel(ormar.Model):
     class Meta:
