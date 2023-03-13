@@ -69,7 +69,7 @@ if __name__ == '__main__':
     # Number of worker processes. Defaults to the $WEB_CONCURRENCY environment variable if available, or 1.
     # Not valid with --reload.
     uvicorn.run(
-        'main:app', port=8010,
+        'main:app', host='0.0.0.0', port=service_port,
         reload=True,
         debug=debug,
         workers=2
