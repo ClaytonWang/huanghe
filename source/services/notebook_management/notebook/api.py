@@ -6,7 +6,7 @@
     >Time   : 2022/12/15 10:21
 """
 import json
-from typing import List, Dict
+from typing import List
 from fastapi import APIRouter, Depends, Request, HTTPException, status, Path, Query
 from fastapi.responses import JSONResponse
 from models import Notebook, Status, Image
@@ -29,6 +29,7 @@ COMMON = "https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-ko
 ACCOUNT = "jovyan"
 PASSWORD = "jovyan"
 
+
 @router_notebook.get(
     '/project_backend/{project_id}',
     description='通过项目查询nb',
@@ -43,12 +44,14 @@ async def list_nb_by_project(project_id: int = Path(..., ge=1, description='需�
         return False
     return True
 
+
 @router_notebook.get(
     '/by_server/{server_ip}',
     description='通过节点IP查询nb',
 )
 async def list_nb_by_server(server_ip: str = Path(..., description='需要查询项目的server_ip')):
     return await Notebook.project_list_by_ip(server_ip)
+
 
 def format_notebook_detail(nb: Notebook):
     result = nb.dict()
@@ -74,6 +77,7 @@ def format_notebook_detail(nb: Notebook):
         "address": nb.pod_ip,
     }
     return result
+
 
 @router_notebook.get(
     '/volume/{volume_id}',
@@ -101,7 +105,7 @@ async def get_volume_notebook(volume_id: int = Path(..., ge=1, description='需�
     response_model_exclude_unset=True
 )
 async def get_simple_notebook(request: Request,
-                              query_params: QueryParameters = Depends(QueryParameters),):
+                              query_params: QueryParameters = Depends(QueryParameters), ):
     params_filter = query_params.filter_
     authorization: str = request.headers.get('authorization')
 
@@ -282,7 +286,8 @@ async def create_notebook(request: Request,
     init_data['project_by'] = pg.name
     init_data['project_en_by'] = pg.en_name
 
-    if await Notebook.objects.filter(name=init_data['name'], project_by_id=int(nc.project.id), created_by_id=ag.id).count():
+    if await Notebook.objects.filter(name=init_data['name'], project_by_id=int(nc.project.id),
+                                     created_by_id=ag.id).count():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户，Notebook不能重名')
 
     gpu_count = 0
@@ -364,8 +369,8 @@ async def update_notebook(request: Request,
     if not check:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
     update_data.update({"project_by_id": project_id,
-                       "project_by": extra_info['name'],
-                       "project_en_by": extra_info['en_name']})
+                        "project_by": extra_info['name'],
+                        "project_en_by": extra_info['en_name']})
     if 'project' in update_data:
         update_data.pop('project')
     k8s_info['namespace'] = extra_info['en_name']
@@ -447,6 +452,7 @@ async def operate_notebook(request: Request,
         stat = await Status.objects.get(name='stop')
         update_data['status'] = stat.id
         response = await delete_notebook_k8s(authorization, payloads)
+        await _notebook.update(**{"ended_at": datetime.datetime.now()})
         # if response.status != 200:
         #     _notebook.status = None
     else:
@@ -456,6 +462,8 @@ async def operate_notebook(request: Request,
         update_data['status'] = stat.id
         # todo response返回不为200时更新notebook状态到异常
         response = await create_notebook_k8s(authorization, payloads)
+        await _notebook.update(**{"started_at": datetime.datetime.now()})
+
         # if response.status != 200:
         #     _notebook.status = None
     # print(response)
