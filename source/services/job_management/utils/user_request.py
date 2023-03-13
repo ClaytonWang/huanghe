@@ -12,7 +12,7 @@ from typing import Optional, List, Set
 # from config import USER_SERVICE_PATH
 from pydantic import BaseModel, Field
 from basic.config.job_management import *
-from basic.config.service_requests import *
+from basic.common.base_config import *
 
 
 class RoleInfo(BaseModel):

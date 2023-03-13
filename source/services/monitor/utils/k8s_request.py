@@ -1,5 +1,5 @@
 import aiohttp
-from basic.config.service_requests import *
+from basic.common.base_config import *
 
 async def list_server_ip_k8s():
     async with aiohttp.ClientSession() as session:

@@ -12,7 +12,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from basic.common.env_variable import get_integer_variable
 from basic.common.env_variable import get_string_variable
-from basic.config.notebook_management import *
+from config import *
 from basic.middleware.auth import OFOAuth2PasswordBearer
 from basic.middleware.exception import ormar_db_exception_handler
 from basic.middleware.exception import pg_db_exception_handler

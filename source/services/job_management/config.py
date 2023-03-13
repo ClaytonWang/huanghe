@@ -1,20 +1,22 @@
+# -*- coding: utf-8 -*-
+"""
+    >File   : config.py
+    >Auther : TXK
+    >Mail   : xinkai.tao@digitalbrain.cn
+    >Time   : 2023/3/7 20:29
+"""
 
-"""
-    >File    : config.py
-    >Author  : YJD
-    >Mail    : jindu.yin@digitalbrain.cn
-    >Time    : 2022/11/15 13:44
-"""
 import os
 import sys
 import yaml
 import importlib
 from pathlib import Path
+from basic.common.env_variable import get_string_variable
 
-DEBUG = True
-SERVICE_PORT = 8000
-DO_NOT_AUTH_URI = ['/auth/login', '/docs', '/openapi', '/openapi.json']
-NO_AUTH_WORDS = ['events']
+
+"""
+项目基础信息配置
+"""
 
 APP_NAME = Path(__file__).parent.name
 BASIC_PATH = Path.joinpath(Path(__file__).parent.parent.parent, 'basic')
@@ -23,7 +25,9 @@ sys.path.insert(0, SOURCE_PATH.__str__())
 K8S_YAML_CONFIG_PATH = '/etc/juece/config.yaml'
 COMMON_CONFIG_PATH = f'basic.common.base_config'
 
-
+"""
+加载公用配置 
+"""
 try:
     common_module = importlib.import_module(COMMON_CONFIG_PATH)
     for key in common_module.__dict__:
@@ -31,17 +35,20 @@ try:
             continue
         val = getattr(common_module, key)
         locals().__setitem__(key, val)
+    # print(locals())
 except ModuleNotFoundError:
     pass
 
 
-DB_USER = 'root'
-DB_PASSWORD = 'linshimima2!'
-DB_NAME = 'huanghe_dev'
-DB_HOST = '123.60.43.172'
-DB_PORT = '5432'
+DO_NOT_AUTH_URI = ['/auth/login', '/docs', '/openapi', '/openapi.json']
+NO_AUTH_WORDS = ['events', "status_update", "project_backend", "by_server"]
 
 
+debug = False if 'PRODUCTION' == get_string_variable('ENV', 'DEV') else True
+
+"""
+加载服务器配置
+"""
 if os.path.exists(K8S_YAML_CONFIG_PATH):
     try:
         with open(K8S_YAML_CONFIG_PATH) as f:

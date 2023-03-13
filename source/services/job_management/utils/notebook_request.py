@@ -7,7 +7,7 @@
 """
 import aiohttp
 from pydantic import BaseModel
-from basic.config.service_requests import *
+from basic.common.base_config import *
 
 
 class SourceInfo(BaseModel):
