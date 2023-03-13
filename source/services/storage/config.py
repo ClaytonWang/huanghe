@@ -38,7 +38,6 @@ except ModuleNotFoundError:
 
 # 从服务间请求加载
 try:
-    # print(SERVICE_CONFIG_PATH)
     service_module = importlib.import_module(SERVICE_CONFIG_PATH)
     for key in service_module.__dict__:
         if key.startswith('__'):

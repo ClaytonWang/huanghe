@@ -11,7 +11,7 @@ import datetime
 from fastapi import HTTPException, status
 import ormar
 from basic.common.base_model import GenericNoProjectModel
-from services.storage.models import DB, META
+from basic.common.initdb import DB, META
 from services.storage.volume.serializers import VolumeCreateReq
 from basic.middleware.account_getter import AccountGetter, ADMIN
 

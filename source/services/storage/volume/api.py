@@ -5,8 +5,8 @@ from typing import List
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from services.storage.volume.serializers import VolumeCreateReq, VolumeEditReq, VolumeDetailRes
-from basic.middleware.account_getter import AccountGetter, ADMIN, OWNER, \
-    query_notebook_volume, list_user_by_project
+from basic.common.base_config import ADMIN, OWNER
+from basic.middleware.account_getter import AccountGetter, query_notebook_volume, list_user_by_project
 from basic.middleware.service_requests import get_job_list
 
 router_volume = APIRouter()
@@ -42,8 +42,10 @@ async def list_volume(request: Request,
         volumes = await Volume.undeleted_self_volumes(user.id)
     if query_params.filter_.get("isdeleted", False):
         query_params.filter_.pop("isdeleted")
-        query_params.filter_["deleted_at"] = None
-        query_params.filter_["owner_by_id"] = user.id
+        query_params.filter_.update({
+            "deleted_at": None,
+            "owner_by_id": user.id
+        })
     p = await paginate(volumes.filter(
         **query_params.filter_
     ), params=query_params.params)
