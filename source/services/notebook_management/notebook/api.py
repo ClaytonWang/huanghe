@@ -17,8 +17,8 @@ from basic.common.query_filter_params import QueryParameters
 from basic.common.event_model import Event
 from basic.common.env_variable import get_string_variable
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project
-from utils.user_request import project_check, project_check_obj, get_user_list, get_project_list
-from utils.storage_request import volume_check
+from basic.middleware.service_requests import get_user_list, volume_check
+from utils.user_request import project_check, project_check_obj
 from utils.k8s_request import create_notebook_k8s, delete_notebook_k8s
 from utils.auth import operate_auth
 from collections import defaultdict
@@ -55,27 +55,34 @@ async def list_nb_by_server(server_ip: str = Path(..., description='需要查询
 
 def format_notebook_detail(nb: Notebook):
     result = nb.dict()
-    result['source'] = nb.get_str()
-    result['project'] = {"id": nb.project_by_id,
-                         "name": nb.project_by, }
-
-    result['image'] = {"desc": "",
-                       "name": nb.image,
-                       "custom": nb.custom, }
-    result['creator'] = {"id": nb.created_by_id,
-                         "username": nb.created_by, }
-    result['hooks'] = result['storage']
-    result['grafana'] = {
-        'cpu': nb.cpu_url(COMMON),
-        'ram': nb.ram_url(COMMON),
-        'gpu': nb.gpu_url(COMMON),
-        'vram': nb.vram_url(COMMON),
-    }
-    result['ssh'] = {
-        "account": ACCOUNT,
-        "password": PASSWORD,
-        "address": nb.pod_ip,
-    }
+    result.update({
+        'source': nb.get_source(),
+        'project': {
+            'id': nb.project_by_id,
+            'name': nb.project_by,
+        },
+        'image': {
+            'desc': '',
+            'name': nb.image,
+            'custom': nb.custom,
+        },
+        'creator': {
+            'id': nb.created_by_id,
+            'username': nb.created_by,
+        },
+        'hooks': result['storage'],
+        'grafana': {
+            'cpu': nb.cpu_url(COMMON),
+            'ram': nb.ram_url(COMMON),
+            'gpu': nb.gpu_url(COMMON),
+            'vram': nb.vram_url(COMMON),
+        },
+        'ssh': {
+            'account': ACCOUNT,
+            'password': PASSWORD,
+            'address': nb.pod_ip,
+        },
+    })
     return result
 
 
@@ -93,7 +100,7 @@ async def get_volume_notebook(volume_id: int = Path(..., ge=1, description='需�
     note_ids = volume_note_dict.get(volume_id, [])
     if not note_ids:
         return []
-    note_map = {x.id: {"id": x.id, "name": x.name} for x in _notebook}
+    note_map = {x.id: {'id': x.id, 'name': x.name} for x in _notebook}
     result = [note_map[x] for x in note_ids]
     return result
 
@@ -104,10 +111,8 @@ async def get_volume_notebook(volume_id: int = Path(..., ge=1, description='需�
     response_model=List[NotebookSimple],
     response_model_exclude_unset=True
 )
-async def get_simple_notebook(request: Request,
-                              query_params: QueryParameters = Depends(QueryParameters), ):
+async def get_simple_notebook(query_params: QueryParameters = Depends(QueryParameters),):
     params_filter = query_params.filter_
-    authorization: str = request.headers.get('authorization')
 
     if params_filter:
         if 'creator_id' in params_filter:
@@ -119,37 +124,9 @@ async def get_simple_notebook(request: Request,
                 project_ids = [int(x) for x in project_ids.split(',')]
             params_filter['project_by_id__in'] = project_ids
 
-    project_list = await get_project_list(authorization)
-    res_proj_map = {x['id']: {'name': x['name'], "id": x['id']} for x in project_list}
-
     query = await Notebook.objects.select_related('status').filter(**params_filter).all()
-    # print(query)
-    res = []
 
-    for x in query:
-        item = dict(
-            id=x.id,
-            name=x.name,
-            created_at=x.created_at,
-            updated_at=x.updated_at,
-            status=x.status.name,
-            cpu=x.cpu,
-            memory=x.memory,
-            gpu=x.gpu,
-            namespace_name=x.namespace_name(),
-            pod_name=x.pod_name(),
-        )
-        item['creator'] = {
-            "id": int(x.created_by_id),
-            "username": x.created_by,
-        }
-        item['project'] = res_proj_map.get(x.project_by_id)
-        item['volume_ids'] = [y['storage']['id'] for y in x.storage]
-        note_config = [y['storage']['config'] for y in x.storage]
-        item['storage_value'] = sum([conf['value'] for conf in note_config])
-        item['storage_size'] = sum([conf['size'] for conf in note_config])
-        res.append(item)
-    return res
+    return [x.get_dict() for x in query]
 
 
 @router_notebook.get(
@@ -178,55 +155,17 @@ async def list_notebook(request: Request,
     :return:
     """
     params_filter = query_params.filter_
-    # print(params_filter)
     authorization: str = request.headers.get('authorization')
     role_name = request.user.role.name
-    # print(f"role_name: {role_name}")
 
     user_list = await get_user_list(authorization)
-    # print("user_list")
-    # print(user_list)
-    # 建立映射表
     id_proj_map = {x['id']: x['project_ids'] for x in user_list}
-    name_userid_map = defaultdict(list)
-    role_userid_map = defaultdict(list)
-    for x in user_list:
-        name_userid_map[x['username']].append(x['id'])
-        role_userid_map[x['role_name']].append(x['id'])
-    # print(role_userid_map)
-
-    project_list = await get_project_list(authorization)
-    # print("project_list")
-    # print(project_list)
-    code_id_map = {x['code']: x['id'] for x in project_list}
-    res_proj_map = {x['id']: {'name': x['name'], "id": x['id']} for x in project_list}
 
     # 用户可见项目
     if role_name != 'admin':
         viewable_project_ids = id_proj_map.get(request.user.id)
         params_filter['project_by_id__in'] = viewable_project_ids
         params_filter['created_by_id'] = request.user.id
-
-    if params_filter:
-        name_filter, role_filter, need_filter = {}, {}, False
-        if 'username' in params_filter:
-            name = params_filter.pop('username')
-            # name_filter = set(name_userid_map.get(name, []))
-            # need_filter = True
-        if 'project__code' in params_filter:
-            project_code = params_filter.pop('project__code')
-            params_filter['project_by_id'] = code_id_map.get(project_code)
-        if 'role__name' in params_filter:
-            role__name = params_filter.pop('role__name')
-            # role_filter = set(role_userid_map.get(role__name, []))
-            # need_filter = True
-        # if name_filter and role_filter:
-        #     params_filter['creator_id__in'] = list(name_filter.intersection(role_filter))
-        # elif need_filter:
-        #     params_filter['creator_id__in'] = list(name_filter or role_filter)
-    # todo 要修改合理的params_filter，不然会报错
-    # print("show filter")
-    # print(params_filter)
 
     result = await paginate(Notebook.objects.select_related(
         'status'
@@ -252,10 +191,10 @@ async def list_notebook(request: Request,
             'desc': "",
             # "custom": item['custom'],
         }
-
-        project_id = item.pop('project_by_id')
-        project_info = res_proj_map.get(project_id)
-        item['project'] = project_info
+        item['project'] = {
+            'id': int(item['project_by_id']),
+            'name': item['project_by'],
+        }
 
     return result
 
@@ -444,29 +383,21 @@ async def operate_notebook(request: Request,
     payloads = json.dumps(_notebook.k8s_info)
 
     # 数字，0（停止）｜1（启动）
-    # todo 状态还需要调整
     update_data = {}
     if action == 0:
         if _notebook.status.name not in ['start', 'running', 'pending']:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
         stat = await Status.objects.get(name='stop')
         update_data['status'] = stat.id
-        response = await delete_notebook_k8s(authorization, payloads)
+        await delete_notebook_k8s(authorization, payloads)
         await _notebook.update(**{"ended_at": datetime.datetime.now()})
-        # if response.status != 200:
-        #     _notebook.status = None
     else:
         if _notebook.status.name != 'stopped':
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
         stat = await Status.objects.get(name='start')
         update_data['status'] = stat.id
-        # todo response返回不为200时更新notebook状态到异常
-        response = await create_notebook_k8s(authorization, payloads)
+        await create_notebook_k8s(authorization, payloads)
         await _notebook.update(**{"started_at": datetime.datetime.now()})
-
-        # if response.status != 200:
-        #     _notebook.status = None
-    # print(response)
 
     if not update_data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
@@ -493,9 +424,7 @@ async def delete_notebook(request: Request,
     # error状态调用删除需要释放资源
     if _notebook.status.name == 'error':
         authorization: str = request.headers.get('authorization')
-        response = await delete_notebook_k8s(authorization, payloads)
-        # if response.status != 200:
-        #     _notebook.status = None
+        await delete_notebook_k8s(authorization, payloads)
     await _notebook.delete()
 
 
