@@ -98,6 +98,7 @@ class Volume(BaseModel):
     mount_path: str
     mount_propagation: Optional[str] = "HostToContainer"
 
+
 class VolcanoJobCreateReq(BaseModelValidatorName):
     namespace: str
     image: str
@@ -117,6 +118,7 @@ class VolcanoJobCreateReq(BaseModelValidatorName):
 class VolcanoJobDeleteReq(BaseModel):
     name: str
     namespace: str
+
 
 async def get_current_user(token: str) -> AccountGetter:
     if MOCK:
@@ -211,6 +213,7 @@ def delete_ns(ns: Namespace):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='删除namespace失败')
     return True
 
+
 def create_vcjob(vjc: VolcanoJobCreateReq, ignore_exist=False):
     try:
         # response = requests.post(f"http://127.0.0.1:8003/job", json=vjc.dict()).json()
@@ -222,6 +225,7 @@ def create_vcjob(vjc: VolcanoJobCreateReq, ignore_exist=False):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='创建vcjob失败')
     return True
 
+
 def delete_vcjob(vjd: VolcanoJobDeleteReq, ignore_no_found=False):
     try:
         response = requests.delete(f"http://{CLUSTER_SERVICE_URL}{CLUSTER_VCJOB_PREFIX_URL}", json=vjd.dict()).json()
@@ -231,6 +235,7 @@ def delete_vcjob(vjd: VolcanoJobDeleteReq, ignore_no_found=False):
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='删除vcjob失败')
     return True
+
 
 def query_notebook_volume(token: str, volume_id) -> List[Dict]:
     # http://{USER_SERVICE_URL}{PROJECT_PREFIX_URL}/{project_id}

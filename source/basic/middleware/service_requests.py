@@ -8,6 +8,9 @@
 
 import aiohttp
 
+import json
+
+from fastapi import HTTPException, status
 from typing import Optional, List, Set
 from pydantic import BaseModel, Field
 from basic.common.base_config import *
@@ -112,6 +115,54 @@ class JobInfo(BaseModel):
         }
 
 
+class PVCCreateReq(BaseModel):
+    name: str
+    namespace: str
+    size: str
+    # 对应环境
+    env: str = "dev"
+
+
+class Storage(BaseModel):
+    name: Optional[str]
+    id: int
+
+
+class HookItem(BaseModel):
+    storage: Storage
+    path: str
+
+
+class VolumeConfigInfo(BaseModel):
+    value: int
+    size: int
+
+    def vol_config(self):
+        return {
+            "value": self.value,
+            "size": self.size,
+        }
+
+
+class VolumeInfo(BaseModel):
+    id: int = Field(..., alias='volume_id')
+    name: str = Field(..., alias='volume_name')
+    creator_en_name: str = Field(..., alias='creator_en_name')
+    config: VolumeConfigInfo
+
+    class Config:
+        orm_mode = True
+        allow_population_by_field_name = True
+
+    def get_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'creator_en_name': self.creator_en_name,
+            'config': self.config.vol_config(),
+        }
+
+
 async def get_user_list(token):
     async with aiohttp.ClientSession() as session:
         url = f"http://{USER_SERVICE_URL}{USER_ITEMS_URL}"
@@ -190,3 +241,62 @@ async def get_job_list(token, filter_path=None):
                 job['project_id'] = job['project']['id']
                 res.append(JobInfo.parse_obj(job))
             return [x.get_dict() for x in res]
+
+
+async def create_pvc(pvc: PVCCreateReq, ignore_exist=False):
+    async with aiohttp.ClientSession() as session:
+        url = f"http://{CLUSTER_SERVICE_URL}{CLUSTER_PVC_PREFIX_URL}"
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        try:
+            async with session.post(url, headers=headers, data=json.dumps(pvc.dict())) as response:
+                # print("status:{}".format(response.status))
+                response = await response.json()
+                # print(response)
+                if ignore_exist and response["success"] is not True and response["message"] == "AlreadyExists":
+                    return True
+                assert response['success'] is True
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail='创建pvc失败, 请确认是否存在namespace， 或者pvc是否已经存在')
+        return True
+
+
+async def get_volume_list(token, page_no=1):
+    res = []
+    async with aiohttp.ClientSession() as session:
+        url = f"http://{STORAGE_SERVICE_URL}{VOLUME_PREFIX_URL}?pagesize=100&pageno={page_no}"
+        headers = {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+        }
+        async with session.get(url, headers=headers) as response:
+            # print("status:{}".format(response.status))
+            text = await response.json()
+            # print(text)
+            volume_data = text['result']['data']
+            for vol in volume_data:
+                vol['creator_en_name'] = vol['creator']['en_name']
+                res.append(VolumeInfo.parse_obj(vol))
+    return [x.get_dict() for x in res]
+
+
+async def volume_check(authorization: str, hooks: List[HookItem], namespace: str):
+    storages, volumes_k8s = [], []
+    if not hooks:
+        return storages, volumes_k8s
+    volume_list = await get_volume_list(authorization)
+    volume_map = {int(x['id']): x for x in volume_list}
+
+    for hook in hooks:
+        path = hook.path
+        volume_info = volume_map.get(int(hook.storage.id))
+        volume_k8s_name = f"{volume_info['creator_en_name']}-{volume_info['name']}"
+        volumes_k8s.append({'name': volume_k8s_name, 'mount_path': path})
+        storages.append({'storage': volume_info, 'path': path})
+        # 校验创建pvc
+        await create_pvc(PVCCreateReq(name=volume_k8s_name, namespace=namespace,
+                                      size=volume_info['config']['size'], env=ENV),
+                         ignore_exist=True)
+    return storages, volumes_k8s
