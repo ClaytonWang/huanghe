@@ -225,6 +225,8 @@ async def update_status(jsu: JobStatusUpdate,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Job不存在")
     st = Job.compare_status_and_update(jsu.status, sc)
     update_data = {"status": st}
+    if jsu.status in {"Failed", "Completed", "Terminated"}:
+        update_data.update({"ended_at": datetime.datetime.now()})
     if jsu.server_ip:
         update_data['server_ip'] = jsu.server_ip
     await j.update(**update_data)
@@ -282,6 +284,7 @@ async def update_job(request: Request,
                      'namespace': extra_info['en_name'],
                      'name': f"{request.user.en_name}-{_job.name}",
                      "command": [je.start_command],
+                     "work_dir": je.work_dir,
                      })
     update_data.update({"storage": json.dumps(storages),
                         "k8s_info": json.dumps(k8s_info),
@@ -320,9 +323,11 @@ async def operate_job(request: Request,
     if action == 0:
         update_data['status'] = sc.get('stopped')
         delete_vcjob(vjd=VolcanoJobDeleteReq.parse_raw(payloads), ignore_no_found=True)
+        await _job.update(**{"ended_at": datetime.datetime.now()})
     elif action == 1:
         update_data['status'] = sc.get('pending')
         create_vcjob(vjc=VolcanoJobCreateReq.parse_raw(payloads))
+        await _job.update(**{"started_at": datetime.datetime.now()})
 
     if not update_data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
