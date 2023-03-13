@@ -10,6 +10,7 @@ from __future__ import annotations
 import ormar
 from basic.common.base_model import DateModel, GenericDateModel
 from models import DB, META
+import time
 
 NOTEBOOK_STATUS_RUNNING = "RUNNING"
 NOTEBOOK_STATUS_PENDING = "PENDING"
@@ -80,21 +81,29 @@ class Notebook(GenericDateModel):
     host_ip: str = ormar.String(max_length=20, comment='所在的node ip', nullable=True)
     pod_ip: str = ormar.String(max_length=20, comment='所在的node ip', nullable=True)
 
+    @property
+    def start_time_timestamp(self):
+        return time.mktime(self.started_at.timetuple()) if self.started_at else time.time()
+
+    @property
+    def ended_time_timestamp(self):
+        return time.mktime(self.ended_at.timetuple()) if self.ended_at else time.time()
+
     def cpu_url(self, common: str):
-        return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&panelId=4"
+        return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&panelId=4&from={self.start_time_timestamp}&to={self.ended_time_timestamp}"
 
     def gpu_url(self, common: str):
         if self.gpu > 0:
-            return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&panelId=8"
+            return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&panelId=8&from={self.start_time_timestamp}&to={self.ended_time_timestamp}"
         else:
             return ""
 
     def ram_url(self, common: str):
-        return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&panelId=6"
+        return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&panelId=6&from={self.start_time_timestamp}&to={self.ended_time_timestamp}"
 
     def vram_url(self, common: str):
         if self.gpu > 0:
-            return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&panelId=12"
+            return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&panelId=12&from={self.start_time_timestamp}&to={self.ended_time_timestamp}"
         else:
             return ""
 
