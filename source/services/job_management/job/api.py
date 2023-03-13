@@ -282,6 +282,7 @@ async def update_job(request: Request,
                      'namespace': extra_info['en_name'],
                      'name': f"{request.user.en_name}-{_job.name}",
                      "command": [je.start_command],
+                     "work_dir": je.work_dir,
                      })
     update_data.update({"storage": json.dumps(storages),
                         "k8s_info": json.dumps(k8s_info),
