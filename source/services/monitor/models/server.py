@@ -44,7 +44,7 @@ class Server(OnlyPrimaryKeyModel):
     @classmethod
     def gen_server_pagation_response(cls, scr: ServerCreateReq):
         return {
-            "id": scr.id,
+            "id": cls.id,
             "status": scr.status,
             "server": scr.server_ip,
             "occupied_rate": cls.get_occupied_rate(scr),
