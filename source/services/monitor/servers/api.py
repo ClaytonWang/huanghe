@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends
-from servers.serializers import ServerCreateReq, NodeDetailRes
-from models.server import Server
+from services.monitor.models.server import Server
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 

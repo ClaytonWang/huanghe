@@ -14,7 +14,7 @@ class PodCreatedBy(BaseModel):
 
 
 class ServerCreateReq(BaseModel):
-    server_ip:str
+    server_ip: str
     server: str
     status: str
     cpu: int
