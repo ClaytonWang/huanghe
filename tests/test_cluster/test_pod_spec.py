@@ -14,8 +14,7 @@ def test_add_pvc_volume_and_volume_mount(pod_spec):
     volumes = [volume1,volume2]
     pod_spec.add_pvc_volume_and_volume_mount(volumes)
     print(pod_spec.volumes[0])
-    # assert pod_spec.volumes == {{'name': 'vol1', 'persistentVolumeClaim': {'claimName': 'vol1'}},
-    #                             {'name': 'vol2', 'persistentVolumeClaim': {'claimName': 'vol2'}}}
+
 
 
 def test_add_dshm(pod_spec):
