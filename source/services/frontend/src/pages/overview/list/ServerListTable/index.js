@@ -2,12 +2,12 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-14 13:53:37
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-24 15:55:07
+ * @LastEditTime: 2023-03-14 22:57:50
  * @FilePath: /huanghe/source/services/frontend/src/pages/overview/serverlist/ServerListTable/index.js
  * @Description: Server List Table
  */
 import { useSearchParams } from 'react-router-dom';
-import { Table, Tooltip } from 'antd';
+import { Table, Tooltip, Progress } from 'antd';
 import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons';
 import qs from 'qs';
 
@@ -50,7 +50,20 @@ const ServerListTable = ({
       dataIndex: 'occupiedRate',
       width: '20%',
       render(value) {
-        return value || '-';
+        const percent = parseInt(value * 100, 10);
+        return (
+          <div>
+            {percent <= 50 && (
+              <Progress steps={5} percent={percent} strokeColor="#05e087" />
+            )}
+            {percent > 50 && percent <= 80 && (
+              <Progress steps={5} percent={percent} strokeColor="#ffb511" />
+            )}
+            {percent > 80 && (
+              <Progress steps={5} percent={percent} strokeColor="#ff4538" />
+            )}
+          </div>
+        );
       },
     },
     {
