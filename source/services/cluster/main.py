@@ -12,6 +12,7 @@ from services.cluster.notebook.api import router_notebook
 from services.cluster.secret.api import router_secret
 from services.cluster.volcanojob.api import router_vcjob
 from services.cluster.server.api import router_server
+from services.cluster.deployment.api import router_deployment
 from starlette.middleware.base import BaseHTTPMiddleware
 from basic.middleware.exception import validation_pydantic_exception_handler
 from basic.middleware.rsp import add_common_response_data
@@ -38,6 +39,7 @@ app.include_router(router_secret, prefix='/secret')
 app.include_router(router_vcjob, prefix='/job')
 app.include_router(router_server, prefix='/server')
 app.include_router(router_pod, prefix='/pod')
+app.include_router(router_deployment, prefix='/deployment')
 
 app.add_middleware(BaseHTTPMiddleware, dispatch=add_common_response_data)
 
