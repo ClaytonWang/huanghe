@@ -1,7 +1,7 @@
 DEFAULT_NAMESPACE = "default"
 
 API_VERSION_V1 = "v1"
-
+DEPLOYMENT_KIND = "Deployment"
 NAMESPACE_KIND = "Namespace"
 POD_KIND = "Pod"
 PERSISTENT_VOLUME_CLAIM_KIND = "PersistentVolumeClaim"
