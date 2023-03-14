@@ -7,6 +7,8 @@
 """
 
 from __future__ import annotations
+
+import datetime
 import time
 
 import ormar
@@ -96,11 +98,14 @@ class Job(GenericDateModel):
 
     @property
     def start_time_timestamp(self):
-        return int(time.mktime(self.started_at.timetuple())) if self.started_at else int(time.time())
+        return int(time.mktime(self.started_at.utctimetuple())) if self.started_at \
+            else int(time.mktime(datetime.datetime.utcnow().utctimetuple()))
+
 
     @property
     def ended_time_timestamp(self):
-        return int(time.mktime(self.ended_at.timetuple())) if self.ended_at else int(time.time())
+        return int(time.mktime(self.ended_at.utctimetuple())) if self.ended_at \
+            else int(time.mktime(datetime.datetime.utcnow().utctimetuple()))
 
     @property
     def cpu_url(self):
