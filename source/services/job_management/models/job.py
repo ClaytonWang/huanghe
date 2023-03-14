@@ -96,11 +96,11 @@ class Job(GenericDateModel):
 
     @property
     def start_time_timestamp(self):
-        return time.mktime(self.started_at.timetuple()) if self.started_at else time.time()
+        return int(time.mktime(self.started_at.timetuple())) if self.started_at else int(time.time())
 
     @property
     def ended_time_timestamp(self):
-        return time.mktime(self.ended_at.timetuple()) if self.ended_at else time.time()
+        return int(time.mktime(self.ended_at.timetuple())) if self.ended_at else int(time.time())
 
     @property
     def cpu_url(self):
