@@ -11,7 +11,7 @@ router_deployment = APIRouter()
     description='创建notebook',
 )
 def create_notebook(dcr: DeploymentCreateReq):
-    cc.create_deployment(Deployment.parse_obj(dcr.gen_notebook_dict()))
+    cc.create_deployment(Deployment.parse_obj(dcr.gen_deployment_dict()))
     return success_common_response()
 
 

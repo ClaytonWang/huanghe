@@ -24,7 +24,7 @@ class DeploymentCreateReq(BaseModelValidatorName):
     tolerations: List[str] = []
     annotations: Dict = {}
 
-    def gen_notebook_dict(self):
+    def gen_deployment_dict(self):
         return {
             "name": self.name,
             "namespace": self.namespace,

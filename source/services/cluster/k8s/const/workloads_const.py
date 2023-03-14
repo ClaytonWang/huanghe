@@ -1,6 +1,7 @@
 DEFAULT_NAMESPACE = "default"
 
 API_VERSION_V1 = "v1"
+APPS_API_VERSION_V1 = "apps/v1"
 DEPLOYMENT_KIND = "Deployment"
 NAMESPACE_KIND = "Namespace"
 POD_KIND = "Pod"
