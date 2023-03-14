@@ -86,22 +86,6 @@ async def get_current_user_aio(token):
             return userinfo
 
 
-async def get_project(token, proj_id):
-    async with aiohttp.ClientSession() as session:
-        # url = USER_SERVICE_PATH + f"/project/{proj_id}"
-        # url = f"{ENV_COMMON_URL}{PROJECT_PREFIX_URL}/{proj_id}"
-        url = f"http://{USER_SERVICE_URL}{PROJECT_PREFIX_URL}/{proj_id}"
-        headers = {
-            'Authorization': token,
-            'Content-Type': 'application/json'
-        }
-        async with session.get(url, headers=headers) as response:
-            # print("status:{}".format(response.status))
-            text = await response.json()
-            # print(text)
-            return text['status'], text['result']
-
-
 async def project_check(request, project_id):
     if request.user.role.name != 'admin' and project_id not in request.user.project_ids:
         return False, '不是用户所属项目'
