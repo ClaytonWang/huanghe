@@ -10,8 +10,6 @@ import aiohttp
 import json
 
 from typing import Optional, List, Dict, Set
-# from config import USER_SERVICE_PATH
-from collections import defaultdict
 from pydantic import BaseModel, Field
 from config import *
 
@@ -85,47 +83,6 @@ async def get_current_user_aio(token):
             user_dict['project_ids'] = {x["id"] for x in projects}
             userinfo = UserInfo.parse_obj(user_dict)
             return userinfo
-
-
-async def get_user_list(token):
-    async with aiohttp.ClientSession() as session:
-        # url = USER_SERVICE_PATH + f"/user?pagesize=100&pageno={page_no}"
-        # url = f"{ENV_COMMON_URL}{USER_PREFIX_URL}/items"
-        url = f"http://{USER_SERVICE_URL}{USER_PREFIX_URL}/items"
-        headers = {
-            'Authorization': token,
-            'Content-Type': 'application/json'
-        }
-        async with session.get(url, headers=headers) as response:
-            # print("status:{}".format(response.status))
-            text = await response.json()
-            user_data = text['result']
-            res = []
-            for user in user_data:
-                projects = user.pop('projects')
-                user['project_ids'] = {x["id"] for x in projects}
-                res.append(UserInfo.parse_obj(user))
-            return [x.get_dict() for x in res]
-
-
-async def get_project_list(token):
-    async with aiohttp.ClientSession() as session:
-        # url = USER_SERVICE_PATH + f"/project?pagesize=100&pageno={page_no}"
-        # url = f"{ENV_COMMON_URL}{PROJECT_PREFIX_URL}/items"
-        url = f"http://{USER_SERVICE_URL}{PROJECT_PREFIX_URL}/items"
-        headers = {
-            'Authorization': token,
-            'Content-Type': 'application/json'
-        }
-        async with session.get(url, headers=headers) as response:
-            # print("status:{}".format(response.status))
-            text = await response.json()
-            # print(text)
-            proj_data = text['result']
-            res = []
-            for proj in proj_data:
-                res.append(ProjectInfo.parse_obj(proj))
-            return [x.get_dict() for x in res]
 
 
 async def get_project(token, proj_id):
