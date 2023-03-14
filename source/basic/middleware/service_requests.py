@@ -163,7 +163,20 @@ class VolumeInfo(BaseModel):
         }
 
 
+class SourceInfo(BaseModel):
+    id: int
+    name: str
+
+
 async def get_user_list(token):
+    """
+    获取用户全量列表
+    Args:
+        token:
+
+    Returns:
+
+    """
     async with aiohttp.ClientSession() as session:
         url = f"http://{USER_SERVICE_URL}{USER_ITEMS_URL}"
         headers = {
@@ -183,6 +196,14 @@ async def get_user_list(token):
 
 
 async def get_project_list(token):
+    """
+    获取项目全量列表
+    Args:
+        token:
+
+    Returns:
+
+    """
     async with aiohttp.ClientSession() as session:
         url = f"http://{USER_SERVICE_URL}{PROJECT_ITEMS_URL}"
         headers = {
@@ -201,6 +222,15 @@ async def get_project_list(token):
 
 
 async def get_notebook_list(token, filter_path=None):
+    """
+    获取notebook全量列表
+    Args:
+        token:
+        filter_path:
+
+    Returns:
+
+    """
     async with aiohttp.ClientSession() as session:
         url = f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_ITEMS_URL}"
         headers = {
@@ -222,6 +252,15 @@ async def get_notebook_list(token, filter_path=None):
 
 
 async def get_job_list(token, filter_path=None):
+    """
+    获取job全量列表
+    Args:
+        token:
+        filter_path:
+
+    Returns:
+
+    """
     async with aiohttp.ClientSession() as session:
         url = f"http://{JOB_SERVICE_URL}{JOB_ITEMS_URL}"
         headers = {
@@ -244,6 +283,15 @@ async def get_job_list(token, filter_path=None):
 
 
 async def create_pvc(pvc: PVCCreateReq, ignore_exist=False):
+    """
+    创建pvc
+    Args:
+        pvc:
+        ignore_exist:
+
+    Returns:
+
+    """
     async with aiohttp.ClientSession() as session:
         url = f"http://{CLUSTER_SERVICE_URL}{CLUSTER_PVC_PREFIX_URL}"
         headers = {
@@ -264,6 +312,15 @@ async def create_pvc(pvc: PVCCreateReq, ignore_exist=False):
 
 
 async def get_volume_list(token, page_no=1):
+    """
+    获取存储卷列表
+    Args:
+        token:
+        page_no:
+
+    Returns:
+
+    """
     res = []
     async with aiohttp.ClientSession() as session:
         url = f"http://{STORAGE_SERVICE_URL}{VOLUME_PREFIX_URL}?pagesize=100&pageno={page_no}"
@@ -283,6 +340,16 @@ async def get_volume_list(token, page_no=1):
 
 
 async def volume_check(authorization: str, hooks: List[HookItem], namespace: str):
+    """
+    存储卷校验
+    Args:
+        authorization:
+        hooks:
+        namespace:
+
+    Returns:
+
+    """
     storages, volumes_k8s = [], []
     if not hooks:
         return storages, volumes_k8s
@@ -300,3 +367,71 @@ async def volume_check(authorization: str, hooks: List[HookItem], namespace: str
                                       size=volume_info['config']['size'], env=ENV),
                          ignore_exist=True)
     return storages, volumes_k8s
+
+
+async def get_project(token, proj_id):
+    """
+    获取单个project信息
+    Args:
+        token:
+        proj_id:
+
+    Returns:
+
+    """
+    async with aiohttp.ClientSession() as session:
+        url = f"http://{USER_SERVICE_URL}{PROJECT_PREFIX_URL}/{proj_id}"
+        headers = {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+        }
+        async with session.get(url, headers=headers) as response:
+            # print("status:{}".format(response.status))
+            text = await response.json()
+            # print(text)
+            return text['status'], text['result']
+
+
+async def get_source_list(token):
+    """
+    获取资源列表
+    Args:
+        token:
+
+    Returns:
+
+    """
+    async with aiohttp.ClientSession() as session:
+        url = f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_SOURCE_PREFIX_URL}"
+        headers = {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+        }
+        async with session.get(url, headers=headers) as response:
+            # print("status:{}".format(response.status))
+            text = await response.json()
+            result = text['result']
+            return result
+
+
+async def get_image_list(token):
+    """
+    获取镜像列表
+    Args:
+        token:
+
+    Returns:
+
+    """
+    async with aiohttp.ClientSession() as session:
+        url = f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_IMAGE_PREFIX_URL}"
+        headers = {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+        }
+        async with session.get(url, headers=headers) as response:
+            # print("status:{}".format(response.status))
+            text = await response.json()
+            result = text['result']
+            # print(job_data)
+            return result

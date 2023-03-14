@@ -23,7 +23,7 @@ from basic.utils.log import configure_logging
 from basic.common.initdb import startup_event, shutdown_event
 from job.api import router_job
 from basic.middleware.account_getter import verify_token
-from utils.notebook_request import get_source_list, get_image_list
+from basic.middleware.service_requests import get_source_list, get_image_list
 
 
 configure_logging('logging.config.dictConfig', LOGGING)
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     from multiprocessing import cpu_count
     print("cpu_count: ", cpu_count())
     service_port = get_integer_variable('JOB_SERVICE_PORT', SERVICE_PORT)
-    debug = False if 'PRODUCTION' == get_string_variable('ENV', 'DEV') else DEBUG
+    debug = False if 'PRODUCTION' == get_string_variable('ENV', 'DEV') else True
 
     # -workers INTEGER
     # Number of worker processes. Defaults to the $WEB_CONCURRENCY environment variable if available, or 1.

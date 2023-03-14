@@ -11,7 +11,6 @@ import sys
 import yaml
 import importlib
 from pathlib import Path
-from basic.common.env_variable import get_string_variable
 
 
 """
@@ -44,7 +43,7 @@ DO_NOT_AUTH_URI = ['/auth/login', '/docs', '/openapi', '/openapi.json']
 NO_AUTH_WORDS = ['events', "status_update", "project_backend", "by_server"]
 
 
-debug = False if 'PRODUCTION' == get_string_variable('ENV', 'DEV') else True
+DEBUG = True
 
 """
 加载服务器配置

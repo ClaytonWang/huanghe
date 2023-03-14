@@ -21,34 +21,14 @@ from job.serializers import JobCreate, JobDetail, JobList, JobEdit, \
     JobOp, EventItem, EventCreate, JobStatusUpdate, JobSimple
 from services.job_management.models.job import Job
 from utils.auth import operate_auth
-from utils.storage_request import volume_check
+from basic.middleware.service_requests import volume_check
 from utils.user_request import project_check, project_check_obj
-from basic.middleware.account_getter import ADMIN
+from basic.common.base_config import ADMIN, ENV
 from basic.common.event_model import Event
 from basic.common.status_cache import sc
-from basic.common.base_config import ENV
 
 router_job = APIRouter()
 
-
-#
-# @router_job.get(
-#     '/volume/{volume_id}',
-#     description='存储-job列表',
-# )
-# async def get_volume_job(volume_id: int = Path(..., ge=1, description='需要查询的存储 ID')):
-#     _job = await Job.objects.all()
-#     storage_list = [(x.storage, x.id) for x in _job]
-#     volume_note_dict = defaultdict(set)
-#     for storage, job_id in storage_list:
-#         for x in storage:
-#             volume_note_dict[x['storage']['id']].add(job_id)
-#     note_ids = volume_note_dict.get(volume_id, [])
-#     if not note_ids:
-#         return []
-#     note_map = {x.id: {"id": x.id, "name": x.name} for x in _job}
-#     result = [note_map[x] for x in note_ids]
-#     return result
 
 @router_job.get(
     '/project_backend/{project_id}',
@@ -93,7 +73,6 @@ async def get_simple_job(request: Request,
             if isinstance(project_ids, str):
                 project_ids = [int(x) for x in project_ids.split(',')]
             params_filter['project_by_id__in'] = project_ids
-    # print(params_filter)
 
     if user.role.name == ADMIN:
         jobs = await Job.all_jobs()
