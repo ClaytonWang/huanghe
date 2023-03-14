@@ -57,16 +57,16 @@ class Server(OnlyPrimaryKeyModel):
         if (self.type != "cpu" and (self.occupied_gpu / self.gpu) <= res) or (self.type == "cpu"):
             if self.occupied_cpu / self.cpu >= self.occupied_memory / self.memory:
                 if self.occupied_cpu == 0:
-                    return "0"
+                    return 0.00
                 else:
-                    return f"{self.occupied_cpu}/{self.cpu}"
+                    return round(int(self.occupied_cpu)/int(self.cpu),2)
             else:
                 if self.occupied_memory == 0:
-                    return "0"
+                    return 0.00
                 else:
-                    return f"{self.occupied_memory}/{self.memory}"
+                    return round(int(self.occupied_memory) / int(self.memory), 2)
         else:
-            return f"{self.occupied_gpu}/{self.gpu}"
+            return round(int(self.occupied_gpu) / int(self.gpu), 2)
 
     @classmethod
     async def create_node_database(self, scr: ServerCreateReq):
