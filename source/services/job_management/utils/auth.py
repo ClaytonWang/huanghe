@@ -6,43 +6,9 @@
     >Time   : 2022/12/20 17:42
 """
 
-from fastapi import Request, Response, status
-from config import DO_NOT_AUTH_URI
-from jose.jwt import JWTError
-from utils.user_request import get_current_user_aio, get_project
+from fastapi import Request
+from basic.middleware.service_requests import get_project
 from services.job_management.models.job import Job
-
-async def verify_token(request: Request, call_next):
-    auth_error = Response(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        content="Invalid authentication credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
-    path: str = request.get('path')
-    # 登录接口、docs文档依赖的接口，不做token校验
-    if path in DO_NOT_AUTH_URI:
-        return await call_next(request)
-    else:
-        try:
-            # 从header读取token
-            authorization: str = request.headers.get('authorization')
-            # print("that's it token")
-            # print(authorization)
-            if not authorization:
-                return auth_error
-
-            userinfo = await get_current_user_aio(authorization)
-            # print(type(userinfo))
-            # print(userinfo)
-
-            if userinfo:
-                request.scope['user'] = userinfo
-            else:
-                return auth_error
-            return await call_next(request)
-        except JWTError:
-            return auth_error
 
 
 async def operate_auth(request: Request, job_id: int):
