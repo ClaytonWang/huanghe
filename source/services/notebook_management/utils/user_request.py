@@ -11,6 +11,7 @@ import json
 
 from typing import Optional, List, Dict, Set
 from pydantic import BaseModel, Field
+from basic.middleware.service_requests import get_project
 from config import *
 
 

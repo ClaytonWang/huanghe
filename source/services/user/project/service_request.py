@@ -15,7 +15,7 @@ from typing import Optional, List, Dict, Set
 from collections import defaultdict
 from datetime import datetime
 from pydantic import BaseModel, Field
-from basic.config.user import *
+from config import *
 
 
 class NotebookInfo(BaseModel):
