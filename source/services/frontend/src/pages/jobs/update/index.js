@@ -372,9 +372,18 @@ const JobsUpdate = () => {
             defaultValue={value?.name}
             onChange={onSelectChange}
           >
-            {imagesDatasource.map(({ id, name }) => (
+            {imagesDatasource.map(({ id, name, desc }) => (
               <Option key={id} value={name}>
-                <Tooltip title={name}>{name}</Tooltip>
+                <Tooltip
+                  title={
+                    <div>
+                      <p>镜像名称: {name}</p>
+                      <p>说明: {desc}</p>
+                    </div>
+                  }
+                >
+                  {name}
+                </Tooltip>
               </Option>
             ))}
           </Select>
