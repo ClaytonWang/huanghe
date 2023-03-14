@@ -15,7 +15,8 @@ class DeploymentMixin(AppsV1Api):
         return self.apps_v1_api.create_namespaced_deployment(namespace=d.namespace,
                                                              body=V1Deployment.default(name=d.name,
                                                                                        namespace=d.namespace,
-                                                                                       image=d.image))
+                                                                                       image=d.image,
+                                                                                       labels=d.labels))
 
     def delete_deployment(self, ddr: DeploymentDeleteReq) -> V1Status:
         return self.apps_v1_api.delete_namespaced_deployment(name=ddr.name,
