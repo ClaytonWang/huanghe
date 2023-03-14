@@ -113,11 +113,37 @@ class Notebook(GenericDateModel):
     def pod_name(self):
         return f"{self.k8s_info.get('name')}-0"
 
-    def get_str(self):
+    def get_source(self):
         if self.gpu:
             return f"GPU {self.gpu}*{self.type} {self.cpu}C {self.memory}G"
         else:
             return f"CPU {self.cpu}C {self.memory}G"
+
+    def get_dict(self):
+        note_config = [y['storage']['config'] for y in self.storage]
+        return dict(
+            id=self.id,
+            name=self.name,
+            created_at=self.created_at,
+            updated_at=self.updated_at,
+            status=self.status.name,
+            cpu=self.cpu,
+            memory=self.memory,
+            gpu=self.gpu,
+            namespace_name=self.namespace_name(),
+            pod_name=self.pod_name(),
+            creator=dict(
+                id=int(self.created_by_id),
+                username=self.created_by,
+            ),
+            project=dict(
+                id=int(self.project_by_id),
+                name=self.project_by,
+            ),
+            volume_ids=[y['storage']['id'] for y in self.storage],
+            storage_value=sum([conf['value'] for conf in note_config]),
+            storage_size=sum([conf['size'] for conf in note_config]),
+        )
 
     @classmethod
     def compare_status_and_update(cls, nb: Notebook, status: str, status_dic):
