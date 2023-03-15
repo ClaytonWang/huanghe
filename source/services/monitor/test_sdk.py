@@ -62,7 +62,6 @@ if __name__ == "__main__":
 
         )
         response = client.list_sample(request)
-        print("``````````````````")
         print(response)
         print("``````````````````")
     except exceptions.ClientRequestException as e:
