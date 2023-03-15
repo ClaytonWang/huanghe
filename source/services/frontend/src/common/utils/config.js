@@ -65,9 +65,14 @@ module.exports = {
     jobDetailEvent: 'get|/job/jobs/:id/events',
     jobSourceList: 'get|/job/source',
     jobImageList: 'get|/job/image',
+    jobStartModes: 'get|/job/startmodes',
 
     // services
     servicesList: 'get|/service/services',
+    servicesListCreate: 'post|/service/services',
+    servicesListUpdate: 'put|/service/services/:id',
+    servicesDetail: 'get|/service/services/:id',
+    servicesDetailMonitor: 'get|/service/services/:id/monitor',
 
     imagesList: 'get|/notebook/image',
     sourceList: 'get|/notebook/source',
