@@ -34,12 +34,17 @@ class V1Alpha1VolcanoJobTask(GenericMixin):
     }
 
     @classmethod
-    def default(cls, name, image, resource, envs, volumes, tolerations, command, working_dir):
+    def default(cls, name, image, resource, envs, volumes, tolerations, command, working_dir, task_num):
         return cls.new(
-            template=V1Alpha1VolcanoJobTaskTemplate.default(name=name, image=image, resource=resource, envs=envs,
+            template=V1Alpha1VolcanoJobTaskTemplate.default(name=name,
+                                                            image=image,
+                                                            resource=resource,
+                                                            envs=envs,
                                                             volumes=volumes,
-                                                            tolerations=tolerations, command=command,
-                                                            working_dir=working_dir))
+                                                            tolerations=tolerations,
+                                                            command=command,
+                                                            working_dir=working_dir),
+            replicas=task_num)
 
     @staticmethod
     def new(template, name: str = VOLCANO_TASK_DEFAULT_NAME, replicas: int = VOLCANO_TASK_REPLICAS):

@@ -1,8 +1,9 @@
 from __future__ import annotations
 from services.cluster.k8s.model.generic_mixin import GenericMixin
 from services.cluster.k8s.model.v1_alpha1_volcano_job_task import V1Alpha1VolcanoJobTask
-from typing import List, Optional
-from services.cluster.k8s.const.crd_kubeflow_const import VOLCANO_DEFAULT_QUEUE, VOLCANO_DEFAULT_MAX_RETRY, VOLCANO_DEFAULT_MIN_AVAILABLE
+from typing import List, Optional, Dict
+from services.cluster.k8s.const.crd_kubeflow_const import VOLCANO_DEFAULT_QUEUE, VOLCANO_DEFAULT_MAX_RETRY, \
+    VOLCANO_DEFAULT_MIN_AVAILABLE, TENSORFLOW_PLUGIN, PYTORCH_PLUGIN, TENSORFLOW_MODE, PYTORCH_MODE
 
 
 class V1Alpha1VolcanoJobSpec(GenericMixin):
@@ -26,6 +27,7 @@ class V1Alpha1VolcanoJobSpec(GenericMixin):
     max_retry: Optional[int]
     queue: Optional[str]
     tasks: List[V1Alpha1VolcanoJobTask]
+    plugins: Optional[Dict[str, List]]
 
     openapi_types = {
         "min_available": 'int',
@@ -34,6 +36,7 @@ class V1Alpha1VolcanoJobSpec(GenericMixin):
         "policies": "str",
         "max_retry": "int",
         "queue": "str",
+        "plugins": "Dict",
         "tasks": "List[V1Alpha1VolcanoJobTask]",
     }
     attribute_map = {
@@ -43,7 +46,8 @@ class V1Alpha1VolcanoJobSpec(GenericMixin):
         "policies": "policies",
         "max_retry": "maxRetry",
         "queue": "queue",
-        "tasks": "tasks"
+        "tasks": "tasks",
+        "plugins": "plugins",
     }
 
     def set_scheduler(self, scheduler_name):
@@ -62,13 +66,30 @@ class V1Alpha1VolcanoJobSpec(GenericMixin):
         self.max_retry = max_retry
         return self
 
+    def _set_plugins(self, plugins):
+        self.plugins = plugins
+        return self
+
+    def set_tensorflow_plugin(self):
+        self._set_plugins(TENSORFLOW_PLUGIN)
+
+    def set_pytorch_plugin(self):
+        self._set_plugins(PYTORCH_PLUGIN)
+
+    def find_mode(self, mode: str):
+        if TENSORFLOW_MODE == mode:
+            self.set_tensorflow_plugin()
+        elif PYTORCH_MODE == mode:
+            self.set_pytorch_plugin()
+        return self
+
     @classmethod
-    def default(cls, name, image, resource, envs, volumes, tolerations, command, working_dir):
+    def default(cls, name, image, resource, envs, volumes, tolerations, command, working_dir, task_num, mode):
         spec = cls.new([V1Alpha1VolcanoJobTask.default(name=name, image=image, resource=resource, envs=envs,
                                                        volumes=volumes, tolerations=tolerations, command=command,
-                                                       working_dir=working_dir)])
+                                                       working_dir=working_dir, task_num=task_num)])
         spec.set_queue(VOLCANO_DEFAULT_QUEUE).set_max_retry(VOLCANO_DEFAULT_MAX_RETRY).set_min_available(
-            VOLCANO_DEFAULT_MIN_AVAILABLE)
+            VOLCANO_DEFAULT_MIN_AVAILABLE).find_mode(mode)
         return spec
 
     @staticmethod
