@@ -8,3 +8,4 @@ WORKDIR /source/services/monitor
 # python dependence
 COPY ./monitor/requirements.txt .
 RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip install huaweicloudsdkaom
