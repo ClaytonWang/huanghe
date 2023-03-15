@@ -31,3 +31,9 @@ VOLCANO_TASK_REPLICAS = 1
 VOLCANO_TASK_DEFAULT_NAME = "tfjob"
 
 ISTIO_DISABLE_INJECT_ANNOTATION = {"sidecar.istio.io/inject": "false"}
+
+HUAWEICLOUD_GPU_NAMESPACE_ANNOTATION = {"namespace.kubernetes.io/flavor": "gpu-accelerated"}
+
+HUAWEICLOUD_CPU_NAMESPACE_ANNOTATION = {"namespace.kubernetes.io/flavor": "general-computing"}
+
+HUAWEICLOUD_ENTERPRISE_PROJECT_LABEL = "sys_enterprise_project_id"
