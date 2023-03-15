@@ -36,12 +36,9 @@ class PodInfoByServer(BaseModel):
 
 async def get_notebook_job_list_by_server(server_ip):
     res = []
-    # response = requests.get(f"http://127.0.0.1:8012/notebooks/by_server/{server_ip}",
-    #                         headers={'Content-Type': 'application/json'})
     response = requests.get(f"http://{NOTEBOOK_SERVICE_URL}{NOTEBOOK_PREFIX_URL}/by_server/{server_ip}",
                             headers={'Content-Type': 'application/json'})
     text_notebook = response.json()
-    print(text_notebook)
     notebook_data = text_notebook['result']
     for note in notebook_data:
         print("``````````")
