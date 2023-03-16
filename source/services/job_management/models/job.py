@@ -15,6 +15,7 @@ import ormar
 from basic.config.job_management import WEBKUBECTL_URL
 from basic.common.base_model import GenericDateModel
 from basic.common.status_cache import Status
+from services.job_management.models.mode import Mode
 from basic.common.initdb import DB, META
 
 # 状态
@@ -57,6 +58,8 @@ class Job(GenericDateModel):
     image: str = ormar.String(max_length=150, comment='镜像名称')
 
     status: Status = ormar.ForeignKey(Status, related_name='job_status')
+    start_mode: Mode = ormar.ForeignKey(Mode, related_name='job_start_mode')
+    nodes: int = ormar.Integer(comment='任务节点数量')
     work_dir: str = ormar.String(max_length=100, comment='工作目录', nullable=True)
     k8s_info: dict = ormar.JSON(comment="集群信息")
 
@@ -208,6 +211,11 @@ class Job(GenericDateModel):
             "url": self.webkubectl,
             "logging_url": self.logging_url,
             "work_dir": self.work_dir,
+            "start_mode": {
+                "id": self.start_mode.id,
+                "name": self.start_mode.name,
+            },
+            "nodes": self.nodes,
         }
 
     @classmethod
