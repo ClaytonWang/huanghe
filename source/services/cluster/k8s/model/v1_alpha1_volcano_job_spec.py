@@ -3,7 +3,8 @@ from services.cluster.k8s.model.generic_mixin import GenericMixin
 from services.cluster.k8s.model.v1_alpha1_volcano_job_task import V1Alpha1VolcanoJobTask
 from typing import List, Optional, Dict
 from services.cluster.k8s.const.crd_kubeflow_const import VOLCANO_DEFAULT_QUEUE, VOLCANO_DEFAULT_MAX_RETRY, \
-    VOLCANO_DEFAULT_MIN_AVAILABLE, TENSORFLOW_PLUGIN, PYTORCH_PLUGIN, TENSORFLOW_MODE, PYTORCH_MODE
+    VOLCANO_DEFAULT_MIN_AVAILABLE, TENSORFLOW_PLUGIN, PYTORCH_PLUGIN, MPI_PLUGIN, \
+    TENSORFLOW_MODE, PYTORCH_MODE, MPI_MODE, POLICY_TASK_COMPLETED_EVENT_TO_COMPLETE_JOB_ACTION
 
 
 class V1Alpha1VolcanoJobSpec(GenericMixin):
@@ -66,6 +67,15 @@ class V1Alpha1VolcanoJobSpec(GenericMixin):
         self.max_retry = max_retry
         return self
 
+    def _set_policy(self, policy):
+        if not self.policies:
+            self.policies = []
+        self.policies.extend([policy])
+        return self
+
+    def set_task_complete_event_complete(self):
+        return self._set_policy(POLICY_TASK_COMPLETED_EVENT_TO_COMPLETE_JOB_ACTION)
+
     def _set_plugins(self, plugins):
         self.plugins = plugins
         return self
@@ -76,21 +86,54 @@ class V1Alpha1VolcanoJobSpec(GenericMixin):
     def set_pytorch_plugin(self):
         self._set_plugins(PYTORCH_PLUGIN)
 
-    def find_mode(self, mode: str):
-        if TENSORFLOW_MODE == mode:
+    def set_mpi_plugin(self):
+        self._set_plugins(MPI_PLUGIN)
+
+    def set_plugins(self, mode: str):
+        if mode == TENSORFLOW_MODE:
             self.set_tensorflow_plugin()
-        elif PYTORCH_MODE == mode:
+        elif mode == PYTORCH_MODE:
             self.set_pytorch_plugin()
+        elif mode == MPI_MODE:
+            self.set_mpi_plugin()
         return self
 
     @classmethod
+    def generate_tasks(cls, name, image, resource, envs, volumes, tolerations, command, working_dir, task_num, mode):
+        if mode == MPI_MODE:
+            return cls.mpi(name, image, resource, envs, volumes, tolerations, command, working_dir, task_num)
+        return cls.single(name, image, resource, envs, volumes, tolerations, command, working_dir, task_num)
+
+
+    @classmethod
     def default(cls, name, image, resource, envs, volumes, tolerations, command, working_dir, task_num, mode):
-        spec = cls.new([V1Alpha1VolcanoJobTask.default(name=name, image=image, resource=resource, envs=envs,
+        spec = cls.generate_tasks(name, image, resource, envs, volumes, tolerations, command, working_dir, task_num, mode)
+        spec.set_queue(VOLCANO_DEFAULT_QUEUE).set_max_retry(VOLCANO_DEFAULT_MAX_RETRY).set_min_available(
+            VOLCANO_DEFAULT_MIN_AVAILABLE).set_plugins(mode).set_task_complete_event_complete()
+        return spec
+
+    @classmethod
+    def tensorflow(cls):
+        pass
+
+    @classmethod
+    def pytorch(cls):
+        pass
+
+    @classmethod
+    def mpi(cls, name, image, resource, envs, volumes, tolerations, command, working_dir, task_num):
+        return cls.new([V1Alpha1VolcanoJobTask.master(name=name, image=image, resource=resource, envs=envs,
+                                                       volumes=volumes, tolerations=tolerations, command=["sleep 5; mkdir -p /var/run/sshd; /usr/sbin/sshd; mpiexec --allow-run-as-root --hostfile /etc/volcano/mpiworker.host -np 2 mpi_hello_world > /home/re"],
+                                                       working_dir=working_dir, task_num=1),
+                        V1Alpha1VolcanoJobTask.worker(name=name, image=image, resource=resource, envs=envs,
+                                                       volumes=volumes, tolerations=tolerations, command=["mkdir -p /var/run/sshd; /usr/sbin/sshd -D"],
+                                                       working_dir=working_dir, task_num=task_num-1)])
+
+    @classmethod
+    def single(cls, name, image, resource, envs, volumes, tolerations, command, working_dir, task_num):
+        return cls.new([V1Alpha1VolcanoJobTask.default(name=name, image=image, resource=resource, envs=envs,
                                                        volumes=volumes, tolerations=tolerations, command=command,
                                                        working_dir=working_dir, task_num=task_num)])
-        spec.set_queue(VOLCANO_DEFAULT_QUEUE).set_max_retry(VOLCANO_DEFAULT_MAX_RETRY).set_min_available(
-            VOLCANO_DEFAULT_MIN_AVAILABLE).find_mode(mode)
-        return spec
 
     @staticmethod
     def new(tasks: List[V1Alpha1VolcanoJobTask], min_available: Optional[int] = None,
