@@ -56,7 +56,7 @@ async def list_job_by_project(project_id: int = Path(..., ge=1, description='需
     '/by_server/{server_ip}',
     description='通过节点IP查询job',
 )
-async def list_nb_by_server(server_ip: int = Path(..., description='需要查询项目的server_ip')):
+async def list_nb_by_server(server_ip: str = Path(..., description='需要查询项目的server_ip')):
     return await Job.project_list_by_ip(server_ip)
 
 
