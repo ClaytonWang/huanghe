@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-03-03 15:51:48
+ * @LastEditTime: 2023-03-16 14:40:20
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -35,6 +35,7 @@ import {
   purifyDeep,
   transformDate,
   getStatusName,
+  join,
 } from '@/common/utils/helper';
 import api from '@/common/api';
 import qs from 'qs';
@@ -345,15 +346,21 @@ const JobDetail = () => {
               >
                 存储挂载：
                 <Tooltip
-                  title={(() =>
-                    detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
+                  title={join(
+                    detailData?.hooks,
+                    '\n',
+                    (v) =>
+                      `挂载盘：${v?.storage?.name}\n路径：${v?.path}` || '-'
+                  )}
                 >
-                  {(() =>
-                    detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
+                  {join(detailData?.hooks, ',', (v) => v?.storage?.name || '-')}
                 </Tooltip>
               </Col>
               <Col span={6} title={detailData?.mode}>
                 任务模式：{detailData?.mode}
+              </Col>
+              <Col span={6} title={detailData?.startMode?.name}>
+                启动方式：{detailData?.startMode?.name}
               </Col>
               <Col span={6} title={detailData?.image?.name}>
                 <Tooltip title={detailData?.image?.name}>
@@ -369,8 +376,14 @@ const JobDetail = () => {
                   </Typography.Text>
                 </Tooltip>
               </Col>
+              <Col span={6} title={detailData?.workDir}>
+                工作路径：{detailData?.workDir}
+              </Col>
               <Col span={6} title={detailData?.source}>
                 资源规格：{detailData?.source}
+              </Col>
+              <Col span={6} title={detailData?.nodes}>
+                节点数量：{detailData?.nodes}
               </Col>
               <Col span={6} title={detailData?.creator?.username}>
                 创建人：{detailData?.creator?.username}

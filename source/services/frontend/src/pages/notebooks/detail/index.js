@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-03-03 15:51:39
+ * @LastEditTime: 2023-03-16 14:45:58
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
@@ -27,7 +27,7 @@ import Icon, { InfoCircleOutlined } from '@ant-design/icons';
 import { ChartMonitor, EventMonitor, AuthButton } from '@/common/components';
 import { get } from 'lodash';
 
-import { purifyDeep, transformDate } from '@/common/utils/helper';
+import { join, purifyDeep, transformDate } from '@/common/utils/helper';
 import api from '@/common/api';
 import qs from 'qs';
 import { NOTEBOOK_ACTION, START, STOP, UPDATE } from '@/common/constants';
@@ -312,12 +312,14 @@ const NotebookDetail = () => {
               </Col>
               <Col
                 span={6}
-                title={(() =>
-                  detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
+                title={join(
+                  detailData?.hooks,
+                  '\n',
+                  (v) => `挂载盘：${v?.storage?.name}\n路径：${v?.path}` || '-'
+                )}
               >
                 存储挂载：
-                {(() =>
-                  detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
+                {join(detailData?.hooks, ',', (v) => v?.storage?.name || '-')}
               </Col>
               <Col span={6} title={detailData?.image?.name}>
                 <Tooltip title={detailData?.image?.name}>
