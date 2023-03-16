@@ -30,13 +30,23 @@ VOLCANO_TASK_REPLICAS = 1
 
 VOLCANO_TASK_DEFAULT_NAME = "tfjob"
 
+VOLCANO_TASK_MASTER_NAME = "master"
+
+VOLCANO_TASK_WORKER_NAME = "worker"
+
 TENSORFLOW_PLUGIN = {"tensorflow": ["--port=5000", "--worker=worker", "--ps=ps"]}
 
-PYTORCH_PLUGIN = {"pytorch": ["--master=master","--worker=worker","--port=23456"]}
+PYTORCH_PLUGIN = {"pytorch": ["--master=master","--worker=worker", "--port=23456"]}
+
+MPI_PLUGIN = {"mpi": ["--master=master", "--worker=worker", "--port=22"]}
 
 TENSORFLOW_MODE = "tensorflow"
 
 PYTORCH_MODE = "pytorch"
+
+MPI_MODE = "mpi"
+
+POLICY_TASK_COMPLETED_EVENT_TO_COMPLETE_JOB_ACTION = {"action": "CompleteJob", "event": "TaskCompleted"}
 
 ISTIO_DISABLE_INJECT_ANNOTATION = {"sidecar.istio.io/inject": "false"}
 
