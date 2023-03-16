@@ -17,18 +17,25 @@ from basic.utils.source import source_convert
 from basic.common.query_filter_params import QueryParameters
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project, create_vcjob, \
     delete_vcjob, VolcanoJobCreateReq, VolcanoJobDeleteReq
-from job.serializers import JobCreate, JobDetail, JobList, JobEdit, \
+from services.job_management.job.serializers import JobCreate, JobDetail, JobList, JobEdit, \
     JobOp, EventItem, EventCreate, JobStatusUpdate, JobSimple
 from services.job_management.models.job import Job
-from utils.auth import operate_auth
+from services.job_management.models.mode import Mode
+from services.job_management.utils.auth import operate_auth
 from basic.middleware.service_requests import volume_check
-from utils.user_request import project_check, project_check_obj
+from services.job_management.utils.user_request import project_check, project_check_obj
 from basic.common.base_config import ADMIN, ENV
 from basic.common.event_model import Event
 from basic.common.status_cache import sc
 
 router_job = APIRouter()
 
+@router_job.get(
+    '/startmodes',
+    description="任务启动方式"
+)
+async def list_modes():
+    return await Mode.mode_cache_pagation()
 
 @router_job.get(
     '/project_backend/{project_id}',
@@ -49,7 +56,7 @@ async def list_job_by_project(project_id: int = Path(..., ge=1, description='需
     '/by_server/{server_ip}',
     description='通过节点IP查询job',
 )
-async def list_nb_by_server(server_ip: str = Path(..., description='需要查询项目的server_ip')):
+async def list_nb_by_server(server_ip: int = Path(..., description='需要查询项目的server_ip')):
     return await Job.project_list_by_ip(server_ip)
 
 
@@ -94,7 +101,7 @@ async def get_simple_job(request: Request,
 )
 async def get_job(job_id: int = Path(..., ge=1, description='需要查询的job ID')):
     _job = await Job.objects.select_related(
-        'status'
+        ['status', "start_mode"]
     ).get(pk=job_id)
     return _job.gen_job_detail_response()
 
@@ -185,6 +192,8 @@ async def create_job(request: Request,
                  "gpu": gpu_count,
                  "memory": memory,
                  "type": machine_type,
+                 "start_mode": jc.start_mode,
+                 "nodes": jc.nodes,
                  }
 
     _job = await Job.objects.create(**init_data)
@@ -276,6 +285,8 @@ async def update_job(request: Request,
                         'status': sc.get('stopped'),
                         "mode": je.mode,
                         "start_command": je.start_command,
+                        "start_mode": je.start_mode,
+                        "nodes": je.nodes,
                         })
     if not await _job.update(**update_data):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job不存在')
