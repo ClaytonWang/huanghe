@@ -33,6 +33,10 @@ class UserStr(BaseModel):
     id: int
     username: str = None
 
+class StartMode(BaseModel):
+    id: int
+    name: str
+
 
 class Grafana(BaseModel):
     cpu: str
@@ -128,6 +132,8 @@ class JobCreate(BaseModel):
     image: Image
     work_dir: Optional[str]
     hooks: List[HookItem] = []
+    start_mode: int
+    nodes: Optional[int] = 1
 
     @validator('name')
     def job_name_validator(cls, name):
@@ -151,6 +157,8 @@ class JobDetail(BaseModel):
     logging_url: Optional[str]
     start_command: Optional[str]
     work_dir: Optional[str]
+    nodes: Optional[int]
+    start_mode: Optional[StartMode]
 
     @validator('created_at', 'updated_at')
     def format_dt(cls, dt):
@@ -167,7 +175,8 @@ class JobEdit(BaseModel):
     work_dir: Optional[str]
     hooks: List[HookItem] = []
     source: str
-
+    start_mode: Optional[int]
+    nodes: Optional[int]
 
 class StatusItemOnlyDesc(BaseModel):
     desc: str = None
