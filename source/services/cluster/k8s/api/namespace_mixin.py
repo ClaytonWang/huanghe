@@ -15,3 +15,11 @@ class NamespaceMixin(CoreV1Api):
 
     def delete_namespace(self, ns: Namespace) -> V1Status:
         return self.core_v1_api.delete_namespace(name=ns.name)
+
+    def create_huaweiyun_gpu_ns(self, ns: Namespace):
+        return self.core_v1_api.create_namespace(body=V1Namespace.huaweicloud_gpu(name=ns.name,
+                                                                                  labels=ns.labels))
+
+    def create_huaweiyun_cpu_ns(self, ns: Namespace):
+        return self.core_v1_api.create_namespace(body=V1Namespace.huaweicloud_cpu(name=ns.name,
+                                                                                  labels=ns.labels))

@@ -25,6 +25,8 @@ class VolcanoJobCreateReq(BaseModelValidatorName):
     command: List[str] = []
     working_dir: Optional[str] = None
     annotations: Dict = {}
+    task_num: int = 1
+    mode: Optional[str] = ""
 
     def gen_vcjob_dict(self):
         return {
@@ -41,6 +43,8 @@ class VolcanoJobCreateReq(BaseModelValidatorName):
             "command": ['sh', "-c"] + self.command if self.command else self.command,
             "working_dir": self.working_dir,
             "annotations": self.annotations,
+            "task_num": self.task_num,
+            "mode": self.mode,
         }
 
 
@@ -70,3 +74,5 @@ class VolcanoJob(BaseModelValidatorName):
     command: List[str] = []
     working_dir: Optional[str] = None
     annotations: Dict = {}
+    task_num: Optional[int] = 1
+    mode: Optional[str] = ""
