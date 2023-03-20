@@ -20,7 +20,7 @@ from basic.middleware.exception import ormar_db_exception_handler
 from basic.middleware.exception import pg_db_exception_handler
 from ormar.exceptions import AsyncOrmException
 from deployment.api import router_deployment
-from basic.middleware.auth import verify_token
+from basic.middleware.account_getter import verify_token
 from basic.common.initdb import startup_event, shutdown_event
 
 
@@ -62,7 +62,7 @@ app.include_router(router_deployment, prefix='/deployments', tags=['Deployment']
 if __name__ == '__main__':
     from multiprocessing import cpu_count
     print("cpu_count: ", cpu_count())
-    service_port = get_integer_variable('NOTEBOOK_SERVICE_PORT', SERVICE_PORT)
+    service_port = get_integer_variable('DEPLOYMENT_SERVICE_PORT', SERVICE_PORT)
     debug = False if 'PRODUCTION' == get_string_variable('ENV', 'DEV') else DEBUG
 
     # -workers INTEGER
