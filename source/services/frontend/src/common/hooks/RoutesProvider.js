@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-03 16:00:40
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-28 20:30:05
+ * @LastEditTime: 2023-03-07 10:32:40
  * @FilePath: /huanghe/source/services/frontend/src/providers/RoutesProvider.js
  * @Description: RoutesProvider
  */
@@ -66,7 +66,6 @@ export const RoutesProvider = ({ children }) => {
   const location = useFixedLocation();
   const [currentContext, setCurrentContext] = useState(null);
   const [currentContextProps, setCurrentContextProps] = useState(null);
-
   const routesMap = useMemo(() => pageSetToRoutes(Pages), []);
 
   const routesChain = useMemo(

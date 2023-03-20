@@ -2,7 +2,7 @@
  * @Author: guanlin.li guanlin.li@digitalbrain.cn
  * @Date: 2023-02-28 15:30:19
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-02-28 20:16:41
+ * @LastEditTime: 2023-03-03 17:48:48
  * @FilePath: /frontend/src/pages/services/routes.js
  * @Description: 服务部署模块路由
  */
@@ -16,8 +16,8 @@ const ServicesRoutes = () => (
     <Route path="" element={<Navigate to="list" />} />
     <Route path="list" element={<ServicesList />} />
     <Route path="list/create" element={<ServicesUpdate />} />
-    <Route path="list/update" element={<ServicesUpdate />} />
-    <Route path="list/detail" element={<ServicesDetail />} />
+    <Route path="list/update/:id" element={<ServicesUpdate />} />
+    <Route path="list/detail/:id" element={<ServicesDetail />} />
   </Routes>
 );
 export default ServicesRoutes;

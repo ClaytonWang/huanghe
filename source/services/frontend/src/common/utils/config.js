@@ -73,6 +73,8 @@ module.exports = {
     servicesListUpdate: 'put|/service/services/:id',
     servicesDetail: 'get|/service/services/:id',
     servicesDetailMonitor: 'get|/service/services/:id/monitor',
+    servicesDetailEvent: 'get|/service/services/:id/event',
+    servicesDetailLog: 'get|/service/services/:id/log',
 
     imagesList: 'get|/notebook/image',
     sourceList: 'get|/notebook/source',

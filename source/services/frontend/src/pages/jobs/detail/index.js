@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-03-16 14:40:20
+ * @LastEditTime: 2023-03-16 20:27:38
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -24,8 +24,8 @@ import {
 } from 'antd';
 import Icon from '@ant-design/icons';
 import {
-  ChartMonitor,
-  EventMonitor,
+  GrafanaComponent,
+  EventList,
   AuthButton,
   Auth,
 } from '@/common/components';
@@ -305,9 +305,11 @@ const JobDetail = () => {
   }, [currTab]);
 
   const contentList = {
-    chart: <ChartMonitor urls={detailData?.grafana} dateRange={dateRange} />,
+    chart: (
+      <GrafanaComponent urls={detailData?.grafana} dateRange={dateRange} />
+    ),
     event: (
-      <EventMonitor
+      <EventList
         onPageNoChange={onPageNoChange}
         tableData={tableData}
         reload={reload}
@@ -315,7 +317,7 @@ const JobDetail = () => {
       />
     ),
     log: (
-      <ChartMonitor
+      <GrafanaComponent
         style={{ height: 800 }}
         urls={{
           log: detailData?.loggingUrl,

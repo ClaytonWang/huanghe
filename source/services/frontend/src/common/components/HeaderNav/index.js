@@ -103,7 +103,11 @@ const HeaderNav = () => {
         </div>
         <div className="user-info">
           <Icon component={Icons.account} />
-          <Dropdown menu={{ items, onClick: handleDropdownClicked }}>
+          <Dropdown
+            className="dbr-header-dropdown"
+            trigger="click"
+            menu={{ items, onClick: handleDropdownClicked }}
+          >
             <a onClick={(e) => e.preventDefault()}>
               <Space>
                 {user.username || null}

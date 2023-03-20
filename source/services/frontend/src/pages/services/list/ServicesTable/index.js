@@ -2,8 +2,8 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Modal, Spin, Table, Tooltip, Dropdown, Space, Typography } from 'antd';
 import qs from 'qs';
 import { get } from 'lodash';
-import Icon, { CopyOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { debounceEvent, transformDate } from '@/common/utils/helper';
+import Icon, { EllipsisOutlined } from '@ant-design/icons';
+import { debounceEvent } from '@/common/utils/helper';
 import { AuthButton, Auth } from '@/common/components';
 import Icons from '@/common/components/Icon';
 import { ADDRESS_TYPE } from '@/common/constants';
@@ -63,7 +63,7 @@ const ServicesTable = ({
       render(value, _) {
         return (
           <Tooltip placement="topLeft" title={value}>
-            <Link to={`/services/list/detail?id=${_.id}`}>{value}</Link>
+            <Link to={`/services/list/detail/${_.id}`}>{value}</Link>
           </Tooltip>
         );
       },
