@@ -1,11 +1,3 @@
-/*
- * @Author: junshi clayton.wang@digitalbrain.cn
- * @Date: 2023-02-01 15:53:49
- * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-03-20 14:41:02
- * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
- * @Description: detail page
- */
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -20,89 +12,100 @@ import {
   message,
   Modal,
   DatePicker,
-  Button,
   Typography,
 } from 'antd';
-import Icon, { InfoCircleOutlined } from '@ant-design/icons';
-import { GrafanaComponent, EventList, AuthButton } from '@/common/components';
 import { get } from 'lodash';
-
-import { join, purifyDeep, transformDate } from '@/common/utils/helper';
+import moment from 'moment';
+import ECharts from 'echarts-for-react';
+import Icon from '@ant-design/icons';
 import api from '@/common/api';
-import qs from 'qs';
-import { NOTEBOOK_ACTION, START, STOP, UPDATE } from '@/common/constants';
+import { EventList, AuthButton } from '@/common/components';
+import { transformDate } from '@/common/utils/helper';
+import { ACTION, ADDRESS_TYPE, START, STOP, UPDATE } from '@/common/constants';
 import Icons from '@/common/components/Icon';
 import { useContextProps } from '@/common/hooks/RoutesProvider';
-import moment from 'moment';
-
 import './index.less';
+import LogList from './LogList';
 
 const { RangePicker } = DatePicker;
-const DATE_FORMAT = 'YYYY/MM/DD HH:mm:ss';
 
-const NotebookDetail = () => {
-  const { id: notebookId } = useParams();
+const ServiceDetail = () => {
+  const { id: serviceId } = useParams();
+  const [detailData, setDetailData] = useState({});
+  const [monitorDataSource, setMonitorDataSource] = useState([]);
   const [eventTableData, setEventTableData] = useState({});
-  const [detailData, setDetailData] = useState(null);
+  const [logTableData, setLogTableData] = useState({});
   const [currTab, setCurrTab] = useState('chart');
   const [dateRange, setDateRange] = useState({
-    from: null, // 默认1小时
-    to: null,
+    from: moment().add(-1, 'h'), // 默认1小时
+    to: moment(),
   });
   const [loading, setLoading] = useState(false);
   const [eventLoading, setEventLoading] = useState(false);
   const setContextProps = useContextProps();
   const navigate = useNavigate();
+  // TODO：日志事件范围
+  // const [logRange, setLogRange] = useState({
+  //   from: moment().add(-1, 'h'), // 默认1小时
+  //   to: moment(),
+  // });
+  const { urls = [] } = detailData;
   const defaultFilters = {
     pageno: 1,
-    pagesize: 2,
+    pagesize: 10,
   };
 
-  const rangePresets = useMemo(
-    () => [
-      {
-        label: 'Last 7 Days',
-        value: [moment().add(-7, 'd'), moment()],
-      },
-      {
-        label: 'Last 14 Days',
-        value: [moment().add(-14, 'd'), moment()],
-      },
-      {
-        label: 'Last 30 Days',
-        value: [moment().add(-30, 'd'), moment()],
-      },
-      {
-        label: 'Last 90 Days',
-        value: [moment().add(-90, 'd'), moment()],
-      },
-    ],
-    []
-  );
+  const rangePresets = [
+    {
+      label: 'Last 7 Days',
+      value: [moment().add(-7, 'd'), moment()],
+    },
+    {
+      label: 'Last 14 Days',
+      value: [moment().add(-14, 'd'), moment()],
+    },
+    {
+      label: 'Last 30 Days',
+      value: [moment().add(-30, 'd'), moment()],
+    },
+    {
+      label: 'Last 90 Days',
+      value: [moment().add(-90, 'd'), moment()],
+    },
+  ];
 
-  const requestList = async (args) => {
-    const { loading = false, ...rest } = args;
-    const params = purifyDeep({ ...rest });
+  const requestService = async (params) => {
     try {
-      setLoading(loading);
-      const { result } = await api.notebooksDetail(params);
+      // setLoading(loading);
+      const { result } = await api.servicesDetail(params);
       setDetailData(result);
-      setLoading(false);
+      // setLoading(false);
     } catch (error) {
       console.log(error);
-      setLoading(false);
+      // setLoading(false);
+    }
+  };
+
+  const requestMonitorList = async (params) => {
+    try {
+      const { result } = await api.servicesDetailMonitor(params);
+      setMonitorDataSource(result);
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const requestEvent = async (args) => {
-    const { loading = false, ...rest } = args;
-    const params = purifyDeep({ ...defaultFilters, ...rest });
+    const { loading = false, pageno, pagesize, ...rest } = args;
+    const params = { pageno, pagesize, ...rest };
     try {
       setEventLoading(loading);
-      const { result } = await api.notebooksDetailEvent(params);
+      const { result } = await api.servicesDetailEvent(params);
       setEventTableData({
         ...defaultFilters,
         ...result,
+        pageno,
+        pagesize,
       });
     } catch (error) {
       console.log(error);
@@ -111,16 +114,52 @@ const NotebookDetail = () => {
     }
   };
 
-  /* eslint-disable react-hooks/exhaustive-deps */
-  const reload = async (args) => {
-    const params = purifyDeep({ ...args });
-    requestList(params);
+  const requestLog = async (args) => {
+    const defaultFilters = {
+      pageno: 1,
+      pagesize: 10,
+    };
+    const params = {
+      ...defaultFilters,
+      ...args,
+    };
+    try {
+      const { pageno, pagesize } = params;
+      console.log('request log loaded:', pageno);
+      const { result } = await api.servicesDetailLog(params);
+      const { data: _data = [] } = logTableData;
+      const data = _data?.concat(result.data);
+      setLogTableData({
+        pageno,
+        pagesize,
+        total: result.total,
+        data: [...data],
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  const reload = (args) => {
+    requestService(args);
+  };
+
+  const loadLog = (args = {}) => {
+    requestLog({
+      id: serviceId,
+      ...args,
+    });
+  };
+  // TODO：Tab切换时日志列表刷新，原日志清空
+  // const reloadLog = () => {
+  //   setLogTableData({});
+  //   loadLog();
+  // };
 
   const handleStartClicked = async (record) => {
     try {
       const { id } = record;
-      await api.notebooksListAction({ id, action: NOTEBOOK_ACTION[START] });
+      await api.servicesListAction({ id, action: ACTION[START] });
       message.success('已触发启动！');
     } catch (error) {
       console.log(error);
@@ -129,7 +168,7 @@ const NotebookDetail = () => {
   const onStop = async (record) => {
     try {
       const { id } = record;
-      await api.notebooksListAction({ id, action: NOTEBOOK_ACTION[STOP] });
+      await api.servicesListAction({ id, action: ACTION[STOP] });
       message.success('已触发停止！');
     } catch (error) {
       console.log(error);
@@ -148,7 +187,7 @@ const NotebookDetail = () => {
   };
 
   const handleEditClicked = (values) => {
-    navigate('/notebooks/list/update', {
+    navigate('/services/list/update', {
       state: {
         params: values,
         type: UPDATE,
@@ -156,12 +195,12 @@ const NotebookDetail = () => {
     });
   };
 
-  const deleteNotebook = async (record) => {
+  const deleteService = async (record) => {
     const { id } = record;
     try {
-      await api.notebooksListDelete({ id });
-      message.success('删除Notebook成功！');
-      navigate('/notebooks/list');
+      await api.servicesListDelete({ id });
+      message.success('删除Service成功！');
+      navigate('/services/list');
     } catch (error) {
       console.log(error);
     }
@@ -169,32 +208,53 @@ const NotebookDetail = () => {
 
   const handleDelete = (record) => {
     Modal.confirm({
-      title: '确定要删除该Notebook吗？',
+      title: '确定要删除该Service吗？',
       okText: '删除',
       okType: 'danger',
       cancelText: '取消',
       onOk: () => {
-        deleteNotebook(record);
+        deleteService(record);
       },
     });
   };
-  const handleConfigInfoClicked = () => {
-    const sshConfig = detailData?.ssh;
-    Modal.info({
-      title: 'SSH配置信息',
-      content: (
-        <div className="ssh-config">
-          <p>账号：{sshConfig?.account}</p>
-          <p>密码：{sshConfig?.password}</p>
-          <p>地址：{sshConfig?.address}</p>
-        </div>
-      ),
-    });
-  };
 
-  const onPageNoChange = (pageno, pagesize) => {
-    const params = purifyDeep({ pageno, pagesize });
-    requestEvent(params);
+  /* eslint-disable react-hooks/exhaustive-deps */
+  useEffect(() => {
+    const timer = setInterval(() => {
+      reload();
+    }, 3000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
+  /* eslint-disable react-hooks/exhaustive-deps */
+  useEffect(() => {
+    requestService({ id: serviceId });
+    requestMonitorList({ id: serviceId });
+    requestEvent({ id: serviceId });
+    loadLog();
+  }, []);
+
+  useEffect(() => {
+    setContextProps({
+      handleStartClicked,
+      handleStopClicked,
+      handleEditClicked,
+      handleDelete,
+      detail: detailData,
+      loading,
+      setLoading,
+    });
+  }, [detailData]);
+
+  const handleEventPageNoChange = (pageno, pagesize) => {
+    // const filters = getFilters();
+    // const params = purifyDeep({ pageno, pagesize });
+    // 手动同步Url
+    // setSearchParams(qs.stringify(params));
+    requestEvent({ pageno, pagesize });
+    // setEventTableData({ ...eventTableData, pageno, pagesize });
   };
 
   const onTabChange = (key) => {
@@ -202,7 +262,7 @@ const NotebookDetail = () => {
     // eslint-disable-next-line default-case
     switch (key) {
       case 'event':
-        // requestEvent({ loading: true, id: notebookId });
+        // requestEvent({ loading: true });
         break;
     }
   };
@@ -215,86 +275,116 @@ const NotebookDetail = () => {
     }
   };
 
-  const findTimeRange = (obj) => {
-    if (!obj) return {};
-    const urls = Object.values(obj);
-    for (let i = 0; i < urls.length; i++) {
-      let { from = null, to = null } =
-        urls[i].split('?').length > 0 && qs.parse(urls[i].split('?')[1]);
-      if (from && to) {
-        return { from: Number(from), to: Number(to) };
-      }
-    }
-    return {};
-  };
-
   const operations = useMemo(() => {
     if (currTab === 'event') return null;
-    console.log(dateRange);
+
+    const from = moment(dateRange.from);
+    const to = moment(dateRange.to);
+    const dateFormat = 'YYYY/MM/DD HH:mm:ss';
     return (
       <RangePicker
         allowClear={false}
         presets={rangePresets}
         showTime
-        format={DATE_FORMAT}
+        format={dateFormat}
         onChange={onRangeChange}
         placement="bottomRight"
-        value={[
-          moment(dateRange.from) || moment().add(-1, 'h'),
-          moment(dateRange.to) || moment(),
-        ]}
+        defaultValue={[moment(from, dateFormat), moment(to, dateFormat)]}
       />
     );
-  }, [currTab, rangePresets, dateRange]);
+  }, [currTab, dateRange]);
+
+  const Chart = ({ datasource = [[], []], name, unit }) => {
+    const xData = datasource[0];
+    const yData = datasource[1];
+    const option = {
+      title: {
+        text: name,
+      },
+      tooltip: {
+        show: true,
+      },
+      xAxis: {
+        type: 'category',
+        data: xData,
+        axisLabel: {
+          formatter: function (value) {
+            return transformDate(value, 'YYYY-MM-DD HH:mm:ss');
+          },
+        },
+      },
+      yAxis: {
+        type: 'value',
+        name: unit,
+      },
+      series: [
+        {
+          data: yData,
+          type: 'line',
+          markPoint: {
+            data: [
+              {
+                name: '最大值',
+                type: 'max',
+                symbolOffset: [0, -10],
+                symbol: 'triangle',
+                label: {
+                  position: 'top',
+                },
+              },
+              {
+                name: '最小值',
+                type: 'min',
+                symbolOffset: [0, 10],
+                symbol: 'triangle',
+                label: {
+                  position: 'bottom',
+                },
+              },
+            ],
+            symbolSize: 10,
+          },
+        },
+      ],
+    };
+    return <ECharts option={option} />;
+  };
+
+  const ServicesMonitor = () => (
+    <div className="services-monitor">
+      <Row gutter={[16, 24]}>
+        {monitorDataSource.map(({ data, ...rest }, index) => (
+          <Col key={index} span={8} title={rest.name}>
+            <Chart key={index} datasource={data} {...rest} />
+          </Col>
+        ))}
+      </Row>
+    </div>
+  );
 
   const contentList = {
-    chart: <GrafanaComponent urls={detailData?.grafana} />,
+    chart: <ServicesMonitor />,
     event: (
       <EventList
-        onPageNoChange={onPageNoChange}
-        eventTableData={eventTableData}
+        onPageNoChange={handleEventPageNoChange}
+        tableData={eventTableData}
         reload={reload}
         loading={eventLoading}
       />
     ),
+    log: (
+      <LogList
+        datasource={logTableData.data}
+        total={logTableData.total}
+        pageno={logTableData.pageno}
+        pagesize={logTableData.pagesize}
+        onLoadNext={loadLog}
+      />
+    ),
   };
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      reload();
-    }, 3000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, [reload]);
-
-  /* eslint-disable react-hooks/exhaustive-deps */
-  useEffect(() => {
-    requestList({ loading: true, id: notebookId });
-    requestEvent({ loading: true, id: notebookId });
-  }, []);
-
-  useEffect(() => {
-    if (detailData != null) {
-      const { from = null, to = null } = findTimeRange(detailData?.grafana);
-      setDateRange({
-        from: transformDate(from, DATE_FORMAT),
-        to: transformDate(to, DATE_FORMAT),
-      });
-    }
-    setContextProps({
-      handleStartClicked,
-      handleStopClicked,
-      handleEditClicked,
-      handleDelete,
-      detail: detailData,
-      loading,
-      setLoading,
-    });
-  }, [detailData]);
-
   return (
-    <div className="notebooks-detail">
+    <div className="detail">
       <div className="detail-section">
         <Row gutter={[16, 24]}>
           {loading ? (
@@ -306,17 +396,6 @@ const NotebookDetail = () => {
               </Col>
               <Col span={6} title={detailData?.project?.name}>
                 项目：{detailData?.project?.name}
-              </Col>
-              <Col
-                span={6}
-                title={join(
-                  detailData?.hooks,
-                  '\n',
-                  (v) => `挂载盘：${v?.storage?.name}\n路径：${v?.path}` || '-'
-                )}
-              >
-                存储挂载：
-                {join(detailData?.hooks, ',', (v) => v?.storage?.name || '-')}
               </Col>
               <Col span={6} title={detailData?.image?.name}>
                 <Tooltip title={detailData?.image?.name}>
@@ -335,31 +414,23 @@ const NotebookDetail = () => {
               <Col span={6} title={detailData?.source}>
                 资源规格：{detailData?.source}
               </Col>
-              <Col span={6} title="SSH远程开发">
-                SSH远程开发
-                <Tooltip
-                  title={
-                    <span>
-                      详细说明请参考
-                      <Button
-                        type="link"
-                        href="https://digital-brain.feishu.cn/docx/IzMPd7NCYoSTYjxJNDTcLC1HnCg"
+              <Col span={6} title="公网访问">
+                公网访问
+              </Col>
+              <Col span={6} title="URL">
+                URL：
+                <span>
+                  {urls.map(({ type, address }, index) => (
+                    <Tooltip key={index} title={ADDRESS_TYPE[type]}>
+                      <Typography.Paragraph
+                        style={{ display: 'inline-block' }}
+                        copyable={{ tooltips: false }}
                       >
-                        使用手册
-                      </Button>
-                    </span>
-                  }
-                >
-                  <InfoCircleOutlined />
-                </Tooltip>
-                :
-                <Button
-                  type="link"
-                  style={{ marginLeft: 5 }}
-                  onClick={handleConfigInfoClicked}
-                >
-                  查看配置信息
-                </Button>
+                        {address}
+                      </Typography.Paragraph>
+                    </Tooltip>
+                  ))}
+                </span>
               </Col>
               <Col span={6} title={detailData?.creator?.username}>
                 创建人：{detailData?.creator?.username}
@@ -385,6 +456,10 @@ const NotebookDetail = () => {
               key: 'event',
               tab: '事件',
             },
+            {
+              key: 'log',
+              tab: '日志',
+            },
           ]}
           onTabChange={onTabChange}
         >
@@ -395,7 +470,7 @@ const NotebookDetail = () => {
   );
 };
 
-NotebookDetail.context = (props = {}) => {
+ServiceDetail.context = (props = {}) => {
   const {
     handleStartClicked,
     handleStopClicked,
@@ -410,7 +485,7 @@ NotebookDetail.context = (props = {}) => {
       {
         label: (
           <AuthButton
-            required="notebooks.list.edit"
+            required="services.list.edit"
             type="text"
             onClick={() => {
               handleEditClicked(detail);
@@ -429,7 +504,7 @@ NotebookDetail.context = (props = {}) => {
       {
         label: (
           <AuthButton
-            required="notebooks.list.edit"
+            required="services.list.edit"
             type="text"
             onClick={() => {
               handleDelete(detail);
@@ -481,7 +556,7 @@ NotebookDetail.context = (props = {}) => {
       <Dropdown.Button menu={menuProps} trigger="click">
         {statusName === 'stopped' && (
           <AuthButton
-            required="notebooks.list.edit"
+            required="services.list.edit"
             type="text"
             onClick={() => {
               handleStartClicked(detail);
@@ -496,7 +571,7 @@ NotebookDetail.context = (props = {}) => {
         )}
         {statusName !== 'stopped' && (
           <AuthButton
-            required="notebooks.list.edit"
+            required="services.list.edit"
             type="text"
             style={(() => {
               if (statusName === 'error') {
@@ -517,7 +592,7 @@ NotebookDetail.context = (props = {}) => {
         )}
       </Dropdown.Button>
       <AuthButton
-        required="notebooks.list"
+        required="services.list"
         type="primary"
         onClick={() => {
           const { url } = detail;
@@ -534,6 +609,6 @@ NotebookDetail.context = (props = {}) => {
   );
 };
 
-NotebookDetail.path = '/notebooks/list/detail';
+ServiceDetail.path = '/services/list/detail/:id';
 
-export default NotebookDetail;
+export default ServiceDetail;
