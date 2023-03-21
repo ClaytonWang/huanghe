@@ -18,8 +18,9 @@ from basic.common.env_variable import get_string_variable
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project
 from basic.middleware.service_requests import get_user_list, volume_check
 
-from services.deployment.deployment.serializers import DeploymentList, DeploymentCreate, DeploymentDetail, Deployment, \
-    DeploymentDeleteReq, DeploymentCreateReq, DeploymentListReq
+from services.deployment.deployment.serializers import DeploymentList, DeploymentCreate, DeploymentDetail, \
+    DeploymentEdit, DeploymentOp, DeploymentStatusUpdate, VolcanoDeploymentDeleteReq, VolcanoDeploymentCreateReq, \
+    VolcanoDeploymentListReq, VolcanoDeployment
 from services.deployment.models.deployment import Deployment
 from services.deployment.utils.auth import operate_auth
 from utils.user_request import project_check, project_check_obj
@@ -38,7 +39,7 @@ PASSWORD = "jovyan"
 
 @router_deployment.get(
     '',
-    description='deployment列表',
+    description='Deployment列表',
     response_model=Page[DeploymentList],
     response_model_exclude_unset=True
 )
@@ -67,7 +68,7 @@ async def list_deployment(request: Request,
 
 @router_deployment.post(
     '',
-    description='创建deployment',
+    description='创建Deployment',
     response_model=DeploymentDetail,
 )
 async def create_deployment(request: Request,
@@ -77,8 +78,7 @@ async def create_deployment(request: Request,
     pg: ProjectGetter = get_project(request.headers.get('authorization'), dc.project.id)
 
     if await Deployment.objects.filter(name=dc.name, project_by_id=dc.project.id, created_by_id=ag.id).count():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户, deployment不能重名')
-    # todo 重名规则待校验
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户, Deployment不能重名')
 
     # 存储检查
     storages, volumes_k8s = await volume_check(authorization, dc.hooks, pg.en_name)
@@ -88,15 +88,15 @@ async def create_deployment(request: Request,
 
     machine_type, gpu_count, cpu_count, memory = source_convert(dc.source)
 
-    k8s_info = DeploymentCreateReq(name=f"{ag.en_name}-{dc.name}",
-                                   namespace=pg.en_name,
-                                   image=dc.image.name,
-                                   env=ENV,
-                                   cpu=cpu_count,
-                                   memory=memory,
-                                   gpu=gpu_count,
-                                   volumes=volumes_k8s,
-                                   working_dir=dc.work_dir, ).dict()
+    k8s_info = VolcanoDeploymentCreateReq(name=f"{ag.en_name}-{dc.name}",
+                                          namespace=pg.en_name,
+                                          image=dc.image.name,
+                                          env=ENV,
+                                          cpu=cpu_count,
+                                          memory=memory,
+                                          gpu=gpu_count,
+                                          volumes=volumes_k8s,
+                                          working_dir=dc.work_dir, ).dict()
     # TODO 要加上创建路由等的
 
     init_data = {"name": dc.name,
@@ -118,12 +118,153 @@ async def create_deployment(request: Request,
                  "gpu": gpu_count,
                  "memory": memory,
                  "type": machine_type,
-                 "private_ip": dc.private_ip,
-                 "public_ip": dc.public_ip,
-                 "port": dc.port,
+                 # "private_ip": dc.private_ip,
+                 # "public_ip": dc.public_ip,
+                 # "port": dc.port,
+                 "private_ip": "待连接service",
+                 "public_ip": "待连接service",
+                 "port": 80,
                  }
 
     _deploy = await Deployment.objects.create(**init_data)
     k8s_info['annotations'] = {"id": str(_deploy.id)}
     await _deploy.update(**{"k8s_info": k8s_info})
     return _deploy.gen_deployment_detail_response()
+
+
+@router_deployment.put(
+    '/{deployment_id}/status_update',
+    description='状态更新',
+)
+async def update_status(jsu: DeploymentStatusUpdate,
+                        deployment_id: int = Path(..., ge=1, description="DeploymentID")):
+    j = await Deployment.get_deploy_related_status_by_pk(deployment_id)
+    if not j:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Deployment不存在")
+    st = Deployment.compare_status_and_update(jsu.status, sc)
+    update_data = {"status": st}
+    if jsu.status in {"Failed", "Completed", "Terminated"}:
+        update_data.update({"ended_at": datetime.datetime.now()})
+    if jsu.server_ip:
+        update_data['server_ip'] = jsu.server_ip
+    await j.update(**update_data)
+    return JSONResponse(dict(id=deployment_id))
+
+
+@router_deployment.put(
+    '/{deployment_id}',
+    description='编辑Deployment',
+)
+async def update_deployment(request: Request,
+                            de: DeploymentEdit,
+                            deployment_id: int = Path(..., ge=1, description="DeploymentID"),
+                            ):
+    ag: AccountGetter = request.user
+    authorization: str = request.headers.get('authorization')
+
+    _deploy, reason = await operate_auth(request, deployment_id)
+    if not _deploy:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
+
+    duplicate_name = await Deployment.objects.filter(name=_deploy.name, project_by_id=int(de.project.id),
+                                                     created_by_id=ag.id).exclude(id=deployment_id).count()
+    if duplicate_name:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户，Deployment不能重名')
+    k8s_info = _deploy.k8s_info
+
+    if _deploy.status.name not in {'stopped', "completed", "run_fail"}:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Deployment未停止')
+    # if _deploy.status.name != 'stopped':
+    #     delete_vcjob(vjd=VolcanoDeploymentDeleteReq.parse_obj(k8s_info), ignore_no_found=True)
+
+    check, extra_info = await project_check_obj(request, de.project.id)
+    if not check:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
+
+    update_data = {}
+    if de.source:
+        machine_type, gpu_count, cpu_count, memory = source_convert(de.source)
+        source_dic = {'cpu': cpu_count,
+                      'memory': memory,
+                      'gpu': gpu_count,
+                      'type': machine_type, }
+        k8s_info.update(source_dic)
+        update_data = source_dic
+
+    storages, volumes_k8s = await volume_check(authorization, de.hooks, extra_info['en_name'])
+    path_set = {x['path'] for x in storages}
+    if len(path_set) != len(storages):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
+    k8s_info.update({"volumes": volumes_k8s,
+                     'image': de.image.name,
+                     'namespace': extra_info['en_name'],
+                     'name': f"{request.user.en_name}-{_deploy.name}",
+                     "work_dir": de.work_dir,
+                     })
+    update_data.update({"storage": json.dumps(storages),
+                        "k8s_info": json.dumps(k8s_info),
+                        "updated_at": datetime.datetime.now(),
+                        "project_by_id": de.project.id,
+                        "project_by": extra_info['name'],
+                        "image": de.image.name,
+                        "custom": de.image.custom,
+                        "work_dir": de.work_dir,
+                        'status': sc.get('stopped'),
+                        })
+    if not await _deploy.update(**update_data):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Deployment不存在')
+    return JSONResponse(dict(id=deployment_id))
+
+
+@router_deployment.post(
+    '/{deployment_id}',
+    description='启动/停止Deployment',
+)
+async def operate_deployment(request: Request,
+                             data: DeploymentOp,
+                             deployment_id: int = Path(..., ge=1, description="DeploymentID")):
+    action = int(data.dict()['action'])
+    _deploy, reason = await operate_auth(request, deployment_id)
+    if not _deploy:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
+    if action not in [0, 1]:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
+    payloads = json.dumps(_deploy.k8s_info)
+
+    # 数字，0（停止）｜1（启动）
+    update_data = {}
+    # TODO 涉及vcjob的先后做
+    if action == 0:
+        update_data['status'] = sc.get('stopped')
+        # todo delete_vcjob(vjd=VolcanoDeploymentDeleteReq.parse_raw(payloads), ignore_no_found=True)
+        await _deploy.update(**{"ended_at": datetime.datetime.now()})
+    elif action == 1:
+        update_data['status'] = sc.get('pending')
+        # todo create_vcjob(vjc=VolcanoDeploymentCreateReq.parse_raw(payloads))
+        await _deploy.update(**{"started_at": datetime.datetime.now()})
+
+    if not update_data:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='更新数据不能为空')
+    if not await _deploy.update(**update_data):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Deployment不存在')
+    return JSONResponse(dict(id=deployment_id))
+
+
+@router_deployment.delete(
+    '/{deployment_id}',
+    description='删除Deployment',
+)
+async def delete_deployment(request: Request,
+                            deployment_id: int = Path(..., ge=1, description="DeploymentID")):
+    _deploy, reason = await operate_auth(request, deployment_id)
+    if not _deploy:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
+    check, extra_info = await project_check(request, _deploy.project_by_id)
+    if not check:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
+
+    payloads = _deploy.k8s_info
+    # # error状态调用删除需要释放资源
+    # if _deploy.status.name != 'stop':
+    #     delete_vcjob(vjd=VolcanoDeploymentDeleteReq.parse_obj(dict(payloads)), ignore_no_found=True)
+    await _deploy.delete()

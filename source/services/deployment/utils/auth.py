@@ -21,7 +21,7 @@ async def operate_auth(request: Request, job_id: int):
     # 普通用户
     if request.user.role.name == 'user':
         permissions = request.user.permissions
-        if {'jobs.list.create', 'jobs.list.edit', 'jobs.list.delete'}.issubset(permissions):
+        if {'deployments.list.create', 'deployments.list.edit', 'deployments.list.delete'}.issubset(permissions):
             return None, '不能编辑非自己创建的Deployment'
         else:
             return None, '用户没有编辑权限'
