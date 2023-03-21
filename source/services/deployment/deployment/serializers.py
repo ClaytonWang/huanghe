@@ -8,12 +8,13 @@
 import re
 from datetime import datetime
 from fastapi import HTTPException, status
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Dict
 
 from pydantic import BaseModel, Field
 from pydantic import validator
 
 from basic.utils.dt_format import dt_to_string
+from basic.common.validator_name import BaseModelValidatorName
 
 
 def k8s_format(name):
@@ -196,3 +197,60 @@ class EventCreate(BaseModel):
     desc: str
     source_id: int
     source: Optional[str] = "VCJOB"
+
+
+class Volume(BaseModel):
+    name: str
+    mount_path: str
+    mount_propagation: Optional[str] = "HostToContainer"
+
+
+class DeploymentCreateReq(BaseModelValidatorName):
+    namespace: str
+    image: str
+    # 对应环境
+    env: str = "dev"
+    platform: str = "mvp"
+    cpu: int = 0
+    memory: int = 0
+    gpu: int = 0
+    volumes: List[Volume] = []
+    tolerations: List[str] = []
+    annotations: Dict = {}
+
+    def gen_deployment_dict(self):
+        return {
+            "name": self.name,
+            "namespace": self.namespace,
+            "image": self.image,
+            "labels": {"env": self.env, "app": self.name},
+            "resource": {
+                "cpu": self.cpu,
+                "memory": f"{self.memory}Gi",
+                "nvidia.com/gpu": self.gpu,
+            },
+            "annotations": self.annotations,
+            "volumes": [v.dict() for v in self.volumes]
+        }
+
+
+class DeploymentDeleteReq(BaseModel):
+    name: str
+    namespace: str
+
+
+class DeploymentListReq(BaseModel):
+    platform: str = "mvp"
+    env: str
+    namespace: str
+
+
+class Deployment(BaseModelValidatorName):
+    namespace: str
+    image: str
+    labels: Dict
+    resource: Dict
+    envs: Dict = {}
+    volumes: List[Volume] = []
+    tolerations: List[str] = []
+    annotations: Dict = {}
