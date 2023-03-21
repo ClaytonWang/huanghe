@@ -132,9 +132,9 @@ class DeploymentCreate(BaseModel):
     image: Image
     work_dir: Optional[str]
     hooks: List[HookItem] = []
-    private_ip: str
-    public_ip: str
-    port: int
+    # private_ip: str
+    # public_ip: str
+    # port: int
 
     @validator('name')
     def deployment_name_validator(cls, name):
@@ -166,14 +166,14 @@ class DeploymentDetail(BaseModel):
 
 class DeploymentEdit(BaseModel):
     project: Project
-    mode: str
-    start_command: Optional[str]
     image: Image
     work_dir: Optional[str]
     hooks: List[HookItem] = []
     source: str
-    start_mode: Optional[int]
-    nodes: Optional[int]
+
+
+class DeploymentOp(BaseModel):
+    action: int
 
 
 class StatusItemOnlyDesc(BaseModel):
@@ -196,7 +196,12 @@ class EventCreate(BaseModel):
     name: str
     desc: str
     source_id: int
-    source: Optional[str] = "VCJOB"
+    source: Optional[str] = "VCDEPLOYMENT"
+
+
+class DeploymentStatusUpdate(BaseModel):
+    status: str
+    server_ip: Optional[str]
 
 
 class Volume(BaseModel):
@@ -205,7 +210,7 @@ class Volume(BaseModel):
     mount_propagation: Optional[str] = "HostToContainer"
 
 
-class DeploymentCreateReq(BaseModelValidatorName):
+class VolcanoDeploymentCreateReq(BaseModelValidatorName):
     namespace: str
     image: str
     # 对应环境
@@ -234,18 +239,18 @@ class DeploymentCreateReq(BaseModelValidatorName):
         }
 
 
-class DeploymentDeleteReq(BaseModel):
+class VolcanoDeploymentDeleteReq(BaseModel):
     name: str
     namespace: str
 
 
-class DeploymentListReq(BaseModel):
+class VolcanoDeploymentListReq(BaseModel):
     platform: str = "mvp"
     env: str
     namespace: str
 
 
-class Deployment(BaseModelValidatorName):
+class VolcanoDeployment(BaseModelValidatorName):
     namespace: str
     image: str
     labels: Dict
