@@ -8,28 +8,28 @@
 
 from fastapi import Request
 from basic.middleware.service_requests import get_project
-from services.job_management.models.job import Job
+from services.deployment.models.deployment import Deployment
 
 
 async def operate_auth(request: Request, job_id: int):
-    _job = await Job.objects.select_related('status').get_or_none(pk=job_id)
-    if not _job:
-        return None, 'Job不存在'
-    # 正确返回job
-    if _job.created_by_id == request.user.id or request.user.role.name == 'admin':
-        return _job, None
+    _deploy = await Deployment.objects.select_related('status').get_or_none(pk=job_id)
+    if not _deploy:
+        return None, 'Deployment'
+    # 正确返回_deploy
+    if _deploy.created_by_id == request.user.id or request.user.role.name == 'admin':
+        return _deploy, None
     # 普通用户
     if request.user.role.name == 'user':
         permissions = request.user.permissions
-        if {'jobs.list.create', 'jobs.list.edit', 'jobs.list.delete'}.issubset(permissions):
-            return None, '不能编辑非自己创建的Job'
+        if {'deployments.list.create', 'deployments.list.edit', 'deployments.list.delete'}.issubset(permissions):
+            return None, '不能编辑非自己创建的Deployment'
         else:
             return None, '用户没有编辑权限'
     # 项目负责人
-    stat, _project = await get_project(request.headers.get('authorization'), _job.project_id)
+    stat, _project = await get_project(request.headers.get('authorization'), _deploy.project_id)
     if stat != 200:
         return None, '项目不存在'
     owner_id = _project['owner']['id']
     if int(owner_id) != request.user.id:
-        return None, '不能编辑非自己负责的Job'
-    return _job, None
+        return None, '不能编辑非自己负责的Deployment'
+    return _deploy, None
