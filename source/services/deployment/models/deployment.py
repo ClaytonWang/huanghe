@@ -159,12 +159,13 @@ class Deployment(GenericDateModel):
                         "name": self.project_by, },
             "image": {"name": self.image,
                       "custom": self.custom, },
-            "url": self.webkubectl,
+            # "url": self.webkubectl,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
-            "private_ip": self.private_ip,
-            "public_ip": self.public_ip,
-            "port": self.port,
+            "urls": [
+                {"type": "public", "address": self.public_ip + ':' + str(self.port)},
+                {"type": "private", "address": self.private_ip + ':' + str(self.port)}
+            ],
         }
 
     def gen_deployment_simple_response(self):
