@@ -86,6 +86,11 @@ class SourceItem(BaseModel):
     name: str
 
 
+class UrlAddress(BaseModel):
+    type: str
+    address: str
+
+
 class DeploymentSimple(BaseModel):
     id: int
     status: str
@@ -111,12 +116,13 @@ class DeploymentList(BaseModel):
     creator: Optional[UserStr]
     project: Optional[ProjectStr]
     image: Image
-    url: Optional[str]
+    # url: Optional[str]
     created_at: Union[datetime, str, None]
     updated_at: Union[datetime, str, None]
-    private_ip: str
-    public_ip: str
-    port: int
+    # private_ip: str
+    # public_ip: str
+    # port: int
+    urls: List[UrlAddress]
 
     @validator('created_at', 'updated_at')
     def format_dt(cls, dt):
