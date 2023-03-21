@@ -8,7 +8,7 @@
 
 from fastapi import Request
 from basic.middleware.service_requests import get_project
-from services.deployment.models import Deployment
+from services.deployment.models.deployment import Deployment
 
 
 async def operate_auth(request: Request, job_id: int):
