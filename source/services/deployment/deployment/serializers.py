@@ -216,7 +216,8 @@ class Volume(BaseModel):
     mount_propagation: Optional[str] = "HostToContainer"
 
 
-class VolcanoDeploymentCreateReq(BaseModelValidatorName):
+# 部署部分
+class DeploymentCreateReq(BaseModelValidatorName):
     namespace: str
     image: str
     # 对应环境
@@ -245,18 +246,18 @@ class VolcanoDeploymentCreateReq(BaseModelValidatorName):
         }
 
 
-class VolcanoDeploymentDeleteReq(BaseModel):
+class DeploymentDeleteReq(BaseModel):
     name: str
     namespace: str
 
 
-class VolcanoDeploymentListReq(BaseModel):
+class DeploymentListReq(BaseModel):
     platform: str = "mvp"
     env: str
     namespace: str
 
 
-class VolcanoDeployment(BaseModelValidatorName):
+class DeploymentItem(BaseModelValidatorName):
     namespace: str
     image: str
     labels: Dict
@@ -265,3 +266,35 @@ class VolcanoDeployment(BaseModelValidatorName):
     volumes: List[Volume] = []
     tolerations: List[str] = []
     annotations: Dict = {}
+
+
+# 服务部分
+class ServiceCreateReq(BaseModelValidatorName):
+    name: str
+    namespace: str
+    # 对应环境
+    env: str = "dev"
+    annotations: Dict = {}
+    cluster_ip: str
+    port: int
+
+    def gen_service_dict(self):
+        return {
+            "name": self.name,
+            "namespace": self.namespace,
+            # "image": self.image,
+            "labels": {"env": self.env, "app": self.name},
+            "annotations": self.annotations,
+            "cluster_ip": self.cluster_ip,
+            "ports": [{"name": self.name, "port": self.port}],
+            "selector": {"app": self.name}
+        }
+
+
+class ServiceDeleteReq(BaseModel):
+    name: str
+    namespace: str
+
+
+class ServiceQuery(BaseModel):
+    namespace: str

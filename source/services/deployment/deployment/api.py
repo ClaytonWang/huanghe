@@ -19,10 +19,11 @@ from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_pr
 from basic.middleware.service_requests import get_user_list, volume_check
 
 from services.deployment.deployment.serializers import DeploymentList, DeploymentCreate, DeploymentDetail, \
-    DeploymentEdit, DeploymentOp, DeploymentStatusUpdate, VolcanoDeploymentDeleteReq, VolcanoDeploymentCreateReq, \
-    VolcanoDeploymentListReq, VolcanoDeployment
+    DeploymentEdit, DeploymentOp, DeploymentStatusUpdate, DeploymentDeleteReq, DeploymentCreateReq, \
+    DeploymentListReq, DeploymentItem
 from services.deployment.models.deployment import Deployment
 from services.deployment.utils.auth import operate_auth
+from services.deployment.utils.k8s_request import create_deploy_k8s_pipeline, delete_deploy_k8s_pipeline
 from utils.user_request import project_check, project_check_obj
 from utils.auth import operate_auth
 from collections import defaultdict
@@ -88,15 +89,15 @@ async def create_deployment(request: Request,
 
     machine_type, gpu_count, cpu_count, memory = source_convert(dc.source)
 
-    k8s_info = VolcanoDeploymentCreateReq(name=f"{ag.en_name}-{dc.name}",
-                                          namespace=pg.en_name,
-                                          image=dc.image.name,
-                                          env=ENV,
-                                          cpu=cpu_count,
-                                          memory=memory,
-                                          gpu=gpu_count,
-                                          volumes=volumes_k8s,
-                                          working_dir=dc.work_dir, ).dict()
+    k8s_info = DeploymentCreateReq(name=f"{ag.en_name}-{dc.name}",
+                                   namespace=pg.en_name,
+                                   image=dc.image.name,
+                                   env=ENV,
+                                   cpu=cpu_count,
+                                   memory=memory,
+                                   gpu=gpu_count,
+                                   volumes=volumes_k8s,
+                                   working_dir=dc.work_dir, ).dict()
     # TODO 要加上创建路由等的
 
     init_data = {"name": dc.name,
@@ -121,9 +122,9 @@ async def create_deployment(request: Request,
                  # "private_ip": dc.private_ip,
                  # "public_ip": dc.public_ip,
                  # "port": dc.port,
-                 "private_ip": "待连接service",
-                 "public_ip": "待连接service",
-                 "port": 80,
+                 # "private_ip": "待连接service",
+                 # "public_ip": "待连接service",
+                 # "port": 80,
                  }
 
     _deploy = await Deployment.objects.create(**init_data)
@@ -174,8 +175,8 @@ async def update_deployment(request: Request,
 
     if _deploy.status.name not in {'stopped', "completed", "run_fail"}:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Deployment未停止')
-    # if _deploy.status.name != 'stopped':
-    #     delete_vcjob(vjd=VolcanoDeploymentDeleteReq.parse_obj(k8s_info), ignore_no_found=True)
+    if _deploy.status.name != 'stopped':
+        delete_deploy_k8s_pipeline(json.dumps(k8s_info), ignore_no_found=True)
 
     check, extra_info = await project_check_obj(request, de.project.id)
     if not check:
@@ -233,14 +234,13 @@ async def operate_deployment(request: Request,
 
     # 数字，0（停止）｜1（启动）
     update_data = {}
-    # TODO 涉及vcjob的先后做
     if action == 0:
         update_data['status'] = sc.get('stopped')
-        # todo delete_vcjob(vjd=VolcanoDeploymentDeleteReq.parse_raw(payloads), ignore_no_found=True)
+        delete_deploy_k8s_pipeline(payloads, ignore_no_found=True)
         await _deploy.update(**{"ended_at": datetime.datetime.now()})
     elif action == 1:
         update_data['status'] = sc.get('pending')
-        # todo create_vcjob(vjc=VolcanoDeploymentCreateReq.parse_raw(payloads))
+        create_deploy_k8s_pipeline(payloads)
         await _deploy.update(**{"started_at": datetime.datetime.now()})
 
     if not update_data:
@@ -265,6 +265,6 @@ async def delete_deployment(request: Request,
 
     payloads = _deploy.k8s_info
     # # error状态调用删除需要释放资源
-    # if _deploy.status.name != 'stop':
-    #     delete_vcjob(vjd=VolcanoDeploymentDeleteReq.parse_obj(dict(payloads)), ignore_no_found=True)
+    if _deploy.status.name != 'stop':
+        delete_deploy_k8s_pipeline(json.dumps(payloads), ignore_no_found=True)
     await _deploy.delete()
