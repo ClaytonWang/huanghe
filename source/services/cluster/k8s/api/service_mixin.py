@@ -41,10 +41,9 @@ class ServiceMixin(CustomerObjectApi, CoreV1Api):
                                                           name=servdr.name,)
 
     def list_service(self, servq: ServiceQuery):
-        thread = self.core_v1_api.list_namespaced_service(namespace=servq.namespace, async_req=True)
-        result = thread.get()
+        thread = self.core_v1_api.list_namespaced_service(namespace=servq.namespace)
         services = []
-        for service in result.items:
+        for service in thread.items:
             metadata = service.metadata
             spec = service.spec
             _ports = spec.ports
