@@ -23,4 +23,18 @@ class DeploymentMixin(AppsV1Api):
                                                              namespace=ddr.namespace)
 
     def list_deployment(self, dlr: DeploymentListReq):
-        return self.apps_v1_api.list_namespaced_deployment(namespace=dlr.namespace)
+        thread = self.apps_v1_api.list_namespaced_deployment(namespace=dlr.namespace)
+        # pprint.pprint(thread)
+        deployments = []
+        for deploy in thread.items:
+            metadata = deploy.metadata
+            spec = deploy.spec
+            deployments.append({
+                "deployment_name": metadata.name,
+                "namespace": metadata.namespace,
+                "labels": metadata.labels,
+                "self_link": metadata.self_link,
+                # "selector": spec.selector, 要显示selector需要额外format
+            })
+        # pprint.pprint(deployments)
+        return deployments
