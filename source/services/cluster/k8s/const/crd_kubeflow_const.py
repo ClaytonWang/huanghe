@@ -59,3 +59,7 @@ HUAWEICLOUD_GPU_NAMESPACE_ANNOTATION = {"namespace.kubernetes.io/flavor": "gpu-a
 HUAWEICLOUD_CPU_NAMESPACE_ANNOTATION = {"namespace.kubernetes.io/flavor": "general-computing"}
 
 HUAWEICLOUD_ENTERPRISE_PROJECT_LABEL = "sys_enterprise_project_id"
+
+HUAWEICLOUD_INGRESS_APIVERSION = "extensions/v1beta1"
+
+HUAWEICLOUD_INGRESS_KIND = "Ingress"
