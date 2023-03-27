@@ -6,6 +6,7 @@ FROM $BASE_IMG
 
 COPY services/cluster .
 COPY basic /source/basic/
+COPY services/cluster/kubeconfig/ ~/.kube/
 
 ENTRYPOINT python3 main.py
 CMD ["uvicorn", "main:app", "--host=0.0.0.0", "--port=80"]

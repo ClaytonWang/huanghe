@@ -51,9 +51,9 @@ class Deployment(GenericDateModel):
 
     name: str = ormar.String(max_length=20, comment='名称')
     storage: str = ormar.JSON(comment='存储信息')
-    private_ip: str = ormar.String(max_length=20, comment='私网IP')
-    public_ip: str = ormar.String(max_length=20, comment='公网IP')
-    port: int = ormar.Integer(comment='端口')
+    private_ip: str = ormar.String(max_length=20, comment='私网IP', nullable=True)
+    public_ip: str = ormar.String(max_length=20, comment='公网IP', nullable=True)
+    port: int = ormar.Integer(comment='端口', nullable=True)
 
     custom: bool = ormar.Boolean(default=False)
     image: str = ormar.String(max_length=150, comment='镜像名称')

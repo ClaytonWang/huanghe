@@ -4,15 +4,17 @@ from kubernetes.client import CoreV1Api, CustomObjectsApi, StorageV1Api, AppsV1A
 
 
 class Core:
-    def __init__(self):
-        self._find_kubeconfig()
+    def __init__(self, path=None):
+        self._find_kubeconfig(path)
         self._core_v1_api = CoreV1Api()
         self._custom_object_api = CustomObjectsApi()
         self._storage_v1_api = StorageV1Api()
         self._apps_v1_api = AppsV1Api()
 
-    def _find_kubeconfig(self):
-        if os.getenv("KUBECONFIG"):
+    def _find_kubeconfig(self, path=None):
+        if path:
+            load_kube_config(path)
+        elif os.getenv("KUBECONFIG"):
             load_kube_config()
         else:
             load_incluster_config()
