@@ -12,13 +12,7 @@ class Core:
         self._apps_v1_api = AppsV1Api()
 
     def _find_kubeconfig(self, path=None):
-        if path:
-            try:
-                load_kube_config(path)
-            except Exception as e:
-                load_kube_config()
-                print(f'Loading k8s config path error. {e}')
-        elif os.getenv("KUBECONFIG"):
+        if os.getenv("KUBECONFIG"):
             load_kube_config()
         else:
             load_incluster_config()
