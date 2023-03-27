@@ -5,6 +5,8 @@ import os
 import uvicorn
 from fastapi import FastAPI, status as st
 from fastapi.responses import JSONResponse
+
+from services.cluster.event.api import router_event
 from services.cluster.namespace.api import router_namespace
 from services.cluster.pod.api import router_pod
 from services.cluster.pvc.api import router_pvc
@@ -33,6 +35,7 @@ def k8s_exception_handler(request, exc):
 def status():
     return {"status": "ok"}
 
+
 app.include_router(router_namespace, prefix="/namespace")
 app.include_router(router_pvc, prefix="/pvc")
 app.include_router(router_notebook, prefix="/notebook")
@@ -42,6 +45,7 @@ app.include_router(router_server, prefix='/server')
 app.include_router(router_pod, prefix='/pod')
 app.include_router(router_deployment, prefix='/deployment')
 app.include_router(router_service, prefix='/service')
+app.include_router(router_event, prefix="/event")
 
 app.add_middleware(BaseHTTPMiddleware, dispatch=add_common_response_data)
 
