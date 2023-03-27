@@ -38,7 +38,8 @@ class K8sConfigFactory:
 @Singleton
 class HuaweiConfig(Core):
     def __init__(self):
-        hw_path = '~/.kube/hw_config'
+        # hw_path = '~/.kube/hw_config'
+        hw_path = '/source/services/cluster/kubeconfig/hw_config'
         super().__init__(path=hw_path)
 
 

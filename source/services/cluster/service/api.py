@@ -7,7 +7,7 @@
 """
 from fastapi import APIRouter
 
-from services.cluster.k8s.cluster_client import cc
+from services.cluster.k8s.cluster_client import cc, hwc
 from services.cluster.service.serializers import ServiceCreateReq, Service, ServiceDeleteReq, ServiceQuery
 from basic.middleware.rsp import success_common_response
 
@@ -28,7 +28,12 @@ def create_service(servcr: ServiceCreateReq):
     description='批量查询service',
 )
 def list_service(servq: ServiceQuery):
-    return cc.list_service(servq)
+    # for test to diff env
+    env = servq.env
+    if env == 'huawei':
+        return hwc.list_service(servq)
+    else:
+        return cc.list_service(servq)
 
 
 @router_service.delete(
