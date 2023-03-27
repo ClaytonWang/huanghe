@@ -6,4 +6,4 @@ from pydantic import BaseModel
 
 class Event(BaseModel):
     namespace: str
-    label_selector: Dict[str, str]
+    label_selector: Dict[str, str] = {}
