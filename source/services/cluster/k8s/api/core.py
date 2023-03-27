@@ -12,7 +12,9 @@ class Core:
         self._apps_v1_api = AppsV1Api()
 
     def _find_kubeconfig(self, path=None):
-        if os.getenv("KUBECONFIG"):
+        if path:
+            load_kube_config(path)
+        elif os.getenv("KUBECONFIG"):
             load_kube_config()
         else:
             load_incluster_config()
