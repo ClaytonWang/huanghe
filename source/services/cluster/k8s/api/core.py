@@ -13,7 +13,11 @@ class Core:
 
     def _find_kubeconfig(self, path=None):
         if path:
-            load_kube_config(path)
+            try:
+                load_kube_config(path)
+            except Exception as e:
+                load_kube_config()
+                print(f'Loading k8s config path error. {e}')
         elif os.getenv("KUBECONFIG"):
             load_kube_config()
         else:
