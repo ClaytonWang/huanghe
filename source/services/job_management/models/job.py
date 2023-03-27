@@ -233,5 +233,5 @@ class Job(GenericDateModel):
         return 1
 
     @classmethod
-    async def project_list_by_ip(cls, _ip: int):
+    async def project_list_by_ip(cls, _ip: str):
         return await cls.objects.all(cls.server_ip == _ip, status__in=[4, 11])

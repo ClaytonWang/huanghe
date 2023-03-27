@@ -3,8 +3,8 @@ from services.cluster.k8s.model.generic_mixin import GenericMixin
 from services.cluster.k8s.model.v1_alpha1_volcano_job_task import V1Alpha1VolcanoJobTask
 from typing import List, Optional, Dict
 from services.cluster.k8s.const.crd_kubeflow_const import VOLCANO_DEFAULT_QUEUE, VOLCANO_DEFAULT_MAX_RETRY, \
-    VOLCANO_DEFAULT_MIN_AVAILABLE, TENSORFLOW_PLUGIN, PYTORCH_PLUGIN, MPI_PLUGIN, \
-    TENSORFLOW_MODE, PYTORCH_MODE, MPI_MODE, POLICY_TASK_COMPLETED_EVENT_TO_COMPLETE_JOB_ACTION
+    VOLCANO_DEFAULT_MIN_AVAILABLE, TENSORFLOW_PLUGIN, PYTORCH_PLUGIN, MPI_PLUGIN, DEEPSPEED_PLUGIN, \
+    DEEPSPEED_MODE, TENSORFLOW_MODE, PYTORCH_MODE, MPI_MODE, POLICY_TASK_COMPLETED_EVENT_TO_COMPLETE_JOB_ACTION
 
 
 class V1Alpha1VolcanoJobSpec(GenericMixin):
@@ -55,6 +55,10 @@ class V1Alpha1VolcanoJobSpec(GenericMixin):
         self.scheduler_name = scheduler_name
         return self
 
+    def set_default_scheduler(self):
+        self.set_scheduler("default-scheduler")
+        return self
+
     def set_queue(self, queue):
         self.queue = queue
         return self
@@ -89,6 +93,9 @@ class V1Alpha1VolcanoJobSpec(GenericMixin):
     def set_mpi_plugin(self):
         self._set_plugins(MPI_PLUGIN)
 
+    def set_deepspeed_plugin(self):
+        self._set_plugins(DEEPSPEED_PLUGIN)
+
     def set_plugins(self, mode: str):
         if mode == TENSORFLOW_MODE:
             self.set_tensorflow_plugin()
@@ -96,12 +103,16 @@ class V1Alpha1VolcanoJobSpec(GenericMixin):
             self.set_pytorch_plugin()
         elif mode == MPI_MODE:
             self.set_mpi_plugin()
+        elif mode == DEEPSPEED_MODE:
+            self.set_deepspeed_plugin()
         return self
 
     @classmethod
     def generate_tasks(cls, name, image, resource, envs, volumes, tolerations, command, working_dir, task_num, mode):
         if mode == MPI_MODE:
             return cls.mpi(name, image, resource, envs, volumes, tolerations, command, working_dir, task_num)
+        elif mode == DEEPSPEED_MODE:
+            return cls.deepspeed(name, image, resource, envs, volumes, tolerations, command, working_dir, task_num)
         return cls.single(name, image, resource, envs, volumes, tolerations, command, working_dir, task_num)
 
 
@@ -109,7 +120,7 @@ class V1Alpha1VolcanoJobSpec(GenericMixin):
     def default(cls, name, image, resource, envs, volumes, tolerations, command, working_dir, task_num, mode):
         spec = cls.generate_tasks(name, image, resource, envs, volumes, tolerations, command, working_dir, task_num, mode)
         spec.set_queue(VOLCANO_DEFAULT_QUEUE).set_max_retry(VOLCANO_DEFAULT_MAX_RETRY).set_min_available(
-            VOLCANO_DEFAULT_MIN_AVAILABLE).set_plugins(mode).set_task_complete_event_complete()
+            VOLCANO_DEFAULT_MIN_AVAILABLE).set_plugins(mode).set_task_complete_event_complete().set_default_scheduler()
         return spec
 
     @classmethod
@@ -123,11 +134,23 @@ class V1Alpha1VolcanoJobSpec(GenericMixin):
     @classmethod
     def mpi(cls, name, image, resource, envs, volumes, tolerations, command, working_dir, task_num):
         return cls.new([V1Alpha1VolcanoJobTask.master(name=name, image=image, resource=resource, envs=envs,
-                                                       volumes=volumes, tolerations=tolerations, command=["sleep 5; mkdir -p /var/run/sshd; /usr/sbin/sshd; mpiexec --allow-run-as-root --hostfile /etc/volcano/mpiworker.host -np 2 mpi_hello_world > /home/re"],
+                                                       volumes=volumes, tolerations=tolerations, command=command,
                                                        working_dir=working_dir, task_num=1),
                         V1Alpha1VolcanoJobTask.worker(name=name, image=image, resource=resource, envs=envs,
-                                                       volumes=volumes, tolerations=tolerations, command=["mkdir -p /var/run/sshd; /usr/sbin/sshd -D"],
+                                                       volumes=volumes, tolerations=tolerations, command=["sh", "-c", "mkdir -p /var/run/sshd && /usr/sbin/sshd -D"],
                                                        working_dir=working_dir, task_num=task_num-1)])
+
+
+    @classmethod
+    def deepspeed(cls, name, image, resource, envs, volumes, tolerations, command, working_dir, task_num):
+        return cls.new([V1Alpha1VolcanoJobTask.master(name=name, image=image, resource=resource, envs=envs,
+                                                      volumes=volumes, tolerations=tolerations,
+                                                      command=command,
+                                                      working_dir=working_dir, task_num=1),
+                        V1Alpha1VolcanoJobTask.worker(name=name, image=image, resource=resource, envs=envs,
+                                                      volumes=volumes, tolerations=tolerations,
+                                                      command=["sh", "-c", "mkdir -p /var/run/sshd && /usr/sbin/sshd -D"],
+                                                      working_dir=working_dir, task_num=task_num - 1)])
 
     @classmethod
     def single(cls, name, image, resource, envs, volumes, tolerations, command, working_dir, task_num):
