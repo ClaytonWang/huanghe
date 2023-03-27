@@ -50,3 +50,4 @@ class Service(BaseModelValidatorName):
 
 class ServiceQuery(BaseModel):
     namespace: str
+    env: str
