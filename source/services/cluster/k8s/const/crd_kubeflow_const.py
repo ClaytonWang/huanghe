@@ -30,9 +30,9 @@ VOLCANO_TASK_REPLICAS = 1
 
 VOLCANO_TASK_DEFAULT_NAME = "tfjob"
 
-VOLCANO_TASK_MASTER_NAME = "master"
+VOLCANO_TASK_MASTER_NAME = "mpimaster"
 
-VOLCANO_TASK_WORKER_NAME = "worker"
+VOLCANO_TASK_WORKER_NAME = "mpiworker"
 
 TENSORFLOW_PLUGIN = {"tensorflow": ["--port=5000", "--worker=worker", "--ps=ps"]}
 
@@ -40,11 +40,15 @@ PYTORCH_PLUGIN = {"pytorch": ["--master=master","--worker=worker", "--port=23456
 
 MPI_PLUGIN = {"mpi": ["--master=master", "--worker=worker", "--port=22"]}
 
+DEEPSPEED_PLUGIN = {"deepspeed": ["--master=master", "--worker=worker", "--port=22"]}
+
 TENSORFLOW_MODE = "tensorflow"
 
 PYTORCH_MODE = "pytorch"
 
 MPI_MODE = "mpi"
+
+DEEPSPEED_MODE = "deepspeed"
 
 POLICY_TASK_COMPLETED_EVENT_TO_COMPLETE_JOB_ACTION = {"action": "CompleteJob", "event": "TaskCompleted"}
 
