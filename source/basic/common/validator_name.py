@@ -3,7 +3,7 @@ import re
 
 
 class Cluster(BaseModel):
-    cluster: str = "zk"
+    cluster: str = "default"
 
 class BaseModelValidatorName(Cluster):
     name: str
