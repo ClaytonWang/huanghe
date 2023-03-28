@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from pydantic import BaseModel
+from basic.common.validator_name import BaseModelValidatorName, Cluster
 
 
-class SecretCommon(BaseModel):
-    name: str
+class SecretCommon(BaseModelValidatorName):
     namespace: str
 
 
-class SecretNamespace(BaseModel):
+class SecretNamespace(Cluster):
     namespace: str

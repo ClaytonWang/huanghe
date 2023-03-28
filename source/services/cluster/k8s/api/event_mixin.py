@@ -1,16 +1,16 @@
 import datetime
 
 from services.cluster.event.serializers import Event
-from services.cluster.k8s.api.core import Core
+from services.cluster.k8s.api.core import K8sConfigFactory
 from services.cluster.k8s.api.core_v1_api import CoreV1Api
 
 
 class EventMixin(CoreV1Api):
-    def __init__(self, c: Core):
-        super(EventMixin, self).__init__(c=c)
+    def __init__(self, kcf: K8sConfigFactory):
+        super(EventMixin, self).__init__(kcf=kcf)
 
     def list_event(self, event: Event):
-        result = self.core_v1_api.list_namespaced_event(
+        result = self.core_v1_api(cluster=event.cluster).list_namespaced_event(
             namespace=event.namespace,
             label_selector=",".join([f"{key}={val}" for key, val in event.label_selector.items()]))
         events = []

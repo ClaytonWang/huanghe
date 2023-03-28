@@ -6,7 +6,7 @@
     >Time   : 2023/3/14 15:49
 """
 from pydantic import BaseModel
-from basic.common.validator_name import BaseModelValidatorName
+from basic.common.validator_name import BaseModelValidatorName, Cluster
 from typing import Dict, List
 
 
@@ -33,7 +33,7 @@ class ServiceCreateReq(BaseModelValidatorName):
         }
 
 
-class ServiceDeleteReq(BaseModel):
+class ServiceDeleteReq(BaseModelValidatorName):
     name: str
     namespace: str
 
@@ -48,6 +48,6 @@ class Service(BaseModelValidatorName):
     selector: Dict = {}
 
 
-class ServiceQuery(BaseModel):
+class ServiceQuery(Cluster):
     namespace: str
     env: str

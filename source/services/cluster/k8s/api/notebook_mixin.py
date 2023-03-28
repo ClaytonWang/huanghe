@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List
 
-from services.cluster.k8s.api.core import Core
+from services.cluster.k8s.api.core import K8sConfigFactory
 from services.cluster.k8s.model.v1_status import V1Status
 from services.cluster.k8s.api.custom_object_api import CustomerObjectApi
 from services.cluster.k8s.api.core_v1_api import CoreV1Api
@@ -20,11 +20,11 @@ NOTEBOOK_STATUS_ON = "ON"
 
 
 class NotebookMixin(CustomerObjectApi, CoreV1Api):
-    def __init__(self, c: Core):
-        super(NotebookMixin, self).__init__(c=c)
+    def __init__(self, kcf: K8sConfigFactory):
+        super(NotebookMixin, self).__init__(kcf=kcf)
 
     def create_notebook(self, nb: NoteBook) -> Dict:
-        return self.custom_object_api.create_namespaced_custom_object(group=KUBEFLOW_NOTEBOOK_GROUP,
+        return self.custom_object_api(cluster=nb.cluster).create_namespaced_custom_object(group=KUBEFLOW_NOTEBOOK_GROUP,
                                                                       version=KUBEFLOW_V1_VERSION,
                                                                       namespace=nb.namespace,
                                                                       plural=KUBEFLOW_NOTEBOOK_PLURAL,
@@ -41,7 +41,7 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                                                                       )
 
     def delete_notebook(self, nbdr: NoteBookDeleteReq) -> V1Status:
-        return self.custom_object_api.delete_namespaced_custom_object(group=KUBEFLOW_NOTEBOOK_GROUP,
+        return self.custom_object_api(cluster=nbdr.cluster).delete_namespaced_custom_object(group=KUBEFLOW_NOTEBOOK_GROUP,
                                                                       version=KUBEFLOW_V1_VERSION,
                                                                       namespace=nbdr.namespace,
                                                                       plural=KUBEFLOW_NOTEBOOK_PLURAL,
@@ -49,7 +49,7 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
 
     def list_notebook(self, nblr: NoteBookListReq) -> List:
         notebooks = []
-        for notebook in self.custom_object_api.list_cluster_custom_object(group=KUBEFLOW_NOTEBOOK_GROUP,
+        for notebook in self.custom_object_api(cluster=nblr.cluster).list_cluster_custom_object(group=KUBEFLOW_NOTEBOOK_GROUP,
                                                                           version=KUBEFLOW_V1_VERSION,
                                                                           plural=KUBEFLOW_NOTEBOOK_PLURAL,
                                                                           label_selector=f"env={nblr.env}"
@@ -60,7 +60,7 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
             if NOTEBOOK_STATUS_ON == status:
                 status, reason = NOTEBOOK_STATUS_ON, "success"
             else:
-                status, reason = self.process_notebook_status(notebook_name, namespace)
+                status, reason = self.process_notebook_status(notebook_name, namespace, nblr.cluster)
             node_name = "default"
             node_ip = "default"
             notebooks.append({"name": notebook_name,
@@ -74,7 +74,7 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
         node_names = {}
         node_ips = {}
         pod_ips = {}
-        for pod in self.core_v1_api.list_pod_for_all_namespaces(label_selector=f"env={nblr.env}").items:
+        for pod in self.core_v1_api(cluster=nblr.cluster).list_pod_for_all_namespaces(label_selector=f"env={nblr.env}").items:
             node_names[pod.spec.containers[0].name] = pod.spec.node_name
             node_ips[pod.spec.containers[0].name] = pod.status.host_ip
             pod_ips[pod.spec.containers[0].name] = pod.status.pod_ip
@@ -84,8 +84,6 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
             notebook["pod_ip"] = pod_ips.get(notebook["name"])
         return notebooks
 
-    def watch_notebook(self):
-        return self.custom_object_api.list_namespaced_custom_object
 
     @staticmethod
     def is_ready(notebook: Dict):
@@ -93,9 +91,9 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
             return True
         return False
 
-    def process_notebook_status(self, name, namespace):
+    def process_notebook_status(self, name, namespace, cluster):
         try:
-            pod = self.core_v1_api.read_namespaced_pod("{}-0".format(name), namespace)
+            pod = self.core_v1_api(cluster=cluster).read_namespaced_pod("{}-0".format(name), namespace)
             # check init-container
             for init_container in pod.status.init_container_statuses:
                 # check is finished
@@ -118,10 +116,10 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
                     if container.state.waiting.reason == "ImagePullBackOff":
                         return NOTEBOOK_STATUS_ERROR, "image pull failed"
         except Exception as e:
-            return self.process_notebook_event_status(name, namespace)
+            return self.process_notebook_event_status(name, namespace, cluster)
 
-    def process_notebook_event_status(self, name, namespace):
-        nb_events = self.list_notebook_events(name, namespace).items
+    def process_notebook_event_status(self, name, namespace, cluster):
+        nb_events = self.list_notebook_events(name, namespace, cluster).items
         if not nb_events:
             return NOTEBOOK_STATUS_PENDING, "without event"
         event = nb_events[-1]
@@ -143,6 +141,6 @@ class NotebookMixin(CustomerObjectApi, CoreV1Api):
             return NOTEBOOK_STATUS_RUNNING, "now is waiting for pod"
         return NOTEBOOK_STATUS_ERROR, "unknow error"
 
-    def list_notebook_events(self, name, namespace):
-        return self.core_v1_api.list_namespaced_event(namespace=namespace,
+    def list_notebook_events(self, name, namespace, cluster):
+        return self.core_v1_api(cluster=cluster).list_namespaced_event(namespace=namespace,
                                                       field_selector="involvedObject.name={}-0".format(name))

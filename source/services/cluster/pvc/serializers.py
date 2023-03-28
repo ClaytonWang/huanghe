@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from pydantic import BaseModel
 from basic.common.validator_name import BaseModelValidatorName
 
 
@@ -12,6 +11,5 @@ class PVCCreateReq(BaseModelValidatorName):
     platform: str = "mvp"
 
 
-class PVCDeleteReq(BaseModel):
-    name: str
+class PVCDeleteReq(BaseModelValidatorName):
     namespace: str

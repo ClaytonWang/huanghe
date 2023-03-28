@@ -1,4 +1,4 @@
-from services.cluster.k8s.api.core import Core
+from services.cluster.k8s.api.core import K8sConfigFactory
 from services.cluster.k8s.api.core_v1_api import CoreV1Api
 
 
@@ -20,12 +20,12 @@ def translate_memory(memory_data):
 
 
 class ServerMixin(CoreV1Api):
-    def __init__(self, c: Core):
-        super(ServerMixin, self).__init__(c=c)
+    def __init__(self, kcf: K8sConfigFactory):
+        super(ServerMixin, self).__init__(kcf=kcf)
 
     def get_server_list(self):
         nodes = []
-        response = self.core_v1_api.list_node_with_http_info()[0].items
+        response = self.core_v1_api().list_node_with_http_info()[0].items
         for node in response:
             server = node.metadata.name
             node_source_data = node.status.capacity
