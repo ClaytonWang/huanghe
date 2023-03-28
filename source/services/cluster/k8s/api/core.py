@@ -50,6 +50,8 @@ class K8sConfigFactory:
 
 
     def __getitem__(self, item):
+        if not item:
+            return self.pool["default"]
         return self.pool[item]
 
     def get(self, key=None) -> Core:
