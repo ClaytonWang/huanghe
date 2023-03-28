@@ -20,7 +20,7 @@ from basic.middleware.service_requests import get_user_list, volume_check
 
 from services.deployment.deployment.serializers import DeploymentList, DeploymentCreate, DeploymentDetail, \
     DeploymentEdit, DeploymentOp, DeploymentStatusUpdate, DeploymentDeleteReq, DeploymentCreateReq, \
-    DeploymentListReq, DeploymentItem
+    DeploymentListReq, DeploymentItem, DeploymentSimple
 from services.deployment.models.deployment import Deployment
 from services.deployment.utils.auth import operate_auth
 from services.deployment.utils.k8s_request import create_deploy_k8s_pipeline, delete_deploy_k8s_pipeline
@@ -36,6 +36,41 @@ router_deployment = APIRouter()
 COMMON = "https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
 ACCOUNT = "jovyan"
 PASSWORD = "jovyan"
+
+
+@router_deployment.get(
+    '/items',
+    description='Deployment概况',
+    response_model=List[DeploymentSimple],
+    response_model_exclude_unset=True
+)
+async def get_simple_deployment(query_params: QueryParameters = Depends(QueryParameters),):
+    params_filter = query_params.filter_
+
+    if params_filter:
+        if 'creator_id' in params_filter:
+            creator_id = params_filter.pop('creator_id')
+            params_filter['created_by_id'] = int(creator_id)
+        if 'project_ids' in params_filter:
+            project_ids = params_filter.pop('project_ids')
+            if isinstance(project_ids, str):
+                project_ids = [int(x) for x in project_ids.split(',')]
+            params_filter['project_by_id__in'] = project_ids
+
+    query = await Deployment.objects.select_related('status').filter(**params_filter).all()
+
+    return [x.gen_deployment_simple_response() for x in query]
+
+
+@router_deployment.get(
+    '/{deployment_id}',
+    description="Deployment详情",
+    response_model=DeploymentDetail,
+    response_model_exclude_unset=True
+)
+async def get_deployment(deployment_id: int = Path(..., ge=1, description='需要查询的deployment ID')):
+    _deployment = await Deployment.objects.select_related(['status']).get(pk=deployment_id)
+    return _deployment.gen_deployment_detail_response()
 
 
 @router_deployment.get(

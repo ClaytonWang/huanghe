@@ -162,6 +162,9 @@ class DeploymentDetail(BaseModel):
     grafana: Optional[Grafana]
     logging_url: Optional[str]
     work_dir: Optional[str]
+    public_ip: Optional[str]
+    private_ip: Optional[str]
+    port: Optional[int]
 
     @validator('created_at', 'updated_at')
     def format_dt(cls, dt):

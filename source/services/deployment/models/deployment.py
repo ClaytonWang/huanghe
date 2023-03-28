@@ -179,7 +179,6 @@ class Deployment(GenericDateModel):
                         "name": self.project_by, },
             "created_at": self.created_at,
             "updated_at": self.updated_at,
-            "mode": self.mode,
             "volume_ids": [x['storage']['id'] for x in self.storage],
             "private_ip": self.private_ip,
             "public_ip": self.public_ip,
