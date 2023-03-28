@@ -8,6 +8,19 @@ COPY services/cluster .
 COPY basic /source/basic/
 COPY services/cluster/kubeconfig/hw_config ~/.kube/
 
+# 华为云aksk
+ARG AK=RABVMT0LW6WB2QSZNRVT
+ARG SK=00SGlW1Y9970QGCI87eUgQO6SjBZfiNXKxWlbzP4
+
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
+    && chmod +x ./kubectl \
+    && mv ./kubectl /usr/local/bin
+
+COPY cci-iam-authenticator .
+RUN chmod +x ./cci-iam-authenticator  \
+    && mv ./cci-iam-authenticator /usr/local/bin  \
+    && cci-iam-authenticator generate-kubeconfig --cci-endpoint=https://cci.cn-north-4.myhuaweicloud.com --ak=$AK --sk=$SK
+
 ENTRYPOINT python3 main.py
 CMD ["uvicorn", "main:app", "--host=0.0.0.0", "--port=80"]
 
