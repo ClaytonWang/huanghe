@@ -9,13 +9,13 @@ class PodMixin(CoreV1Api):
     def __init__(self, c: Core):
         super(PodMixin, self).__init__(c=c)
 
-    def list_namespaced_pod(self):
-        return self.core_v1_api.list_namespaced_pod()
+    def list_namespaced_pod(self, cluster):
+        return self.core_v1_api(cluster=cluster).list_namespaced_pod()
 
-    def create_namespaced_pod(self, namespace: str, name: str, image: str):
-        return self.core_v1_api.create_namespaced_pod(namespace, body=V1Pod.default(name=name,
+    def create_namespaced_pod(self, namespace: str, name: str, image: str, cluster: str):
+        return self.core_v1_api(cluster=cluster).create_namespaced_pod(namespace, body=V1Pod.default(name=name,
                                                                                     namespace=namespace,
                                                                                     image=image))
 
     def read_namespaced_pod_log(self, p: Pod):
-        return self.core_v1_api.read_namespaced_pod_log(name=p.name, namespace=p.namespace)
+        return self.core_v1_api(cluster=p.cluster).read_namespaced_pod_log(name=p.name, namespace=p.namespace)
