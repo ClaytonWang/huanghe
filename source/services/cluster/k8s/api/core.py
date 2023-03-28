@@ -46,6 +46,8 @@ class K8sConfigFactory:
         if not self.pool:
             for file in os.listdir(kubeconfig_path):
                 self.pool[file] = Core(os.path.join(kubeconfig_path, file))
+        self.pool["default"] = Core()
+
 
     def __getitem__(self, item):
         return self.pool[item]
