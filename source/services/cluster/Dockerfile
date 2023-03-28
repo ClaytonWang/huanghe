@@ -16,7 +16,6 @@ RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s
     && chmod +x ./kubectl \
     && mv ./kubectl /usr/local/bin
 
-COPY cci-iam-authenticator .
 RUN chmod +x ./cci-iam-authenticator  \
     && mv ./cci-iam-authenticator /usr/local/bin  \
     && cci-iam-authenticator generate-kubeconfig --cci-endpoint=https://cci.cn-north-4.myhuaweicloud.com --ak=$AK --sk=$SK
