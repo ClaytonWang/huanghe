@@ -22,10 +22,10 @@ import pprint
 
 class ServiceMixin(CustomerObjectApi, CoreV1Api):
     def __init__(self, c: Core):
-        super(ServiceMixin, self).__init__(c=c)
+        super(ServiceMixin, self).__init__(kcf=kcf)
 
     def create_service(self, serv: Service) -> Dict:
-        return self.core_v1_api.create_namespaced_service(namespace=serv.namespace,
+        return self.core_v1_api(cluster=serv.cluster).create_namespaced_service(namespace=serv.namespace,
                                                           body=V1Service.default(name=serv.name,
                                                                                  namespace=serv.namespace,
                                                                                  labels=serv.labels,
@@ -37,11 +37,11 @@ class ServiceMixin(CustomerObjectApi, CoreV1Api):
                                                           )
 
     def delete_service(self, servdr: ServiceDeleteReq) -> V1Status:
-        return self.core_v1_api.delete_namespaced_service(namespace=servdr.namespace,
+        return self.core_v1_api(cluster=servdr.cluster).delete_namespaced_service(namespace=servdr.namespace,
                                                           name=servdr.name,)
 
     def list_service(self, servq: ServiceQuery):
-        thread = self.core_v1_api.list_namespaced_service(namespace=servq.namespace)
+        thread = self.core_v1_api(cluster=servq.cluster).list_namespaced_service(namespace=servq.namespace)
         services = []
         for service in thread.items:
             metadata = service.metadata

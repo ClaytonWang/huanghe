@@ -2,11 +2,10 @@
 
 from pydantic import BaseModel
 from typing import Optional, Dict, List
-from basic.common.validator_name import BaseModelValidatorName
+from basic.common.validator_name import BaseModelValidatorName, Cluster
 
 
-class Volume(BaseModel):
-    name: str
+class Volume(BaseModelValidatorName):
     mount_path: str
     mount_propagation: Optional[str] = "HostToContainer"
 
@@ -48,8 +47,7 @@ class VolcanoJobCreateReq(BaseModelValidatorName):
         }
 
 
-class VolcanoJobDeleteReq(BaseModel):
-    name: str
+class VolcanoJobDeleteReq(BaseModelValidatorName):
     namespace: str
 
 
@@ -58,8 +56,7 @@ class VolcanoJobListReq(BaseModel):
     env: str
 
 
-class VolcanoStatusPostReq(BaseModel):
-    name: str
+class VolcanoStatusPostReq(BaseModelValidatorName):
     status: str
 
 

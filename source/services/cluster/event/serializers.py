@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from typing import Dict
 
-from pydantic import BaseModel
+from basic.common.validator_name import Cluster
 
 
-class Event(BaseModel):
+class Event(Cluster):
     namespace: str
     label_selector: Dict[str, str] = {}

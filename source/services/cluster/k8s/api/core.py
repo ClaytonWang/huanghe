@@ -34,3 +34,23 @@ class Core:
     @property
     def apps_v1_api(self):
         return self._apps_v1_api
+
+
+kubeconfig_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "kubeconfig")
+
+
+class K8sConfigFactory:
+    pool = {}
+
+    def __init__(self):
+        if not self.pool:
+            for file in os.listdir(kubeconfig_path):
+                self.pool[file] = Core(os.path.join(kubeconfig_path, file))
+
+    def __getitem__(self, item):
+        return self.pool[item]
+
+    def get(self, key=None) -> Core:
+        return self.pool[key]
+
+kcf = K8sConfigFactory()
