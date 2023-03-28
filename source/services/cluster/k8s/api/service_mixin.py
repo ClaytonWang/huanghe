@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import List
 
-from services.cluster.k8s.api.core import Core
+from services.cluster.k8s.api.core import K8sConfigFactory
 from services.cluster.k8s.model.v1_status import V1Status
 from services.cluster.k8s.api.custom_object_api import CustomerObjectApi
 from services.cluster.k8s.api.core_v1_api import CoreV1Api
@@ -21,7 +21,7 @@ import pprint
 
 
 class ServiceMixin(CustomerObjectApi, CoreV1Api):
-    def __init__(self, c: Core):
+    def __init__(self, kcf: K8sConfigFactory):
         super(ServiceMixin, self).__init__(kcf=kcf)
 
     def create_service(self, serv: Service) -> Dict:
