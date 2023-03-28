@@ -55,6 +55,8 @@ class K8sConfigFactory:
         return self.pool[item]
 
     def get(self, key=None) -> Core:
+        if not key:
+            return self.pool["default"]
         return self.pool[key]
 
 kcf = K8sConfigFactory()
