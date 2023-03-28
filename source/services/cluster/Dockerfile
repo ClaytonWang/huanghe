@@ -6,7 +6,6 @@ FROM $BASE_IMG
 
 COPY services/cluster .
 COPY basic /source/basic/
-COPY services/cluster/kubeconfig/hw_config ~/.kube/
 
 # 华为云aksk
 ARG AK=RABVMT0LW6WB2QSZNRVT
