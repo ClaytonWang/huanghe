@@ -20,7 +20,7 @@ router_service_pipeline = APIRouter()
 )
 def create_service(servcr: ServiceCreateReq):
     #TODO(jiangshouchen): create service/ingress/deployments
-    cc.create
+    cc.create_service(servcr)
     return success_common_response()
 
 
