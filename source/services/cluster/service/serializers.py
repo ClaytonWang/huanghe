@@ -5,7 +5,6 @@
     >Mail   : xinkai.tao@digitalbrain.cn
     >Time   : 2023/3/14 15:49
 """
-from pydantic import BaseModel
 from basic.common.validator_name import BaseModelValidatorName, Cluster
 from typing import Dict, List
 
