@@ -58,12 +58,26 @@ HUAWEICLOUD_GPU_NAMESPACE_ANNOTATION = {"namespace.kubernetes.io/flavor": "gpu-a
 
 HUAWEICLOUD_CPU_NAMESPACE_ANNOTATION = {"namespace.kubernetes.io/flavor": "general-computing"}
 
+HUAWEICLOUD_NETWORK_ANNOTATION = {"network.alpha.kubernetes.io/domain-id": "a13b3c35734648b39befee62731ae42f",
+                                  "network.alpha.kubernetes.io/default-security-group":"6664c5b1-294c-4078-8153-cd07b5437683",
+                                  "network.alpha.kubernetes.io/project-id": "9c2349a364784c38a4e40121ef5d67d4",}
+
 HUAWEICLOUD_ENTERPRISE_PROJECT_LABEL = "sys_enterprise_project_id"
 
 HUAWEICLOUD_INGRESS_APIVERSION = "extensions/v1beta1"
 
 HUAWEICLOUD_INGRESS_KIND = "Ingress"
 
+HUAWEICLOUD_NETWORK_APIVERSION = "networking.cci.io/v1beta1"
+
 HUAWEICLOUD_NETWORK_AVAILABLE_ZONE = "cn-north-4a"
 
-HUAWEICLOUD_NETWORK_CIDR = "192.168.0.0/16"
+HUAWEICLOUD_NETWORK_CIDR = "192.168.0.0/18"
+
+HUAWEICLOUD_NETWORK_VPC_ID = "c4bfbd62-44e9-4b6c-9629-613e892ce4f2"
+
+HUAWEICLOUD_NETWORK_SUBNET_ID = "516e5c43-f315-469a-bf47-cd68fc49e819"
+
+HUAWEICLOUD_NETWORK_NETWORK_ID = "828770d8-4d8b-4ab8-8b70-07c8ab8fc0e3"
+
+HUAWEICLOUD_NETWORK_NETTYPE = "underlay_neutron"
