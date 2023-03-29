@@ -17,7 +17,8 @@ RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s
 
 RUN chmod +x ./cci-iam-authenticator  \
     && mv ./cci-iam-authenticator /usr/local/bin  \
-    && cci-iam-authenticator generate-kubeconfig --cci-endpoint=https://cci.cn-north-4.myhuaweicloud.com --ak=$AK --sk=$SK
+    && cci-iam-authenticator generate-kubeconfig --cci-endpoint=https://cci.cn-north-4.myhuaweicloud.com --ak=$AK --sk=$SK \
+    && cp ~/.kube/config ./kubeconfig/hw
 
 ENTRYPOINT python3 main.py
 CMD ["uvicorn", "main:app", "--host=0.0.0.0", "--port=80"]

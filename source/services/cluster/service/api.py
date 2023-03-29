@@ -23,17 +23,12 @@ def create_service(servcr: ServiceCreateReq):
     return success_common_response()
 
 
-# @router_service.post(
-#     '/batch',
-#     description='批量查询service',
-# )
-# def list_service(servq: ServiceQuery):
-#     # for test to diff env
-#     env = servq.env
-#     if env == 'huawei':
-#         return hwc.list_service(servq)
-#     else:
-#         return cc.list_service(servq)
+@router_service.post(
+    '/batch',
+    description='批量查询service',
+)
+def list_service(servq: ServiceQuery):
+    return cc.list_service(servq)
 
 
 @router_service.delete(
