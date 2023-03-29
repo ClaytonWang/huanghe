@@ -151,4 +151,13 @@ class HWV1Beta1Api(object):
 
 
 if __name__ == '__main__':
-    h = HWV1Beta1Api()
+    # from kubernetes.config import load_kube_config
+    # load_kube_config("hw")
+    # h = HWV1Beta1Api()
+    # from services.cluster.k8s.model.v1_beta1_network import V1Beta1Network
+    # h.create_namespaced_network("lilaidi", V1Beta1Network.default("laojiang-test", "lilaidi"))
+
+    from services.cluster.k8s.model.v1_beta1_network import V1Beta1Network
+    n = V1Beta1Network.default("laojiang-test", "lilaidi")
+    import pprint
+    pprint.pprint(n)

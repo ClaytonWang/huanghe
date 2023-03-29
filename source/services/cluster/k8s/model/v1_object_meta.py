@@ -170,6 +170,7 @@ class V1ObjectMeta(GenericMixin):
     def huaweicloud_network(cls, name, namespace, annotations=None, labels=None):
         meta = cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
         meta.extend_annotations(HUAWEICLOUD_NETWORK_ANNOTATION)
+        return meta
 
     @classmethod
     def _check_enterprise_label(cls, name: str, namespace: str, annotations: Dict[str, str], labels: Dict[str, str]):
