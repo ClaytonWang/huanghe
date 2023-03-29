@@ -37,12 +37,18 @@ class V1Beta1Network(BaseModel):
     }
 
     @classmethod
-    def default(cls):
+    def default(cls, name: str, namespace: str):
         return cls.new(api_version=HUAWEICLOUD_INGRESS_APIVERSION,
                        kind=HUAWEICLOUD_INGRESS_KIND,
-                       metadata=V1ObjectMeta.default(),
-                       spec=V1Beta1IngressSpec.default())
+                       metadata=V1ObjectMeta.huaweicloud_network(name=name, namespace=namespace),
+                       spec=V1Beta1NetworkSpec.default())
 
     @staticmethod
-    def new(api_version: str, kind: str, metadata: V1ObjectMeta, spec: V1Beta1IngressSpec):
-        return V1Beta1Ingress(api_version=api_version, kind=kind, metadata=metadata, spec=spec)
+    def new(api_version: str, kind: str, metadata: V1ObjectMeta, spec: V1Beta1NetworkSpec):
+        return V1Beta1Network(api_version=api_version, kind=kind, metadata=metadata, spec=spec)
+
+
+if __name__ == '__main__':
+    d = V1Beta1Network.default(name="test", namespace="test-ns").dict()
+    import pprint
+    pprint.pprint(d)
