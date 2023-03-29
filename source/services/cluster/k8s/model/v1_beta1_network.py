@@ -1,7 +1,7 @@
 from services.cluster.k8s.model.base_model import BaseModel
 from services.cluster.k8s.model.v1_beta1_network_spec import V1Beta1NetworkSpec
 from services.cluster.k8s.model.v1_object_meta import V1ObjectMeta
-from services.cluster.k8s.const.crd_kubeflow_const import HUAWEICLOUD_INGRESS_APIVERSION, HUAWEICLOUD_INGRESS_KIND
+from services.cluster.k8s.const.crd_kubeflow_const import HUAWEICLOUD_NETWORK_APIVERSION, HUAWEICLOUD_NETWORK_KIND
 
 
 class V1Beta1Network(BaseModel):
@@ -38,8 +38,8 @@ class V1Beta1Network(BaseModel):
 
     @classmethod
     def default(cls, name: str, namespace: str):
-        return cls.new(api_version=HUAWEICLOUD_INGRESS_APIVERSION,
-                       kind=HUAWEICLOUD_INGRESS_KIND,
+        return cls.new(api_version=HUAWEICLOUD_NETWORK_APIVERSION,
+                       kind=HUAWEICLOUD_NETWORK_KIND,
                        metadata=V1ObjectMeta.huaweicloud_network(name=name, namespace=namespace),
                        spec=V1Beta1NetworkSpec.default())
 
