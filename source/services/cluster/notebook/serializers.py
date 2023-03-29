@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel
 from typing import Optional, Dict, List
-from basic.common.validator_name import BaseModelValidatorName
+from basic.common.validator_name import BaseModelValidatorName, Cluster
 
 
 class Volume(BaseModel):
@@ -40,12 +40,11 @@ class NoteBookCreateReq(BaseModelValidatorName):
         }
 
 
-class NoteBookDeleteReq(BaseModel):
-    name: str
+class NoteBookDeleteReq(BaseModelValidatorName):
     namespace: str
 
 
-class NoteBookListReq(BaseModel):
+class NoteBookListReq(Cluster):
     platform: str = "mvp"
     env: str
 

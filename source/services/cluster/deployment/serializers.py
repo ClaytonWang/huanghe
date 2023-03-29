@@ -40,8 +40,7 @@ class DeploymentCreateReq(BaseModelValidatorName):
         }
 
 
-class DeploymentDeleteReq(BaseModel):
-    name: str
+class DeploymentDeleteReq(BaseModelValidatorName):
     namespace: str
 
 

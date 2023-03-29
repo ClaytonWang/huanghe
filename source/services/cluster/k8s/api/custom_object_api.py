@@ -1,10 +1,9 @@
-from services.cluster.k8s.api.core import Core
+from services.cluster.k8s.api.core import K8sConfigFactory
 
 
 class CustomerObjectApi:
-    def __init__(self, c: Core):
-        self._c = c
+    def __init__(self, kcf: K8sConfigFactory):
+        self._kcf = kcf
 
-    @property
-    def custom_object_api(self):
-        return self._c.custom_object_api
+    def custom_object_api(self, cluster=None):
+        return self._kcf.get(key=cluster).custom_object_api

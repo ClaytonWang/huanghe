@@ -1,10 +1,9 @@
-from services.cluster.k8s.api.core import Core
+from services.cluster.k8s.api.core import K8sConfigFactory
 
 
 class CoreV1Api:
-    def __init__(self, c: Core):
-        self._c = c
+    def __init__(self, kcf: K8sConfigFactory):
+        self._kcf = kcf
 
-    @property
-    def core_v1_api(self):
-        return self._c.core_v1_api
+    def core_v1_api(self, cluster=None):
+        return self._kcf.get(key=cluster).core_v1_api
