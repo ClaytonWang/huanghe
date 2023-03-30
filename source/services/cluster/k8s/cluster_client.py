@@ -8,10 +8,11 @@ from services.cluster.k8s.api.volcano_job_mixin import VolcanoJobMixin
 from services.cluster.k8s.api.server_mixin import ServerMixin
 from services.cluster.k8s.api.deployment_mixin import DeploymentMixin
 from services.cluster.k8s.api.service_mixin import ServiceMixin
+from services.cluster.k8s.api.network_mixin import NetworkMixin
 from services.cluster.k8s.api.core import kcf, K8sConfigFactory
 
 
-class ClusterClient(NamespaceMixin, NotebookMixin, PodMixin, PersistentVolumeClaimMixin,
+class ClusterClient(NamespaceMixin, NotebookMixin, PodMixin, PersistentVolumeClaimMixin, NetworkMixin,
                     SecretMixin, VolcanoJobMixin, ServerMixin, DeploymentMixin, ServiceMixin, EventMixin):
     def __init__(self, kcf: K8sConfigFactory):
         super(ClusterClient, self).__init__(kcf=kcf)
