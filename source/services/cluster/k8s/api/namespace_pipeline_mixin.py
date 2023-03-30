@@ -3,7 +3,7 @@ from services.cluster.k8s.api.core import K8sConfigFactory
 from services.cluster.k8s.api.namespace_mixin import NamespaceMixin
 from services.cluster.k8s.api.network_mixin import NetworkMixin
 from services.cluster.k8s.model.v1_status import V1Status
-from services.cluster.namespace_pipeline.serializers import NamespacePipeline
+from services.cluster.namespace_pipeline.serializers import NamespacePipeline, Namespace
 
 
 class NamespacePipelineMixin(NamespaceMixin, NetworkMixin):
@@ -11,7 +11,11 @@ class NamespacePipelineMixin(NamespaceMixin, NetworkMixin):
         super(NamespacePipelineMixin, self).__init__(kcf=kcf)
 
     def create_namespace_pipeline(self, np: NamespacePipeline):
-        return self.create_huaweiyun_cpu_ns(np.gen_namespace()) and self.create_network(np.gen_network())
+        self.create_huaweiyun_cpu_ns(np.gen_namespace()) and self.create_network(np.gen_network())
+        np.name = np.name + "-" + "gpu"
+        self.create_huaweiyun_gpu_ns(np.gen_namespace()) and self.create_network(np.gen_network())
 
-    # def delete_namespace_pipeline(self, np: NamespacePipeline) -> V1Status:
-    #     return self.delete_namespace()
+    def delete_namespace_pipeline(self, ns: Namespace):
+        self.delete_namespace(ns)
+        ns.name = ns.name + "-" + "gpu"
+        self.delete_namespace(ns)
