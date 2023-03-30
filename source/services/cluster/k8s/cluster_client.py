@@ -13,7 +13,7 @@ from services.cluster.k8s.api.namespace_pipeline_mixin import NamespacePipelineM
 from services.cluster.k8s.api.core import kcf, K8sConfigFactory
 
 
-class ClusterClient(NamespaceMixin, NotebookMixin, PodMixin, PersistentVolumeClaimMixin, NetworkMixin, NamespacePipelineMixin,
+class ClusterClient(NotebookMixin, PodMixin, PersistentVolumeClaimMixin, NamespacePipelineMixin,
                     SecretMixin, VolcanoJobMixin, ServerMixin, DeploymentMixin, ServiceMixin, EventMixin):
     def __init__(self, kcf: K8sConfigFactory):
         super(ClusterClient, self).__init__(kcf=kcf)
