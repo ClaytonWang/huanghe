@@ -156,13 +156,13 @@ class V1ObjectMeta(GenericMixin):
 
     @classmethod
     def huaweicloud_gpu_namespace(cls, name, namespace=None, annotations=None, labels=None):
-        meta = cls._check_enterprise_label(name=name, namespace=namespace, annotations=annotations, labels=labels)
+        meta = cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
         meta.extend_annotations(HUAWEICLOUD_GPU_NAMESPACE_ANNOTATION)
         return meta
 
     @classmethod
     def huaweicloud_cpu_namespace(cls, name, namespace=None, annotations=None, labels=None):
-        meta = cls._check_enterprise_label(name=name, namespace=namespace, annotations=annotations, labels=labels)
+        meta = cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
         meta.extend_annotations(HUAWEICLOUD_CPU_NAMESPACE_ANNOTATION)
         return meta
 
@@ -171,11 +171,6 @@ class V1ObjectMeta(GenericMixin):
         meta = cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
         meta.extend_annotations(HUAWEICLOUD_NETWORK_ANNOTATION)
         return meta
-
-    @classmethod
-    def _check_enterprise_label(cls, name: str, namespace: str, annotations: Dict[str, str], labels: Dict[str, str]):
-        assert HUAWEICLOUD_ENTERPRISE_PROJECT_LABEL in labels
-        return cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
 
 
     @staticmethod
