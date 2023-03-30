@@ -8,7 +8,7 @@
 from fastapi import APIRouter
 
 from services.cluster.k8s.cluster_client import cc
-from services.cluster.namespace_pipeline.serializers import NamespacePipeline
+from services.cluster.namespace_pipeline.serializers import NamespacePipeline, Namespace
 from basic.middleware.rsp import success_common_response
 
 router_namespace_pipeline = APIRouter()
@@ -24,10 +24,10 @@ def create_namespace_pipeline(np: NamespacePipeline):
 
 
 
-# @router_namespace_pipeline.delete(
-#     '',
-#     description='删除namespace & network',
-# )
-# def delete_service(serv: ServiceDeleteReq):
-#     cc.delete_namespace_pipeline(serv)
-#     return success_common_response()
+@router_namespace_pipeline.delete(
+    '',
+    description='删除namespace & network',
+)
+def delete_service(ns: Namespace):
+    cc.delete_namespace_pipeline(ns)
+    return success_common_response()
