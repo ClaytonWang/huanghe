@@ -40,7 +40,7 @@ class HWV1Beta1Api(object):
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :return: V1DaemonSet
+        :return: V1Beta1Network
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -72,7 +72,7 @@ class HWV1Beta1Api(object):
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :return: tuple(V1DaemonSet, status_code(int), headers(HTTPHeaderDict))
+        :return: tuple(V1Beta1Network, status_code(int), headers(HTTPHeaderDict))
                  If the method is called asynchronously,
                  returns the request thread.
         """
