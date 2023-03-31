@@ -36,11 +36,15 @@ class V1Deployment(BaseModel):
 
 
     @classmethod
-    def default(cls, name: str, namespace: str, image: str, labels: Dict[str, str]):
+    def default(cls, name: str, namespace: str, image: str, labels: Dict[str, str], resources: Dict[str, str], envs: Dict[str, str]):
         return cls.new(api_version=APPS_API_VERSION_V1,
                        kind=DEPLOYMENT_KIND,
                        metadata=V1ObjectMeta.default(name=name, namespace=namespace, labels=labels),
-                       spec=V1DeploymentSpec.default(name=name, image=image, labels=labels))
+                       spec=V1DeploymentSpec.default(name=name,
+                                                     image=image,
+                                                     labels=labels,
+                                                     resources=resources,
+                                                     envs=envs))
 
     @staticmethod
     def new(api_version: str, kind: str, metadata: V1ObjectMeta, spec: V1DeploymentSpec, status=None):

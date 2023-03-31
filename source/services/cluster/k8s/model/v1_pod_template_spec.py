@@ -32,6 +32,14 @@ class V1PodTemplateSpec(GenericMixin):
     }
 
     @classmethod
+    def deployment(cls, name: str, image: str, labels: Dict[str, str], resource: Dict[str, str], envs: Dict[str, str]):
+        return cls.new(metadata=V1ObjectMeta.default(name=name, labels=labels),
+                       spec=V1PodSpec.deployment(name=name,
+                                                 image=image,
+                                                 resource=resource,
+                                                 envs=envs))
+
+    @classmethod
     def default(cls, name: str, image: str, labels: Dict[str, str]):
         return cls.new(metadata=V1ObjectMeta.default(name=name, labels=labels), spec=V1PodSpec.default(name, image))
 

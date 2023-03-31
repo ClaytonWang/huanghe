@@ -24,7 +24,7 @@ class ServicePipelineCreateReq(DeploymentCreateReq, ServiceCreateReq):
         return d
 
 
-class PipelineDeleteReq(BaseModel):
+class ServicePipelineDeleteReq(BaseModel):
     name: str
     namespace: str
 
