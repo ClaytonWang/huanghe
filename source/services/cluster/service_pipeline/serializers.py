@@ -16,19 +16,12 @@ class Volume(BaseModel):
     mount_path: str
     mount_propagation: Optional[str] = "HostToContainer"
 
-class PipelineCreateReq(DeploymentCreateReq, ServiceCreateReq):
+class ServicePipelineCreateReq(DeploymentCreateReq, ServiceCreateReq):
 
     def gen_service_pipeline_dict(self):
-        return {
-            "name": self.name,
-            "namespace": self.namespace,
-            "image": self.image,
-            "labels": {"env": self.env, "app": self.name},
-            "volumes": self.volumes,
-            "annotations": self.annotations,
-            "ports": [{"name": self.name, "port": self.port}],
-            "selector": {"app": self.name}
-        }
+        d = self.gen_service_dict()
+        d.update(self.gen_deployment_dict())
+        return d
 
 
 class PipelineDeleteReq(BaseModel):

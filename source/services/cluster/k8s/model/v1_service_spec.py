@@ -40,9 +40,9 @@ class V1ServiceSpec(GenericMixin):
         'ports': 'list[V1ServicePort]',
         # 'publish_not_ready_addresses': 'bool',
         'selector': 'dict(str, str)',
-        'session_affinity': 'str',
+        # 'session_affinity': 'str',
         # 'session_affinity_config': 'V1SessionAffinityConfig',
-        'type': 'str'
+        # 'type': 'str'
     }
 
     attribute_map = {
@@ -68,8 +68,8 @@ class V1ServiceSpec(GenericMixin):
     }
 
     @classmethod
-    def default(cls, ports, selector):
-        return cls.new(selector=selector, ports=[V1ServicePort.default(port=x['port']) for x in ports])
+    def default(cls, selector):
+        return cls.new(selector=selector, ports=[V1ServicePort.default()])
 
     @staticmethod
     def new(ports: List[V1ServicePort], selector: Dict[str, str]):

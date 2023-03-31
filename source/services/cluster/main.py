@@ -17,6 +17,7 @@ from services.cluster.server.api import router_server
 from services.cluster.deployment.api import router_deployment
 from services.cluster.service.api import router_service
 from services.cluster.network.api import router_network
+from services.cluster.service_pipeline.api import router_service_pipeline
 from services.cluster.namespace_pipeline.api import router_namespace_pipeline
 from starlette.middleware.base import BaseHTTPMiddleware
 from basic.middleware.exception import validation_pydantic_exception_handler
@@ -50,6 +51,7 @@ app.include_router(router_service, prefix='/service')
 app.include_router(router_event, prefix="/event")
 app.include_router(router_network, prefix='/network')
 app.include_router(router_namespace_pipeline, prefix="/namespace_pipeline")
+app.include_router(router_service_pipeline, prefix="/service_pipeline")
 
 app.add_middleware(BaseHTTPMiddleware, dispatch=add_common_response_data)
 

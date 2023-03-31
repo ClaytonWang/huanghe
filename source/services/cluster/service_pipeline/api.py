@@ -8,7 +8,7 @@
 from fastapi import APIRouter
 
 from services.cluster.k8s.cluster_client import cc
-from services.cluster.service_pipeline.serializers import ServiceCreateReq, Service, ServiceDeleteReq, ServiceQuery
+from services.cluster.service_pipeline.serializers import ServicePipelineCreateReq, ServicePipeline
 from basic.middleware.rsp import success_common_response
 
 router_service_pipeline = APIRouter()
@@ -16,26 +16,18 @@ router_service_pipeline = APIRouter()
 
 @router_service_pipeline.post(
     '',
-    description='创建service pipeline',
+    description='创建service && deployments && ingress',
 )
-def create_service(servcr: ServiceCreateReq):
+def create_service_pipeline(spcr: ServicePipelineCreateReq):
     #TODO(jiangshouchen): create service/ingress/deployments
-    cc.create_service(servcr)
+    cc.create_service_pipeline(ServicePipeline.parse_obj(spcr.gen_service_pipeline_dict()))
     return success_common_response()
 
 
-@router_service_pipeline.post(
-    '/batch',
-    description='批量查询service',
-)
-def list_service(servq: ServiceQuery):
-    return cc.list_service(servq)
-
-
-@router_service_pipeline.delete(
-    '',
-    description='删除service',
-)
-def delete_service(serv: ServiceDeleteReq):
-    cc.delete_service(serv)
-    return success_common_response()
+# @router_service_pipeline.delete(
+#     '',
+#     description='删除service',
+# )
+# def delete_service(serv: ServiceDeleteReq):
+#     cc.delete_service(serv)
+#     return success_common_response()

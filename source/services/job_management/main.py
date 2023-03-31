@@ -67,7 +67,7 @@ async def get_source(request: Request):
     res_source = await get_source_list(authorization)
     return res_source
 
-@router_job.get(
+@app.get(
     '/startmodes',
     description="任务启动方式"
 )
