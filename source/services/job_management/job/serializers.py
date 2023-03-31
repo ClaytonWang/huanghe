@@ -35,7 +35,7 @@ class UserStr(BaseModel):
 
 class StartMode(BaseModel):
     id: int
-    name: str
+    name: Optional[str]
 
 
 class Grafana(BaseModel):
@@ -132,7 +132,7 @@ class JobCreate(BaseModel):
     image: Image
     work_dir: Optional[str]
     hooks: List[HookItem] = []
-    start_mode: int
+    start_mode: Optional[StartMode]
     nodes: Optional[int] = 1
 
     @validator('name')
@@ -175,7 +175,7 @@ class JobEdit(BaseModel):
     work_dir: Optional[str]
     hooks: List[HookItem] = []
     source: str
-    start_mode: Optional[int]
+    start_mode: Optional[StartMode]
     nodes: Optional[int]
 
 class StatusItemOnlyDesc(BaseModel):
