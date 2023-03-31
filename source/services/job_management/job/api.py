@@ -5,6 +5,7 @@
     >Mail   : xinkai.tao@digitalbrain.cn
     >Time   : 2022/12/15 10:21
 """
+import asyncio
 import datetime
 import json
 
@@ -70,11 +71,9 @@ async def get_simple_job(request: Request,
                          query_params: QueryParameters = Depends(QueryParameters), ):
     params_filter = query_params.filter_
     user: AccountGetter = request.user
-
     if params_filter:
         if 'creator_id' in params_filter:
-            creator_id = params_filter.pop('creator_id')
-            params_filter['created_by_id'] = int(creator_id)
+            params_filter['created_by_id'] = int(params_filter.pop('creator_id'))
         if 'project_ids' in params_filter:
             project_ids = params_filter.pop('project_ids')
             if isinstance(project_ids, str):
@@ -135,6 +134,13 @@ async def list_job(request: Request,
     return p
 
 
+async def job_name_verification(name, project_by_id, created_by_id):
+    if await Job.objects.filter(name=name, project_by_id=project_by_id, created_by_id=created_by_id).count():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户, job不能重名')
+
+
+
+
 @router_job.post(
     '',
     description='创建job',
@@ -153,9 +159,12 @@ async def create_job(request: Request,
         jc.start_command = "sleep 14400"
 
     # 存储检查
-    storages, volumes_k8s = await volume_check(authorization, jc.hooks, pg.en_name)
-    path_set = {x['path'] for x in storages}
-    if len(path_set) != len(storages):
+    ((storages, volumes_k8s), _) = await asyncio.gather(
+        volume_check(authorization, jc.hooks, pg.en_name),
+        job_name_verification(name=jc.name, project_by_id=jc.project.id, created_by_id=ag.id)
+    )
+
+    if len(set(x['path'] for x in storages)) != len(storages):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
 
     machine_type, gpu_count, cpu_count, memory = source_convert(jc.source)
@@ -264,8 +273,7 @@ async def update_job(request: Request,
         update_data = source_dic
 
     storages, volumes_k8s = await volume_check(authorization, je.hooks, extra_info['en_name'])
-    path_set = {x['path'] for x in storages}
-    if len(path_set) != len(storages):
+    if len(set(x['path'] for x in storages)) != len(storages):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
     k8s_info.update({"volumes": volumes_k8s,
                      'image': je.image.name,
