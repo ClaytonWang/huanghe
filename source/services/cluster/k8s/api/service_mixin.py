@@ -17,7 +17,6 @@ from services.cluster.k8s.model.v1_service import V1Service
 from typing import Dict
 from services.cluster.service.serializers import ServiceDeleteReq, Service, ServiceQuery
 
-import pprint
 
 
 class ServiceMixin(CustomerObjectApi, CoreV1Api):
@@ -30,9 +29,7 @@ class ServiceMixin(CustomerObjectApi, CoreV1Api):
                                                                                  namespace=serv.namespace,
                                                                                  labels=serv.labels,
                                                                                  annotations=serv.annotations,
-                                                                                 cluster_ip=serv.cluster_ip,
-                                                                                 ports=serv.ports,
-                                                                                 selector=serv.selector,
+                                                                                 selector=serv.labels,
                                                                                  ),
                                                           )
 

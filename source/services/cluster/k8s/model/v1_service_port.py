@@ -44,7 +44,7 @@ class V1ServicePort(GenericMixin):
 
     @classmethod
     def default(cls, port: int = DEFAULT_PORT):
-        return cls.new(name='http', port=DEFAULT_PORT, target_port=DEFAULT_PORT, protocol='TCP')
+        return cls.new(name='http', port=port, target_port=port, protocol='TCP')
 
     @staticmethod
     def new(name: str, port: int, target_port: int, protocol: str):
