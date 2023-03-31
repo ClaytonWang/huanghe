@@ -84,14 +84,14 @@ class Notebook(GenericDateModel):
 
     @property
     def start_time_timestamp(self):
-        return int(time.mktime(self.started_at.utctimetuple())) if self.started_at \
-            else int(time.mktime(datetime.datetime.utcnow().utctimetuple()))
+        return self.started_at.strftime("%Y-%m-%d %H:%M:%S") if self.started_at \
+            else datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
     @property
     def ended_time_timestamp(self):
-        return int(time.mktime(self.ended_at.utctimetuple())) if self.ended_at \
-            else int(time.mktime(datetime.datetime.utcnow().utctimetuple()))
+        return self.ended_at.strftime("%Y-%m-%d %H:%M:%S") if self.ended_at \
+            else datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     def cpu_url(self, common: str):
         return f"{common}orgId=1&var-namespace={self.namespace_name()}&var-cluster=&var-job={self.pod_name()}&panelId=4&from={self.start_time_timestamp}&to={self.ended_time_timestamp}"
