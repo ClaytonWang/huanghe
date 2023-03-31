@@ -8,7 +8,7 @@
 
 import ormar
 from basic.common.base_model import DateModel
-from models import DB, META
+from basic.common.initdb import META, DB
 
 
 # todo 镜像放在notebook里做临时方案,先用主键关联凑合下后期看是否分离单独配置,不用外键了怕麻烦

@@ -24,7 +24,7 @@ from utils.auth import verify_token
 from notebook.api import router_notebook
 from source.api import router_source
 from image.api import router_image
-from models import startup_event, shutdown_event
+from basic.common.initdb import startup_event, shutdown_event
 
 
 # oauth2_scheme = OFOAuth2PasswordBearer(token_url="/v1/auth/login")
