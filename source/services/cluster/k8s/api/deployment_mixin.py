@@ -12,7 +12,7 @@ class DeploymentMixin(AppsV1Api):
         super(DeploymentMixin, self).__init__(kcf=kcf)
 
     def create_deployment(self, d: Deployment) -> Dict:
-        return self.apps_v1_api(d.cluster).create_namespaced_deployment(namespace=d.namespace,
+        return self.apps_v1_api(cluster=d.cluster).create_namespaced_deployment(namespace=d.namespace,
                                                              body=V1Deployment.default(name=d.name,
                                                                                        namespace=d.namespace,
                                                                                        image=d.image,

@@ -19,7 +19,6 @@ router_service_pipeline = APIRouter()
     description='创建service && deployments && ingress',
 )
 def create_service_pipeline(spcr: ServicePipelineCreateReq):
-    #TODO(jiangshouchen): create service/ingress/deployments
     cc.create_service_pipeline(ServicePipeline.parse_obj(spcr.gen_service_pipeline_dict()))
     return success_common_response()
 

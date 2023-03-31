@@ -21,6 +21,7 @@ class ServiceCreateReq(BaseModelValidatorName):
             "name": self.name,
             "namespace": self.namespace,
             # "image": self.image,
+            "cluster": self.cluster,
             "labels": {"env": self.env, "app": self.name},
             "annotations": self.annotations,
             "selector": {"env": self.env, "app": self.name},
