@@ -139,8 +139,6 @@ async def job_name_verification(name, project_by_id, created_by_id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户, job不能重名')
 
 
-
-
 @router_job.post(
     '',
     description='创建job',
