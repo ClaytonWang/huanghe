@@ -52,7 +52,7 @@ const ServiceDetail = () => {
   const { urls = [] } = detailData;
   const defaultFilters = {
     pageno: 1,
-    pagesize: 10,
+    pagesize: 5,
   };
 
   const rangePresets = [
@@ -96,13 +96,12 @@ const ServiceDetail = () => {
   };
 
   const requestEvent = async (args) => {
-    const { loading = false, pageno, pagesize, ...rest } = args;
+    const { pageno, pagesize, ...rest } = args;
     const params = { pageno, pagesize, ...rest };
     try {
-      setEventLoading(loading);
+      setEventLoading(true);
       const { result } = await api.servicesDetailEvent(params);
       setEventTableData({
-        ...defaultFilters,
         ...result,
         pageno,
         pagesize,
@@ -125,7 +124,6 @@ const ServiceDetail = () => {
     };
     try {
       const { pageno, pagesize } = params;
-      console.log('request log loaded:', pageno);
       const { result } = await api.servicesDetailLog(params);
       const { data: _data = [] } = logTableData;
       const data = _data?.concat(result.data);
@@ -232,7 +230,7 @@ const ServiceDetail = () => {
   useEffect(() => {
     requestService({ id: serviceId });
     requestMonitorList({ id: serviceId });
-    requestEvent({ id: serviceId });
+    requestEvent({ ...defaultFilters, id: serviceId, action: 'event' });
     loadLog();
   }, []);
 
@@ -249,12 +247,7 @@ const ServiceDetail = () => {
   }, [detailData]);
 
   const handleEventPageNoChange = (pageno, pagesize) => {
-    // const filters = getFilters();
-    // const params = purifyDeep({ pageno, pagesize });
-    // 手动同步Url
-    // setSearchParams(qs.stringify(params));
-    requestEvent({ pageno, pagesize });
-    // setEventTableData({ ...eventTableData, pageno, pagesize });
+    requestEvent({ id: serviceId, pageno, pagesize, action: 'event' });
   };
 
   const onTabChange = (key) => {
@@ -415,7 +408,7 @@ const ServiceDetail = () => {
                 资源规格：{detailData?.source}
               </Col>
               <Col span={6} title="公网访问">
-                公网访问
+                公网访问：{detailData?.isPublic ? '是' : '否'}
               </Col>
               <Col span={6} title="URL">
                 URL：

@@ -68,13 +68,14 @@ module.exports = {
     jobStartModes: 'get|/job/startmodes',
 
     // services
-    servicesList: 'get|/service/services',
-    servicesListCreate: 'post|/service/services',
-    servicesListUpdate: 'put|/service/services/:id',
-    servicesDetail: 'get|/service/services/:id',
-    servicesDetailMonitor: 'get|/service/services/:id/monitor',
-    servicesDetailEvent: 'get|/service/services/:id/event',
-    servicesDetailLog: 'get|/service/services/:id/log',
+    servicesList: 'get|/deployment/deployments',
+    servicesListCreate: 'post|/deployment/deployments',
+    servicesListUpdate: 'put|/deployment/deployments/:id',
+    servicesDetail: 'get|/deployment/deployments/:id',
+    servicesDetailMonitor: 'get|/deployment/deployments/:id/monitor',
+    servicesDetailEvent: 'get|/deployment/deployments/:id/event',
+    servicesDetailLog: 'get|/deployment/deployments/:id/log',
+    servicesSourceList: 'get|/deployment/source',
 
     imagesList: 'get|/notebook/image',
     sourceList: 'get|/notebook/source',

@@ -2,12 +2,10 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 18:13:47
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-03-17 16:17:19
+ * @LastEditTime: 2023-03-29 11:59:01
  * @FilePath: /huanghe/source/services/frontend/src/common/components/EventList/index.js
  * @Description: 事件监控
  */
-// import { useSearchParams } from 'react-router-dom';
-// import qs from 'qs';
 import { Table } from 'antd';
 import { transformTime } from '@/common/utils/helper';
 
@@ -39,10 +37,6 @@ const EventList = ({
       },
     },
   ];
-  // const [searchParams] = useSearchParams();
-  // const { pageno = 1, pagesize = 10 } = {
-  //   ...qs.parse(searchParams.toString()),
-  // };
   const { total = 0, data = [], pageno, pagesize } = tableData;
   const pagination = {
     current: Number(pageno),

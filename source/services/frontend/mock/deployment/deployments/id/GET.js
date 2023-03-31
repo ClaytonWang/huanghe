@@ -2,9 +2,9 @@
  * @Author: guanlin.li guanlin.li@digitalbrain.cn
  * @Date: 2023-03-02 15:55:28
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-03-02 15:57:34
+ * @LastEditTime: 2023-03-31 15:35:49
  * @FilePath: /frontend/mock/service/services/id/GET.js
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @Description: 服务部署详情Mock
  */
 module.exports = {
   success: true,
@@ -33,7 +33,7 @@ module.exports = {
     },
     project: {
       // 所属项目
-      id: 87,
+      id: 'ENG113',
       name: 'shouchen',
     },
     urls: [
