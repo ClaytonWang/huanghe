@@ -185,7 +185,7 @@ async def create_job(request: Request,
                  "gpu": gpu_count,
                  "memory": memory,
                  "type": machine_type,
-                 "start_mode": jc.start_mode,
+                 "start_mode": jc.start_mode.id,
                  "nodes": jc.nodes,
                  }
 
@@ -278,7 +278,7 @@ async def update_job(request: Request,
                         'status': sc.get('stopped'),
                         "mode": je.mode,
                         "start_command": je.start_command,
-                        "start_mode": je.start_mode,
+                        "start_mode": je.start_mode.id,
                         "nodes": je.nodes,
                         })
     if not await _job.update(**update_data):
