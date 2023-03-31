@@ -20,7 +20,6 @@ from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_pr
 from services.job_management.job.serializers import JobCreate, JobDetail, JobList, JobEdit, \
     JobOp, EventItem, EventCreate, JobStatusUpdate, JobSimple
 from services.job_management.models.job import Job
-from services.job_management.models.mode import Mode
 from services.job_management.utils.auth import operate_auth
 from basic.middleware.service_requests import volume_check
 from services.job_management.utils.user_request import project_check, project_check_obj
@@ -30,12 +29,6 @@ from basic.common.status_cache import sc
 
 router_job = APIRouter()
 
-@router_job.get(
-    '/startmodes',
-    description="任务启动方式"
-)
-async def list_modes():
-    return await Mode.mode_cache_pagation()
 
 @router_job.get(
     '/project_backend/{project_id}',
