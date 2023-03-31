@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-03-16 20:27:38
+ * @LastEditTime: 2023-03-31 11:31:47
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
@@ -58,7 +58,7 @@ const { RangePicker } = DatePicker;
 const JobDetail = () => {
   const [tableData, setTableData] = useState([]);
   const [detailData, setDetailData] = useState(null);
-  const [currTab, setCurrTab] = useState('chart');
+  const [currTab, setCurrTab] = useState(null);
   const [dateRange, setDateRange] = useState({
     from: moment().add(-1, 'h'), // 默认1小时
     to: moment(),
@@ -72,24 +72,27 @@ const JobDetail = () => {
   const setContextProps = useContextProps();
   const navigate = useNavigate();
 
-  const rangePresets = [
-    {
-      label: 'Last 7 Days',
-      value: [moment().add(-7, 'd'), moment()],
-    },
-    {
-      label: 'Last 14 Days',
-      value: [moment().add(-14, 'd'), moment()],
-    },
-    {
-      label: 'Last 30 Days',
-      value: [moment().add(-30, 'd'), moment()],
-    },
-    {
-      label: 'Last 90 Days',
-      value: [moment().add(-90, 'd'), moment()],
-    },
-  ];
+  const rangePresets = useMemo(
+    () => [
+      {
+        label: 'Last 7 Days',
+        value: [moment().add(-7, 'd'), moment()],
+      },
+      {
+        label: 'Last 14 Days',
+        value: [moment().add(-14, 'd'), moment()],
+      },
+      {
+        label: 'Last 30 Days',
+        value: [moment().add(-30, 'd'), moment()],
+      },
+      {
+        label: 'Last 90 Days',
+        value: [moment().add(-90, 'd'), moment()],
+      },
+    ],
+    []
+  );
 
   const defaultFilters = useMemo(
     () => ({
@@ -227,33 +230,6 @@ const JobDetail = () => {
     });
   };
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      reload();
-    }, 3000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, [reload]);
-
-  /* eslint-disable react-hooks/exhaustive-deps */
-  useEffect(() => {
-    requestList({ loading: true });
-    const filters = getFilters();
-    setSearchParams(qs.stringify(filters));
-  }, []);
-
-  useEffect(() => {
-    setContextProps({
-      handleStartClicked,
-      handleStopClicked,
-      handleEditClicked,
-      handleCopyClicked,
-      handleDeleteClicked,
-      detail: detailData,
-    });
-  }, [detailData]);
-
   const onPageNoChange = (pageno, pagesize) => {
     const filters = getFilters();
     const params = purifyDeep({ ...filters, pageno, pagesize });
@@ -279,6 +255,7 @@ const JobDetail = () => {
       console.log('Clear');
     }
   };
+
   const operations = useMemo(() => {
     const from = moment(dateRange.from);
     const to = moment(dateRange.to);
@@ -302,30 +279,67 @@ const JobDetail = () => {
       return null;
     }
     return null;
-  }, [currTab]);
+  }, [currTab, dateRange.from, dateRange.to, rangePresets]);
 
-  const contentList = {
-    chart: (
-      <GrafanaComponent urls={detailData?.grafana} dateRange={dateRange} />
-    ),
-    event: (
-      <EventList
-        onPageNoChange={onPageNoChange}
-        tableData={tableData}
-        reload={reload}
-        loading={loading}
-      />
-    ),
-    log: (
-      <GrafanaComponent
-        style={{ height: 800 }}
-        urls={{
-          log: detailData?.loggingUrl,
-        }}
-        dateRange={logRange}
-      />
-    ),
-  };
+  const contentList = [
+    {
+      name: 'chart',
+      component: (
+        <GrafanaComponent urls={detailData?.grafana} dateRange={dateRange} />
+      ),
+    },
+    {
+      name: 'event',
+      component: (
+        <EventList
+          onPageNoChange={onPageNoChange}
+          tableData={tableData}
+          reload={reload}
+          loading={loading}
+        />
+      ),
+    },
+    {
+      name: 'log',
+      component: (
+        <GrafanaComponent
+          style={{ height: 800 }}
+          urls={{
+            log: detailData?.loggingUrl,
+          }}
+          dateRange={logRange}
+        />
+      ),
+    },
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      reload();
+    }, 3000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [reload]);
+
+  /* eslint-disable react-hooks/exhaustive-deps */
+  useEffect(() => {
+    requestList({ loading: true });
+    const filters = getFilters();
+    setSearchParams(qs.stringify(filters));
+    setCurrTab(contentList[0].name);
+  }, []);
+
+  useEffect(() => {
+    setContextProps({
+      handleStartClicked,
+      handleStopClicked,
+      handleEditClicked,
+      handleCopyClicked,
+      handleDeleteClicked,
+      detail: detailData,
+    });
+  }, [detailData]);
 
   return (
     <div className="jobs-detail">
