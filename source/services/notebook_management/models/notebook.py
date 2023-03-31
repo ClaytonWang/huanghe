@@ -9,7 +9,7 @@
 from __future__ import annotations
 import ormar
 from basic.common.base_model import DateModel, GenericDateModel
-from models import DB, META
+from basic.common.initdb import META, DB
 import datetime
 import time
 
