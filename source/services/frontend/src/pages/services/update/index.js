@@ -93,24 +93,13 @@ const ServicesUpdate = () => {
 
   const requestSource = async () => {
     try {
-      const { result } = await api.sourceList();
+      const { result } = await api.servicesSourceList();
       setSourceDatasource(result.data);
     } catch (error) {
       console.log(error);
     }
   };
-  // const requestStorages = async () => {
-  //   try {
-  //     const { result } = await api.storagesList({
-  //       filter: { isdeleted: false },
-  //     });
-  //     setStoragesDatasource(
-  //       result.data.map(({ id, ...rest }) => ({ id: Number(id), ...rest }))
-  //     );
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+
   const saveService = async (values) => {
     try {
       await api.servicesListCreate(values);
@@ -165,6 +154,7 @@ const ServicesUpdate = () => {
     });
   }, []);
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const { id = null } = get(location, 'state.params', {});
     const type = get(location, 'state.type');
@@ -178,7 +168,7 @@ const ServicesUpdate = () => {
       });
     }
     setType(type);
-  }, [location, form, projectDefaultValue, imageDefaultValue]);
+  }, []);
 
   const ProjectSelect = ({ value, onChange }) => {
     const onSelectChange = (value) => {
@@ -234,7 +224,7 @@ const ServicesUpdate = () => {
           <ProjectSelect />
         </Form.Item>
         <Form.Item
-          name="image"
+          name={['image', 'name']}
           label="镜像"
           rules={[{ required: true, message: '请选择镜像' }]}
         >
@@ -262,10 +252,6 @@ const ServicesUpdate = () => {
         <Form.Item name="isPublic" label="公网访问" valuePropName="checked">
           <Switch checkedChildren="是" unCheckedChildren="否" />
         </Form.Item>
-        {/* <MyFormItem name="isPublic" label="公网访问" valuePropName="checked">
-          <Switch />
-          {(form.getFieldValue('isPublic') === 'checked' && ' 是') || ' 否'}
-        </MyFormItem> */}
       </Form>
     </div>
   );

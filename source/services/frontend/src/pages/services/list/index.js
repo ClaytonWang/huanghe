@@ -127,7 +127,8 @@ const ServicesList = () => {
     }
   };
   const handleEditClicked = (values) => {
-    navigate('update', {
+    const { id } = values;
+    navigate(`update/${id}`, {
       state: {
         params: values,
         type: UPDATE,
