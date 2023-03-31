@@ -44,9 +44,13 @@ class V1DeploymentSpec(GenericMixin):
     }
 
     @classmethod
-    def default(cls, name: str, image: str, labels: Dict[str, str]):
+    def default(cls, name: str, image: str, labels: Dict[str, str], resources: Dict[str, str], envs: Dict[str, str]):
         return cls.new(replicas=1,
-                       template=V1PodTemplateSpec.default(name=name, image=image, labels=labels),
+                       template=V1PodTemplateSpec.deployment(name=name,
+                                                             image=image,
+                                                             labels=labels,
+                                                             resource=resources,
+                                                             envs=envs),
                        selector=V1LabelSelector.default(match_labels=labels))
 
     @staticmethod

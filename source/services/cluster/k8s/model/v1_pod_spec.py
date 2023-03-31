@@ -176,6 +176,15 @@ class V1PodSpec(GenericMixin):
             [SECRET_NAME_DOCKER_CONFIG])
         return spec
 
+    @classmethod
+    def deployment(cls, name: str, image: str, resource: Dict[str, str], envs: Dict[str, str]):
+        c = V1Container.default(name=name, image=image)
+        c.set_envs(envs).set_resources(resource).set_image_pull_policy(IMAGE_PULL_POLICY_IF_NOT_PRESENT)
+        return cls.new([c])
+
+
+
+
     @staticmethod
     def new(containers: List[V1Container], volumes: Optional[List[V1Volume]] = None):
         return V1PodSpec(containers=containers, volumes=volumes)

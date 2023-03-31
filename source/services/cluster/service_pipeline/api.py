@@ -8,7 +8,7 @@
 from fastapi import APIRouter
 
 from services.cluster.k8s.cluster_client import cc
-from services.cluster.service_pipeline.serializers import ServicePipelineCreateReq, ServicePipeline
+from services.cluster.service_pipeline.serializers import ServicePipelineCreateReq, ServicePipeline, ServicePipelineDeleteReq
 from basic.middleware.rsp import success_common_response
 
 router_service_pipeline = APIRouter()
@@ -23,10 +23,10 @@ def create_service_pipeline(spcr: ServicePipelineCreateReq):
     return success_common_response()
 
 
-# @router_service_pipeline.delete(
-#     '',
-#     description='删除service',
-# )
-# def delete_service(serv: ServiceDeleteReq):
-#     cc.delete_service(serv)
-#     return success_common_response()
+@router_service_pipeline.delete(
+    '',
+    description='删除service',
+)
+def delete_service(spdr: ServicePipelineDeleteReq):
+    cc.delete_service_pipeline(spdr)
+    return success_common_response()
