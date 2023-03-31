@@ -19,6 +19,7 @@ import {
   Space,
   Switch,
   InputNumber,
+  Typography,
 } from 'antd';
 import { uniqueId, get, map, drop } from 'lodash';
 import {
@@ -55,6 +56,8 @@ const JobsUpdate = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [form] = Form.useForm();
+  const START_COMMAND_EXAMPLE = `cd /home/jovyan && mkdir -p /var/run/sshd && /usr/sbin/sshd
+  && mpiexec --allow-run-as-root --host "$MPI_HOST" -np 2 mpi_hello_world`;
 
   const projectDefaultValue = useMemo(() => {
     if (projectsDatasource && projectsDatasource.length > 0) {
@@ -533,7 +536,17 @@ const JobsUpdate = () => {
               name="startCommand"
               label="启动命令"
               tooltip={{
-                title: '...',
+                title: (
+                  <Typography.Text
+                    copyable={{
+                      tooltips: false,
+                      text: START_COMMAND_EXAMPLE,
+                    }}
+                    style={{ color: '#fff' }}
+                  >
+                    <span className="overflow">{START_COMMAND_EXAMPLE}</span>
+                  </Typography.Text>
+                ),
                 icon: <InfoCircleOutlined />,
               }}
               rules={[{ required: true, message: '请输入启动命令' }]}
@@ -544,7 +557,7 @@ const JobsUpdate = () => {
           )}
         </Form.Item>
         <Form.Item
-          name="startMode"
+          name={['startMode', 'id']}
           label="启动方式"
           rules={[{ required: true, message: '请选择启动方式' }]}
         >
