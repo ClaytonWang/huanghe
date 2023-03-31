@@ -26,6 +26,7 @@ from basic.middleware.account_getter import verify_token
 from basic.middleware.service_requests import get_source_list, get_image_list
 
 
+
 configure_logging('logging.config.dictConfig', LOGGING)
 app = FastAPI(
     title='job管理',
