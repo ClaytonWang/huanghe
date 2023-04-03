@@ -10,7 +10,7 @@ class ServicePipelineMixin(DeploymentMixin, ServiceMixin, IngressMixin):
         super(ServiceMixin, self).__init__(kcf=kcf)
 
     def create_service_pipeline(self, sp: ServicePipeline) -> Dict:
-        return self.create_deployment(sp.gen_deployment()) and self.create_service(sp.gen_service())
+        return self.create_deployment(sp.gen_deployment()) and self.create_service(sp.gen_service()) and self.create_ingress(sp.gen_ingress())
 
     def delete_service_pipeline(self, sp: ServicePipelineDeleteReq):
         pass

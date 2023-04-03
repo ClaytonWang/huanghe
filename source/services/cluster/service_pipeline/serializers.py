@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from typing import Dict, List, Optional
 from services.cluster.deployment.serializers import Deployment, DeploymentCreateReq
 from services.cluster.service.serializers import Service, ServiceCreateReq
+from services.cluster.ingress.serializers import Ingress
 
 
 class Volume(BaseModel):
@@ -16,7 +17,7 @@ class Volume(BaseModel):
     mount_path: str
     mount_propagation: Optional[str] = "HostToContainer"
 
-class ServicePipelineCreateReq(DeploymentCreateReq, ServiceCreateReq):
+class ServicePipelineCreateReq(DeploymentCreateReq, ServiceCreateReq, Ingress):
 
     def gen_service_pipeline_dict(self):
         d = self.gen_service_dict()
@@ -29,7 +30,7 @@ class ServicePipelineDeleteReq(BaseModel):
     namespace: str
 
 
-class ServicePipeline(Service, Deployment):
+class ServicePipeline(Service, Deployment, Ingress):
 
     def gen_service(self) -> Service:
         return Service.parse_obj(self)
@@ -37,6 +38,8 @@ class ServicePipeline(Service, Deployment):
     def gen_deployment(self) -> Deployment:
         return Deployment.parse_obj(self)
 
+    def gen_ingress(self) -> Ingress:
+        return Ingress.parse_obj(self)
 
 
 if __name__ == '__main__':
