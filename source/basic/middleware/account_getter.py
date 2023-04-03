@@ -113,6 +113,8 @@ class VolcanoJobCreateReq(BaseModelValidatorName):
     command: List[str] = []
     working_dir: Optional[str] = None
     annotations: Dict = {}
+    task_num: int = 1
+    mode: Optional[str] = ""
 
 
 class VolcanoJobDeleteReq(BaseModel):

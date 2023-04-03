@@ -26,7 +26,7 @@ from services.job_management.utils.user_request import project_check, project_ch
 from basic.common.base_config import ADMIN, ENV
 from basic.common.event_model import Event
 from basic.common.status_cache import sc
-
+from services.job_management.models.mode import Mode
 router_job = APIRouter()
 
 
@@ -152,7 +152,8 @@ async def create_job(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
 
     machine_type, gpu_count, cpu_count, memory = source_convert(jc.source)
-
+    mode_desc = await Mode.get(jc.mode)
+    annotations = {"gpu": str(gpu_count), "slots": str(gpu_count) if gpu_count else "1"}
     k8s_info = VolcanoJobCreateReq(name=f"{ag.en_name}-{jc.name}",
                                    namespace=pg.en_name,
                                    image=jc.image.name,
@@ -162,7 +163,10 @@ async def create_job(request: Request,
                                    gpu=gpu_count,
                                    volumes=volumes_k8s,
                                    command=[jc.start_command],
-                                   working_dir=jc.work_dir, ).dict()
+                                   working_dir=jc.work_dir,
+                                   task_num=jc.nodes,
+                                   mode=mode_desc,
+                                   annotations=annotations).dict()
 
     init_data = {"name": jc.name,
                  "created_by_id": ag.id,
