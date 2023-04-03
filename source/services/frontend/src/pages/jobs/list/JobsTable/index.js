@@ -1,7 +1,7 @@
 import { useSearchParams, Link } from 'react-router-dom';
 import { Modal, Spin, Table, Tooltip, Dropdown, Space } from 'antd';
 import qs from 'qs';
-import { get, debounce } from 'lodash';
+import { get } from 'lodash';
 import Icon, { EllipsisOutlined } from '@ant-design/icons';
 import {
   transformDate,
@@ -63,7 +63,7 @@ const JobsTable = ({
       dataIndex: 'name',
       width: '10%',
       render(value, _) {
-        return <Link to={`/jobs/list/detail?id=${_.id}`}>{value}</Link>;
+        return <Link to={`/jobs/list/detail/${_.id}`}>{value}</Link>;
       },
     },
     {

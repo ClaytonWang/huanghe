@@ -150,7 +150,8 @@ const JobList = () => {
     }
   };
   const handleEditClicked = (values) => {
-    navigate(UPDATE, {
+    const { id } = values;
+    navigate(`${UPDATE}/${id}`, {
       state: {
         params: values,
         type: UPDATE,

@@ -62,7 +62,7 @@ const NotebooksTable = ({
       render(value, _) {
         return (
           <Tooltip placement="topLeft" title={value}>
-            <Link to={`/notebooks/list/detail/id=${_.id}`}>{value}</Link>
+            <Link to={`/notebooks/list/detail/${_.id}`}>{value}</Link>
           </Tooltip>
         );
       },
