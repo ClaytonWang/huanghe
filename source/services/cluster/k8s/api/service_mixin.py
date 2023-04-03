@@ -33,9 +33,9 @@ class ServiceMixin(CustomerObjectApi, CoreV1Api):
                                                                                  ),
                                                           )
 
-    def delete_service(self, servdr: ServiceDeleteReq) -> V1Status:
-        return self.core_v1_api(cluster=servdr.cluster).delete_namespaced_service(namespace=servdr.namespace,
-                                                          name=servdr.name,)
+    def delete_service(self, sdr: ServiceDeleteReq) -> V1Status:
+        return self.core_v1_api(cluster=sdr.cluster).delete_namespaced_service(namespace=sdr.namespace,
+                                                          name=sdr.name,)
 
     def list_service(self, servq: ServiceQuery):
         thread = self.core_v1_api(cluster=servq.cluster).list_namespaced_service(namespace=servq.namespace)

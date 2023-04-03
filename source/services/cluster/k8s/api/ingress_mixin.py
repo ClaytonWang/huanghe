@@ -14,8 +14,10 @@ class IngressMixin(V1Beta1Api):
         return self.v1_beta1_api(cluster=ig.cluster).create_namespaced_ingress(namespace=ig.namespace,
                body=V1Beta1Ingress.default(name=ig.name, namespace=ig.namespace, port=str(self.random_port())))
 
-    # def delete_namespace(self, ns: Namespace) -> V1Status:
-    #     return self.core_v1_api(cluster=ns.cluster).delete_namespace(name=ns.name)
+    def delete_ingress(self, ig: Ingress):
+        return self.v1_beta1_api(cluster=ig.cluster).delete_namespaced_ingress(name=ig.name, namespace=ig.namespace)
+
+
     # #
     # def create_huaweiyun_gpu_ns(self, ns: Namespace):
     #     return self.core_v1_api(cluster=ns.cluster).create_namespace(body=V1Namespace.huaweicloud_gpu(name=ns.name,
