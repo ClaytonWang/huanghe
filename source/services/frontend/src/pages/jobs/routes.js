@@ -17,9 +17,9 @@ const JobRoutes = () => (
     <Route path="" element={<Navigate to="list" />} />
     <Route path="list" element={<JobList />} />
     <Route path="list/create" element={<JobUpdate />} />
-    <Route path="list/update" element={<JobUpdate />} />
+    <Route path="list/update/:id" element={<JobUpdate />} />
     <Route path="list/copy" element={<JobUpdate />} />
-    <Route path="list/detail" element={<JobDetail />} />
+    <Route path="list/detail/:id" element={<JobDetail />} />
   </Routes>
 );
 export default JobRoutes;

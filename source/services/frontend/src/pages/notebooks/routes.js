@@ -2,7 +2,7 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-01-31 15:07:28
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-03-20 10:09:34
+ * @LastEditTime: 2023-03-31 15:39:42
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/routes.js
  * @Description: Router page
  */
@@ -16,7 +16,7 @@ const NotebooksRoutes = () => (
     <Route path="" element={<Navigate to="list" />} />
     <Route path="list" element={<NotebooksList />} />
     <Route path="list/create" element={<NotebookUpdate />} />
-    <Route path="list/update" element={<NotebookUpdate />} />
+    <Route path="list/update/:id" element={<NotebookUpdate />} />
     <Route path="list/detail/:id" element={<NotebookDetail />} />
   </Routes>
 );

@@ -2,12 +2,12 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-03-31 11:31:47
+ * @LastEditTime: 2023-04-03 16:07:54
  * @FilePath: /huanghe/source/services/frontend/src/pages/jobs/detail/index.js
  * @Description: detail page
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Col,
   Card,
@@ -29,16 +29,18 @@ import {
   AuthButton,
   Auth,
 } from '@/common/components';
-import { get } from 'lodash';
+import { get, pickBy } from 'lodash';
 
 import {
   purifyDeep,
   transformDate,
   getStatusName,
   join,
+  sequencePromise,
 } from '@/common/utils/helper';
 import api from '@/common/api';
 import qs from 'qs';
+import moment from 'moment';
 import {
   JOB_ACTION,
   START,
@@ -49,16 +51,18 @@ import {
 } from '@/common/constants';
 import Icons from '@/common/components/Icon';
 import { useContextProps } from '@/common/hooks/RoutesProvider';
-import moment from 'moment';
 
 import './index.less';
 
 const { RangePicker } = DatePicker;
 
 const JobDetail = () => {
-  const [tableData, setTableData] = useState([]);
+  const { id: jobId } = useParams();
+  const [eventTableData, setEventTableData] = useState([]);
   const [detailData, setDetailData] = useState(null);
   const [currTab, setCurrTab] = useState(null);
+  const [grafanaSource, setGrafanaSource] = useState({});
+  const [loggingSource, setLoggingSource] = useState({});
   const [dateRange, setDateRange] = useState({
     from: moment().add(-1, 'h'), // 默认1小时
     to: moment(),
@@ -68,31 +72,8 @@ const JobDetail = () => {
     to: moment(),
   });
   const [loading, setLoading] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
   const setContextProps = useContextProps();
   const navigate = useNavigate();
-
-  const rangePresets = useMemo(
-    () => [
-      {
-        label: 'Last 7 Days',
-        value: [moment().add(-7, 'd'), moment()],
-      },
-      {
-        label: 'Last 14 Days',
-        value: [moment().add(-14, 'd'), moment()],
-      },
-      {
-        label: 'Last 30 Days',
-        value: [moment().add(-30, 'd'), moment()],
-      },
-      {
-        label: 'Last 90 Days',
-        value: [moment().add(-90, 'd'), moment()],
-      },
-    ],
-    []
-  );
 
   const defaultFilters = useMemo(
     () => ({
@@ -108,54 +89,48 @@ const JobDetail = () => {
     []
   );
 
-  const getFilters = useCallback(
-    () => ({ ...defaultFilters, ...qs.parse(searchParams.toString()) }),
-    [defaultFilters, searchParams]
-  );
-
-  const requestList = useCallback(
-    async (args) => {
-      const { loading = false, ...rest } = args;
-      const params = purifyDeep({ ...getFilters(), ...rest });
-      try {
-        setLoading(loading);
-        const { result } = await api.jobDetail(params);
-        setDetailData(result);
-        setLoading(false);
-      } catch (error) {
-        console.log(error);
-        setLoading(false);
-      }
-    },
-    [getFilters]
-  );
+  const requestList = useCallback(async (args) => {
+    const { loading = false, ...rest } = args;
+    const params = purifyDeep({ ...rest });
+    try {
+      setLoading(loading);
+      const { result } = await api.jobDetail(params);
+      setDetailData(result);
+      setLoading(false);
+      return Promise.resolve(result);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  }, []);
 
   const requestEvent = useCallback(
     async (args) => {
-      const { loading = false, ...rest } = args;
-      const params = purifyDeep({ ...getFilters(), ...rest });
+      const { pageno, pagesize, ...rest } = args;
+      const params = { pageno, pagesize, ...rest };
       try {
         setLoading(loading);
         const { result } = await api.jobDetailEvent(params);
-        setTableData(result);
+        setEventTableData({
+          ...result,
+          pageno,
+          pagesize,
+        });
         setLoading(false);
       } catch (error) {
         console.log(error);
         setLoading(false);
       }
     },
-    [getFilters]
+    [loading]
   );
 
   const reload = useCallback(
     (args) => {
-      const filters = getFilters();
-      const params = purifyDeep({ ...filters, ...args });
-      // 手动同步Url
-      setSearchParams(qs.stringify(params));
-      requestList(params);
+      const params = purifyDeep({ ...args });
+      requestList({ ...params, id: jobId });
     },
-    [getFilters, requestList, setSearchParams]
+    [jobId, requestList]
   );
 
   const handleStartClicked = async (record) => {
@@ -189,7 +164,8 @@ const JobDetail = () => {
   };
 
   const handleEditClicked = (values) => {
-    navigate('/jobs/list/update', {
+    const { id } = values;
+    navigate(`/jobs/list/update/${id}`, {
       state: {
         params: values,
         type: UPDATE,
@@ -230,22 +206,25 @@ const JobDetail = () => {
     });
   };
 
-  const onPageNoChange = (pageno, pagesize) => {
-    const filters = getFilters();
-    const params = purifyDeep({ ...filters, pageno, pagesize });
-    // 手动同步Url
-    setSearchParams(qs.stringify(params));
-    requestEvent(params);
-  };
+  const onPageNoChange = useCallback(
+    (pageno, pagesize) => {
+      requestEvent({ id: jobId, pageno, pagesize });
+    },
+    [jobId, requestEvent]
+  );
 
   const onTabChange = (key) => {
     setCurrTab(key);
-    // eslint-disable-next-line default-case
-    switch (key) {
-      case 'event':
-        requestEvent({ loading: true });
-        break;
-    }
+  };
+
+  const initialData = (data) => {
+    const { grafana = {}, loggingUrl = {} } = data;
+    setGrafanaSource(grafana);
+    setLoggingSource(loggingUrl);
+    const url = Object.values(pickBy(grafana, (value) => value))[0];
+    const params = url?.split('?')[1] && qs.parse(url.split('?')[1]);
+    onRangeChange([moment(params.from), moment(params.to)]);
+    return Promise.resolve();
   };
 
   const onRangeChange = (dates) => {
@@ -265,7 +244,6 @@ const JobDetail = () => {
       return (
         <RangePicker
           allowClear={false}
-          presets={rangePresets}
           showTime
           format={dateFormat}
           onChange={onRangeChange}
@@ -279,39 +257,56 @@ const JobDetail = () => {
       return null;
     }
     return null;
-  }, [currTab, dateRange.from, dateRange.to, rangePresets]);
+  }, [currTab, dateRange.from, dateRange.to]);
 
-  const contentList = [
-    {
-      name: 'chart',
-      component: (
-        <GrafanaComponent urls={detailData?.grafana} dateRange={dateRange} />
-      ),
-    },
-    {
-      name: 'event',
-      component: (
-        <EventList
-          onPageNoChange={onPageNoChange}
-          tableData={tableData}
-          reload={reload}
-          loading={loading}
-        />
-      ),
-    },
-    {
-      name: 'log',
-      component: (
-        <GrafanaComponent
-          style={{ height: 800 }}
-          urls={{
-            log: detailData?.loggingUrl,
-          }}
-          dateRange={logRange}
-        />
-      ),
-    },
-  ];
+  const contentList = useMemo(
+    () => [
+      {
+        name: 'chart',
+        component: (
+          <GrafanaComponent urls={grafanaSource} dateRange={dateRange} />
+        ),
+      },
+      {
+        name: 'event',
+        component: (
+          <EventList
+            onPageNoChange={onPageNoChange}
+            tableData={eventTableData}
+            reload={reload}
+            loading={loading}
+          />
+        ),
+      },
+      {
+        name: 'log',
+        component: (
+          <GrafanaComponent
+            style={{ height: 800 }}
+            urls={{
+              log: loggingSource,
+            }}
+            dateRange={logRange}
+          />
+        ),
+      },
+    ],
+    [
+      dateRange,
+      grafanaSource,
+      loggingSource,
+      eventTableData,
+      loading,
+      logRange,
+      onPageNoChange,
+      reload,
+    ]
+  );
+
+  const currentTabCmp = useMemo(
+    () => contentList.find(({ name }) => name === currTab)?.component || null,
+    [contentList, currTab]
+  );
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -324,9 +319,11 @@ const JobDetail = () => {
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
-    requestList({ loading: true });
-    const filters = getFilters();
-    setSearchParams(qs.stringify(filters));
+    sequencePromise([
+      () => requestList({ loading: true, id: jobId }),
+      initialData,
+    ]);
+    requestEvent({ ...defaultFilters, id: jobId });
     setCurrTab(contentList[0].name);
   }, []);
 
@@ -432,7 +429,7 @@ const JobDetail = () => {
           ]}
           onTabChange={onTabChange}
         >
-          {contentList[currTab]}
+          {currentTabCmp}
         </Card>
       </div>
     </div>

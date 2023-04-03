@@ -5,7 +5,7 @@
  * @LastEditTime 2022-12-23 09:40:59
  * @Description Job 新建/编辑页
  */
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -84,6 +84,15 @@ const JobsUpdate = () => {
     mode: true,
     nodes: 1,
   };
+  const getMaxNodes = useCallback(
+    (getFieldValue) => {
+      const result = startModes?.find(
+        ({ id }) => getFieldValue('startMode')?.id === id?.maxNodes
+      );
+      return result;
+    },
+    [startModes]
+  );
 
   const updateSelectedStorage = (values, transform) => {
     let result = [];
@@ -251,8 +260,13 @@ const JobsUpdate = () => {
     uniqueID.current = new ID();
     setContextProps({
       onCancel: handleCancelClicked,
-      onSubmit: () => {
-        form.submit();
+      onSubmit: async () => {
+        try {
+          await form.validateFields();
+          form.submit();
+        } catch (_error) {
+          message.warning('表单信息有误，请检查之后再保存');
+        }
       },
     });
   }, []);
@@ -619,11 +633,15 @@ const JobsUpdate = () => {
         >
           {({ getFieldValue }) => (
             <JobNodes
-              rules={[{ required: true, message: '请输入节点数量' }]}
-              max={
-                startModes?.find(({ id }) => getFieldValue('startMode') === id)
-                  ?.maxNodes
-              }
+              rules={[
+                { required: true, message: '请输入节点数量' },
+                {
+                  max: getMaxNodes(getFieldValue),
+                  type: 'number',
+                  message: `最大节点数不得超过${getMaxNodes(getFieldValue)}`,
+                },
+              ]}
+              max={getMaxNodes(getFieldValue)}
               min={1}
             />
           )}
@@ -641,6 +659,10 @@ JobsUpdate.context = ({ onCancel, onSubmit }) => (
   </Space>
 );
 
-JobsUpdate.path = ['/jobs/list/update', '/jobs/list/create', '/jobs/list/copy'];
+JobsUpdate.path = [
+  '/jobs/list/update/:id',
+  '/jobs/list/create',
+  '/jobs/list/copy',
+];
 
 export default JobsUpdate;

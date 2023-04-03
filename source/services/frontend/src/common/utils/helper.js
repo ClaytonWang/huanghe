@@ -140,7 +140,7 @@ export const transformDate = (value, format = 'YYYY-MM-DD') => {
  */
 export const sequencePromise = (tasks) => {
   tasks.reduce(
-    (promise, task) => promise.then((value) => task(value)),
+    (promise, task) => promise.then((result) => task(result)),
     Promise.resolve()
   );
 };
