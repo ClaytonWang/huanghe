@@ -153,7 +153,7 @@ async def create_job(request: Request,
 
     machine_type, gpu_count, cpu_count, memory = source_convert(jc.source)
     start_mode = await Mode.get(jc.start_mode.id)
-    annotations = {"gpu": str(gpu_count), "slots": str(gpu_count) if gpu_count else "1"}
+
     k8s_info = VolcanoJobCreateReq(name=f"{ag.en_name}-{jc.name}",
                                    namespace=pg.en_name,
                                    image=jc.image.name,
@@ -165,8 +165,7 @@ async def create_job(request: Request,
                                    command=[jc.start_command],
                                    working_dir=jc.work_dir,
                                    task_num=jc.nodes,
-                                   mode=start_mode,
-                                   annotations=annotations).dict()
+                                   mode=start_mode,).dict()
 
     init_data = {"name": jc.name,
                  "created_by_id": ag.id,
@@ -195,7 +194,7 @@ async def create_job(request: Request,
 
     _job = await Job.objects.create(**init_data)
     k8s_info['annotations'] = {"id": str(_job.id)}
-    await _job.update(**{"k8s_info": k8s_info})
+    await _job.update(**{"k8s_info": k8s_info, "gpu": str(gpu_count), "slots": str(gpu_count) if gpu_count else "1"})
     return _job.gen_job_detail_response()
 
 
