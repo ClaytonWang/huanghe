@@ -193,8 +193,8 @@ async def create_job(request: Request,
                  }
 
     _job = await Job.objects.create(**init_data)
-    k8s_info['annotations'] = {"id": str(_job.id)}
-    await _job.update(**{"k8s_info": k8s_info, "gpu": str(gpu_count), "slots": str(gpu_count) if gpu_count else "1"})
+    k8s_info['annotations'] = {"id": str(_job.id), "gpu": str(gpu_count), "slots": str(gpu_count) if gpu_count else "1"}
+    await _job.update(**{"k8s_info": k8s_info})
     return _job.gen_job_detail_response()
 
 
