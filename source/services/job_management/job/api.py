@@ -22,7 +22,7 @@ from services.job_management.job.dependencies import verify_project_check, verif
     verify_edit_same_job, \
     verify_status_name, verify_create_same_job
 from services.job_management.job.serializers import JobCreate, JobDetail, JobList, JobEdit, \
-    EventItem, EventCreate, JobStatusUpdate, JobSimple
+    EventItem, EventCreate, JobStatusUpdate, JobSimple, JobOp
 from services.job_management.models.job import Job
 from services.job_management.models.mode import Mode
 from basic.middleware.service_requests import volume_check
@@ -39,6 +39,7 @@ router_job = APIRouter()
 )
 async def list_modes():
     return await Mode.mode_cache_pagation()
+
 
 @router_job.get(
     '/project_backend/{project_id}',
@@ -134,7 +135,6 @@ async def list_job(request: Request,
     for i, j in enumerate(p.data):
         p.data[i] = JobList.parse_obj(j.gen_job_pagation_response())
     return p
-
 
 
 @router_job.post(
@@ -253,6 +253,7 @@ async def update_job(request: Request,
     storages, volumes_k8s = await volume_check(authorization, je.hooks, extra_info['en_name'])
     if len(set(x['path'] for x in storages)) != len(storages):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
+
     k8s_info.update({"volumes": volumes_k8s,
                      'image': je.image.name,
                      'namespace': extra_info['en_name'],
@@ -283,18 +284,18 @@ async def update_job(request: Request,
     '/{job_id}',
     description='启动/停止Job',
 )
-async def operate_job(job_id: int = Path(..., ge=1, description="JobID"),
-                      _job: Job = Depends(verify_auth),
-                      action: int = Depends(verify_action)):
+async def operate_job(job_op: JobOp,
+                      job_id: int = Path(..., ge=1, description="JobID"),
+                      _job: Job = Depends(verify_auth)):
     payloads = json.dumps(_job.k8s_info)
 
     # 数字，0（停止）｜1（启动）
     update_data = {}
-    if action == 0:
+    if job_op.action == 0:
         update_data['status'] = sc.get('stopped')
         delete_vcjob(vjd=VolcanoJobDeleteReq.parse_raw(payloads), ignore_no_found=True)
         await _job.update(**{"ended_at": datetime.datetime.now()})
-    elif action == 1:
+    elif job_op.action == 1:
         update_data['status'] = sc.get('pending')
         create_vcjob(vjc=VolcanoJobCreateReq.parse_raw(payloads))
         await _job.update(**{"started_at": datetime.datetime.now()})
@@ -306,14 +307,12 @@ async def operate_job(job_id: int = Path(..., ge=1, description="JobID"),
     return JSONResponse(dict(id=job_id))
 
 
-
 @router_job.delete(
     '/{job_id}',
     description='删除Job',
     dependencies=[Depends(verify_project_check)]
 )
 async def delete_job(_job: Job = Depends(verify_auth)):
-
     payloads = _job.k8s_info
     # # error状态调用删除需要释放资源
     if _job.status.name != 'stop':

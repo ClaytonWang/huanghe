@@ -63,6 +63,12 @@ class HookItem(BaseModel):
 class JobOp(BaseModel):
     action: int
 
+    @validator("action")
+    def validate_bad_words(cls, action: int):
+        if action not in [0, 1]:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
+        return action
+
 
 class Creator(BaseModel):
     id: str
@@ -177,6 +183,7 @@ class JobEdit(BaseModel):
     source: str
     start_mode: Optional[int]
     nodes: Optional[int]
+
 
 class StatusItemOnlyDesc(BaseModel):
     desc: str = None

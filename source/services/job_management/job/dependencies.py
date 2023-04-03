@@ -15,7 +15,7 @@ async def verify_auth(request: Request, job_id: int = Path(..., ge=1, descriptio
 
 
 def verify_action(data: JobOp):
-    action = int(data.dict()['action'])
+    action = data.action
     if action not in [0, 1]:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
     return action
