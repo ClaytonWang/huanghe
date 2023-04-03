@@ -65,6 +65,17 @@ module.exports = {
     jobDetailEvent: 'get|/job/jobs/:id/events',
     jobSourceList: 'get|/job/source',
     jobImageList: 'get|/job/image',
+    jobStartModes: 'get|/job/startmodes',
+
+    // services
+    servicesList: 'get|/deployment/deployments',
+    servicesListCreate: 'post|/deployment/deployments',
+    servicesListUpdate: 'put|/deployment/deployments/:id',
+    servicesDetail: 'get|/deployment/deployments/:id',
+    servicesDetailMonitor: 'get|/deployment/deployments/:id/monitor',
+    servicesDetailEvent: 'get|/deployment/deployments/:id/event',
+    servicesDetailLog: 'get|/deployment/deployments/:id/log',
+    servicesSourceList: 'get|/deployment/source',
 
     imagesList: 'get|/notebook/image',
     sourceList: 'get|/notebook/source',
@@ -93,6 +104,11 @@ module.exports = {
     '/jobs/list/update': '编辑Job',
     '/jobs/list/create': '新建Job',
     '/jobs/list/detail': 'Job详情',
+
+    '/services/list': '部署',
+    '/services/list/update': '编辑部署',
+    '/services/list/create': '新建部署',
+    '/services/list/detail': '部署详情',
   },
   menuItemsConfig: [
     {
@@ -133,6 +149,19 @@ module.exports = {
           key: 'jobs.list',
           label: 'Job列表',
           permission: 'jobs.list',
+        },
+      ],
+    },
+    {
+      key: 'services',
+      label: '服务部署',
+      icon: 'services',
+      permission: 'services',
+      children: [
+        {
+          key: 'services.list',
+          label: '部署',
+          permission: 'services.list',
         },
       ],
     },

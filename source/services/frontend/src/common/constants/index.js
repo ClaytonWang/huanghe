@@ -2,7 +2,8 @@
  * @Author: liguanlin<guanlin.li@digitalbrain.cn> junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-01-31 15:07:28
  * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-01 10:21:58
+ *               guanlin.li guanlin.li@digitalbrain.cn
+ * @LastEditTime: 2023-02-28 20:35:31
  * @FilePath: /frontend/src/common/constants/index.js
  * @Description: Global Constants
  */
@@ -63,4 +64,12 @@ export const NOTEBOOK_ACTION = {
 export const JOB_ACTION = {
   [START]: 1,
   [STOP]: 0,
+};
+export const ACTION = {
+  [START]: 1,
+  [STOP]: 0,
+};
+export const ADDRESS_TYPE = {
+  private: '私网',
+  public: '公网',
 };

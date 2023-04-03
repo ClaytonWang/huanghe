@@ -9,7 +9,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@/common/hooks/useAuth';
 import { SystemProvider } from '@/common/hooks/useSystem';
 import Login from '@/pages/login';
-import Pages from '@/pages';
+import PagesRoutes from '@/pages/routes';
 
 const App = () => {
   const { token } = useAuth();
@@ -21,7 +21,7 @@ const App = () => {
   );
   const renderApp = () => (
     <SystemProvider>
-      <Pages />
+      <PagesRoutes />
     </SystemProvider>
   );
   return !token ? renderLogin() : renderApp();

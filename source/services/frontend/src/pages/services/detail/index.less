@@ -1,0 +1,36 @@
+@import '../../../common/css/index.less';
+.detail {
+  .detail-section {
+    padding: @dbr-container-padding;
+    background-color: @background-color;
+    margin-bottom: @dbr-margin;
+    .operations {
+        button {
+            margin-right: 8px;
+        }
+    }
+    .ant-row.ant-form-item-row {
+      margin: 0 @dbr-margin @dbr-margin 0;
+    }
+    .ant-col {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .ant-col .anticon {
+      padding: 0 2px;
+      color: #848586;
+    }
+    .ant-col .ant-btn {
+      padding: 0 2px;
+    }
+  }
+  .monitor-container{
+    .ant-tabs-large > .ant-tabs-nav .ant-tabs-tab{
+      font-size: 14px;
+    }
+    .ant-tabs .ant-tabs-tab+.ant-tabs-tab{
+      margin: 0 0 0 32px;
+    }
+  }
+}

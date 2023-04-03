@@ -1,16 +1,15 @@
 /*
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-03 16:00:40
- * @LastEditors: junshi clayton.wang@digitalbrain.cn
- * @LastEditTime: 2023-02-09 19:07:20
+ * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
+ * @LastEditTime: 2023-03-07 10:32:40
  * @FilePath: /huanghe/source/services/frontend/src/providers/RoutesProvider.js
  * @Description: RoutesProvider
  */
 import { createContext, useContext, useMemo, useState, useEffect } from 'react';
 import { matchPath, useLocation } from 'react-router';
 import { pageSetToRoutes } from '@/common/utils/helper';
-import { NotebooksPages } from '@/pages/notebooks/routes';
-import { JobsPages } from '@/pages/jobs/routes';
+import { Pages } from '@/pages';
 
 export const RoutesContext = createContext();
 
@@ -67,11 +66,7 @@ export const RoutesProvider = ({ children }) => {
   const location = useFixedLocation();
   const [currentContext, setCurrentContext] = useState(null);
   const [currentContextProps, setCurrentContextProps] = useState(null);
-
-  const routesMap = useMemo(() => {
-    const pages = [...NotebooksPages, ...JobsPages];
-    return pageSetToRoutes(pages);
-  }, []);
+  const routesMap = useMemo(() => pageSetToRoutes(Pages), []);
 
   const routesChain = useMemo(
     () => findMacthingComponents(location.pathname, routesMap),
