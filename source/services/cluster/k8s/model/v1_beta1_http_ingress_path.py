@@ -34,7 +34,7 @@ class V1Beta1HTTPIngressPath(GenericMixin):
 
     @classmethod
     def default(cls, service_name: str):
-        return cls.new(backend=V1Beta1IngressBackend.default(service_name=service_name, service_port="80"))
+        return cls.new(backend=V1Beta1IngressBackend.default(service_name=service_name, service_port=80))
 
     @staticmethod
     def new(backend: V1Beta1IngressBackend, path: str = None, property: Dict[str, str] = None):
