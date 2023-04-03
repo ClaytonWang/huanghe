@@ -6,11 +6,11 @@
     >Time   : 2023/3/14 15:49
 """
 from pydantic import BaseModel
-from typing import Dict, List, Optional
+from typing import Optional
 from services.cluster.deployment.serializers import Deployment, DeploymentCreateReq
 from services.cluster.service.serializers import Service, ServiceCreateReq
 from services.cluster.ingress.serializers import Ingress
-
+from basic.common.validator_name import BaseModelValidatorName
 
 class Volume(BaseModel):
     name: str
@@ -25,8 +25,7 @@ class ServicePipelineCreateReq(DeploymentCreateReq, ServiceCreateReq, Ingress):
         return d
 
 
-class ServicePipelineDeleteReq(BaseModel):
-    name: str
+class ServicePipelineDeleteReq(BaseModelValidatorName):
     namespace: str
 
 
