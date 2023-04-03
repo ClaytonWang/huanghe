@@ -258,9 +258,9 @@ async def update_job(request: Request,
                       'memory': memory,
                       'gpu': gpu_count,
                       'type': machine_type,
-                      "annotations": {"id": str(_job.id), "gpu": str(gpu_count), "slots": str(gpu_count) if gpu_count else "1"},
                       }
         k8s_info.update(source_dic)
+        k8s_info['annotations'] = {"id": str(_job.id), "gpu": str(gpu_count), "slots": str(gpu_count) if gpu_count else "1"}
         update_data = source_dic
 
     storages, volumes_k8s = await volume_check(authorization, je.hooks, extra_info['en_name'])
