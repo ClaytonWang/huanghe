@@ -30,9 +30,9 @@ class V1Beta1IngressRule(GenericMixin):
 
 
     @classmethod
-    def default(cls):
-        return cls.new()
+    def default(cls, service_name: str):
+        return cls.new(http=V1Beta1HTTPIngressRuleValue.default(service_name=service_name))
 
     @staticmethod
-    def new(host: str, http: V1Beta1HTTPIngressRuleValue):
+    def new(http: V1Beta1HTTPIngressRuleValue, host: Optional[str] = None):
         return V1Beta1IngressRule(host=host, http=http)

@@ -3,7 +3,7 @@ from __future__ import annotations as anno
 from services.cluster.k8s.model.generic_mixin import GenericMixin
 from services.cluster.k8s.const.crd_kubeflow_const import ISTIO_DISABLE_INJECT_ANNOTATION, \
     HUAWEICLOUD_GPU_NAMESPACE_ANNOTATION, HUAWEICLOUD_CPU_NAMESPACE_ANNOTATION, HUAWEICLOUD_ENTERPRISE_PROJECT_LABEL,\
-    HUAWEICLOUD_NETWORK_ANNOTATION
+    HUAWEICLOUD_NETWORK_ANNOTATION, HUAWEICLOUD_INGRESS_ELB_PORT_ANNOTATION, HUAWEICLOUD_INGRESS_ANNOTATION
 from typing import Optional, List, Dict
 from datetime import datetime
 
@@ -170,6 +170,13 @@ class V1ObjectMeta(GenericMixin):
     def huaweicloud_network(cls, name, namespace, annotations=None, labels=None):
         meta = cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
         meta.extend_annotations(HUAWEICLOUD_NETWORK_ANNOTATION)
+        return meta
+
+    @classmethod
+    def huaweicloud_ingress(cls, name, namespace, port, annotations=None, labels=None):
+        meta = cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
+        meta.extend_annotations(HUAWEICLOUD_INGRESS_ANNOTATION)
+        meta.extend_annotations({HUAWEICLOUD_INGRESS_ELB_PORT_ANNOTATION: port})
         return meta
 
 

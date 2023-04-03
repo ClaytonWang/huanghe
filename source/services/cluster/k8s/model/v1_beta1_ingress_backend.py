@@ -30,7 +30,7 @@ class V1Beta1IngressBackend(GenericMixin):
 
 
     @classmethod
-    def default(cls, service_name="deploy", service_port="80"):
+    def default(cls, service_name, service_port="80"):
         return cls.new(service_name=service_name, service_port=service_port)
 
     @staticmethod
