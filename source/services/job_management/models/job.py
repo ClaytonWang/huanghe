@@ -145,10 +145,16 @@ class Job(GenericDateModel):
         else:
             return f"CPU {self.cpu}C {self.memory}G"
 
+    @property
+    def pods(self):
+        if self.start_mode == 2:
+            return [f"{self.created_by}-{self.name}-mpimaster-0"] + [f"{self.created_by}-{self.name}-mpiworker-{i}" for i in range(self.nodes-1)]
+        return [f"{self.created_by}-{self.name}-tfjob-0"]
+
 
     @property
     def webkubectl(self):
-        return f"{WEBKUBECTL_URL}/?arg=-n{self.project_en_by}&arg={self.create_en_by}-{self.name}-tfjob-0&arg=bash"
+        return [f"{WEBKUBECTL_URL}/?arg=-n{self.project_en_by}&arg={i}&arg=bash" for i in self.pods]
 
     def gen_job_pagation_response(self):
         return {
