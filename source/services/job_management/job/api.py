@@ -152,7 +152,7 @@ async def create_job(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
 
     machine_type, gpu_count, cpu_count, memory = source_convert(jc.source)
-    start_mode = await Mode.get(jc.start_mode)
+    start_mode = await Mode.get(jc.start_mode.id)
     annotations = {"gpu": str(gpu_count), "slots": str(gpu_count) if gpu_count else "1"}
     k8s_info = VolcanoJobCreateReq(name=f"{ag.en_name}-{jc.name}",
                                    namespace=pg.en_name,
