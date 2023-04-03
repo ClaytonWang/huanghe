@@ -250,12 +250,16 @@ async def update_job(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
 
     update_data = {}
+    start_mode = await Mode.get(je.start_mode.id)
+
     if je.source:
         machine_type, gpu_count, cpu_count, memory = source_convert(je.source)
         source_dic = {'cpu': cpu_count,
                       'memory': memory,
                       'gpu': gpu_count,
-                      'type': machine_type, }
+                      'type': machine_type,
+                      "annotations": {"id": str(_job.id), "gpu": str(gpu_count), "slots": str(gpu_count) if gpu_count else "1"},
+                      }
         k8s_info.update(source_dic)
         update_data = source_dic
 
@@ -269,6 +273,8 @@ async def update_job(request: Request,
                      'name': f"{request.user.en_name}-{_job.name}",
                      "command": [je.start_command],
                      "work_dir": je.work_dir,
+                     "task_num": je.nodes,
+                     "mode": start_mode,
                      })
     update_data.update({"storage": json.dumps(storages),
                         "k8s_info": json.dumps(k8s_info),
