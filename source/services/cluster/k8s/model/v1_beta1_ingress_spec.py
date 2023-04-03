@@ -37,10 +37,9 @@ class V1Beta1IngressSpec(GenericMixin):
 
 
     @classmethod
-    def default(cls):
-        return cls.new(backend=V1Beta1IngressBackend.default(),
-                       rules=V1Beta1IngressRule.default(),)
+    def default(cls, service_name):
+        return cls.new(rules=[V1Beta1IngressRule.default(service_name=service_name)],)
 
     @staticmethod
-    def new(backend: V1Beta1IngressBackend, rules: List[V1Beta1IngressRule], tls: List[V1Beta1IngressTLS] = None):
+    def new(rules: List[V1Beta1IngressRule], tls: List[V1Beta1IngressTLS] = None, backend: V1Beta1IngressBackend=None):
         return V1Beta1IngressSpec(backend=backend, rules=rules, tls=tls)
