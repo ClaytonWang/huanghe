@@ -281,6 +281,161 @@ class HWV1Beta1Api(object):
             _request_timeout=local_var_params.get('_request_timeout'),
             collection_formats=collection_formats)
 
+    def delete_namespaced_ingress(self, name, namespace, **kwargs):  # noqa: E501
+        """delete_namespaced_deployment  # noqa: E501
+
+        delete a Ingress  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        # >>> thread = api.delete_namespaced_ingress(name, namespace, async_req=True)
+        # >>> result = thread.get()
+
+        :param async_req bool: execute request asynchronously
+        :param str name: name of the Deployment (required)
+        :param str namespace: object name and auth scope, such as for teams and projects (required)
+        :param str pretty: If 'true', then the output is pretty printed.
+        :param str dry_run: When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed
+        :param int grace_period_seconds: The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.
+        :param bool orphan_dependents: Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7. Should the dependent objects be orphaned. If true/false, the \"orphan\" finalizer will be added to/removed from the object's finalizers list. Either this field or PropagationPolicy may be set, but not both.
+        :param str propagation_policy: Whether and how garbage collection will be performed. Either this field or OrphanDependents may be set, but not both. The default policy is decided by the existing finalizer set in the metadata.finalizers and the resource-specific default policy. Acceptable values are: 'Orphan' - orphan the dependents; 'Background' - allow the garbage collector to delete the dependents in the background; 'Foreground' - a cascading policy that deletes all dependents in the foreground.
+        :param V1DeleteOptions body:
+        :param _preload_content: if False, the urllib3.HTTPResponse object will
+                                 be returned without reading/decoding response
+                                 data. Default is True.
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :return: V1Status
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        return self.delete_namespaced_ingress_with_http_info(name, namespace, **kwargs)  # noqa: E501
+
+    def delete_namespaced_ingress_with_http_info(self, name, namespace, **kwargs):  # noqa: E501
+        """delete_namespaced_ingress  # noqa: E501
+
+        delete a Ingress  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        # >>> thread = api.delete_namespaced_ingress_with_http_info(name, namespace, async_req=True)
+        # >>> result = thread.get()
+
+        :param async_req bool: execute request asynchronously
+        :param str name: name of the Deployment (required)
+        :param str namespace: object name and auth scope, such as for teams and projects (required)
+        :param str pretty: If 'true', then the output is pretty printed.
+        :param str dry_run: When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed
+        :param int grace_period_seconds: The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.
+        :param bool orphan_dependents: Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7. Should the dependent objects be orphaned. If true/false, the \"orphan\" finalizer will be added to/removed from the object's finalizers list. Either this field or PropagationPolicy may be set, but not both.
+        :param str propagation_policy: Whether and how garbage collection will be performed. Either this field or OrphanDependents may be set, but not both. The default policy is decided by the existing finalizer set in the metadata.finalizers and the resource-specific default policy. Acceptable values are: 'Orphan' - orphan the dependents; 'Background' - allow the garbage collector to delete the dependents in the background; 'Foreground' - a cascading policy that deletes all dependents in the foreground.
+        :param V1DeleteOptions body:
+        :param _return_http_data_only: response data without head status code
+                                       and headers
+        :param _preload_content: if False, the urllib3.HTTPResponse object will
+                                 be returned without reading/decoding response
+                                 data. Default is True.
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :return: tuple(V1Status, status_code(int), headers(HTTPHeaderDict))
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        local_var_params = locals()
+
+        all_params = [
+            'name',
+            'namespace',
+            'pretty',
+            'dry_run',
+            'grace_period_seconds',
+            'orphan_dependents',
+            'propagation_policy',
+            'body'
+        ]
+        all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout'
+            ]
+        )
+
+        for key, val in six.iteritems(local_var_params['kwargs']):
+            if key not in all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method delete_namespaced_deployment" % key
+                )
+            local_var_params[key] = val
+        del local_var_params['kwargs']
+        # verify the required parameter 'name' is set
+        if self.api_client.client_side_validation and ('name' not in local_var_params or  # noqa: E501
+                                                        local_var_params['name'] is None):  # noqa: E501
+            raise ApiValueError("Missing the required parameter `name` when calling `delete_namespaced_deployment`")  # noqa: E501
+        # verify the required parameter 'namespace' is set
+        if self.api_client.client_side_validation and ('namespace' not in local_var_params or  # noqa: E501
+                                                        local_var_params['namespace'] is None):  # noqa: E501
+            raise ApiValueError("Missing the required parameter `namespace` when calling `delete_namespaced_deployment`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'name' in local_var_params:
+            path_params['name'] = local_var_params['name']  # noqa: E501
+        if 'namespace' in local_var_params:
+            path_params['namespace'] = local_var_params['namespace']  # noqa: E501
+
+        query_params = []
+        if 'pretty' in local_var_params and local_var_params['pretty'] is not None:  # noqa: E501
+            query_params.append(('pretty', local_var_params['pretty']))  # noqa: E501
+        if 'dry_run' in local_var_params and local_var_params['dry_run'] is not None:  # noqa: E501
+            query_params.append(('dryRun', local_var_params['dry_run']))  # noqa: E501
+        if 'grace_period_seconds' in local_var_params and local_var_params['grace_period_seconds'] is not None:  # noqa: E501
+            query_params.append(('gracePeriodSeconds', local_var_params['grace_period_seconds']))  # noqa: E501
+        if 'orphan_dependents' in local_var_params and local_var_params['orphan_dependents'] is not None:  # noqa: E501
+            query_params.append(('orphanDependents', local_var_params['orphan_dependents']))  # noqa: E501
+        if 'propagation_policy' in local_var_params and local_var_params['propagation_policy'] is not None:  # noqa: E501
+            query_params.append(('propagationPolicy', local_var_params['propagation_policy']))  # noqa: E501
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in local_var_params:
+            body_params = local_var_params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/yaml', 'application/vnd.kubernetes.protobuf'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = ['BearerToken']  # noqa: E501
+
+        return self.api_client.call_api(
+            '/apis/extensions/v1beta1/namespaces/{namespace}/ingresses/{name}', 'DELETE',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='V1Status',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=local_var_params.get('async_req'),
+            _return_http_data_only=local_var_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=local_var_params.get('_preload_content', True),
+            _request_timeout=local_var_params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+
+
 if __name__ == '__main__':
     # from kubernetes.config import load_kube_config
     # load_kube_config("hw")
