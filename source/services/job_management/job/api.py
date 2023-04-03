@@ -18,18 +18,20 @@ from basic.utils.source import source_convert
 from basic.common.query_filter_params import QueryParameters
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project, create_vcjob, \
     delete_vcjob, VolcanoJobCreateReq, VolcanoJobDeleteReq
+from services.job_management.job.dependencies import verify_project_check, verify_auth, verify_action, \
+    verify_edit_same_job, \
+    verify_status_name, verify_create_same_job
 from services.job_management.job.serializers import JobCreate, JobDetail, JobList, JobEdit, \
-    JobOp, EventItem, EventCreate, JobStatusUpdate, JobSimple
+    EventItem, EventCreate, JobStatusUpdate, JobSimple
 from services.job_management.models.job import Job
 from services.job_management.models.mode import Mode
-from services.job_management.utils.auth import operate_auth
 from basic.middleware.service_requests import volume_check
-from services.job_management.utils.user_request import project_check, project_check_obj
 from basic.common.base_config import ADMIN, ENV
 from basic.common.event_model import Event
 from basic.common.status_cache import sc
 
 router_job = APIRouter()
+
 
 @router_job.get(
     '/startmodes',
@@ -134,15 +136,12 @@ async def list_job(request: Request,
     return p
 
 
-async def job_name_verification(name, project_by_id, created_by_id):
-    if await Job.objects.filter(name=name, project_by_id=project_by_id, created_by_id=created_by_id).count():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户, job不能重名')
-
 
 @router_job.post(
     '',
     description='创建job',
     response_model=JobDetail,
+    dependencies=[Depends(verify_create_same_job)]
 )
 async def create_job(request: Request,
                      jc: JobCreate):
@@ -150,18 +149,11 @@ async def create_job(request: Request,
     ag: AccountGetter = request.user
     pg: ProjectGetter = get_project(request.headers.get('authorization'), jc.project.id)
 
-    if await Job.objects.filter(name=jc.name, project_by_id=jc.project.id, created_by_id=ag.id).count():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户, job不能重名')
-
     if jc.mode == "调试":
         jc.start_command = "sleep 14400"
 
     # 存储检查
-    ((storages, volumes_k8s), _) = await asyncio.gather(
-        volume_check(authorization, jc.hooks, pg.en_name),
-        job_name_verification(name=jc.name, project_by_id=jc.project.id, created_by_id=ag.id)
-    )
-
+    storages, volumes_k8s = await volume_check(authorization, jc.hooks, pg.en_name)
     if len(set(x['path'] for x in storages)) != len(storages):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
 
@@ -231,34 +223,22 @@ async def update_status(jsu: JobStatusUpdate,
 @router_job.put(
     '/{job_id}',
     description='编辑Job',
+    dependencies=[Depends(verify_edit_same_job), Depends(verify_status_name)]
 )
 async def update_job(request: Request,
                      je: JobEdit,
                      job_id: int = Path(..., ge=1, description="JobID"),
+                     _job: Job = Depends(verify_auth),
+                     extra_info: dict = Depends(verify_project_check)
                      ):
-    ag: AccountGetter = request.user
     authorization: str = request.headers.get('authorization')
     if je.mode == "调试":
         je.start_command = "sleep 14400"
 
-    _job, reason = await operate_auth(request, job_id)
-    if not _job:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
-
-    duplicate_name = await Job.objects.filter(name=_job.name, project_by_id=int(je.project.id),
-                                              created_by_id=ag.id).exclude(id=job_id).count()
-    if duplicate_name:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户，Job不能重名')
     k8s_info = _job.k8s_info
 
-    if _job.status.name not in {'stopped', "completed", "run_fail"}:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job未停止')
     if _job.status.name != 'stopped':
         delete_vcjob(vjd=VolcanoJobDeleteReq.parse_obj(k8s_info), ignore_no_found=True)
-
-    check, extra_info = await project_check_obj(request, je.project.id)
-    if not check:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
 
     update_data = {}
     if je.source:
@@ -303,15 +283,9 @@ async def update_job(request: Request,
     '/{job_id}',
     description='启动/停止Job',
 )
-async def operate_job(request: Request,
-                      data: JobOp,
-                      job_id: int = Path(..., ge=1, description="JobID")):
-    action = int(data.dict()['action'])
-    _job, reason = await operate_auth(request, job_id)
-    if not _job:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
-    if action not in [0, 1]:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
+async def operate_job(job_id: int = Path(..., ge=1, description="JobID"),
+                      _job: Job = Depends(verify_auth),
+                      action: int = Depends(verify_action)):
     payloads = json.dumps(_job.k8s_info)
 
     # 数字，0（停止）｜1（启动）
@@ -332,18 +306,13 @@ async def operate_job(request: Request,
     return JSONResponse(dict(id=job_id))
 
 
+
 @router_job.delete(
     '/{job_id}',
     description='删除Job',
+    dependencies=[Depends(verify_project_check)]
 )
-async def delete_job(request: Request,
-                     job_id: int = Path(..., ge=1, description="JobID")):
-    _job, reason = await operate_auth(request, job_id)
-    if not _job:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=reason)
-    check, extra_info = await project_check(request, _job.project_by_id)
-    if not check:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
+async def delete_job(_job: Job = Depends(verify_auth)):
 
     payloads = _job.k8s_info
     # # error状态调用删除需要释放资源
