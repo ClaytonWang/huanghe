@@ -35,6 +35,7 @@ class DeploymentCreateReq(BaseModelValidatorName):
                 "memory": f"{self.memory}Gi",
                 "nvidia.com/gpu": self.gpu,
             },
+            "cluster": self.cluster,
             "annotations": self.annotations,
             "volumes": [v.dict() for v in self.volumes]
         }

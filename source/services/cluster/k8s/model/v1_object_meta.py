@@ -3,7 +3,7 @@ from __future__ import annotations as anno
 from services.cluster.k8s.model.generic_mixin import GenericMixin
 from services.cluster.k8s.const.crd_kubeflow_const import ISTIO_DISABLE_INJECT_ANNOTATION, \
     HUAWEICLOUD_GPU_NAMESPACE_ANNOTATION, HUAWEICLOUD_CPU_NAMESPACE_ANNOTATION, HUAWEICLOUD_ENTERPRISE_PROJECT_LABEL,\
-    HUAWEICLOUD_NETWORK_ANNOTATION
+    HUAWEICLOUD_NETWORK_ANNOTATION, HUAWEICLOUD_INGRESS_ELB_PORT_ANNOTATION, HUAWEICLOUD_INGRESS_ANNOTATION
 from typing import Optional, List, Dict
 from datetime import datetime
 
@@ -144,6 +144,14 @@ class V1ObjectMeta(GenericMixin):
         self.annotations.update(annotations)
         return self
 
+    def extend_labels(self, labels=None):
+        if not self.labels:
+            self.labels = {}
+        if not labels:
+            labels = {}
+        self.labels.update(labels)
+        return self
+
     @classmethod
     def default(cls, name, namespace=None, annotations=None, labels=None):
         return cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
@@ -156,25 +164,30 @@ class V1ObjectMeta(GenericMixin):
 
     @classmethod
     def huaweicloud_gpu_namespace(cls, name, namespace=None, annotations=None, labels=None):
-        meta = cls._check_enterprise_label(name=name, namespace=namespace, annotations=annotations, labels=labels)
+        meta = cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
         meta.extend_annotations(HUAWEICLOUD_GPU_NAMESPACE_ANNOTATION)
+        meta.extend_labels(labels=HUAWEICLOUD_ENTERPRISE_PROJECT_LABEL)
         return meta
 
     @classmethod
     def huaweicloud_cpu_namespace(cls, name, namespace=None, annotations=None, labels=None):
-        meta = cls._check_enterprise_label(name=name, namespace=namespace, annotations=annotations, labels=labels)
+        meta = cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
         meta.extend_annotations(HUAWEICLOUD_CPU_NAMESPACE_ANNOTATION)
+        meta.extend_labels(labels=HUAWEICLOUD_ENTERPRISE_PROJECT_LABEL)
         return meta
 
     @classmethod
     def huaweicloud_network(cls, name, namespace, annotations=None, labels=None):
         meta = cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
         meta.extend_annotations(HUAWEICLOUD_NETWORK_ANNOTATION)
+        return meta
 
     @classmethod
-    def _check_enterprise_label(cls, name: str, namespace: str, annotations: Dict[str, str], labels: Dict[str, str]):
-        assert HUAWEICLOUD_ENTERPRISE_PROJECT_LABEL in labels
-        return cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
+    def huaweicloud_ingress(cls, name, namespace, port, annotations=None, labels=None):
+        meta = cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
+        meta.extend_annotations(HUAWEICLOUD_INGRESS_ANNOTATION)
+        meta.extend_annotations({HUAWEICLOUD_INGRESS_ELB_PORT_ANNOTATION: port})
+        return meta
 
 
     @staticmethod

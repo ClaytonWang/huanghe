@@ -9,7 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from ormar.exceptions import AsyncOrmException
 from pydantic.error_wrappers import ValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
-
+from services.job_management.models.mode import Mode
 from basic.common.env_variable import get_integer_variable
 from basic.common.env_variable import get_string_variable
 from config import *
@@ -24,6 +24,7 @@ from basic.common.initdb import startup_event, shutdown_event
 from job.api import router_job
 from basic.middleware.account_getter import verify_token
 from basic.middleware.service_requests import get_source_list, get_image_list
+
 
 
 configure_logging('logging.config.dictConfig', LOGGING)
@@ -65,6 +66,13 @@ async def get_source(request: Request):
     authorization: str = request.headers.get('authorization')
     res_source = await get_source_list(authorization)
     return res_source
+
+@app.get(
+    '/startmodes',
+    description="任务启动方式"
+)
+async def list_modes():
+    return await Mode.mode_cache_pagation()
 
 
 # 路由配置

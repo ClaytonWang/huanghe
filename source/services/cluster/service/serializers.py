@@ -12,23 +12,19 @@ from typing import Dict, List
 class ServiceCreateReq(BaseModelValidatorName):
     name: str
     namespace: str
-    # image: str
     # 对应环境
     env: str = "dev"
     annotations: Dict = {}
-    cluster_ip: str
-    port: int
 
     def gen_service_dict(self):
         return {
             "name": self.name,
             "namespace": self.namespace,
             # "image": self.image,
+            "cluster": self.cluster,
             "labels": {"env": self.env, "app": self.name},
             "annotations": self.annotations,
-            "cluster_ip": self.cluster_ip,
-            "ports": [{"name": self.name, "port": self.port}],
-            "selector": {"app": self.name}
+            "selector": {"env": self.env, "app": self.name},
         }
 
 
@@ -42,8 +38,6 @@ class Service(BaseModelValidatorName):
     # image: str
     labels: Dict
     annotations: Dict = {}
-    cluster_ip: str
-    ports: List
     selector: Dict = {}
 
 

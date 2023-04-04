@@ -37,12 +37,13 @@ class V1Beta1Ingress(BaseModel):
     }
 
     @classmethod
-    def default(cls):
+    def default(cls, name: str, namespace: str, port: str):
         return cls.new(api_version=HUAWEICLOUD_INGRESS_APIVERSION,
                        kind=HUAWEICLOUD_INGRESS_KIND,
-                       metadata=V1ObjectMeta.default(),
-                       spec=V1Beta1IngressSpec.default())
+                       metadata=V1ObjectMeta.huaweicloud_ingress(name=name, namespace=namespace, port=port),
+                       spec=V1Beta1IngressSpec.default(service_name=name))
 
     @staticmethod
     def new(api_version: str, kind: str, metadata: V1ObjectMeta, spec: V1Beta1IngressSpec):
         return V1Beta1Ingress(api_version=api_version, kind=kind, metadata=metadata, spec=spec)
+

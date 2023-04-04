@@ -62,13 +62,23 @@ HUAWEICLOUD_NETWORK_ANNOTATION = {"network.alpha.kubernetes.io/domain-id": "a13b
                                   "network.alpha.kubernetes.io/default-security-group":"6664c5b1-294c-4078-8153-cd07b5437683",
                                   "network.alpha.kubernetes.io/project-id": "9c2349a364784c38a4e40121ef5d67d4",}
 
-HUAWEICLOUD_ENTERPRISE_PROJECT_LABEL = "sys_enterprise_project_id"
+HUAWEICLOUD_INGRESS_ANNOTATION = {"network.alpha.kubernetes.io/domain-id": "a13b3c35734648b39befee62731ae42f",
+                                  "network.alpha.kubernetes.io/project-id": "9c2349a364784c38a4e40121ef5d67d4",
+                                  "kubernetes.io/elb.id": "6e7919c2-5b0a-4ee2-acd1-4dcbfcd14bc9",
+                                  "kubernetes.io/elb.ip": '192.168.59.29',
+                                  }
+
+HUAWEICLOUD_INGRESS_ELB_PORT_ANNOTATION = "kubernetes.io/elb.port"
+
+HUAWEICLOUD_ENTERPRISE_PROJECT_LABEL = {"sys_enterprise_project_id": "33a795c3-c4e6-46ba-afc1-798d132c3966"}
 
 HUAWEICLOUD_INGRESS_APIVERSION = "extensions/v1beta1"
 
 HUAWEICLOUD_INGRESS_KIND = "Ingress"
 
 HUAWEICLOUD_NETWORK_APIVERSION = "networking.cci.io/v1beta1"
+
+HUAWEICLOUD_NETWORK_KIND = "Network"
 
 HUAWEICLOUD_NETWORK_AVAILABLE_ZONE = "cn-north-4a"
 

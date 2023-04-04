@@ -35,7 +35,7 @@ class UserStr(BaseModel):
 
 class StartMode(BaseModel):
     id: int
-    name: str
+    name: Optional[str]
 
 
 class Grafana(BaseModel):
@@ -62,6 +62,10 @@ class HookItem(BaseModel):
 
 class JobOp(BaseModel):
     action: int
+
+class Url(BaseModel):
+    name: str
+    url: str
 
 
 class Creator(BaseModel):
@@ -111,7 +115,7 @@ class JobList(BaseModel):
     creator: Optional[UserStr]
     project: Optional[ProjectStr]
     image: Image
-    url: Optional[str]
+    url: Optional[List[Url]]
     created_at: Union[datetime, str, None]
     updated_at: Union[datetime, str, None]
     mode: str
@@ -132,7 +136,7 @@ class JobCreate(BaseModel):
     image: Image
     work_dir: Optional[str]
     hooks: List[HookItem] = []
-    start_mode: int
+    start_mode: Optional[StartMode]
     nodes: Optional[int] = 1
 
     @validator('name')
@@ -152,7 +156,7 @@ class JobDetail(BaseModel):
     hooks: List[HookItem]
     updated_at: Union[datetime, str, None]
     mode: str
-    url: Optional[str]
+    url: Optional[List[Url]]
     grafana: Optional[Grafana]
     logging_url: Optional[str]
     start_command: Optional[str]
@@ -175,7 +179,7 @@ class JobEdit(BaseModel):
     work_dir: Optional[str]
     hooks: List[HookItem] = []
     source: str
-    start_mode: Optional[int]
+    start_mode: Optional[StartMode]
     nodes: Optional[int]
 
 class StatusItemOnlyDesc(BaseModel):

@@ -16,11 +16,11 @@ class V1Beta1IngressBackend(GenericMixin):
                             and the value is json key in definition.
     """
     service_name: str
-    service_port: str
+    service_port: int
 
     openapi_types = {
         "service_name": "str",
-        "service_port": "str",
+        "service_port": "int",
     }
 
     attribute_map = {
@@ -30,9 +30,9 @@ class V1Beta1IngressBackend(GenericMixin):
 
 
     @classmethod
-    def default(cls, service_name="deploy", service_port="80"):
+    def default(cls, service_name, service_port=80):
         return cls.new(service_name=service_name, service_port=service_port)
 
     @staticmethod
-    def new(service_name: str, service_port: str):
+    def new(service_name: str, service_port: int):
         return V1Beta1IngressBackend(service_name=service_name, service_port=service_port)

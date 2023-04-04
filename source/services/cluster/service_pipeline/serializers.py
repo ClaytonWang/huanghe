@@ -6,37 +6,30 @@
     >Time   : 2023/3/14 15:49
 """
 from pydantic import BaseModel
-from typing import Dict, List, Optional
+from typing import Optional
 from services.cluster.deployment.serializers import Deployment, DeploymentCreateReq
 from services.cluster.service.serializers import Service, ServiceCreateReq
-
+from services.cluster.ingress.serializers import Ingress
+from basic.common.validator_name import BaseModelValidatorName
 
 class Volume(BaseModel):
     name: str
     mount_path: str
     mount_propagation: Optional[str] = "HostToContainer"
 
-class PipelineCreateReq(DeploymentCreateReq, ServiceCreateReq):
+class ServicePipelineCreateReq(DeploymentCreateReq, ServiceCreateReq, Ingress):
 
     def gen_service_pipeline_dict(self):
-        return {
-            "name": self.name,
-            "namespace": self.namespace,
-            "image": self.image,
-            "labels": {"env": self.env, "app": self.name},
-            "volumes": self.volumes,
-            "annotations": self.annotations,
-            "ports": [{"name": self.name, "port": self.port}],
-            "selector": {"app": self.name}
-        }
+        d = self.gen_service_dict()
+        d.update(self.gen_deployment_dict())
+        return d
 
 
-class PipelineDeleteReq(BaseModel):
-    name: str
+class ServicePipelineDeleteReq(BaseModelValidatorName):
     namespace: str
 
 
-class ServicePipeline(Service, Deployment):
+class ServicePipeline(Service, Deployment, Ingress):
 
     def gen_service(self) -> Service:
         return Service.parse_obj(self)
@@ -44,6 +37,8 @@ class ServicePipeline(Service, Deployment):
     def gen_deployment(self) -> Deployment:
         return Deployment.parse_obj(self)
 
+    def gen_ingress(self) -> Ingress:
+        return Ingress.parse_obj(self)
 
 
 if __name__ == '__main__':

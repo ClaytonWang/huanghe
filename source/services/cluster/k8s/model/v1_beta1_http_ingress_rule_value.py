@@ -26,8 +26,8 @@ class V1Beta1HTTPIngressRuleValue(GenericMixin):
     }
 
     @classmethod
-    def default(cls):
-        return cls.new([V1Beta1HTTPIngressPath.default()])
+    def default(cls, service_name: str):
+        return cls.new([V1Beta1HTTPIngressPath.default(service_name=service_name)])
 
     @staticmethod
     def new(paths: List[V1Beta1HTTPIngressPath]):

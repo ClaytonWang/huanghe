@@ -17,7 +17,6 @@ from services.cluster.k8s.model.v1_service import V1Service
 from typing import Dict
 from services.cluster.service.serializers import ServiceDeleteReq, Service, ServiceQuery
 
-import pprint
 
 
 class ServiceMixin(CustomerObjectApi, CoreV1Api):
@@ -30,15 +29,13 @@ class ServiceMixin(CustomerObjectApi, CoreV1Api):
                                                                                  namespace=serv.namespace,
                                                                                  labels=serv.labels,
                                                                                  annotations=serv.annotations,
-                                                                                 cluster_ip=serv.cluster_ip,
-                                                                                 ports=serv.ports,
-                                                                                 selector=serv.selector,
+                                                                                 selector=serv.labels,
                                                                                  ),
                                                           )
 
-    def delete_service(self, servdr: ServiceDeleteReq) -> V1Status:
-        return self.core_v1_api(cluster=servdr.cluster).delete_namespaced_service(namespace=servdr.namespace,
-                                                          name=servdr.name,)
+    def delete_service(self, sdr: ServiceDeleteReq) -> V1Status:
+        return self.core_v1_api(cluster=sdr.cluster).delete_namespaced_service(namespace=sdr.namespace,
+                                                          name=sdr.name,)
 
     def list_service(self, servq: ServiceQuery):
         thread = self.core_v1_api(cluster=servq.cluster).list_namespaced_service(namespace=servq.namespace)

@@ -20,22 +20,15 @@ from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_pr
 from services.job_management.job.serializers import JobCreate, JobDetail, JobList, JobEdit, \
     JobOp, EventItem, EventCreate, JobStatusUpdate, JobSimple
 from services.job_management.models.job import Job
-from services.job_management.models.mode import Mode
 from services.job_management.utils.auth import operate_auth
 from basic.middleware.service_requests import volume_check
 from services.job_management.utils.user_request import project_check, project_check_obj
 from basic.common.base_config import ADMIN, ENV
 from basic.common.event_model import Event
 from basic.common.status_cache import sc
-
+from services.job_management.models.mode import Mode
 router_job = APIRouter()
 
-@router_job.get(
-    '/startmodes',
-    description="任务启动方式"
-)
-async def list_modes():
-    return await Mode.mode_cache_pagation()
 
 @router_job.get(
     '/project_backend/{project_id}',
@@ -159,6 +152,7 @@ async def create_job(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
 
     machine_type, gpu_count, cpu_count, memory = source_convert(jc.source)
+    start_mode = await Mode.get(jc.start_mode.id)
 
     k8s_info = VolcanoJobCreateReq(name=f"{ag.en_name}-{jc.name}",
                                    namespace=pg.en_name,
@@ -169,7 +163,9 @@ async def create_job(request: Request,
                                    gpu=gpu_count,
                                    volumes=volumes_k8s,
                                    command=[jc.start_command],
-                                   working_dir=jc.work_dir, ).dict()
+                                   working_dir=jc.work_dir,
+                                   task_num=jc.nodes,
+                                   mode=start_mode,).dict()
 
     init_data = {"name": jc.name,
                  "created_by_id": ag.id,
@@ -192,12 +188,12 @@ async def create_job(request: Request,
                  "gpu": gpu_count,
                  "memory": memory,
                  "type": machine_type,
-                 "start_mode": jc.start_mode,
+                 "start_mode": jc.start_mode.id,
                  "nodes": jc.nodes,
                  }
 
     _job = await Job.objects.create(**init_data)
-    k8s_info['annotations'] = {"id": str(_job.id)}
+    k8s_info['annotations'] = {"id": str(_job.id), "gpu": str(gpu_count), "slots": str(gpu_count) if gpu_count else "1"}
     await _job.update(**{"k8s_info": k8s_info})
     return _job.gen_job_detail_response()
 
@@ -254,13 +250,17 @@ async def update_job(request: Request,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
 
     update_data = {}
+    start_mode = await Mode.get(je.start_mode.id)
+
     if je.source:
         machine_type, gpu_count, cpu_count, memory = source_convert(je.source)
         source_dic = {'cpu': cpu_count,
                       'memory': memory,
                       'gpu': gpu_count,
-                      'type': machine_type, }
+                      'type': machine_type,
+                      }
         k8s_info.update(source_dic)
+        k8s_info['annotations'] = {"id": str(_job.id), "gpu": str(gpu_count), "slots": str(gpu_count) if gpu_count else "1"}
         update_data = source_dic
 
     storages, volumes_k8s = await volume_check(authorization, je.hooks, extra_info['en_name'])
@@ -273,6 +273,8 @@ async def update_job(request: Request,
                      'name': f"{request.user.en_name}-{_job.name}",
                      "command": [je.start_command],
                      "work_dir": je.work_dir,
+                     "task_num": je.nodes,
+                     "mode": start_mode,
                      })
     update_data.update({"storage": json.dumps(storages),
                         "k8s_info": json.dumps(k8s_info),
@@ -285,7 +287,7 @@ async def update_job(request: Request,
                         'status': sc.get('stopped'),
                         "mode": je.mode,
                         "start_command": je.start_command,
-                        "start_mode": je.start_mode,
+                        "start_mode": je.start_mode.id,
                         "nodes": je.nodes,
                         })
     if not await _job.update(**update_data):
