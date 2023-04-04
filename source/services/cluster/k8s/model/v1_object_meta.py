@@ -144,6 +144,14 @@ class V1ObjectMeta(GenericMixin):
         self.annotations.update(annotations)
         return self
 
+    def extend_labels(self, labels=None):
+        if not self.labels:
+            self.labels = {}
+        if not labels:
+            labels = {}
+        self.labels.update(labels)
+        return self
+
     @classmethod
     def default(cls, name, namespace=None, annotations=None, labels=None):
         return cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
@@ -158,12 +166,14 @@ class V1ObjectMeta(GenericMixin):
     def huaweicloud_gpu_namespace(cls, name, namespace=None, annotations=None, labels=None):
         meta = cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
         meta.extend_annotations(HUAWEICLOUD_GPU_NAMESPACE_ANNOTATION)
+        meta.extend_labels(labels=HUAWEICLOUD_ENTERPRISE_PROJECT_LABEL)
         return meta
 
     @classmethod
     def huaweicloud_cpu_namespace(cls, name, namespace=None, annotations=None, labels=None):
         meta = cls.new(name=name, namespace=namespace, annotations=annotations, labels=labels)
         meta.extend_annotations(HUAWEICLOUD_CPU_NAMESPACE_ANNOTATION)
+        meta.extend_labels(labels=HUAWEICLOUD_ENTERPRISE_PROJECT_LABEL)
         return meta
 
     @classmethod
