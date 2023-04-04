@@ -115,7 +115,7 @@ class JobList(BaseModel):
     creator: Optional[UserStr]
     project: Optional[ProjectStr]
     image: Image
-    url: Optional[Url]
+    url: Optional[List[Url]]
     created_at: Union[datetime, str, None]
     updated_at: Union[datetime, str, None]
     mode: str
@@ -156,7 +156,7 @@ class JobDetail(BaseModel):
     hooks: List[HookItem]
     updated_at: Union[datetime, str, None]
     mode: str
-    url: Optional[Url]
+    url: Optional[List[Url]]
     grafana: Optional[Grafana]
     logging_url: Optional[str]
     start_command: Optional[str]
