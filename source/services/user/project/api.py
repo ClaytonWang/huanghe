@@ -117,13 +117,12 @@ async def delete_project(
     project = await Project.objects.get(id=project_id)
     if await project.member.count():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联用户，不能删除')
-    # TODO(jiangshouchen): fix bug
-    # result = query_job_by_project(authorization, project_id=project_id)
-    # if result:
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联job，不能删除')
-    #
-    # notebook_list = query_notebook_by_project(authorization, project_id=project_id)
-    # if notebook_list:
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联notebook，不能删除')
+    result = query_job_by_project(authorization, project_id=project_id)
+    if result:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联job，不能删除')
+
+    notebook_list = query_notebook_by_project(authorization, project_id=project_id)
+    if notebook_list:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联notebook，不能删除')
     delete_np(NamespacePipeline(name=project.en_name, namespace=project.en_name, cluster="hw"))
     await project.delete()
