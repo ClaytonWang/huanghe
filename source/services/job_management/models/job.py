@@ -154,7 +154,7 @@ class Job(GenericDateModel):
 
     @property
     def webkubectl(self):
-        return [f"{WEBKUBECTL_URL}/?arg=-n{self.project_en_by}&arg={i}&arg=bash" for i in self.pods]
+        return [{"url": f"{WEBKUBECTL_URL}/?arg=-n{self.project_en_by}&arg={i}&arg=bash", "name": i} for i in self.pods]
 
     def gen_job_pagation_response(self):
         return {
