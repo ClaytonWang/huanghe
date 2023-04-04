@@ -14,7 +14,7 @@ from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
 from basic.common.env_variable import get_string_variable
 from pypinyin import lazy_pinyin, Style
-from basic.middleware.account_getter import create_ns, Namespace, create_secret, SecretNamespace
+from basic.middleware.account_getter import create_ns, Namespace, create_secret, SecretNamespace, create_np, delete_np, NamespacePipeline
 from project.service_request import query_notebook_by_project, query_job_by_project
 from typing import List
 
@@ -53,6 +53,7 @@ async def create_project(project: ProjectCreate):
     init_data['en_name'] = f"{get_string_variable('ENV', 'DEV')}-{en_name}".lower()
     create_ns(Namespace(name=init_data['en_name']), ignore_exist=True)
     create_secret(SecretNamespace(namespace=init_data['en_name']), ignore_exist=True)
+    create_np(NamespacePipeline(name=init_data['en_name'], namespace=init_data['en_name'], cluster="hw"), ignore_exist=True)
     return await Project.objects.create(**init_data)
 
 
