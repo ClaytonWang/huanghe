@@ -13,6 +13,7 @@ class NamespacePipelineMixin(NamespaceMixin, NetworkMixin):
     def create_namespace_pipeline(self, np: NamespacePipeline):
         self.create_huaweiyun_cpu_ns(np.gen_namespace()) and self.create_network(np.gen_network())
         np.name = np.name + "-" + "gpu"
+        np.namespace = np.namespace + "-" + "gpu"
         self.create_huaweiyun_gpu_ns(np.gen_namespace()) and self.create_network(np.gen_network())
 
     def delete_namespace_pipeline(self, ns: Namespace):
