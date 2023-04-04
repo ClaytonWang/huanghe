@@ -63,6 +63,10 @@ class HookItem(BaseModel):
 class JobOp(BaseModel):
     action: int
 
+class Url(BaseModel):
+    name: str
+    url: str
+
 
 class Creator(BaseModel):
     id: str
@@ -111,7 +115,7 @@ class JobList(BaseModel):
     creator: Optional[UserStr]
     project: Optional[ProjectStr]
     image: Image
-    url: Optional[str]
+    url: Optional[Url]
     created_at: Union[datetime, str, None]
     updated_at: Union[datetime, str, None]
     mode: str
@@ -152,7 +156,7 @@ class JobDetail(BaseModel):
     hooks: List[HookItem]
     updated_at: Union[datetime, str, None]
     mode: str
-    url: Optional[str]
+    url: Optional[Url]
     grafana: Optional[Grafana]
     logging_url: Optional[str]
     start_command: Optional[str]
