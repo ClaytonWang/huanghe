@@ -124,5 +124,5 @@ async def delete_project(
     notebook_list = query_notebook_by_project(authorization, project_id=project_id)
     if notebook_list:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='存在关联notebook，不能删除')
-
+    delete_np(NamespacePipeline(name=project.en_name, namespace=project.en_name, cluster="hw"))
     await project.delete()
