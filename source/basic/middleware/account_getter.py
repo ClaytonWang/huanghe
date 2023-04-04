@@ -68,6 +68,9 @@ class Namespace(BaseModel):
                 ans.append(ch.lower())
         return ''.join(ans)
 
+class NamespacePipeline(BaseModelValidatorName):
+    namespace: str
+
 
 class Role(BaseModel):
     name: str
@@ -208,13 +211,29 @@ def create_ns(ns: Namespace, ignore_exist=False):
 
 def delete_ns(ns: Namespace):
     try:
-
         response = requests.delete(f"http://{CLUSTER_SERVICE_URL}{CLUSTER_NAMESPACE_PREFIX_URL}", json=ns.dict()).json()
         assert response['success'] is True
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='删除namespace失败')
     return True
 
+def create_np(np: NamespacePipeline, ignore_exist=False):
+    try:
+        response = requests.post(f"http://{CLUSTER_SERVICE_URL}{CLUSTER_NAMESPACE_PIPELINE_PREFIX_URL}", json=np.dict()).json()
+        if ignore_exist and response["success"] is not True and response["message"] == "AlreadyExists":
+            return True
+        assert response['success'] is True
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='创建namespace失败')
+    return True
+
+def delete_np(np: NamespacePipeline):
+    try:
+        response = requests.delete(f"http://{CLUSTER_SERVICE_URL}{CLUSTER_NAMESPACE_PIPELINE_PREFIX_URL}", json=np.dict()).json()
+        assert response['success'] is True
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='删除namespace失败')
+    return True
 
 def create_vcjob(vjc: VolcanoJobCreateReq, ignore_exist=False):
     try:
