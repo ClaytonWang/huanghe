@@ -70,7 +70,7 @@ HUAWEICLOUD_INGRESS_ANNOTATION = {"network.alpha.kubernetes.io/domain-id": "a13b
 
 HUAWEICLOUD_INGRESS_ELB_PORT_ANNOTATION = "kubernetes.io/elb.port"
 
-HUAWEICLOUD_ENTERPRISE_PROJECT_LABEL = "sys_enterprise_project_id"
+HUAWEICLOUD_ENTERPRISE_PROJECT_LABEL = {"sys_enterprise_project_id": "33a795c3-c4e6-46ba-afc1-798d132c3966"}
 
 HUAWEICLOUD_INGRESS_APIVERSION = "extensions/v1beta1"
 

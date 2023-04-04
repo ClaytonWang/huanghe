@@ -147,7 +147,7 @@ class Job(GenericDateModel):
 
     @property
     def pods(self):
-        if self.start_mode == 2:
+        if self.start_mode != 1:
             return [f"{self.created_by}-{self.name}-mpimaster-0"] + [f"{self.created_by}-{self.name}-mpiworker-{i}" for i in range(self.nodes-1)]
         return [f"{self.created_by}-{self.name}-tfjob-0"]
 
