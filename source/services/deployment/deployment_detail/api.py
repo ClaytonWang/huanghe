@@ -32,7 +32,6 @@ async def deployment_monitor(deployment_id: int = Path(..., ge=1, description="D
     response_model_exclude_unset=True
 )
 #分页日志
-async def deployment_monitor(deployment_id: int = Path(..., ge=1, description="DeploymentID"), data: LogPageIndex = None):
-    index= int(data.dict()['index'])
-    return get_log_hw(index)
+async def deployment_monitor(deployment_id: int = Path(..., ge=1, description="DeploymentID"), log_id: int = Path(..., ge=1, description="LogID")):
+    return get_log_hw(log_id)
 
