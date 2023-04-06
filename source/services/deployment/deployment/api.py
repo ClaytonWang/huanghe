@@ -6,15 +6,12 @@
     >Time   : 2023/3/16 11:16
 """
 import json
-from typing import List
 from config import *
 from basic.utils.source import source_convert
-from fastapi import APIRouter, Depends, Request, HTTPException, status, Path, Query
+from fastapi import APIRouter, Depends, Request, HTTPException, status, Path
 from fastapi.responses import JSONResponse
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
-from basic.common.event_model import Event
-from basic.common.env_variable import get_string_variable
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project
 from basic.middleware.service_requests import get_user_list, volume_check
 
@@ -26,40 +23,12 @@ from services.deployment.utils.auth import operate_auth
 from services.deployment.utils.k8s_request import create_deploy_k8s_pipeline, delete_deploy_k8s_pipeline
 from utils.user_request import project_check, project_check_obj
 from utils.auth import operate_auth
-from collections import defaultdict
 from basic.common.base_config import ADMIN, ENV
 from basic.common.status_cache import sc
 import datetime
 
 router_deployment = APIRouter()
 
-COMMON = "https://grafana.digitalbrain.cn:32443/d-solo/3JLLppA4k/notebookjian-kong?"
-ACCOUNT = "jovyan"
-PASSWORD = "jovyan"
-
-
-@router_deployment.get(
-    '/items',
-    description='Deployment概况',
-    response_model=List[DeploymentSimple],
-    response_model_exclude_unset=True
-)
-async def get_simple_deployment(query_params: QueryParameters = Depends(QueryParameters),):
-    params_filter = query_params.filter_
-
-    if params_filter:
-        if 'creator_id' in params_filter:
-            creator_id = params_filter.pop('creator_id')
-            params_filter['created_by_id'] = int(creator_id)
-        if 'project_ids' in params_filter:
-            project_ids = params_filter.pop('project_ids')
-            if isinstance(project_ids, str):
-                project_ids = [int(x) for x in project_ids.split(',')]
-            params_filter['project_by_id__in'] = project_ids
-
-    query = await Deployment.objects.select_related('status').filter(**params_filter).all()
-
-    return [x.gen_deployment_simple_response() for x in query]
 
 
 @router_deployment.get(
@@ -116,11 +85,6 @@ async def create_deployment(request: Request,
     if await Deployment.objects.filter(name=dc.name, project_by_id=dc.project.id, created_by_id=ag.id).count():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户, Deployment不能重名')
 
-    # 存储检查
-    storages, volumes_k8s = await volume_check(authorization, dc.hooks, pg.en_name)
-    path_set = {x['path'] for x in storages}
-    if len(path_set) != len(storages):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
 
     machine_type, gpu_count, cpu_count, memory = source_convert(dc.source)
 
@@ -131,7 +95,6 @@ async def create_deployment(request: Request,
                                    cpu=cpu_count,
                                    memory=memory,
                                    gpu=gpu_count,
-                                   volumes=volumes_k8s,
                                    working_dir=dc.work_dir, ).dict()
     # TODO 要加上创建路由等的
 
@@ -149,7 +112,6 @@ async def create_deployment(request: Request,
                  "image": dc.image.name,
                  "work_dir": dc.work_dir,
                  "k8s_info": json.dumps(k8s_info),
-                 "storage": json.dumps(storages),
                  "cpu": cpu_count,
                  "gpu": gpu_count,
                  "memory": memory,
@@ -167,24 +129,6 @@ async def create_deployment(request: Request,
     await _deploy.update(**{"k8s_info": k8s_info})
     return _deploy.gen_deployment_detail_response()
 
-
-@router_deployment.put(
-    '/{deployment_id}/status_update',
-    description='状态更新',
-)
-async def update_status(jsu: DeploymentStatusUpdate,
-                        deployment_id: int = Path(..., ge=1, description="DeploymentID")):
-    j = await Deployment.get_deploy_related_status_by_pk(deployment_id)
-    if not j:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Deployment不存在")
-    st = Deployment.compare_status_and_update(jsu.status, sc)
-    update_data = {"status": st}
-    if jsu.status in {"Failed", "Completed", "Terminated"}:
-        update_data.update({"ended_at": datetime.datetime.now()})
-    if jsu.server_ip:
-        update_data['server_ip'] = jsu.server_ip
-    await j.update(**update_data)
-    return JSONResponse(dict(id=deployment_id))
 
 
 @router_deployment.put(
