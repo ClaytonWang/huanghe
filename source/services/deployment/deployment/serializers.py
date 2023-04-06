@@ -58,7 +58,7 @@ class Project(BaseModel):
 class Image(BaseModel):
     name: str
     desc: Optional[str] = ""
-    custom: Optional[bool] = False
+    custom: Optional[bool] = True
 
 
 class SourceItem(BaseModel):
@@ -100,7 +100,6 @@ class DeploymentCreate(BaseModel):
     project: Project
     source: str
     image: Image
-    work_dir: Optional[str]
     # private_ip: str
     # public_ip: str
     # port: int
