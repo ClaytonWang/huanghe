@@ -76,7 +76,7 @@ def get_chart_hw(start_time, end_time):
             QuerySample(
                 namespace="PAAS.CONTAINER",
                 dimensions=listDimensionsSamples,
-                metric_name="recvPackRate"
+                metric_name="sendBytesRate"
             ),
             QuerySample(
                 namespace="PAAS.CONTAINER",
@@ -113,13 +113,20 @@ def get_chart_hw(start_time, end_time):
             response_chart.pop("time_data")
             response_chart.pop("value_data")
             chart_objects.append(response_chart)
+        chart_objects[0]["name"] = "CPU使用率"
+        chart_objects[0]["unit"] = "Percent"
+        chart_objects[1]["name"] = "Memory使用率"
+        chart_objects[2]["name"] = "网络接收速率"
+        chart_objects[3]["name"] = "网络发送速率"
+        chart_objects[4]["name"] = "GPU使用率"
+        print(chart_objects)
         return chart_objects
     except exceptions.ClientRequestException as e:
         print(e.status_code)
         print(e.request_id)
         print(e.error_code)
         print(e.error_msg)
-
+get_chart_hw("2023-03-21 08:05:00", "2023-03-21 08:06:00")
 def get_log_hw(index):
     ak = "MKYKEUHIABSSLIULE9JR"
     sk = "q5Coe7UrQPJbaa2nc1FbpQf3yRthQSD57ufwRJXx"
@@ -149,10 +156,12 @@ def get_log_hw(index):
         print(response.result)
         data = json.loads(response.result)
         log_list = [info['logContent'] for info in data['data']]
-        print(log_list)
-        start = (index - 1) * 50
-        end = index * 50
-        data = log_list[start:end]
+        if index == 1:
+            data = log_list[:50]
+        else:
+            start = (index - 1) * 50
+            end = index * 50
+            data = log_list[start:end]
         return data
     except exceptions.ClientRequestException as e:
         print(e.status_code)
