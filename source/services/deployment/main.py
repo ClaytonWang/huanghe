@@ -74,7 +74,7 @@ if __name__ == '__main__':
     # Not valid with --reload.
     uvicorn.run(
         'main:app', host='0.0.0.0', port=service_port,
-        reload=False if debug else True,
+        reload=True,
         debug=debug,
         workers=2
     )
