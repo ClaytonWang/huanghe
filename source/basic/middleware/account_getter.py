@@ -126,15 +126,18 @@ class VolcanoJobDeleteReq(BaseModel):
 
 
 async def get_current_user(token: str) -> AccountGetter:
+    print(f"http://{USER_SERVICE_URL}{ACCOUNT_PREFIX_URL}")
     if MOCK:
         return AccountGetter.parse_obj(MOCK_USER_JSON)
     try:
 
         response = requests.get(f"http://{USER_SERVICE_URL}{ACCOUNT_PREFIX_URL}",
                                 headers={"Authorization": token})
+        print(response)
         json = response.json()
         ag = AccountGetter.parse_obj(json['result'])
     except Exception as e:
+        raise e
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='获取用户失败，请检查token')
     return ag
 

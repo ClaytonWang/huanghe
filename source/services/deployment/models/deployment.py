@@ -119,7 +119,7 @@ class Deployment(GenericDateModel):
             "project": {"id": self.project_by_id,
                         "name": self.project_by, },
             "image": {"name": self.image,
-                      "custom": self.custom, },
+                      "custom": True, },
             "source": self.source,
             "updated_at": self.updated_at,
             "created_at": self.created_at,
