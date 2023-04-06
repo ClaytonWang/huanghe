@@ -6,6 +6,7 @@ from typing import Optional, List, Union, Dict
 from pydantic import BaseModel
 from pydantic import validator
 
+
 class TimeReq(BaseModel):
     start: str
     end: str
@@ -13,6 +14,9 @@ class TimeReq(BaseModel):
 
 class SingleChart(BaseModel):
     name: str
-    data:list
+    data: list
     unit: Optional[str]
 
+
+class LogPageIndex(BaseModel):
+    index: int

@@ -1,5 +1,7 @@
 # coding: utf-8
 import datetime
+import json
+
 from huaweicloudsdkcore.auth.credentials import BasicCredentials
 from huaweicloudsdkaom.v2.region.aom_region import AomRegion
 from huaweicloudsdkcore.exceptions import exceptions
@@ -26,16 +28,13 @@ def datetime_to_unix(datetime_str):
     dt = datetime.datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
     return int(dt.timestamp() * 1000)
 
-
+# print(datetime('2023-03-27 14:23:47'))
 def minutes_between(start_time, end_time):
     start_dt = datetime.datetime.fromtimestamp(start_time / 1000)
     end_dt = datetime.datetime.fromtimestamp(end_time / 1000)
     diff = end_dt - start_dt
     minutes = diff.total_seconds() / 60
     return int(minutes)
-
-# ak = "MKYKEUHIABSSLIULE9JR"
-# sk = "q5Coe7UrQPJbaa2nc1FbpQf3yRthQSD57ufwRJXx"
 
 
 def get_chart_hw(start_time, end_time):
@@ -120,4 +119,47 @@ def get_chart_hw(start_time, end_time):
         print(e.request_id)
         print(e.error_code)
         print(e.error_msg)
+
+def get_log_hw(index):
+    ak = "MKYKEUHIABSSLIULE9JR"
+    sk = "q5Coe7UrQPJbaa2nc1FbpQf3yRthQSD57ufwRJXx"
+
+    credentials = BasicCredentials(ak, sk) \
+
+    client = AomClient.new_builder() \
+        .with_credentials(credentials) \
+        .with_region(AomRegion.value_of("cn-north-4")) \
+        .build()
+
+    try:
+        request = ListLogItemsRequest()
+        request.type = "querylogs"
+        searchKeybody = SearchKey(
+            app_name="coredns",
+            cluster_id="CCI-ClusterID",
+            name_space="changjiang-notebook"
+        )
+        request.body = QueryBodyParam(
+            start_time=1679881900846,
+            search_key=searchKeybody,
+            end_time=1680121900846,
+            category="app_log",
+        )
+        response = client.list_log_items(request)
+        print(response.result)
+        data = json.loads(response.result)
+        log_list = [info['logContent'] for info in data['data']]
+        print(log_list)
+        start = (index - 1) * 50
+        end = index * 50
+        data = log_list[start:end]
+        return data
+    except exceptions.ClientRequestException as e:
+        print(e.status_code)
+        print(e.request_id)
+        print(e.error_code)
+        print(e.error_msg)
+
+get_log_hw(2)
+
 

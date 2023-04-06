@@ -14,12 +14,14 @@ from basic.middleware.rsp import add_common_response_data
 # from basic.middleware.auth import OFOAuth2PasswordBearer
 from basic.common.env_variable import get_integer_variable
 from basic.common.env_variable import get_string_variable
+from basic.common.base_config import LOGGING
 from basic.middleware.exception import validation_pydantic_exception_handler
 from basic.middleware.exception import validation_ormar_exception_handler
 from basic.middleware.exception import ormar_db_exception_handler
 from basic.middleware.exception import pg_db_exception_handler
 from ormar.exceptions import AsyncOrmException
 from deployment.api import router_deployment
+from deployment_detail.api import router_deployment_detail
 from basic.middleware.account_getter import verify_token
 from basic.common.initdb import startup_event, shutdown_event
 
@@ -57,6 +59,7 @@ def status():
 
 # 路由配置
 app.include_router(router_deployment, prefix='/deployments', tags=['Deployment'])
+app.include_router(router_deployment_detail, prefix='/services', tags=['monitor'])
 
 
 if __name__ == '__main__':
