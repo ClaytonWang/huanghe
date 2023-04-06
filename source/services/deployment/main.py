@@ -4,7 +4,7 @@
 
 import uvicorn
 from config import *
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from asyncpg.exceptions import PostgresError
 from pydantic.error_wrappers import ValidationError
@@ -25,7 +25,7 @@ from deployment.api import router_deployment
 from deployment_detail.api import router_deployment_detail
 from basic.middleware.account_getter import verify_token
 from basic.common.initdb import startup_event, shutdown_event
-
+from basic.middleware.service_requests import get_source_list
 
 # oauth2_scheme = OFOAuth2PasswordBearer(token_url="/v1/auth/login")
 # oauth2_scheme = OFOAuth2PasswordBearer(token_url=USER_SERVICE_PATH + "/v1/auth/login")
@@ -58,6 +58,12 @@ def status():
     return {"status": "ok"}
 
 
+@app.get('/source')
+async def get_source(request: Request):
+    authorization: str = request.headers.get('authorization')
+    res_source = await get_source_list(authorization)
+    return res_source
+
 # 路由配置
 app.include_router(router_deployment, prefix='/deployments', tags=['Deployment'])
 app.include_router(router_deployment_detail, prefix='/services', tags=['monitor'])
@@ -74,7 +80,7 @@ if __name__ == '__main__':
     # Not valid with --reload.
     uvicorn.run(
         'main:app', host='0.0.0.0', port=service_port,
-        reload=False if debug else True,
+        reload=True,
         debug=debug,
         workers=2
     )

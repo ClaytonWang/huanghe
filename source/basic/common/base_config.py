@@ -12,6 +12,7 @@ import importlib
 from pathlib import Path
 from basic.common.env_variable import get_lower_string_variable
 
+
 # 用于集中服务间调用的URL配置
 
 SECRET_KEY = "dc393487a84ddf9da61fe0180ef295cf0642ecbc5d678a1589ef2e26b35fce9c"
@@ -84,6 +85,7 @@ PROJECT_ITEMS_URL = "/project/items"
 
 CLUSTER_PVC_PREFIX_URL = "/pvc"
 CLUSTER_NAMESPACE_PREFIX_URL = "/namespace"
+CLUSTER_NAMESPACE_PIPELINE_PREFIX_URL = "/namespace_pipeline"
 CLUSTER_SECRET_PREFIX_URL = "/secret"
 CLUSTER_VCJOB_PREFIX_URL = "/job"
 CLUSTER_SERVER_PREFIX_URL = "/server"

@@ -34,31 +34,11 @@ class UserStr(BaseModel):
     id: int
     username: str = None
 
-class StartMode(BaseModel):
-    id: int
-    name: str
-
-
-class Grafana(BaseModel):
-    cpu: str
-    ram: str
-    gpu: str
-    vram: str
-
 
 class ProjectStr(BaseModel):
     id: int
     name: Optional[str] = None
 
-
-class Storage(BaseModel):
-    name: Optional[str]
-    id: int
-
-
-class HookItem(BaseModel):
-    storage: Storage
-    path: str
 
 
 class JobOp(BaseModel):
@@ -78,7 +58,7 @@ class Project(BaseModel):
 class Image(BaseModel):
     name: str
     desc: Optional[str] = ""
-    custom: Optional[bool] = False
+    custom: Optional[bool] = True
 
 
 class SourceItem(BaseModel):
@@ -90,22 +70,6 @@ class UrlAddress(BaseModel):
     type: str
     address: str
 
-
-class DeploymentSimple(BaseModel):
-    id: int
-    status: str
-    name: str
-    creator: Optional[UserStr]
-    project: Optional[ProjectStr]
-    created_at: Union[datetime, str, None]
-    updated_at: Union[datetime, str, None]
-    volume_ids: List[int]
-
-    @validator('created_at', 'updated_at')
-    def format_dt(cls, dt):
-        if isinstance(dt, str):
-            return dt
-        return dt_to_string(dt, '%Y-%m-%d')
 
 
 class DeploymentList(BaseModel):
@@ -136,8 +100,6 @@ class DeploymentCreate(BaseModel):
     project: Project
     source: str
     image: Image
-    work_dir: Optional[str]
-    hooks: List[HookItem] = []
     # private_ip: str
     # public_ip: str
     # port: int
@@ -156,15 +118,8 @@ class DeploymentDetail(BaseModel):
     project: Project
     image: Image
     source: str = None
-    hooks: List[HookItem]
     updated_at: Union[datetime, str, None]
-    url: Optional[str]
-    grafana: Optional[Grafana]
-    logging_url: Optional[str]
-    work_dir: Optional[str]
-    public_ip: Optional[str]
-    private_ip: Optional[str]
-    port: Optional[int]
+    urls: List[UrlAddress]
 
     @validator('created_at', 'updated_at')
     def format_dt(cls, dt):
@@ -177,7 +132,6 @@ class DeploymentEdit(BaseModel):
     project: Project
     image: Image
     work_dir: Optional[str]
-    hooks: List[HookItem] = []
     source: str
 
 
