@@ -8,19 +8,26 @@ import {
   getStatusName,
   debounceEvent,
 } from '@/common/utils/helper';
-import { AuthButton, Auth } from '@/common/components';
+import { Auth } from '@/common/components';
+import {
+  StartStopBtn,
+  DeleteBtn,
+  EditBtn,
+  CopyBtn,
+  DebugBtn,
+} from '../../components';
 import Icons from '@/common/components/Icon';
 import { DEBUG } from '@/common/constants';
 
 const JobsTable = ({
   tableData = {},
   loading = false,
-  onOpen = () => {},
   onStart = () => {},
   onStop = () => {},
   onEdit = () => {},
   onCopy = () => {},
   onDelete = () => {},
+  onDebug = () => {},
   onPageNoChange = () => {},
 }) => {
   const columns = [
@@ -134,132 +141,25 @@ const JobsTable = ({
     },
   ];
   const OperationBtnGroup = ({ record }) => {
-    const _sname = get(record, 'status.name');
-    const statusName = getStatusName(_sname);
     const mode = get(record, 'mode');
 
-    const StartStopBtn = () => {
-      if (
-        statusName === 'stopped' ||
-        _sname === 'run_fail' ||
-        _sname === 'start_fail'
-      ) {
-        return (
-          <AuthButton
-            required="jobs.list.edit"
-            type="link"
-            onClick={debounceEvent(() => handleStartClicked(record))}
-            condition={[
-              (user) =>
-                get(record, 'creator.username') === get(user, 'username'),
-            ]}
-          >
-            启动
-          </AuthButton>
-        );
-      }
-      if (statusName !== 'stopped') {
-        return (
-          <AuthButton
-            required="jobs.list.edit"
-            type="link"
-            onClick={() => {
-              handleStopClicked(record);
-            }}
-            condition={[
-              () => ['stop_fail', 'stop', 'completed'].indexOf(statusName) < 0,
-              (user) =>
-                get(record, 'creator.username') === get(user, 'username'),
-            ]}
-          >
-            停止
-          </AuthButton>
-        );
-      }
-    };
-
-    const DebugBtn = () => (
-      <AuthButton
-        required="jobs.list"
-        type="text"
-        onClick={() => {
-          handleOpenClicked(record);
-        }}
-        condition={[
-          () => ['running'].indexOf(statusName) > -1,
-          (user) => get(record, 'creator.username') === get(user, 'username'),
-        ]}
-      >
-        {mode}
-      </AuthButton>
-    );
-
-    const CopyBtn = () => (
-      <AuthButton
-        required="jobs.list.edit"
-        type="text"
-        onClick={() => {
-          handleCopyClicked(record);
-        }}
-        condition={[
-          () => ['error', 'stopped', 'completed'].indexOf(statusName) > -1,
-          () => ['stop_fail'].indexOf(_sname) < 0,
-          (user) => get(record, 'creator.username') === get(user, 'username'),
-        ]}
-      >
-        复制
-      </AuthButton>
-    );
-
-    const EditBtn = (props = {}) => (
-      <AuthButton
-        required="jobs.list.edit"
-        type="link"
-        {...props}
-        onClick={() => {
-          handleEditClicked(record);
-        }}
-        condition={[
-          () => ['error', 'stopped', 'completed'].indexOf(statusName) > -1,
-          () => ['stop_fail'].indexOf(_sname) < 0,
-          (user) => get(record, 'creator.username') === get(user, 'username'),
-        ]}
-      >
-        编辑
-      </AuthButton>
-    );
-
-    const DeleteBtn = () => (
-      <AuthButton
-        required="jobs.list.edit"
-        type="text"
-        onClick={() => {
-          handleDeleteClicked(record);
-        }}
-        condition={[
-          () => ['stopped', 'error', 'completed'].indexOf(statusName) > -1,
-          () => ['stop_fail'].indexOf(_sname) < 0,
-          (user) => get(record, 'creator.username') === get(user, 'username'),
-        ]}
-      >
-        删除
-      </AuthButton>
-    );
     let items = [
       {
         key: 'copy',
-        label: <CopyBtn />,
+        label: <CopyBtn record={record} onCopy={() => onCopy(record)} />,
       },
       {
         key: 'delete',
-        label: <DeleteBtn />,
+        label: <DeleteBtn record={record} onDelete={() => onDelete(record)} />,
       },
     ];
 
     if (mode === DEBUG) {
       items.unshift({
         key: 'edit',
-        label: <EditBtn type="text" />,
+        label: (
+          <EditBtn type="text" onEdit={() => onEdit(record)} record={record} />
+        ),
       });
     }
 
@@ -267,8 +167,16 @@ const JobsTable = ({
       <Auth required="jobs.list.edit">
         <span className="dbr-table-actions">
           <Space>
-            <StartStopBtn />
-            {mode === DEBUG ? <DebugBtn /> : <EditBtn />}
+            <StartStopBtn
+              onStart={debounceEvent(() => onStart(record))}
+              onStop={() => handleStopClicked(record)}
+              record={record}
+            />
+            {mode === DEBUG ? (
+              <DebugBtn onDebug={() => onDebug(record)} record={record} />
+            ) : (
+              <EditBtn onEdit={() => onEdit(record)} record={record} />
+            )}
             <Dropdown menu={{ items }} placement="bottom">
               <a>
                 <EllipsisOutlined style={{ fontSize: 24 }} />
@@ -293,12 +201,6 @@ const JobsTable = ({
     onChange: onPageNoChange,
     showSizeChanger: false,
   };
-  const handleOpenClicked = (record) => {
-    onOpen(record);
-  };
-  const handleStartClicked = (record) => {
-    onStart(record);
-  };
   const handleStopClicked = (record) => {
     Modal.confirm({
       title: '可能会导致数据丢失，是否要停止该Job服务？',
@@ -308,15 +210,6 @@ const JobsTable = ({
         onStop(record);
       },
     });
-  };
-  const handleEditClicked = (record) => {
-    onEdit(record);
-  };
-  const handleCopyClicked = (record) => {
-    onCopy(record);
-  };
-  const handleDeleteClicked = (record) => {
-    onDelete(record);
   };
 
   return (
