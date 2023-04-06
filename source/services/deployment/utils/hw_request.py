@@ -160,6 +160,6 @@ def get_log_hw(index):
         print(e.error_code)
         print(e.error_msg)
 
-get_log_hw(2)
+# get_log_hw(2)
 
 
