@@ -169,19 +169,7 @@ async def update_deployment(request: Request,
         k8s_info.update(source_dic)
         update_data = source_dic
 
-    storages, volumes_k8s = await volume_check(authorization, de.hooks, extra_info['en_name'])
-    path_set = {x['path'] for x in storages}
-    if len(path_set) != len(storages):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
-    k8s_info.update({"volumes": volumes_k8s,
-                     'image': de.image.name,
-                     'namespace': extra_info['en_name'],
-                     'name': f"{request.user.en_name}-{_deploy.name}",
-                     "work_dir": de.work_dir,
-                     })
-    update_data.update({"storage": json.dumps(storages),
-                        "k8s_info": json.dumps(k8s_info),
-                        "updated_at": datetime.datetime.now(),
+    update_data.update({"updated_at": datetime.datetime.now(),
                         "project_by_id": de.project.id,
                         "project_by": extra_info['name'],
                         "image": de.image.name,
