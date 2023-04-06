@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Col,
@@ -24,8 +24,8 @@ import { transformDate } from '@/common/utils/helper';
 import { ACTION, ADDRESS_TYPE, START, STOP, UPDATE } from '@/common/constants';
 import Icons from '@/common/components/Icon';
 import { useContextProps } from '@/common/hooks/RoutesProvider';
-import './index.less';
 import LogList from './LogList';
+import './index.less';
 
 const { RangePicker } = DatePicker;
 
@@ -35,7 +35,7 @@ const ServiceDetail = () => {
   const [monitorDataSource, setMonitorDataSource] = useState([]);
   const [eventTableData, setEventTableData] = useState({});
   const [logTableData, setLogTableData] = useState({});
-  const [currTab, setCurrTab] = useState('chart');
+  const [currTab, setCurrTab] = useState(null);
   const [dateRange, setDateRange] = useState({
     from: moment().add(-1, 'h'), // 默认1小时
     to: moment(),
@@ -55,6 +55,7 @@ const ServiceDetail = () => {
     pagesize: 5,
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const rangePresets = [
     {
       label: 'Last 7 Days',
@@ -113,41 +114,47 @@ const ServiceDetail = () => {
     }
   };
 
-  const requestLog = async (args) => {
-    const defaultFilters = {
-      pageno: 1,
-      pagesize: 10,
-    };
-    const params = {
-      ...defaultFilters,
-      ...args,
-    };
-    try {
-      const { pageno, pagesize } = params;
-      const { result } = await api.servicesDetailLog(params);
-      const { data: _data = [] } = logTableData;
-      const data = _data?.concat(result.data);
-      setLogTableData({
-        pageno,
-        pagesize,
-        total: result.total,
-        data: [...data],
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const requestLog = useCallback(
+    async (args) => {
+      const defaultFilters = {
+        pageno: 1,
+        pagesize: 10,
+      };
+      const params = {
+        ...defaultFilters,
+        ...args,
+      };
+      try {
+        const { pageno, pagesize } = params;
+        const { result } = await api.servicesDetailLog(params);
+        const { data: _data = [] } = logTableData;
+        const data = _data?.concat(result.data);
+        setLogTableData({
+          pageno,
+          pagesize,
+          total: result.total,
+          data: [...data],
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [logTableData]
+  );
 
-  const reload = (args) => {
+  const reload = useCallback((args) => {
     requestService(args);
-  };
+  }, []);
 
-  const loadLog = (args = {}) => {
-    requestLog({
-      id: serviceId,
-      ...args,
-    });
-  };
+  const loadLog = useCallback(
+    (args = {}) => {
+      requestLog({
+        id: serviceId,
+        ...args,
+      });
+    },
+    [requestLog, serviceId]
+  );
   // TODO：Tab切换时日志列表刷新，原日志清空
   // const reloadLog = () => {
   //   setLogTableData({});
@@ -216,39 +223,12 @@ const ServiceDetail = () => {
     });
   };
 
-  /* eslint-disable react-hooks/exhaustive-deps */
-  useEffect(() => {
-    const timer = setInterval(() => {
-      reload();
-    }, 3000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
-
-  /* eslint-disable react-hooks/exhaustive-deps */
-  useEffect(() => {
-    requestService({ id: serviceId });
-    requestMonitorList({ id: serviceId });
-    requestEvent({ ...defaultFilters, id: serviceId, action: 'event' });
-    loadLog();
-  }, []);
-
-  useEffect(() => {
-    setContextProps({
-      handleStartClicked,
-      handleStopClicked,
-      handleEditClicked,
-      handleDelete,
-      detail: detailData,
-      loading,
-      setLoading,
-    });
-  }, [detailData]);
-
-  const handleEventPageNoChange = (pageno, pagesize) => {
-    requestEvent({ id: serviceId, pageno, pagesize, action: 'event' });
-  };
+  const handleEventPageNoChange = useCallback(
+    (pageno, pagesize) => {
+      requestEvent({ id: serviceId, pageno, pagesize, action: 'event' });
+    },
+    [serviceId]
+  );
 
   const onTabChange = (key) => {
     setCurrTab(key);
@@ -285,7 +265,7 @@ const ServiceDetail = () => {
         defaultValue={[moment(from, dateFormat), moment(to, dateFormat)]}
       />
     );
-  }, [currTab, dateRange]);
+  }, [currTab, dateRange.from, dateRange.to, rangePresets]);
 
   const Chart = ({ datasource = [[], []], name, unit }) => {
     const xData = datasource[0];
@@ -343,38 +323,100 @@ const ServiceDetail = () => {
     return <ECharts option={option} />;
   };
 
-  const ServicesMonitor = () => (
-    <div className="services-monitor">
-      <Row gutter={[16, 24]}>
-        {monitorDataSource.map(({ data, ...rest }, index) => (
-          <Col key={index} span={8} title={rest.name}>
-            <Chart key={index} datasource={data} {...rest} />
-          </Col>
-        ))}
-      </Row>
-    </div>
+  const ServicesMonitor = useMemo(
+    () => (
+      <div className="services-monitor">
+        <Row gutter={[16, 24]}>
+          {monitorDataSource.map(({ data, ...rest }, index) => (
+            <Col key={index} span={8} title={rest.name}>
+              <Chart key={index} datasource={data} {...rest} />
+            </Col>
+          ))}
+        </Row>
+      </div>
+    ),
+    [monitorDataSource]
   );
 
-  const contentList = {
-    chart: <ServicesMonitor />,
-    event: (
-      <EventList
-        onPageNoChange={handleEventPageNoChange}
-        tableData={eventTableData}
-        reload={reload}
-        loading={eventLoading}
-      />
-    ),
-    log: (
-      <LogList
-        datasource={logTableData.data}
-        total={logTableData.total}
-        pageno={logTableData.pageno}
-        pagesize={logTableData.pagesize}
-        onLoadNext={loadLog}
-      />
-    ),
-  };
+  const contentList = useMemo(
+    () => [
+      {
+        name: 'chart',
+        component: <ServicesMonitor />,
+      },
+      {
+        name: 'event',
+        component: (
+          <EventList
+            onPageNoChange={handleEventPageNoChange}
+            tableData={eventTableData}
+            reload={reload}
+            loading={eventLoading}
+          />
+        ),
+      },
+      {
+        name: 'log',
+        component: (
+          <LogList
+            datasource={logTableData.data}
+            total={logTableData.total}
+            pageno={logTableData.pageno}
+            pagesize={logTableData.pagesize}
+            onLoadNext={loadLog}
+          />
+        ),
+      },
+    ],
+    [
+      ServicesMonitor,
+      eventLoading,
+      eventTableData,
+      handleEventPageNoChange,
+      loadLog,
+      logTableData.data,
+      logTableData.pageno,
+      logTableData.pagesize,
+      logTableData.total,
+      reload,
+    ]
+  );
+
+  const currentTabCmp = useMemo(
+    () => contentList.find(({ name }) => name === currTab)?.component || null,
+    [contentList, currTab]
+  );
+
+  /* eslint-disable react-hooks/exhaustive-deps */
+  useEffect(() => {
+    const timer = setInterval(() => {
+      reload();
+    }, 3000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
+  /* eslint-disable react-hooks/exhaustive-deps */
+  useEffect(() => {
+    requestService({ id: serviceId });
+    requestMonitorList({ id: serviceId });
+    requestEvent({ ...defaultFilters, id: serviceId, action: 'event' });
+    loadLog();
+    setCurrTab(contentList[0].name);
+  }, []);
+
+  useEffect(() => {
+    setContextProps({
+      handleStartClicked,
+      handleStopClicked,
+      handleEditClicked,
+      handleDelete,
+      detail: detailData,
+      loading,
+      setLoading,
+    });
+  }, [detailData]);
 
   return (
     <div className="detail">
@@ -456,7 +498,7 @@ const ServiceDetail = () => {
           ]}
           onTabChange={onTabChange}
         >
-          {contentList[currTab]}
+          {currentTabCmp}
         </Card>
       </div>
     </div>
@@ -478,7 +520,7 @@ ServiceDetail.context = (props = {}) => {
       {
         label: (
           <AuthButton
-            required="services.list.edit"
+            required="deployments.list.edit"
             type="text"
             onClick={() => {
               handleEditClicked(detail);
@@ -497,7 +539,7 @@ ServiceDetail.context = (props = {}) => {
       {
         label: (
           <AuthButton
-            required="services.list.edit"
+            required="deployments.list.edit"
             type="text"
             onClick={() => {
               handleDelete(detail);
@@ -549,7 +591,7 @@ ServiceDetail.context = (props = {}) => {
       <Dropdown.Button menu={menuProps} trigger="click">
         {statusName === 'stopped' && (
           <AuthButton
-            required="services.list.edit"
+            required="deployments.list.edit"
             type="text"
             onClick={() => {
               handleStartClicked(detail);
@@ -564,7 +606,7 @@ ServiceDetail.context = (props = {}) => {
         )}
         {statusName !== 'stopped' && (
           <AuthButton
-            required="services.list.edit"
+            required="deployments.list.edit"
             type="text"
             style={(() => {
               if (statusName === 'error') {
@@ -585,7 +627,7 @@ ServiceDetail.context = (props = {}) => {
         )}
       </Dropdown.Button>
       <AuthButton
-        required="services.list"
+        required="deployments.list"
         type="primary"
         onClick={() => {
           const { url } = detail;

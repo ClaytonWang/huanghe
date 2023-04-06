@@ -156,12 +156,12 @@ module.exports = {
       key: 'services',
       label: '服务部署',
       icon: 'services',
-      permission: 'services',
+      permission: 'deployments',
       children: [
         {
           key: 'services.list',
           label: '部署',
-          permission: 'services.list',
+          permission: 'deployments.list',
         },
       ],
     },

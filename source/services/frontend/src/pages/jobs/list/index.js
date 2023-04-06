@@ -3,11 +3,11 @@
  * @author junshi<junshi.wang@digitalbrain.cn>
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Modal, message } from 'antd';
+import { Form, useNavigate, useSearchParams } from 'react-router-dom';
+import { Modal, message, Select } from 'antd';
 import qs from 'qs';
 import api from '@/common/api';
-import { AuthButton } from '@/common/components';
+import { AuthButton, FormModal } from '@/common/components';
 import { purifyDeep } from '@/common/utils/helper';
 import { PlusOutlined } from '@ant-design/icons';
 // import JobsFilter from './JobsFilter';
@@ -19,10 +19,8 @@ import {
   START,
   STOP,
   UPDATE,
-  // ADMIN,
 } from '@/common/constants';
 import './index.less';
-// import { useAuth } from '@/common/hooks/useAuth';
 
 const JobList = () => {
   const defaultFilters = useMemo(
@@ -31,18 +29,19 @@ const JobList = () => {
       pagesize: 10,
       sort: 'id:desc',
       filter: {
-        username: null,
-        role__name: 'all',
-        project__code: 'all',
+        // username: null,
+        // role__name: 'all',
+        // project__code: 'all',
       },
     }),
     []
   );
   const [tableData, setTableData] = useState();
-  // const [projectsDatasource, setProjectsDatasource] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState({});
+  const [showDebugModal, setShowDebugModal] = useState(false);
+
   const [searchParams, setSearchParams] = useSearchParams();
-  // const { user } = useAuth();
   const navigate = useNavigate();
 
   const getFilters = useCallback(
@@ -66,19 +65,15 @@ const JobList = () => {
     },
     [getFilters]
   );
-  // const requestProjects = async () => {
-  //   try {
-  //     if (user.role.name === ADMIN) {
-  //       const { result } = await api.bamProjectsList();
-  //       setProjectsDatasource(result.data);
-  //     } else {
-  //       // 除超级管理员角色，其他项目列表返回自己所属项目
-  //       setProjectsDatasource(user?.projects ?? []);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+
+  const handleDebugClicked = (record) => {
+    setSelectedRecord(record);
+    setShowDebugModal(true);
+  };
+  const handleCancelClicked = () => {
+    setSelectedRecord({});
+    setShowDebugModal(false);
+  };
 
   const reload = (args) => {
     const filters = getFilters();
@@ -90,7 +85,6 @@ const JobList = () => {
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     requestList({ loading: true });
-    // requestProjects();
     const filters = getFilters();
     setSearchParams(qs.stringify(filters));
   }, []);
@@ -124,11 +118,6 @@ const JobList = () => {
         type: CREATE,
       },
     });
-  };
-  const handleOpenClicked = (record) => {
-    // 打开jobs地址
-    const { url } = record;
-    window.open(url);
   };
   const handleStartClicked = async (record) => {
     try {
@@ -177,6 +166,33 @@ const JobList = () => {
       },
     });
   };
+  const DebugModal = ({ record, open, onClose }) => {
+    const { url: urls = [] } = record;
+    const onSubmit = ({ url }) => {
+      window.open(url);
+      onClose();
+    };
+    return (
+      <FormModal
+        title="个人信息"
+        okText="打开"
+        open={open}
+        cancelText="取消"
+        onSubmit={onSubmit}
+        onCancel={onClose}
+      >
+        <Form.Item name="url">
+          <Select>
+            {urls.map(({ name, value }, index) => (
+              <Select.Option key={index} value={value}>
+                {name}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+      </FormModal>
+    );
+  };
   return (
     <div className="storages-list">
       {/* <JobsFilter
@@ -201,7 +217,7 @@ const JobList = () => {
           tableData={tableData}
           reload={reload}
           loading={loading}
-          onOpen={handleOpenClicked}
+          onDebug={handleDebugClicked}
           onStart={handleStartClicked}
           onStop={handleStopClicked}
           onEdit={handleEditClicked}
@@ -210,6 +226,11 @@ const JobList = () => {
           onPageNoChange={onPageNoChange}
         />
       </div>
+      <DebugModal
+        record={selectedRecord}
+        open={showDebugModal}
+        onClose={handleCancelClicked}
+      />
     </div>
   );
 };
