@@ -21,6 +21,7 @@ from basic.middleware.exception import ormar_db_exception_handler
 from basic.middleware.exception import pg_db_exception_handler
 from ormar.exceptions import AsyncOrmException
 from deployment.api import router_deployment
+
 from deployment_detail.api import router_deployment_detail
 from basic.middleware.account_getter import verify_token
 from basic.common.initdb import startup_event, shutdown_event
