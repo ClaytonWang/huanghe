@@ -119,7 +119,7 @@ def get_chart_hw(start_time, end_time):
         chart_objects[2]["name"] = "网络接收速率"
         chart_objects[3]["name"] = "网络发送速率"
         chart_objects[4]["name"] = "GPU使用率"
-        print(chart_objects)
+        # print(chart_objects)
         return chart_objects
     except exceptions.ClientRequestException as e:
         print(e.status_code)
