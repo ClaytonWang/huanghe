@@ -4,5 +4,5 @@ FROM $BASE_IMG
 
 COPY services/deployment .
 COPY basic /source/basic/
-
+RUN pip install huaweicloudsdkaom
 ENTRYPOINT python3 main.py
