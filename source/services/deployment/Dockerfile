@@ -1,5 +1,5 @@
 #python3.11
-ARG BASE_IMG=containers.git.digitalbrain.cn/engineering-group/huanghe.base-deployment:2023-03-21.1
+ARG BASE_IMG=containers.git.digitalbrain.cn/engineering-group/huanghe.deployment:2023-04-06.28
 FROM $BASE_IMG
 
 COPY services/deployment .
