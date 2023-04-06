@@ -158,7 +158,7 @@ const ServicesTable = ({
             key: '2',
             label: (
               <AuthButton
-                required="services.list.edit"
+                required="deployments.list.edit"
                 type="text"
                 onClick={() => {
                   handleDeleteClicked(record);
@@ -175,11 +175,11 @@ const ServicesTable = ({
           },
         ];
         return (
-          <Auth required="services.list.edit">
+          <Auth required="deployments.list.edit">
             <Space className="dbr-table-actions">
               {statusName === 'stopped' && (
                 <AuthButton
-                  required="services.list.edit"
+                  required="deployments.list.edit"
                   type="link"
                   onClick={debounceEvent(() => handleStartClicked(record))}
                   condition={[
@@ -192,7 +192,7 @@ const ServicesTable = ({
               )}
               {statusName !== 'stopped' && (
                 <AuthButton
-                  required="services.list.edit"
+                  required="deployments.list.edit"
                   type="link"
                   onClick={() => {
                     handleStopClicked(record);
@@ -207,7 +207,7 @@ const ServicesTable = ({
                 </AuthButton>
               )}
               <AuthButton
-                required="services.list.edit"
+                required="deployments.list.edit"
                 type="text"
                 onClick={() => {
                   handleEditClicked(record);

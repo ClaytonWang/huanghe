@@ -151,7 +151,7 @@ const ServicesList = () => {
       <div className="dbr-table-container">
         <div className="batch-command">
           <AuthButton
-            required="services.list.create"
+            required="deployments.list.create"
             style={{ float: 'left' }}
             type="primary"
             onClick={handleCreateClicked}
