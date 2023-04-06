@@ -100,7 +100,6 @@ class DeploymentCreate(BaseModel):
     project: Project
     source: str
     image: Image
-    work_dir: Optional[str]
     # private_ip: str
     # public_ip: str
     # port: int

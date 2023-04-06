@@ -96,14 +96,6 @@ async def create_deployment(request: Request,
     #                                memory=memory,
     #                                gpu=gpu_count,
     #                                working_dir=dc.work_dir, ).dict()
-    k8s_info = DeploymentCreateReq(name=f"{ag.en_name}-{dc.name}",
-                                   namespace=pg.en_name,
-                                   image=dc.image.name,
-                                   env=ENV,
-                                   cpu=cpu_count,
-                                   memory=memory,
-                                   gpu=gpu_count,
-                                   working_dir=dc.work_dir, ).dict()
     # TODO 要加上创建路由等的
 
     init_data = {"name": dc.name,
@@ -118,8 +110,6 @@ async def create_deployment(request: Request,
                  "project_en_by": pg.en_name,
                  "custom": dc.image.custom,
                  "image": dc.image.name,
-                 "work_dir": dc.work_dir,
-                 "k8s_info": json.dumps(k8s_info),
                  "cpu": cpu_count,
                  "gpu": gpu_count,
                  "memory": memory,
