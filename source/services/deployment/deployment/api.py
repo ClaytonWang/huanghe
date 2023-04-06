@@ -17,7 +17,7 @@ from basic.middleware.service_requests import get_user_list, volume_check
 
 from services.deployment.deployment.serializers import DeploymentList, DeploymentCreate, DeploymentDetail, \
     DeploymentEdit, DeploymentOp, DeploymentStatusUpdate, DeploymentDeleteReq, DeploymentCreateReq, \
-    DeploymentListReq, DeploymentItem, DeploymentSimple
+    DeploymentListReq, DeploymentItem
 from services.deployment.models.deployment import Deployment
 from services.deployment.utils.auth import operate_auth
 from services.deployment.utils.k8s_request import create_deploy_k8s_pipeline, delete_deploy_k8s_pipeline
@@ -88,14 +88,14 @@ async def create_deployment(request: Request,
 
     machine_type, gpu_count, cpu_count, memory = source_convert(dc.source)
 
-    k8s_info = DeploymentCreateReq(name=f"{ag.en_name}-{dc.name}",
-                                   namespace=pg.en_name,
-                                   image=dc.image.name,
-                                   env=ENV,
-                                   cpu=cpu_count,
-                                   memory=memory,
-                                   gpu=gpu_count,
-                                   working_dir=dc.work_dir, ).dict()
+    # k8s_info = DeploymentCreateReq(name=f"{ag.en_name}-{dc.name}",
+    #                                namespace=pg.en_name,
+    #                                image=dc.image.name,
+    #                                env=ENV,
+    #                                cpu=cpu_count,
+    #                                memory=memory,
+    #                                gpu=gpu_count,
+    #                                working_dir=dc.work_dir, ).dict()
     # TODO 要加上创建路由等的
 
     init_data = {"name": dc.name,
@@ -110,8 +110,6 @@ async def create_deployment(request: Request,
                  "project_en_by": pg.en_name,
                  "custom": dc.image.custom,
                  "image": dc.image.name,
-                 "work_dir": dc.work_dir,
-                 "k8s_info": json.dumps(k8s_info),
                  "cpu": cpu_count,
                  "gpu": gpu_count,
                  "memory": memory,
@@ -125,8 +123,8 @@ async def create_deployment(request: Request,
                  }
 
     _deploy = await Deployment.objects.create(**init_data)
-    k8s_info['annotations'] = {"id": str(_deploy.id)}
-    await _deploy.update(**{"k8s_info": k8s_info})
+    # k8s_info['annotations'] = {"id": str(_deploy.id)}
+    # await _deploy.update(**{"k8s_info": k8s_info})
     return _deploy.gen_deployment_detail_response()
 
 
