@@ -70,7 +70,6 @@ class Job(GenericDateModel):
     url: str = ormar.String(max_length=160, comment='url地址', nullable=True)
     server_ip: str = ormar.String(max_length=20, comment='所在的node', nullable=True)
 
-
     @classmethod
     async def all_jobs(cls):
         return cls.objects.filter()

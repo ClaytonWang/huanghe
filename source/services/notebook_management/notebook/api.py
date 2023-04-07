@@ -255,9 +255,6 @@ async def create_notebook(request: Request,
 
     # 存储检查
     storages, volumes_k8s = await volume_check(authorization, nc.hooks, extra_info)
-    path_set = {x['path'] for x in storages}
-    if len(path_set) != len(storages):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个NoteBook中挂载的目录不能重复')
     init_data['storage'] = json.dumps(storages)
 
     k8s_info = {
@@ -351,9 +348,7 @@ async def update_notebook(request: Request,
 
     update_data.pop('hooks')
     storages, volumes_k8s = await volume_check(authorization, ne.hooks, extra_info['en_name'])
-    path_set = {x['path'] for x in storages}
-    if len(path_set) != len(storages):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
+
     update_data['storage'] = json.dumps(storages)
     k8s_info['volumes'] = volumes_k8s
     k8s_info['annotations'] = {"notebooks.kubeflow.org/http-rewrite-uri": "/"} if "codeserver" in ne.image.name else {}

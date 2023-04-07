@@ -118,9 +118,7 @@ async def create_deployment(request: Request,
 
     # 存储检查
     storages, volumes_k8s = await volume_check(authorization, dc.hooks, pg.en_name)
-    path_set = {x['path'] for x in storages}
-    if len(path_set) != len(storages):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
+
 
     machine_type, gpu_count, cpu_count, memory = source_convert(dc.source)
 
@@ -228,9 +226,7 @@ async def update_deployment(request: Request,
         update_data = source_dic
 
     storages, volumes_k8s = await volume_check(authorization, de.hooks, extra_info['en_name'])
-    path_set = {x['path'] for x in storages}
-    if len(path_set) != len(storages):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
+
     k8s_info.update({"volumes": volumes_k8s,
                      'image': de.image.name,
                      'namespace': extra_info['en_name'],

@@ -366,6 +366,10 @@ async def volume_check(authorization: str, hooks: List[HookItem], namespace: str
         await create_pvc(PVCCreateReq(name=volume_k8s_name, namespace=namespace,
                                       size=volume_info['config']['size'], env=ENV),
                          ignore_exist=True)
+
+    if len(set(x['path'] for x in storages)) != len(storages):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个NoteBook中挂载的目录不能重复')
+
     return storages, volumes_k8s
 
 
@@ -380,7 +384,7 @@ async def get_project(token, proj_id):
 
     """
     async with aiohttp.ClientSession() as session:
-        url = f"http://{USER_SERVICE_URL}{PROJECT_PREFIX_URL}/{proj_id}"
+        url = f"http://121.36.41.231:32767/api/v1/user/project/{proj_id}"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
