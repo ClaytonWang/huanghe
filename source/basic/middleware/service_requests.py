@@ -384,7 +384,7 @@ async def get_project(token, proj_id):
 
     """
     async with aiohttp.ClientSession() as session:
-        url = f"http://121.36.41.231:32767/api/v1/user/project/{proj_id}"
+        url = f"http://{USER_SERVICE_URL}{PROJECT_PREFIX_URL}/{proj_id}"
         headers = {
             'Authorization': token,
             'Content-Type': 'application/json'
