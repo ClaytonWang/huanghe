@@ -19,7 +19,7 @@ from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_pr
     delete_vcjob, VolcanoJobDeleteReq
 from services.job_management.job import service
 from services.job_management.job.dependencies import verify_project_check, verify_auth, \
-    verify_edit_same_job, verify_status_name, verify_create_same_job, verify_job_related_status
+    verify_status_name, verify_create_same_job, verify_job_related_status
 from services.job_management.job.serializers import JobCreate, JobDetail, JobList, JobEditReq, \
     EventItem, EventCreate, JobSimple, JobOpReq, ModeRes, JobStatusUpdateRes, JobStatusUpdateReq, JobEditRes, JobOpRes
 from services.job_management.models.job import Job
@@ -134,7 +134,7 @@ async def update_status(jsu: JobStatusUpdateReq,
 @router_job.put(
     '/{job_id}',
     description='编辑Job',
-    dependencies=[Depends(verify_edit_same_job), Depends(verify_status_name)],
+    dependencies=[Depends(verify_status_name)],
     response_model=JobEditRes
 )
 async def update_job(request: Request,

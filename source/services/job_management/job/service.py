@@ -1,7 +1,7 @@
 import datetime
 import json
 
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 from starlette import status
 
 from basic.common.base_config import ADMIN, ENV
@@ -11,6 +11,7 @@ from basic.common.query_filter_params import QueryParameters
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, VolcanoJobCreateReq, delete_vcjob, \
     create_vcjob, VolcanoJobDeleteReq
 from basic.middleware.service_requests import volume_check
+from basic.utils.async_task import AsyncTask
 from basic.utils.source import source_convert
 from services.job_management.job.serializers import JobEditReq, JobOpReq, EventItem, EventCreate
 from services.job_management.models.job import Job
@@ -71,10 +72,13 @@ async def list_job(user: AccountGetter, query_params):
 
 async def save_job(jc, authorization: str, ag: AccountGetter, pg: ProjectGetter):
     # 存储检查
-    storages, volumes_k8s = await volume_check(authorization, jc.hooks, pg.en_name)
+    async_task = AsyncTask()
+    async_task.add_task(volume_check(authorization, jc.hooks, pg.en_name))
+    async_task.add_task(Mode.get(jc.start_mode.id))
+
+    (storages, volumes_k8s), start_mode = await async_task.run_tasks()
 
     machine_type, gpu_count, cpu_count, memory = source_convert(jc.source)
-    start_mode = await Mode.get(jc.start_mode.id)
 
     k8s_info = VolcanoJobCreateReq(name=f"{ag.en_name}-{jc.name}",
                                    namespace=pg.en_name,
