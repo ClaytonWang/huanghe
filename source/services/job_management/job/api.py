@@ -24,13 +24,9 @@ from services.job_management.job.serializers import JobCreate, JobDetail, JobLis
     EventItem, EventCreate, JobSimple, JobOpReq, ModeRes, JobStatusUpdateRes, JobStatusUpdateReq, JobEditRes, JobOpRes
 from services.job_management.models.job import Job
 
-
-
-from services.job_management.utils.auth import operate_auth
 from basic.middleware.service_requests import volume_check
-from services.job_management.utils.user_request import project_check, project_check_obj
+from services.job_management.utils.user_request import project_check_obj
 from basic.common.base_config import ADMIN, ENV
-from basic.common.event_model import Event
 from basic.common.status_cache import sc
 from services.job_management.models.mode import Mode
 router_job = APIRouter()
@@ -124,56 +120,8 @@ async def create_job(request: Request,
     if jc.mode == "调试":
         jc.start_command = "sleep 14400"
 
-    # 存储检查
-    storages, volumes_k8s = await volume_check(authorization, jc.hooks, pg.en_name)
-    path_set = {x['path'] for x in storages}
-    if len(path_set) != len(storages):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
+    _job = await service.save_job(jc=jc, authorization=authorization, ag=ag, pg=pg)
 
-    machine_type, gpu_count, cpu_count, memory = source_convert(jc.source)
-    start_mode = await Mode.get(jc.start_mode.id)
-
-    k8s_info = VolcanoJobCreateReq(name=f"{ag.en_name}-{jc.name}",
-                                   namespace=pg.en_name,
-                                   image=jc.image.name,
-                                   env=ENV,
-                                   cpu=cpu_count,
-                                   memory=memory,
-                                   gpu=gpu_count,
-                                   volumes=volumes_k8s,
-                                   command=[jc.start_command],
-                                   working_dir=jc.work_dir,
-                                   task_num=jc.nodes,
-                                   mode=start_mode,).dict()
-
-    init_data = {"name": jc.name,
-                 "created_by_id": ag.id,
-                 "updated_by_id": ag.id,
-                 "create_en_by": ag.en_name,
-                 "created_by": ag.username,
-                 "updated_by": ag.username,
-                 "status": sc.get('stopped'),
-                 "project_by_id": pg.id,
-                 "project_by": pg.name,
-                 "project_en_by": pg.en_name,
-                 "mode": jc.mode,
-                 "start_command": jc.start_command,
-                 "custom": jc.image.custom,
-                 "image": jc.image.name,
-                 "work_dir": jc.work_dir,
-                 "k8s_info": json.dumps(k8s_info),
-                 "storage": json.dumps(storages),
-                 "cpu": cpu_count,
-                 "gpu": gpu_count,
-                 "memory": memory,
-                 "type": machine_type,
-                 "start_mode": jc.start_mode.id,
-                 "nodes": jc.nodes,
-                 }
-
-    _job = await Job.objects.create(**init_data)
-    k8s_info['annotations'] = {"id": str(_job.id), "gpu": str(gpu_count), "slots": str(gpu_count) if gpu_count else "1"}
-    await _job.update(**{"k8s_info": k8s_info})
     return _job.gen_job_detail_response()
 
 
@@ -208,54 +156,12 @@ async def update_job(request: Request,
     if _job.status.name != 'stopped':
         delete_vcjob(vjd=VolcanoJobDeleteReq.parse_obj(k8s_info), ignore_no_found=True)
 
-    check, extra_info = await project_check_obj(request, je.project.id)
-    if not check:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
-
-    update_data = {}
-    start_mode = await Mode.get(je.start_mode.id)
-
-    if je.source:
-        machine_type, gpu_count, cpu_count, memory = source_convert(je.source)
-        source_dic = {'cpu': cpu_count,
-                      'memory': memory,
-                      'gpu': gpu_count,
-                      'type': machine_type,
-                      }
-        k8s_info.update(source_dic)
-        k8s_info['annotations'] = {"id": str(_job.id), "gpu": str(gpu_count), "slots": str(gpu_count) if gpu_count else "1"}
-        update_data = source_dic
-
-    storages, volumes_k8s = await volume_check(authorization, je.hooks, extra_info['en_name'])
-    path_set = {x['path'] for x in storages}
-    if len(path_set) != len(storages):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='目录不能重复')
-    k8s_info.update({"volumes": volumes_k8s,
-                     'image': je.image.name,
-                     'namespace': extra_info['en_name'],
-                     'name': f"{request.user.en_name}-{_job.name}",
-                     "command": [je.start_command],
-                     "work_dir": je.work_dir,
-                     "task_num": je.nodes,
-                     "mode": start_mode,
-                     })
-    update_data.update({"storage": json.dumps(storages),
-                        "k8s_info": json.dumps(k8s_info),
-                        "updated_at": datetime.datetime.now(),
-                        "project_by_id": je.project.id,
-                        "project_by": extra_info['name'],
-                        "image": je.image.name,
-                        "custom": je.image.custom,
-                        "work_dir": je.work_dir,
-                        'status': sc.get('stopped'),
-                        "mode": je.mode,
-                        "start_command": je.start_command,
-                        "start_mode": je.start_mode.id,
-                        "nodes": je.nodes,
-                        })
-    if not await _job.update(**update_data):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job不存在')
-    return JSONResponse(dict(id=job_id))
+    _job = await service.update_job(
+        authorization=authorization,
+        je=je, _job=_job, k8s_info=k8s_info, extra_info=extra_info,
+        username=request.user.en_name
+    )
+    return _job
 
 
 @router_job.post(

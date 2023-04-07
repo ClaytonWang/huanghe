@@ -74,6 +74,7 @@ async def save_job(jc, authorization: str, ag: AccountGetter, pg: ProjectGetter)
     storages, volumes_k8s = await volume_check(authorization, jc.hooks, pg.en_name)
 
     machine_type, gpu_count, cpu_count, memory = source_convert(jc.source)
+    start_mode = await Mode.get(jc.start_mode.id)
 
     k8s_info = VolcanoJobCreateReq(name=f"{ag.en_name}-{jc.name}",
                                    namespace=pg.en_name,
@@ -84,7 +85,9 @@ async def save_job(jc, authorization: str, ag: AccountGetter, pg: ProjectGetter)
                                    gpu=gpu_count,
                                    volumes=volumes_k8s,
                                    command=[jc.start_command],
-                                   working_dir=jc.work_dir, ).dict()
+                                   working_dir=jc.work_dir,
+                                   task_num=jc.nodes,
+                                   mode=start_mode, ).dict()
 
     init_data = {"name": jc.name,
                  "created_by_id": ag.id,
@@ -107,12 +110,12 @@ async def save_job(jc, authorization: str, ag: AccountGetter, pg: ProjectGetter)
                  "gpu": gpu_count,
                  "memory": memory,
                  "type": machine_type,
-                 "start_mode": jc.start_mode,
+                 "start_mode": jc.start_mode.id,
                  "nodes": jc.nodes,
                  }
 
     _job = await Job.objects.create(**init_data)
-    k8s_info['annotations'] = {"id": str(_job.id)}
+    k8s_info['annotations'] = {"id": str(_job.id), "gpu": str(gpu_count), "slots": str(gpu_count) if gpu_count else "1"}
     await _job.update(**{"k8s_info": k8s_info})
     return _job
 
@@ -130,23 +133,29 @@ async def update_status(jsu_status: str, jsu_server_ip: str, job: Job):
 
 async def update_job(authorization: str, je: JobEditReq, _job: Job, k8s_info: dict, extra_info: dict, username: str):
     update_data = {}
+    start_mode = await Mode.get(je.start_mode.id)
+
     if je.source:
         machine_type, gpu_count, cpu_count, memory = source_convert(je.source)
         source_dic = {'cpu': cpu_count,
                       'memory': memory,
                       'gpu': gpu_count,
-                      'type': machine_type, }
+                      'type': machine_type,
+                      }
         k8s_info.update(source_dic)
+        k8s_info['annotations'] = {"id": str(_job.id), "gpu": str(gpu_count),
+                                   "slots": str(gpu_count) if gpu_count else "1"}
         update_data = source_dic
 
     storages, volumes_k8s = await volume_check(authorization, je.hooks, extra_info['en_name'])
-
     k8s_info.update({"volumes": volumes_k8s,
                      'image': je.image.name,
                      'namespace': extra_info['en_name'],
                      'name': f"{username}-{_job.name}",
                      "command": [je.start_command],
                      "work_dir": je.work_dir,
+                     "task_num": je.nodes,
+                     "mode": start_mode,
                      })
     update_data.update({"storage": json.dumps(storages),
                         "k8s_info": json.dumps(k8s_info),
@@ -159,7 +168,7 @@ async def update_job(authorization: str, je: JobEditReq, _job: Job, k8s_info: di
                         'status': sc.get('stopped'),
                         "mode": je.mode,
                         "start_command": je.start_command,
-                        "start_mode": je.start_mode,
+                        "start_mode": je.start_mode.id,
                         "nodes": je.nodes,
                         })
     if not await _job.update(**update_data):

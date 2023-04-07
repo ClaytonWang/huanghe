@@ -14,8 +14,8 @@ async def verify_auth(request: Request, job_id: int = Path(..., ge=1, descriptio
     return _job
 
 
-async def verify_project_check(request: Request, _job: Job = Depends(verify_auth)):
-    check, extra_info = await project_check_obj(request, _job.project_by_id)
+async def verify_project_check(request: Request, je: JobEditReq):
+    check, extra_info = await project_check_obj(request, je.project.id)
     if not check:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info['en_name'])
     return extra_info
