@@ -65,19 +65,6 @@ const NotebooksList = () => {
     },
     [getFilters]
   );
-  // const requestProjects = async () => {
-  //   try {
-  //     if (user.role.name === ADMIN) {
-  //       const { result } = await api.bamProjectsList();
-  //       setProjectsDatasource(result.data);
-  //     } else {
-  //       // 除超级管理员角色，其他项目列表返回自己所属项目
-  //       setProjectsDatasource(user?.projects ?? []);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 
   const reload = (args) => {
     const filters = getFilters();
@@ -149,7 +136,8 @@ const NotebooksList = () => {
     }
   };
   const handleEditClicked = (values) => {
-    navigate('update', {
+    const { id } = values;
+    navigate(`update/${id}`, {
       state: {
         params: values,
         type: UPDATE,

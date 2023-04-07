@@ -32,7 +32,7 @@ class V1ResourceRequirements(GenericMixin):
 
     @classmethod
     def default(cls, requirements: Dict[str, str]):
-        require = {k: v for k, v in requirements.items() if k in RESOURCE_REQUIREMENTS_ATTRIBUTE_SETS}
+        require = {k: v for k, v in requirements.items() if k in RESOURCE_REQUIREMENTS_ATTRIBUTE_SETS and v}
         return cls.new(limits=require, requests=require)
 
     @classmethod

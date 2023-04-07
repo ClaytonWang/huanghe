@@ -5,6 +5,8 @@ import ormar
 
 cache_pagation = []
 cache_mapping = {}
+
+
 class Mode(DateModel):
     """
     mvp3
@@ -27,6 +29,7 @@ class Mode(DateModel):
             "id": self.id,
             "max_nodes": self.max_nodes,
             "name": self.name,
+            "desc": self.desc
         }
 
     @classmethod
@@ -46,8 +49,9 @@ class Mode(DateModel):
         if not cache_mapping:
             cache_mapping = {}
             for mode in await cls.mode_cache_pagation():
-                cache_mapping[mode["id"]] = mode["name"]
+                cache_mapping[mode["id"]] = mode["desc"]
         return cache_mapping[key]
+
 
 
 

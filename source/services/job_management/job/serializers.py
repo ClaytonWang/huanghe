@@ -36,7 +36,7 @@ class UserStr(BaseModel):
 
 class StartMode(BaseModel):
     id: int
-    name: str
+    name: Optional[str]
 
 
 class ModeRes(BaseModel):
@@ -79,6 +79,11 @@ class JobOpReq(BaseModel):
 
 class JobOpRes(BaseModel):
     id: int
+    
+    
+class Url(BaseModel):
+    name: str
+    url: str
 
 
 class Creator(BaseModel):
@@ -128,7 +133,7 @@ class JobList(BaseModel):
     creator: Optional[UserStr]
     project: Optional[ProjectStr]
     image: Image
-    url: Optional[str]
+    url: Optional[List[Url]]
     created_at: Union[datetime, str, None]
     updated_at: Union[datetime, str, None]
     mode: str
@@ -149,7 +154,7 @@ class JobCreate(BaseModel):
     image: Image
     work_dir: Optional[str]
     hooks: List[HookItem] = []
-    start_mode: int
+    start_mode: Optional[StartMode]
     nodes: Optional[int] = 1
 
     @validator('name')
@@ -169,7 +174,7 @@ class JobDetail(BaseModel):
     hooks: List[HookItem]
     updated_at: Union[datetime, str, None]
     mode: str
-    url: Optional[str]
+    url: Optional[List[Url]]
     grafana: Optional[Grafana]
     logging_url: Optional[str]
     start_command: Optional[str]
@@ -192,7 +197,7 @@ class JobEditReq(BaseModel):
     work_dir: Optional[str]
     hooks: List[HookItem] = []
     source: str
-    start_mode: Optional[int]
+    start_mode: Optional[StartMode]
     nodes: Optional[int]
 
 

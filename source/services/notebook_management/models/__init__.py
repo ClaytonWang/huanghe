@@ -8,3 +8,4 @@
 from models.initdb import *
 from models.notebook import Notebook, Status, Source
 from models.image import Image
+from basic.common.initdb import *

@@ -140,7 +140,7 @@ export const transformDate = (value, format = 'YYYY-MM-DD') => {
  */
 export const sequencePromise = (tasks) => {
   tasks.reduce(
-    (promise, task) => promise.then((value) => task(value)),
+    (promise, task) => promise.then((result) => task(result)),
     Promise.resolve()
   );
 };
@@ -462,3 +462,23 @@ export const debounceEvent = (event, duration = 1000) =>
     leading: true,
     trailing: false,
   });
+/**
+ * 拼接对象数组
+ *
+ * @param {array} arr
+ * @param {string} splitter
+ * @param {function} getValue
+ * @return string
+ */
+export const join = (arr, splitter = ',', getValue) => {
+  if (!arr || arr.length <= 0) return '';
+  return arr.reduce((prev, curr) => {
+    if (prev) {
+      if (getValue) {
+        return `${prev}${splitter}${getValue(curr)}`;
+      }
+      return `${prev}${splitter}${curr}`;
+    }
+    return getValue && `${getValue(curr)}`;
+  }, null);
+};

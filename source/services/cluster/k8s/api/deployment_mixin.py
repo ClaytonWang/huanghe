@@ -12,16 +12,19 @@ class DeploymentMixin(AppsV1Api):
         super(DeploymentMixin, self).__init__(kcf=kcf)
 
     def create_deployment(self, d: Deployment) -> Dict:
-        return self.apps_v1_api(d.cluster).create_namespaced_deployment(namespace=d.namespace,
+        return self.apps_v1_api(cluster=d.cluster).create_namespaced_deployment(namespace=d.namespace,
                                                              body=V1Deployment.default(name=d.name,
                                                                                        namespace=d.namespace,
                                                                                        image=d.image,
-                                                                                       labels=d.labels))
+                                                                                       labels=d.labels,
+                                                                                       resources=d.resource,
+                                                                                       envs=d.envs))
 
-    # def delete_deployment(self, ddr: DeploymentDeleteReq) -> V1Status:
-    #     return self.apps_v1_api(ddr)_.delete_namespaced_deployment(name=ddr.name,
-    #                                                          namespace=ddr.namespace)
-    #
+    def delete_deployment(self, ddr: DeploymentDeleteReq) -> V1Status:
+        return self.apps_v1_api(cluster=ddr.cluster).delete_namespaced_deployment(name=ddr.name,
+                                                             namespace=ddr.namespace)
+
+
     # def list_deployment(self, dlr: DeploymentListReq):
     #     thread = self.apps_v1_api.list_namespaced_deployment(namespace=dlr.namespace)
     #     # pprint.pprint(thread)

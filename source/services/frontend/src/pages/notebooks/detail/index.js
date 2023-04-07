@@ -2,12 +2,12 @@
  * @Author: junshi clayton.wang@digitalbrain.cn
  * @Date: 2023-02-01 15:53:49
  * @LastEditors: guanlin.li guanlin.li@digitalbrain.cn
- * @LastEditTime: 2023-03-03 15:51:39
+ * @LastEditTime: 2023-04-03 15:11:01
  * @FilePath: /huanghe/source/services/frontend/src/pages/notebooks/detail/index.js
  * @Description: detail page
  */
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Col,
   Row,
@@ -24,10 +24,15 @@ import {
   Typography,
 } from 'antd';
 import Icon, { InfoCircleOutlined } from '@ant-design/icons';
-import { ChartMonitor, EventMonitor, AuthButton } from '@/common/components';
-import { get } from 'lodash';
+import { GrafanaComponent, EventList, AuthButton } from '@/common/components';
+import { get, pickBy } from 'lodash';
 
-import { purifyDeep, transformDate } from '@/common/utils/helper';
+import {
+  join,
+  purifyDeep,
+  sequencePromise,
+  transformDate,
+} from '@/common/utils/helper';
 import api from '@/common/api';
 import qs from 'qs';
 import { NOTEBOOK_ACTION, START, STOP, UPDATE } from '@/common/constants';
@@ -38,103 +43,66 @@ import moment from 'moment';
 import './index.less';
 
 const { RangePicker } = DatePicker;
+const DATE_FORMAT = 'YYYY/MM/DD HH:mm:ss';
 
 const NotebookDetail = () => {
-  const [tableData, setTableData] = useState([]);
+  const { id: notebookId } = useParams();
+  const [eventTableData, setEventTableData] = useState({});
   const [detailData, setDetailData] = useState(null);
-  const [currTab, setCurrTab] = useState('chart');
+  const [currTab, setCurrTab] = useState(null);
+  const [grafanaSource, setGrafanaSource] = useState({});
   const [dateRange, setDateRange] = useState({
-    from: moment().add(-1, 'h'), // 默认1小时
-    to: moment(),
+    from: null, // 默认1小时
+    to: null,
   });
   const [loading, setLoading] = useState(false);
   const [eventLoading, setEventLoading] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
   const setContextProps = useContextProps();
   const navigate = useNavigate();
+  const defaultFilters = {
+    pageno: 1,
+    pagesize: 5,
+  };
 
-  const rangePresets = [
-    {
-      label: 'Last 7 Days',
-      value: [moment().add(-7, 'd'), moment()],
-    },
-    {
-      label: 'Last 14 Days',
-      value: [moment().add(-14, 'd'), moment()],
-    },
-    {
-      label: 'Last 30 Days',
-      value: [moment().add(-30, 'd'), moment()],
-    },
-    {
-      label: 'Last 90 Days',
-      value: [moment().add(-90, 'd'), moment()],
-    },
-  ];
+  const requestList = async (args) => {
+    const { loading = false, ...rest } = args;
+    const params = purifyDeep({ ...rest });
+    try {
+      setLoading(loading);
+      const { result } = await api.notebooksDetail(params);
+      setDetailData(result);
+      setLoading(false);
+      return Promise.resolve(result);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+      return Promise.reject(error);
+    }
+  };
 
-  const defaultFilters = useMemo(
-    () => ({
-      pageno: 1,
-      pagesize: 10,
-      sort: 'update_at:desc',
-      filter: {
-        // username: null,
-        // role__name: 'all',
-        // project__code: 'all',
-      },
-    }),
-    []
-  );
+  const requestEvent = async (args) => {
+    const { pageno, pagesize, ...rest } = args;
+    const params = { pageno, pagesize, ...rest };
+    try {
+      setEventLoading(true);
+      const { result } = await api.notebooksDetailEvent(params);
+      setEventTableData({
+        ...result,
+        pageno,
+        pagesize,
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setEventLoading(false);
+    }
+  };
 
-  const getFilters = useCallback(
-    () => ({ ...defaultFilters, ...qs.parse(searchParams.toString()) }),
-    [defaultFilters, searchParams]
-  );
-
-  const requestList = useCallback(
-    async (args) => {
-      const { loading = false, ...rest } = args;
-      const params = purifyDeep({ ...getFilters(), ...rest });
-      try {
-        setLoading(loading);
-        const { result } = await api.notebooksDetail(params);
-        setDetailData(result);
-        setLoading(false);
-      } catch (error) {
-        console.log(error);
-        setLoading(false);
-      }
-    },
-    [getFilters]
-  );
-
-  const requestEvent = useCallback(
-    async (args) => {
-      const { loading = false, ...rest } = args;
-      const params = purifyDeep({ ...getFilters(), ...rest });
-      try {
-        setEventLoading(loading);
-        const { result } = await api.notebooksDetailEvent(params);
-        setTableData(result);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setEventLoading(false);
-      }
-    },
-    [getFilters]
-  );
-
-  const reload = useCallback(
-    (args) => {
-      const filters = getFilters();
-      const params = purifyDeep({ ...filters, ...args });
-      // 手动同步Url
-      setSearchParams(qs.stringify(params));
-      requestList(params);
-    },
-    [getFilters, requestList, setSearchParams]
-  );
+  /* eslint-disable react-hooks/exhaustive-deps */
+  const reload = async (args) => {
+    const params = purifyDeep({ ...args, id: notebookId });
+    requestList(params);
+  };
 
   const handleStartClicked = async (record) => {
     try {
@@ -211,6 +179,74 @@ const NotebookDetail = () => {
     });
   };
 
+  const onPageNoChange = (pageno, pagesize) => {
+    requestEvent({ id: notebookId, pageno, pagesize });
+  };
+
+  const onTabChange = (key) => {
+    setCurrTab(key);
+  };
+
+  const initialData = (data) => {
+    const { grafana = {} } = data;
+    setGrafanaSource(grafana);
+    const url = Object.values(pickBy(grafana, (value) => value))[0];
+    const params = url?.split('?')[1] && qs.parse(url.split('?')[1]);
+    onRangeChange([moment(params.from), moment(params.to)]);
+    return Promise.resolve();
+  };
+  const onRangeChange = (dates) => {
+    if (dates) {
+      setDateRange({ from: dates[0]?.valueOf(), to: dates[1]?.valueOf() });
+    } else {
+      console.log('Clear');
+    }
+  };
+
+  const operations = useMemo(() => {
+    if (currTab === 'event') return null;
+    console.log(dateRange);
+    return (
+      <RangePicker
+        allowClear={false}
+        showTime
+        format={DATE_FORMAT}
+        onChange={onRangeChange}
+        placement="bottomRight"
+        value={[
+          moment(dateRange.from) || moment().add(-1, 'h'),
+          moment(dateRange.to) || moment(),
+        ]}
+      />
+    );
+  }, [currTab, dateRange]);
+
+  const contentList = useMemo(
+    () => [
+      {
+        name: 'chart',
+        component: <GrafanaComponent urls={grafanaSource} />,
+      },
+      {
+        name: 'event',
+        component: (
+          <EventList
+            onPageNoChange={onPageNoChange}
+            tableData={eventTableData}
+            reload={reload}
+            loading={eventLoading}
+          />
+        ),
+      },
+    ],
+    [grafanaSource, eventTableData]
+  );
+
+  const currentTabCmp = useMemo(
+    () => contentList.find(({ name }) => name === currTab)?.component || null,
+    [currTab, contentList]
+  );
+
   useEffect(() => {
     const timer = setInterval(() => {
       reload();
@@ -222,9 +258,12 @@ const NotebookDetail = () => {
 
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
-    requestList({ loading: true });
-    const filters = getFilters();
-    setSearchParams(qs.stringify(filters));
+    sequencePromise([
+      () => requestList({ loading: true, id: notebookId }),
+      initialData,
+    ]);
+    requestEvent({ ...defaultFilters, id: notebookId });
+    setCurrTab(contentList[0].name);
   }, []);
 
   useEffect(() => {
@@ -238,63 +277,6 @@ const NotebookDetail = () => {
       setLoading,
     });
   }, [detailData]);
-
-  const onPageNoChange = (pageno, pagesize) => {
-    const filters = getFilters();
-    const params = purifyDeep({ ...filters, pageno, pagesize });
-    // 手动同步Url
-    setSearchParams(qs.stringify(params));
-    requestEvent(params);
-  };
-
-  const onTabChange = (key) => {
-    setCurrTab(key);
-    // eslint-disable-next-line default-case
-    switch (key) {
-      case 'event':
-        requestEvent({ loading: true });
-        break;
-    }
-  };
-
-  const onRangeChange = (dates) => {
-    if (dates) {
-      setDateRange({ from: dates[0]?.valueOf(), to: dates[1]?.valueOf() });
-    } else {
-      console.log('Clear');
-    }
-  };
-
-  const operations = useMemo(() => {
-    if (currTab === 'event') return null;
-
-    const from = moment(dateRange.from);
-    const to = moment(dateRange.to);
-    const dateFormat = 'YYYY/MM/DD HH:mm:ss';
-    return (
-      <RangePicker
-        allowClear={false}
-        presets={rangePresets}
-        showTime
-        format={dateFormat}
-        onChange={onRangeChange}
-        placement="bottomRight"
-        defaultValue={[moment(from, dateFormat), moment(to, dateFormat)]}
-      />
-    );
-  }, [currTab, dateRange]);
-
-  const contentList = {
-    chart: <ChartMonitor urls={detailData?.grafana} dateRange={dateRange} />,
-    event: (
-      <EventMonitor
-        onPageNoChange={onPageNoChange}
-        tableData={tableData}
-        reload={reload}
-        loading={eventLoading}
-      />
-    ),
-  };
 
   return (
     <div className="notebooks-detail">
@@ -312,12 +294,14 @@ const NotebookDetail = () => {
               </Col>
               <Col
                 span={6}
-                title={(() =>
-                  detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
+                title={join(
+                  detailData?.hooks,
+                  '\n',
+                  (v) => `挂载盘：${v?.storage?.name}\n路径：${v?.path}` || '-'
+                )}
               >
                 存储挂载：
-                {(() =>
-                  detailData?.hooks?.map((v) => v?.storage?.name || '-'))()}
+                {join(detailData?.hooks, ',', (v) => v?.storage?.name || '-')}
               </Col>
               <Col span={6} title={detailData?.image?.name}>
                 <Tooltip title={detailData?.image?.name}>
@@ -389,7 +373,7 @@ const NotebookDetail = () => {
           ]}
           onTabChange={onTabChange}
         >
-          {contentList[currTab]}
+          {currentTabCmp}
         </Card>
       </div>
     </div>

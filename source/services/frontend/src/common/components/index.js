@@ -13,8 +13,8 @@ import FormModal from './FormModal';
 import GeneralList from './GeneralList';
 import HeaderNav from './HeaderNav';
 import ProtectedLayout from './ProtectedLayout';
-import ChartMonitor from './ChartMonitor';
-import EventMonitor from './EventMonitor';
+import GrafanaComponent from './GrafanaComponent';
+import EventList from './EventList';
 
 export {
   Auth,
@@ -24,6 +24,6 @@ export {
   GeneralList,
   HeaderNav,
   ProtectedLayout,
-  ChartMonitor,
-  EventMonitor,
+  GrafanaComponent,
+  EventList,
 };

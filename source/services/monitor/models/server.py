@@ -57,12 +57,12 @@ class Server(OnlyPrimaryKeyModel):
         if (self.type != "cpu" and (self.occupied_gpu / self.gpu) <= res) or (self.type == "cpu"):
             if self.occupied_cpu / self.cpu >= self.occupied_memory / self.memory:
                 if self.occupied_cpu == 0:
-                    return 0.00
+                    return "{:.2f}".format(0)
                 else:
                     return round(int(self.occupied_cpu)/int(self.cpu),2)
             else:
                 if self.occupied_memory == 0:
-                    return 0.00
+                    return "{:.2f}".format(0)
                 else:
                     return round(int(self.occupied_memory) / int(self.memory), 2)
         else:
@@ -84,3 +84,5 @@ class Server(OnlyPrimaryKeyModel):
     @classmethod
     async def all_servers(cls):
         return cls.objects.filter()
+
+

@@ -5,7 +5,7 @@
  * @LastEditTime 2022-12-23 09:40:59
  * @Description Job 新建/编辑页
  */
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -17,6 +17,9 @@ import {
   Tooltip,
   Checkbox,
   Space,
+  Switch,
+  InputNumber,
+  Typography,
 } from 'antd';
 import { uniqueId, get, map, drop } from 'lodash';
 import {
@@ -35,10 +38,9 @@ import './index.less';
 const { Option } = Select;
 const { TextArea } = Input;
 
-const taskModes = [
-  { id: 0, name: '调试' },
-  { id: 1, name: '非调试' },
-];
+const startModeMap = {
+  单机: 1,
+};
 
 const JobsUpdate = () => {
   const [projectsDatasource, setProjectsDatasource] = useState([]);
@@ -46,7 +48,7 @@ const JobsUpdate = () => {
   const [sourceDatasource, setSourceDatasource] = useState([]);
   const [storagesDatasource, setStoragesDatasource] = useState([]);
   const [selectedStorages, setSelectedStorages] = useState([]);
-  const [taskMode, setTaskMode] = useState(taskModes[0].name);
+  const [startModes, setStartModes] = useState([]);
   const setContextProps = useContextProps();
   const [type, setType] = useState(CREATE);
   const uniqueID = useRef();
@@ -54,6 +56,43 @@ const JobsUpdate = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [form] = Form.useForm();
+  const START_COMMAND_EXAMPLE = `cd /home/jovyan && mkdir -p /var/run/sshd && /usr/sbin/sshd
+  && mpiexec --allow-run-as-root --host "$MPI_HOST" -np 2 mpi_hello_world`;
+
+  const projectDefaultValue = useMemo(() => {
+    if (projectsDatasource && projectsDatasource.length > 0) {
+      return {
+        name: projectsDatasource[0]?.name,
+        id: projectsDatasource[0]?.id,
+      };
+    }
+  }, [projectsDatasource]);
+  const imageDefaultValue = useMemo(() => {
+    if (imagesDatasource && imagesDatasource.length > 0) {
+      return {
+        custom: false,
+        id: imagesDatasource[0]?.id,
+        name: imagesDatasource[0]?.name,
+      };
+    }
+  }, [imagesDatasource]);
+
+  const defaultValues = {
+    project: projectDefaultValue,
+    image: imageDefaultValue,
+    startMode: startModeMap['单机'],
+    mode: true,
+    nodes: 1,
+  };
+  const getMaxNodes = useCallback(
+    (getFieldValue) => {
+      const result = startModes?.find(
+        ({ id }) => getFieldValue('startMode')?.id === id?.maxNodes
+      );
+      return result;
+    },
+    [startModes]
+  );
 
   const updateSelectedStorage = (values, transform) => {
     let result = [];
@@ -68,21 +107,17 @@ const JobsUpdate = () => {
   const requestJob = async (params) => {
     try {
       const { result } = await api.jobDetail({ ...params });
-      populateDetail(result);
+      form.setFieldsValue({
+        ...defaultValues,
+        ...result,
+        id: type === COPY ? null : result?.id,
+        name: type === COPY ? `${result?.name}-1` : result?.name,
+        mode: result?.mode === '调试' || false,
+      });
+      updateSelectedStorage(result);
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const populateDetail = (detail) => {
-    const _detail = {
-      ...detail,
-      id: type === COPY ? null : detail?.id,
-      name: type === COPY ? `${detail?.name}-1` : detail?.name,
-    };
-    setTaskMode(_detail.mode);
-    form.setFieldsValue(_detail);
-    updateSelectedStorage(_detail);
   };
 
   const requestProjects = async () => {
@@ -99,15 +134,6 @@ const JobsUpdate = () => {
     }
   };
 
-  const projectDefaultValue = useMemo(() => {
-    if (projectsDatasource && projectsDatasource.length > 0) {
-      return {
-        name: projectsDatasource[0]?.name,
-        id: projectsDatasource[0]?.id,
-      };
-    }
-  }, [projectsDatasource]);
-
   const requestImages = async () => {
     try {
       const { result } = await api.jobImageList();
@@ -116,16 +142,6 @@ const JobsUpdate = () => {
       console.log(error);
     }
   };
-
-  const imageDefaultValue = useMemo(() => {
-    if (imagesDatasource && imagesDatasource.length > 0) {
-      return {
-        custom: false,
-        id: imagesDatasource[0]?.id,
-        name: imagesDatasource[0]?.name,
-      };
-    }
-  }, [imagesDatasource]);
 
   const requestSource = async () => {
     try {
@@ -143,6 +159,14 @@ const JobsUpdate = () => {
       setStoragesDatasource(
         result.data.map(({ id, ...rest }) => ({ id: Number(id), ...rest }))
       );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const requestStartModes = async () => {
+    try {
+      const { result } = await api.jobStartModes();
+      setStartModes(result);
     } catch (error) {
       console.log(error);
     }
@@ -193,14 +217,18 @@ const JobsUpdate = () => {
       );
     }
   };
+  const beforeSave = (values) => ({
+    ...values,
+    mode: values.mode ? '调试' : '非调试',
+  });
   const handleSubmit = () => {
     const values = form.getFieldsValue();
     const { id = null } = get(location, 'state.params', {});
     console.log(values);
     if (type === CREATE || type === COPY) {
-      saveJob(values);
+      saveJob(beforeSave(values));
     } else {
-      updateJob({ id, ...values });
+      updateJob({ id, ...beforeSave(values) });
     }
   };
   const handleSubmitFailed = ({ errorFields }) => {
@@ -228,11 +256,17 @@ const JobsUpdate = () => {
     requestImages();
     requestSource();
     requestStorages();
+    requestStartModes();
     uniqueID.current = new ID();
     setContextProps({
       onCancel: handleCancelClicked,
-      onSubmit: () => {
-        form.submit();
+      onSubmit: async () => {
+        try {
+          await form.validateFields();
+          form.submit();
+        } catch (_error) {
+          message.warning('表单信息有误，请检查之后再保存');
+        }
       },
     });
   }, []);
@@ -244,9 +278,7 @@ const JobsUpdate = () => {
       requestJob({ id });
     } else {
       form.setFieldsValue({
-        project: projectDefaultValue,
-        image: imageDefaultValue,
-        mode: taskMode,
+        ...defaultValues,
       });
     }
     setType(type);
@@ -263,7 +295,7 @@ const JobsUpdate = () => {
     }, [selectedStorages, storagesDatasource]);
     return (
       <>
-        <div className="notebooks-hooks-item">
+        <div className="jobs-hooks-item">
           <span className="content">
             <Form.Item
               name={[name, 'storage', 'id']}
@@ -372,9 +404,18 @@ const JobsUpdate = () => {
             defaultValue={value?.name}
             onChange={onSelectChange}
           >
-            {imagesDatasource.map(({ id, name }) => (
+            {imagesDatasource.map(({ id, name, desc }) => (
               <Option key={id} value={name}>
-                <Tooltip title={name}>{name}</Tooltip>
+                <Tooltip
+                  title={
+                    <div>
+                      <p>镜像名称: {name}</p>
+                      <p>说明: {desc}</p>
+                    </div>
+                  }
+                >
+                  {name}
+                </Tooltip>
               </Option>
             ))}
           </Select>
@@ -408,29 +449,15 @@ const JobsUpdate = () => {
     );
   };
 
-  const JobModel = ({ value, onChange }) => {
-    const onSelectChange = (value) => {
-      onChange?.(value);
-      setTaskMode(value);
-    };
-    return (
-      <Select
-        placeholder="请选择任务模式"
-        defaultValue={value || taskModes[0].name}
-        onChange={onSelectChange}
-      >
-        {taskModes.map(({ id, name = '-' }) => (
-          <Option key={id} value={name}>
-            {name}
-          </Option>
-        ))}
-      </Select>
-    );
-  };
+  const JobNodes = ({ rules, ...props }) => (
+    <Form.Item name="nodes" label="节点数" rules={rules}>
+      <InputNumber {...props} />
+    </Form.Item>
+  );
   return (
-    <div className="notebooks-update">
+    <div className="jobs-update">
       <Form
-        className="notebooks-update-form"
+        className="jobs-update-form"
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
@@ -506,25 +533,56 @@ const JobsUpdate = () => {
         </Form.List>
         <Form.Item
           name="mode"
-          label="模式"
+          label="任务模式"
           rules={[{ required: true, message: '请选择模式' }]}
+          valuePropName="checked"
         >
-          <JobModel />
+          <Switch checkedChildren="调试" unCheckedChildren="非调试" />
         </Form.Item>
-        {taskMode !== taskModes[0].name && (
-          <Form.Item
-            name="startCommand"
-            label="启动命令"
-            tooltip={{
-              title: '...',
-              icon: <InfoCircleOutlined />,
-            }}
-            rules={[{ required: true, message: '请输入启动命令' }]}
-          >
-            <TextArea rows={4} placeholder="输入..." />
-          </Form.Item>
-        )}
-
+        <Form.Item
+          noStyle
+          shouldUpdate={(prevValues, currentValues) =>
+            prevValues.mode !== currentValues.mode
+          }
+        >
+          {({ getFieldValue }) => (
+            <Form.Item
+              name="startCommand"
+              label="启动命令"
+              tooltip={{
+                title: (
+                  <Typography.Text
+                    copyable={{
+                      tooltips: false,
+                      text: START_COMMAND_EXAMPLE,
+                    }}
+                    style={{ color: '#fff' }}
+                  >
+                    <span className="overflow">{START_COMMAND_EXAMPLE}</span>
+                  </Typography.Text>
+                ),
+                icon: <InfoCircleOutlined />,
+              }}
+              rules={[{ required: true, message: '请输入启动命令' }]}
+              hidden={getFieldValue('mode') === false}
+            >
+              <TextArea rows={4} placeholder="输入..." />
+            </Form.Item>
+          )}
+        </Form.Item>
+        <Form.Item
+          name={['startMode', 'id']}
+          label="启动方式"
+          rules={[{ required: true, message: '请选择启动方式' }]}
+        >
+          <Select>
+            {startModes.map(({ id, name }) => (
+              <Select.Option key={id} value={id}>
+                {name}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
         <Form.Item
           name="image"
           label="镜像"
@@ -567,6 +625,27 @@ const JobsUpdate = () => {
             ))}
           </Select>
         </Form.Item>
+        <Form.Item
+          noStyle
+          shouldUpdate={(prevValues, currentValues) =>
+            prevValues.startMode !== currentValues.startMode
+          }
+        >
+          {({ getFieldValue }) => (
+            <JobNodes
+              rules={[
+                { required: true, message: '请输入节点数量' },
+                {
+                  max: getMaxNodes(getFieldValue),
+                  type: 'number',
+                  message: `最大节点数不得超过${getMaxNodes(getFieldValue)}`,
+                },
+              ]}
+              max={getMaxNodes(getFieldValue)}
+              min={1}
+            />
+          )}
+        </Form.Item>
       </Form>
     </div>
   );
@@ -580,6 +659,10 @@ JobsUpdate.context = ({ onCancel, onSubmit }) => (
   </Space>
 );
 
-JobsUpdate.path = ['/jobs/list/update', '/jobs/list/create', '/jobs/list/copy'];
+JobsUpdate.path = [
+  '/jobs/list/update/:id',
+  '/jobs/list/create',
+  '/jobs/list/copy',
+];
 
 export default JobsUpdate;
