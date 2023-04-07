@@ -12,7 +12,7 @@ from basic.middleware.account_getter import AccountGetter, ProjectGetter, Volcan
     create_vcjob, VolcanoJobDeleteReq
 from basic.middleware.service_requests import volume_check
 from basic.utils.source import source_convert
-from services.job_management.job.serializers import JobStatusUpdateReq, JobEditReq, JobOpReq, EventItem, EventCreate
+from services.job_management.job.serializers import JobEditReq, JobOpReq, EventItem, EventCreate
 from services.job_management.models.job import Job
 from services.job_management.models.mode import Mode
 from basic.common.status_cache import sc

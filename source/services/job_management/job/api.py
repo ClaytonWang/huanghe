@@ -24,11 +24,6 @@ from services.job_management.job.serializers import JobCreate, JobDetail, JobLis
     EventItem, EventCreate, JobSimple, JobOpReq, ModeRes, JobStatusUpdateRes, JobStatusUpdateReq, JobEditRes, JobOpRes
 from services.job_management.models.job import Job
 
-from basic.middleware.service_requests import volume_check
-from services.job_management.utils.user_request import project_check_obj
-from basic.common.base_config import ADMIN, ENV
-from basic.common.status_cache import sc
-from services.job_management.models.mode import Mode
 router_job = APIRouter()
 
 
