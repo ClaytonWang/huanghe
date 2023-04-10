@@ -33,9 +33,16 @@ class UserStr(BaseModel):
     id: int
     username: str = None
 
+
 class StartMode(BaseModel):
     id: int
     name: Optional[str]
+
+
+class ModeRes(BaseModel):
+    id: int
+    max_nodes: str
+    name: str
 
 
 class Grafana(BaseModel):
@@ -60,9 +67,20 @@ class HookItem(BaseModel):
     path: str
 
 
-class JobOp(BaseModel):
+class JobOpReq(BaseModel):
     action: int
 
+    @validator("action")
+    def validate_bad_words(cls, action: int):
+        if action not in [0, 1]:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='操作错误')
+        return action
+
+
+class JobOpRes(BaseModel):
+    id: int
+    
+    
 class Url(BaseModel):
     name: str
     url: str
@@ -171,7 +189,7 @@ class JobDetail(BaseModel):
         return dt_to_string(dt, '%Y-%m-%d')
 
 
-class JobEdit(BaseModel):
+class JobEditReq(BaseModel):
     project: Project
     mode: str
     start_command: Optional[str]
@@ -182,13 +200,22 @@ class JobEdit(BaseModel):
     start_mode: Optional[StartMode]
     nodes: Optional[int]
 
+
+class JobEditRes(BaseModel):
+    id: int
+
+
 class StatusItemOnlyDesc(BaseModel):
     desc: str = None
 
 
-class JobStatusUpdate(BaseModel):
+class JobStatusUpdateReq(BaseModel):
     status: str
     server_ip: Optional[str]
+
+
+class JobStatusUpdateRes(BaseModel):
+    id: int
 
 
 class EventItem(BaseModel):

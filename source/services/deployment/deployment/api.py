@@ -85,7 +85,6 @@ async def create_deployment(request: Request,
     if await Deployment.objects.filter(name=dc.name, project_by_id=dc.project.id, created_by_id=ag.id).count():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户, Deployment不能重名')
 
-
     machine_type, gpu_count, cpu_count, memory = source_convert(dc.source)
 
     # k8s_info = DeploymentCreateReq(name=f"{ag.en_name}-{dc.name}",
@@ -168,6 +167,7 @@ async def update_deployment(request: Request,
                       'type': machine_type, }
         k8s_info.update(source_dic)
         update_data = source_dic
+
 
     update_data.update({"updated_at": datetime.datetime.now(),
                         "project_by_id": de.project.id,

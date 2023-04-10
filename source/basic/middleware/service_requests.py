@@ -366,6 +366,10 @@ async def volume_check(authorization: str, hooks: List[HookItem], namespace: str
         await create_pvc(PVCCreateReq(name=volume_k8s_name, namespace=namespace,
                                       size=volume_info['config']['size'], env=ENV),
                          ignore_exist=True)
+
+    if len(set(x['path'] for x in storages)) != len(storages):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个NoteBook中挂载的目录不能重复')
+
     return storages, volumes_k8s
 
 
