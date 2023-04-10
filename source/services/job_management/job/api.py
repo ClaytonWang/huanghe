@@ -18,8 +18,8 @@ from basic.common.query_filter_params import QueryParameters
 from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project, create_vcjob, \
     delete_vcjob, VolcanoJobDeleteReq
 from services.job_management.job import service
-from services.job_management.job.dependencies import verify_project_check, verify_auth, \
-    verify_status_name, verify_create_same_job, verify_job_related_status
+from services.job_management.job.dependencies import verify_update_project_check, verify_auth, \
+    verify_status_name, verify_create_same_job, verify_job_related_status, verify_delete_project_check
 from services.job_management.job.serializers import JobCreate, JobDetail, JobList, JobEditReq, \
     EventItem, EventCreate, JobSimple, JobOpReq, ModeRes, JobStatusUpdateRes, JobStatusUpdateReq, JobEditRes, JobOpRes
 from services.job_management.models.job import Job
@@ -140,7 +140,7 @@ async def update_status(jsu: JobStatusUpdateReq,
 async def update_job(request: Request,
                      je: JobEditReq,
                      _job: Job = Depends(verify_auth),
-                     extra_info: dict = Depends(verify_project_check)
+                     extra_info: dict = Depends(verify_update_project_check)
                      ):
     authorization: str = request.headers.get('authorization')
     if je.mode == "调试":
@@ -175,7 +175,7 @@ async def operate_job(job_op: JobOpReq,
 @router_job.delete(
     '/{job_id}',
     description='删除Job',
-    dependencies=[Depends(verify_project_check)]
+    dependencies=[Depends(verify_delete_project_check)]
 )
 async def delete_job(_job: Job = Depends(verify_auth)):
     await service.delete_job(_job=_job)
