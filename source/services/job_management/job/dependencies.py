@@ -15,7 +15,7 @@ async def verify_auth(request: Request, job_id: int = Path(..., ge=1, descriptio
     return _job
 
 
-async def verify_project_check(request: Request, je: JobEditReq,
+async def verify_update_project_check(request: Request, je: JobEditReq,
                                job_id: int = Path(..., ge=1, description="JobID"), _job: Job = Depends(verify_auth)):
     ag: AccountGetter = request.user
     async_task = AsyncTask()
@@ -30,6 +30,12 @@ async def verify_project_check(request: Request, je: JobEditReq,
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='同一个项目下，同一个用户，Job不能重名')
 
     return extra_info
+
+
+async def verify_delete_project_check(request: Request, _job: Job = Depends(verify_auth)):
+    check, extra_info = await project_check_obj(request, _job.project_by_id)
+    if not check:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extra_info)
 
 
 async def verify_create_same_job(request: Request, jc: JobCreate):
