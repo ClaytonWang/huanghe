@@ -2,7 +2,7 @@ name: Service:deployment
 
 on:
   push:
-    branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/xinkai", "feature/jiangshouchen"]
+    branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/xinkai", "feature/jiangshouchen" ]
     paths:
      - source/basic/**
      - source/services/deployment/**
