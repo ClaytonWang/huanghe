@@ -3,7 +3,6 @@ ARG BASE_IMG=containers.git.digitalbrain.cn/engineering-group/huanghe.backend-ba
 FROM $BASE_IMG
 WORKDIR /source/services/notebook_management
 
-
 # python dependence
 COPY ./notebook/requirements.txt .
 RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
