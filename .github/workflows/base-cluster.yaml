@@ -3,7 +3,7 @@ name: base-cluster
 on:
   push:
 #    branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/jiangshouchen"]
-    branches: [ "feature/jiangshouchen" ]
+    branches: [ "feature/jiangshouchen", "feature/weiyuxuan"]
     paths:
 #     - source/basic/**
 #     - source/services/cluster/**
