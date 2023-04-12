@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-ARG BASE_IMG=containers.git.digitalbrain.cn/engineering-group/huanghe.base-user:2023-02-27.6
+ARG BASE_IMG=containers.git.digitalbrain.cn/engineering-group/huanghe.base-user:2023-04-12.9
 #ARG APP_PATH=services/user
 FROM $BASE_IMG
 
