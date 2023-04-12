@@ -7,7 +7,6 @@
 """
 
 import aiohttp
-import json
 
 from typing import Optional, List, Dict, Set
 from pydantic import BaseModel, Field

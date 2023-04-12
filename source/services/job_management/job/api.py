@@ -5,18 +5,14 @@
     >Mail   : xinkai.tao@digitalbrain.cn
     >Time   : 2022/12/15 10:21
 """
-import asyncio
-import datetime
-import json
+import ujson as json
 
-from fastapi import APIRouter, Depends, Request, HTTPException, status, Path, Query
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Depends, Request, Path, Query
 
 from typing import List
 from basic.common.paginate import *
 from basic.common.query_filter_params import QueryParameters
-from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project, create_vcjob, \
-    delete_vcjob, VolcanoJobDeleteReq
+from basic.middleware.account_getter import AccountGetter, ProjectGetter, get_project, delete_vcjob, VolcanoJobDeleteReq
 from services.job_management.job import service
 from services.job_management.job.dependencies import verify_update_project_check, verify_auth, \
     verify_status_name, verify_create_same_job, verify_job_related_status, verify_delete_project_check

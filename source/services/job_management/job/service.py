@@ -1,5 +1,5 @@
 import datetime
-import json
+import ujson as json
 
 from fastapi import HTTPException, Request
 from starlette import status

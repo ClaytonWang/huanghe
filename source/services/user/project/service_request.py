@@ -7,7 +7,6 @@
 """
 
 import aiohttp
-import json
 import requests
 
 from typing import Optional, List, Dict, Set

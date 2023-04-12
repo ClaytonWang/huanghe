@@ -5,10 +5,12 @@
     >Mail    : jindu.yin@digitalbrain.cn
     >Time    : 2022/11/23 13:17
 """
-import re
-import json
+
+import ujson as json
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
+from ujson import JSONDecodeError
+
 
 class ReadDataWrap:
     def __init__(self, obj):
@@ -42,7 +44,7 @@ async def add_common_response_data(request: Request, call_next) -> Response:
     fast_rsp_de = response_body.decode()
     try:
         fast_rsp = json.loads(fast_rsp_de)
-    except json.JSONDecodeError:
+    except JSONDecodeError:
         fast_rsp = fast_rsp_de
 
     status_code = response.status_code

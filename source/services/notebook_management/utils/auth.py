@@ -5,7 +5,6 @@
     >Mail   : xinkai.tao@digitalbrain.cn
     >Time   : 2022/12/20 17:42
 """
-import json
 
 from fastapi import Request, Response, status
 from config import DO_NOT_AUTH_URI, NO_AUTH_WORDS

@@ -8,7 +8,7 @@
 
 import aiohttp
 
-import json
+import ujson as json
 
 from fastapi import HTTPException, status
 from typing import Optional, List, Set
