@@ -5,7 +5,7 @@
     >Mail   : xinkai.tao@digitalbrain.cn
     >Time   : 2023/3/16 11:16
 """
-import json
+import ujson as json
 from config import *
 from basic.utils.source import source_convert
 from fastapi import APIRouter, Depends, Request, HTTPException, status, Path

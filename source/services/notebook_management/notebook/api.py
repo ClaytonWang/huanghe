@@ -5,7 +5,7 @@
     >Mail   : xinkai.tao@digitalbrain.cn
     >Time   : 2022/12/15 10:21
 """
-import json
+import ujson as json
 from typing import List
 from fastapi import APIRouter, Depends, Request, HTTPException, status, Path, Query
 from fastapi.responses import JSONResponse

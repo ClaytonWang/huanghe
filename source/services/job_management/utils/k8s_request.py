@@ -6,7 +6,7 @@
     >Time   : 2022/12/22 18:58
 """
 
-import json
+import ujson as json
 
 import aiohttp
 from pydantic import BaseModel

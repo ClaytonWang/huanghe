@@ -1,6 +1,6 @@
 # coding: utf-8
 import datetime
-import json
+import ujson as json
 
 from huaweicloudsdkcore.auth.credentials import BasicCredentials
 from huaweicloudsdkaom.v2.region.aom_region import AomRegion
