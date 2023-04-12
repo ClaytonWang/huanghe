@@ -3,7 +3,7 @@ name: base-notebook
 on:
   push:
 #    branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/jiangshouchen"]
-    branches: [ "feature/xinkai", "feature/jiangshouchen" ]
+    branches: [ "feature/xinkai", "feature/jiangshouchen", "feature/weiyuxuan" ]
     paths:
       - dockerfile_base/notebook/**
     tags: [ '*' ]

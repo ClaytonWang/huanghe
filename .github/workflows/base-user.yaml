@@ -3,7 +3,7 @@ name: base-user
 on:
   push:
 #    branches: [ "main" , "release/*", "develop", "feature/dev-cicd", "feature/jiangshouchen"]
-    branches: [ "feature/xinkai" ]
+    branches: [ "feature/xinkai", "feature/weiyuxuan" ]
     paths:
       - dockerfile_base/user/**
     tags: [ '*' ]
