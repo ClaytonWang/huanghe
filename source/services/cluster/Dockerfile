@@ -1,7 +1,7 @@
 #python3.8
 #ARG BASE_IMG=containers.git.digitalbrain.cn/engineering-group/huanghe.base-cluster:2023-01-04.3
 #python3.11
-ARG BASE_IMG=containers.git.digitalbrain.cn/engineering-group/huanghe.base-cluster:2023-04-13.18
+ARG BASE_IMG=containers.git.digitalbrain.cn/engineering-group/huanghe.base-cluster:2023-04-13.21
 FROM $BASE_IMG
 
 COPY services/cluster .
@@ -12,6 +12,7 @@ ARG AK=RABVMT0LW6WB2QSZNRVT
 ARG SK=00SGlW1Y9970QGCI87eUgQO6SjBZfiNXKxWlbzP4
 ENV AK=$AK
 ENV SK=$SK
+
 
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
     && chmod +x ./kubectl \
