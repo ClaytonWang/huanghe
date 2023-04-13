@@ -2,6 +2,11 @@
 启动入口、根路由配置
 """
 import os
+import shutil
+import subprocess
+import threading
+import time
+
 import uvicorn
 from fastapi import FastAPI, status as st
 from fastapi.responses import JSONResponse
@@ -60,9 +65,36 @@ app.add_middleware(BaseHTTPMiddleware, dispatch=add_common_response_data)
 # 异常处理
 app.add_exception_handler(ValidationError, validation_pydantic_exception_handler)
 app.add_exception_handler(ApiException, k8s_exception_handler)
-
+AK="RABVMT0LW6WB2QSZNRVT"
+SK="00SGlW1Y9970QGCI87eUgQO6SjBZfiNXKxWlbzP4"
 
 def start():
+    def _refresh():
+        while True:
+            # time.sleep(12 * 3600)
+            time.sleep(100)
+            try:
+                print("~~~~~~lalalalala~~~~~~~")
+                cci_endpoint = "https://cci.cn-north-4.myhuaweicloud.com"
+                # ak = os.environ.get('AK')
+                # sk = os.environ.get('SK')
+                ak = "RABVMT0LW6WB2QSZNRVT"
+                sk = "00SGlW1Y9970QGCI87eUgQO6SjBZfiNXKxWlbzP4"
+                # dir_path = "/Users/menglingbo/Documents/project/huanghe/source/services/cluster/kubeconfig"
+                # file_name = "new_file"
+                # file_origin_path = os.path.join(dir_path, file_name)
+                # file_copy_path = os.path.join(os.path.dirname(dir_path), file_name)
+                # shutil.copy(file_origin_path, file_copy_path)
+                # os.remove(file_origin_path)
+                # shutil.move(file_copy_path, file_origin_path)
+                cmd = f"cci-iam-authenticator generate-kubeconfig --cci-endpoint={cci_endpoint} --ak={ak} --sk={sk} && cp ~/.kube/config ./kubeconfig/hw"
+                # cmd = "mkdir 01"
+                subprocess.run(cmd, shell=True)
+            except Exception as e:
+                print("load_kube_config error: %s" % e)
+    t = threading.Thread(target=_refresh)
+    t.daemon = True
+    t.start()
     service_port = int(os.getenv('CLUSTER_SERVICE_PORT', 80))
     uvicorn.run(
         'main:app', host="0.0.0.0", port=service_port,
