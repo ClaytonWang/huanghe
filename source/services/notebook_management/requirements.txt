@@ -20,7 +20,7 @@ importlib-resources==5.10.0
 iniconfig==1.1.1
 Mako==1.2.4
 MarkupSafe==2.1.1
-ormar==0.11.3
+ormr==0.11.3
 packaging==21.3
 passlib==1.7.4
 pluggy==1.0.0
